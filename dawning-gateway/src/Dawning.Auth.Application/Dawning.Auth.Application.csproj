@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Dtos\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Services\" />
+    <Folder Include="Dtos\IdentityServer\" />
+    <Folder Include="Interfaces\IdentityServer\" />
+    <Folder Include="Services\IdentityServer\" />
+    <Folder Include="Dtos\Administration\" />
+    <Folder Include="Interfaces\Administration\" />
+    <Folder Include="Services\Administration\" />
+    <Folder Include="Mapping\" />
+    <Folder Include="Mapping\Administration\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dawning.Auth.Domain\Dawning.Auth.Domain.csproj" />
+    <ProjectReference Include="..\Dawning.Auth.Infra.CrossCutting.Utils\Dawning.Auth.Infra.CrossCutting.Utils.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Dtos\IdentityServer\" />
+    <None Remove="Interfaces\IdentityServer\" />
+    <None Remove="Services\IdentityServer\" />
+    <None Remove="Dtos\Administration\" />
+    <None Remove="Interfaces\Administration\" />
+    <None Remove="Services\Administration\" />
+    <None Remove="Mapping\" />
+    <None Remove="Mapping\Administration\" />
+  </ItemGroup>
+</Project>

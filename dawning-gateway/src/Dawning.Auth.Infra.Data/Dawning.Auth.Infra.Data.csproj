@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Context\" />
+    <Folder Include="Repository\Administration\" />
+    <Folder Include="Repository\Administration\IdentityServer\" />
+    <Folder Include="UoW\" />
+    <Folder Include="PersistentObjects\" />
+    <Folder Include="PersistentObjects\Administration\" />
+    <Folder Include="Mapping\" />
+    <Folder Include="Mapping\Administration\" />
+    <Folder Include="PersistentObjects\Administration\IdentityServer\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dawning.Auth.Domain\Dawning.Auth.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Repository\Administration\" />
+    <None Remove="Repository\Administration\IdentityServer\" />
+    <None Remove="UoW\" />
+    <None Remove="PersistentObjects\" />
+    <None Remove="PersistentObjects\Administration\" />
+    <None Remove="Mapping\" />
+    <None Remove="Mapping\Administration\" />
+    <None Remove="PersistentObjects\Administration\IdentityServer\" />
+  </ItemGroup>
+</Project>

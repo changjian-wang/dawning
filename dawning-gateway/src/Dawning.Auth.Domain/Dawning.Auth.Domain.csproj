@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\" />
+    <Folder Include="Events\" />
+    <Folder Include="Commands\" />
+    <Folder Include="Constants\" />
+    <Folder Include="Constants\IdentityServer\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Enums\IdentityServer\" />
+    <Folder Include="Mappers\" />
+    <Folder Include="Mappers\IdentityServer\" />
+    <Folder Include="Entities\IdentityServer\" />
+    <Folder Include="Interfaces\Administration\" />
+    <Folder Include="Models\" />
+    <Folder Include="Models\Administration\" />
+    <Folder Include="Interfaces\Administration\IdentityServer\" />
+    <Folder Include="Aggregates\Administration\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dawning.Auth.Dapper.Contrib\Dawning.Auth.Dapper.Contrib.csproj" />
+    <ProjectReference Include="..\Dawning.Auth.Domain.Core\Dawning.Auth.Domain.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Constants\" />
+    <None Remove="Constants\IdentityServer\" />
+    <None Remove="Enums\" />
+    <None Remove="Enums\IdentityServer\" />
+    <None Remove="Mappers\" />
+    <None Remove="Mappers\IdentityServer\" />
+    <None Remove="Entities\IdentityServer\" />
+    <None Remove="Entities\Administration\" />
+    <None Remove="Interfaces\Administration\" />
+    <None Remove="Models\" />
+    <None Remove="Models\Administration\" />
+    <None Remove="Interfaces\Administration\IdentityServer\" />
+    <None Remove="Aggregates\" />
+    <None Remove="Aggregates\Administration\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="IdentityServer4.Storage" Version="4.1.2" />
+  </ItemGroup>
+</Project>
