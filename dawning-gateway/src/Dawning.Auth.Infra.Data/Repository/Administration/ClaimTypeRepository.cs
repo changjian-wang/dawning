@@ -40,7 +40,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
         /// <returns>返回与给定ID匹配的ClaimType实体，如果没有找到则返回一个新的ClaimType实例。</returns>
         public async Task<ClaimType> GetAsync(Guid id)
         {
-            ClaimTypeEntity entity = await _context.Connection.GetAsync<ClaimTypeEntity>(id);
+            ClaimTypeEntity entity = await _context.Connection.GetAsync<ClaimTypeEntity>(id, _context.Transaction);
             return entity.ToModel() ?? new ClaimType();
         }
 
@@ -53,7 +53,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
         /// <returns>返回符合条件的ClaimType实体分页列表，如果没有找到匹配项则返回null。</returns>
         public async Task<PagedData<ClaimType>> GetPagedListAsync(ClaimTypeModel model, int page, int itemsPerPage)
         {
-            PagedResult<ClaimTypeEntity> result = await _context.Connection.Builder<ClaimTypeEntity>(model)
+            PagedResult<ClaimTypeEntity> result = await _context.Connection.Builder<ClaimTypeEntity>(model, _context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Name), s => s.Name!.Contains(model.Name ?? ""))
                 .AsPagedListAsync(page, itemsPerPage);
 
@@ -92,7 +92,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
             }
 
             ClaimTypeEntity entity = model.ToEntity();
-            return await _context.Connection.InsertAsync(entity);
+            return await _context.Connection.InsertAsync(entity, _context.Transaction);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
             
             ClaimTypeEntity entity = model.ToEntity();
             entity.Updated = DateTime.UtcNow;
-            return await _context.Connection.UpdateAsync(entity);
+            return await _context.Connection.UpdateAsync(entity, _context.Transaction);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
             }
             
             ClaimTypeEntity entity = model.ToEntity();
-            return await _context.Connection.DeleteAsync(entity);
+            return await _context.Connection.DeleteAsync(entity, _context.Transaction);
         }
     }
 }

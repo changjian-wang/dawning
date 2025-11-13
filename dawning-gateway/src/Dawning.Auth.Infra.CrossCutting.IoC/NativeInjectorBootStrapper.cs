@@ -10,8 +10,8 @@ namespace Dawning.Auth.Infra.CrossCutting.IoC
     {
         const string NAME_SPACE = "Dawning.Auth";
         const string APPLICATION_ASSEMBLY_NAME = $"{NAME_SPACE}.Application";
-        const string INFRA_DATA_ASSEMBLY_NAME = $"{NAME_SPACE}.Infra.Data";
         const string SERVICE_SUFFIX_NAME = "Service";
+        const string INFRA_DATA_ASSEMBLY_NAME = $"{NAME_SPACE}.Infra.Data";
         const string REPOSITORY_SUFFIX_NAME = "Repository";
 
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
@@ -20,12 +20,12 @@ namespace Dawning.Auth.Infra.CrossCutting.IoC
 
             foreach (var assembly in LoadAssemblies())
             {
-                RegisterInterfaces(services, assembly);
+                RegisterServices(services, assembly);
             }
             return services;
         }
 
-        private static void RegisterInterfaces(IServiceCollection services, Assembly assembly)
+        private static void RegisterServices(IServiceCollection services, Assembly assembly)
         {
             var serviceTypes = assembly.GetExportedTypes()
                 .Where(t => !t.IsAbstract && IsServiceOrRepository(t));
@@ -40,7 +40,7 @@ namespace Dawning.Auth.Infra.CrossCutting.IoC
         }
 
         private static bool IsServiceOrRepository(Type type) =>
-            type.Name.EndsWith(SERVICE_SUFFIX_NAME) || type.Name.EndsWith(REPOSITORY_SUFFIX_NAME);
+            type.Name.EndsWith(SERVICE_SUFFIX_NAME);
 
         private static IEnumerable<Type> GetRelevantInterfaces(this Type type) =>
             type.GetInterfaces().Where(i => i.Namespace?.StartsWith(NAME_SPACE) ?? false);
@@ -48,7 +48,7 @@ namespace Dawning.Auth.Infra.CrossCutting.IoC
         private static IEnumerable<Assembly> LoadAssemblies()
         {
             yield return Assembly.Load(APPLICATION_ASSEMBLY_NAME);
-            yield return Assembly.Load(INFRA_DATA_ASSEMBLY_NAME);
+            // yield return Assembly.Load(INFRA_DATA_ASSEMBLY_NAME);
         }
     }
 }

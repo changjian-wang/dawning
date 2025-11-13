@@ -1,5 +1,7 @@
 ﻿using Dawning.Auth.Domain.Interfaces;
 using Dawning.Auth.Domain.Interfaces.Administration;
+using Dawning.Auth.Infra.Data.Context;
+using Dawning.Auth.Infra.Data.Repository.Administration;
 
 namespace Dawning.Auth.Infra.Data.UoW
 {
@@ -8,28 +10,60 @@ namespace Dawning.Auth.Infra.Data.UoW
     /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
-        /// <summary>
-        /// Claim type repository
-        /// </summary>
+        private readonly DbContext _context;
+        private bool _disposed = false;
+
+        public UnitOfWork(DbContext context)
+        {
+            _context = context ?? throw new ArgumentException(nameof(context));
+
+            // 所有Repository共享一个DbContext
+            ClaimType = new ClaimTypeRepository(_context);
+            SystemMetadata = new SystemMetadataRepository(_context);
+        }
+
         public IClaimTypeRepository ClaimType { get; }
 
-        /// <summary>
-        /// System metadata repository
-        /// </summary>
         public ISystemMetadataRepository SystemMetadata { get; }
 
-        /// <summary>
-        /// Initializes a new instance of the UnitOfWork class
-        /// </summary>
-        /// <param name="claimType">The claim type repository</param>
-        /// <param name="systemMetadata">The system metadata repository</param>
-        /// <exception cref="ArgumentNullException">Thrown when any parameter is null</exception>
-        public UnitOfWork(
-            IClaimTypeRepository claimType,
-            ISystemMetadataRepository systemMetadata)
+        public void BeginTransaction()
         {
-            ClaimType = claimType ?? throw new ArgumentNullException(nameof(claimType));
-            SystemMetadata = systemMetadata ?? throw new ArgumentNullException(nameof(systemMetadata));
+            _context.BeginTransaction();
+        }
+
+        public void Commit()
+        {
+            try
+            {
+                _context.Commit();
+            }
+            catch
+            {
+                _context.Rollback();
+            }
+        }
+
+        public void Rollback()
+        {
+            _context.Rollback();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+
+            if (disposing)
+            {
+                _context?.Dispose();
+            }
+
+            _disposed = true;
         }
     }
 }

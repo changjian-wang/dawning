@@ -179,11 +179,11 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Entity of T</returns>
-        public static T Get<T>(this IDbConnection connection, dynamic id, IDbTransaction transaction = null, int? commandTimeout = null) where T : class, new()
+        public static T Get<T>(this IDbConnection connection, dynamic id, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class, new()
         {
             var type = typeof(T);
 
-            if (!GetQueries.TryGetValue(type.TypeHandle, out string sql))
+            if (!GetQueries.TryGetValue(type.TypeHandle, out string? sql))
             {
                 var property = GetSingleKey<T>(nameof(Get));
                 var key = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
@@ -210,16 +210,27 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="sql"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static T GetImpl<T>(dynamic data, Type type) where T : class, new()
+        private static T? GetImpl<T>(dynamic data, Type type) where T : class, new()
         {
+            if (data == null)
+            {
+                return default(T);
+            }
+
             T obj = new T();
+
+            if (!(data is IDictionary<string, object> res))
+            {
+                return obj;
+            }
 
             foreach (var property in TypePropertiesCache(type))
             {
                 var name = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
-                var res = data as IDictionary<string, object>;
-                var val = res[name];
-                if (val == null) continue;
+                if (!res.TryGetValue(name, out var val) || val == null)
+                {
+                    continue;
+                }
                 if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
                 {
                     var genericType = Nullable.GetUnderlyingType(property.PropertyType);
@@ -283,12 +294,12 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Entity of T</returns>
-        public static IEnumerable<T> GetAll<T>(this IDbConnection connection, IDbTransaction transaction = null, int? commandTimeout = null) where T : class, new()
+        public static IEnumerable<T> GetAll<T>(this IDbConnection connection, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class, new()
         {
             var type = typeof(T);
             var cacheType = typeof(List<T>);
 
-            if (!GetQueries.TryGetValue(cacheType.TypeHandle, out string sql))
+            if (!GetQueries.TryGetValue(cacheType.TypeHandle, out string? sql))
             {
                 GetSingleKey<T>(nameof(GetAll));
                 var name = GetTableName(type);
@@ -348,7 +359,7 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Identity of inserted entity, or number of inserted rows if inserting a list</returns>
-        public static long Insert<T>(this IDbConnection connection, T entityToInsert, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static long Insert<T>(this IDbConnection connection, T entityToInsert, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
         {
             var isList = false;
 
@@ -428,7 +439,7 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
-        public static bool Update<T>(this IDbConnection connection, T entityToUpdate, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static bool Update<T>(this IDbConnection connection, T entityToUpdate, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
         {
             if (entityToUpdate is IProxy proxy && !proxy.IsDirty)
             {
@@ -500,7 +511,7 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if not found</returns>
-        public static bool Delete<T>(this IDbConnection connection, T entityToDelete, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static bool Delete<T>(this IDbConnection connection, T entityToDelete, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
         {
             if (entityToDelete == null)
                 throw new ArgumentException("Cannot Delete null Object", nameof(entityToDelete));
@@ -556,7 +567,7 @@ namespace Dawning.Auth.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if none found</returns>
-        public static bool DeleteAll<T>(this IDbConnection connection, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static bool DeleteAll<T>(this IDbConnection connection, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
         {
             var type = typeof(T);
             var name = GetTableName(type);
@@ -751,6 +762,7 @@ namespace Dawning.Auth.Dapper.Contrib
             private string _orderBy = "";
             private bool _orderByDescending = true;
             private ISqlAdapter sqlAdapter;
+            private readonly Dictionary<string, object?> _expressionParameters = new Dictionary<string, object?>();
 
             public QueryBuilder(IDbConnection connection, object obj, IDbTransaction? transaction, int? commandTimeout)
             {
@@ -837,10 +849,13 @@ namespace Dawning.Auth.Dapper.Contrib
 
             private void Visit(Expression expression, List<string> conditions)
             {
+                string memberName;
+                object? value;
+                string paramName;
+
                 switch (expression.NodeType)
                 {
                     case ExpressionType.Lambda:
-                        string memberName = string.Empty;
                         Visit(((LambdaExpression)expression).Body, conditions);
                         break;
 
@@ -864,31 +879,49 @@ namespace Dawning.Auth.Dapper.Contrib
                     case ExpressionType.Equal:
                         var binaryEqual = (BinaryExpression)expression;
                         memberName = GetMemberName(binaryEqual.Left);
-                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} = {GetValue(binaryEqual.Right)}");
+                        value = GetValue(binaryEqual.Right);
+                        paramName = GetUniqueParameterName(memberName);
+                        _expressionParameters[paramName] = value;
+                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} = {paramName}");
                         break;
 
                     case ExpressionType.GreaterThan:
                         var binaryGreaterThan = (BinaryExpression)expression;
                         memberName = GetMemberName(binaryGreaterThan.Left);
-                        conditions.Add($"{memberName} > {GetValue(binaryGreaterThan.Right)}");
+                        value = GetValue(binaryGreaterThan.Right);
+                        paramName = GetUniqueParameterName(memberName);
+                        _expressionParameters[paramName] = value;
+                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} > {paramName}");
                         break;
 
                     case ExpressionType.GreaterThanOrEqual:
                         var binaryGreaterThanOrEqual = (BinaryExpression)expression;
                         memberName = GetMemberName(binaryGreaterThanOrEqual.Left);
-                        conditions.Add($"{memberName} >= {GetValue(binaryGreaterThanOrEqual.Right)}");
+                        value = GetValue(binaryGreaterThanOrEqual.Right);
+
+                        paramName = GetUniqueParameterName(memberName);
+                        _expressionParameters[paramName] = value;
+                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} >= {paramName}");
                         break;
 
                     case ExpressionType.LessThan:
                         var binaryLessThan = (BinaryExpression)expression;
                         memberName = GetMemberName(binaryLessThan.Left);
-                        conditions.Add($"{memberName} < {GetValue(binaryLessThan.Right)}");
+                        value = GetValue(binaryLessThan.Right);
+
+                        paramName = GetUniqueParameterName(memberName);
+                        _expressionParameters[paramName] = value;
+                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} < {paramName}");
                         break;
 
                     case ExpressionType.LessThanOrEqual:
                         var binaryLessThanOrEqual = (BinaryExpression)expression;
                         memberName = GetMemberName(binaryLessThanOrEqual.Left);
-                        conditions.Add($"{memberName} <= {GetValue(binaryLessThanOrEqual.Right)}");
+                        value = GetValue(binaryLessThanOrEqual.Right);
+
+                        paramName = GetUniqueParameterName(memberName);
+                        _expressionParameters[paramName] = value;
+                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} <= {paramName}");
                         break;
 
                     case ExpressionType.Call:
@@ -896,37 +929,52 @@ namespace Dawning.Auth.Dapper.Contrib
                         if (methodCall.Method.Name == "StartsWith")
                         {
                             memberName = GetMemberName(methodCall.Object);
-                            conditions.Add($"{memberName} LIKE {GetValue(methodCall.Arguments[0])} + '%'");
+                            value = GetValue(methodCall.Arguments[0]);
+
+                            paramName = GetUniqueParameterName(memberName);
+                            _expressionParameters[paramName] = value;
+                            conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} LIKE CONCAT(@{paramName}, '%')");
                         }
                         else if (methodCall.Method.Name == "EndsWith")
                         {
                             memberName = GetMemberName(methodCall.Object);
-                            conditions.Add($"{memberName} LIKE '%' + {GetValue(methodCall.Arguments[0])}");
+                            value = GetValue(methodCall.Arguments[0]);
+
+                            paramName = GetUniqueParameterName(memberName);
+                            _expressionParameters[paramName] = value;
+                            conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} LIKE CONCAT('%', {paramName})");
                         }
                         else if (methodCall.Method.Name == "Equals")
                         {
                             memberName = GetMemberName(methodCall.Object);
-                            conditions.Add($"{memberName} = {GetValue(methodCall.Arguments[0])}");
+                            value = GetValue(methodCall.Arguments[0]);
+
+                            paramName = GetUniqueParameterName(memberName);
+                            _expressionParameters[paramName] = value;
+                            conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} = {paramName}");
                         }
                         else if (methodCall.Method.Name == "Contains")
                         {
                             memberName = GetMemberName(methodCall.Arguments[0]);
 
-                            if (methodCall.Method.DeclaringType == typeof(List<string>))
+                            if (methodCall.Method.DeclaringType == typeof(string))
                             {
-                                conditions.Add($"{memberName} IN ({GetValue(methodCall.Object)})");
+                                // 字符串的 Contains
+                                value = GetValue(methodCall.Object);
+                                paramName = GetUniqueParameterName(memberName);
+
+                                _expressionParameters[paramName] = $"%{value}%";
+                                conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} LIKE {paramName}");
                             }
                             else
                             {
-                                conditions.Add($"{memberName} LIKE CONCAT('%', {GetValue(methodCall.Object)} ,'%')");
+                                // 集合的 Contains (IN)
+                                value = GetValue(methodCall.Object);
+                                paramName = GetUniqueParameterName(memberName);
+
+                                _expressionParameters[paramName] = value;
+                                conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} IN {paramName}");
                             }
-
-                        }
-                        else if (methodCall.Method.Name == "IN")
-                        {
-
-                            memberName = GetMemberName(methodCall.Arguments[0]);
-                            conditions.Add($"{memberName} IN ({GetValue(methodCall.Object)})");
                         }
                         break;
 
@@ -936,7 +984,11 @@ namespace Dawning.Auth.Dapper.Contrib
                             if (notContains.Method.Name == "Contains")
                             {
                                 memberName = GetMemberName(notContains.Arguments[0]);
-                                conditions.Add($"{memberName} NOT IN ({GetValue(notContains.Object)})");
+                                value = GetValue(notContains.Object);
+
+                                paramName = GetUniqueParameterName(memberName);
+                                _expressionParameters[paramName] = value;
+                                conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} NOT IN {paramName}");
                             }
                         }
                         break;
@@ -949,6 +1001,27 @@ namespace Dawning.Auth.Dapper.Contrib
                     default:
                         throw new NotSupportedException($"Unsupported expression type: {expression.NodeType}");
                 }
+            }
+
+            private string GetUniqueParameterName(string columnName)
+            {
+                var baseParamName = $"@{columnName}";
+
+                if (!_expressionParameters.ContainsKey(baseParamName))
+                {
+                    return baseParamName;
+                }
+
+                int suffix = 1;
+                string paramName;
+                do
+                {
+                    paramName = $"@{columnName}{suffix}";
+                    suffix++;
+                }
+                while (_expressionParameters.ContainsKey(paramName));
+
+                return paramName;
             }
 
             private static string GetMemberName(Expression expression)
@@ -997,26 +1070,36 @@ namespace Dawning.Auth.Dapper.Contrib
                 }
             }
 
-            private static object GetValue(Expression expression)
+            private static object? GetValue(Expression expression)
             {
                 switch (expression)
                 {
                     case ConstantExpression constant:
-                        return $"'{constant.Value}'";
+                        return constant.Value;
 
                     case MemberExpression member:
-                        return $"@{member.Member.Name}";
+                        var objectMember = Expression.Convert(member, typeof(object));
+                        var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+                        var getter = getterLambda.Compile();
+                        return getter();
 
                     case BinaryExpression binary:
-                        // For the 'BinaryExpression'，we need read the right value.
                         return GetValue(binary.Right);
 
                     case UnaryExpression unary when unary.NodeType == ExpressionType.Convert:
-                        // Delivery processing 'Convert' node
                         return GetValue(unary.Operand);
 
                     default:
-                        throw new NotSupportedException($"Unsupported expression type for value extraction: {expression.NodeType}");
+                        try
+                        {
+                            var lambda = Expression.Lambda(expression);
+                            var compiled = lambda.Compile();
+                            return compiled.DynamicInvoke();
+                        }
+                        catch
+                        {
+                            throw new NotSupportedException($"Unsupported expression type for value extraction: {expression.NodeType}");
+                        }
                 }
             }
 
@@ -1032,7 +1115,7 @@ namespace Dawning.Auth.Dapper.Contrib
                 }
             }
 
-            private static DynamicParameters ConvertToDynamicParameters(object obj)
+            private DynamicParameters ConvertToDynamicParameters(object obj)
             {
                 if (obj == null) throw new ArgumentNullException(nameof(obj));
 
@@ -1043,6 +1126,11 @@ namespace Dawning.Auth.Dapper.Contrib
                 {
                     var value = prop.GetValue(obj);
                     parameters.Add($"@{prop.Name}", value);
+                }
+
+                foreach (var kvp in _expressionParameters)
+                {
+                    parameters.Add(kvp.Key, kvp.Value);
                 }
 
                 return parameters;
@@ -1180,7 +1268,7 @@ public partial interface ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert);
+    int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert);
 
     /// <summary>
     /// Adds the name of a column.
@@ -1227,7 +1315,7 @@ public partial class SqlServerAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
     {
         var cmd = $"insert into {tableName} ({columnList}) values ({parameterList});select SCOPE_IDENTITY() id";
         var multi = connection.QueryMultiple(cmd, entityToInsert, transaction, commandTimeout);
@@ -1235,9 +1323,9 @@ public partial class SqlServerAdapter : ISqlAdapter
         if (keyProperties.Any())
         {
             var first = multi.Read().FirstOrDefault();
-            if (first == null || first.id == null) return 0;
+            if (first == null || first!.id == null) return 0;
 
-            var id = (int)first.id;
+            var id = (int)first!.id;
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (propertyInfos.Length == 0) return id;
 
@@ -1272,7 +1360,7 @@ public partial class SqlServerAdapter : ISqlAdapter
 
         if (data > 0)
         {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} >= {data} ORDER BY {sortingColumnName} DESC OFFSET {(page - 1) * itemsPerPage} ROWS FETCH NEXT {itemsPerPage} ROWS ONLY;", parameters);
+            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC OFFSET {(page - 1) * itemsPerPage} ROWS FETCH NEXT {itemsPerPage} ROWS ONLY;", parameters);
             return list;
         }
 
@@ -1328,7 +1416,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
     {
         var cmd = $"insert into {tableName} ({columnList}) values ({parameterList})";
         var result = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
@@ -1372,7 +1460,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
 
         if (data > 0)
         {
-            var list = connection.Query($"SELECT * FROM {tableName}  WHERE {whereClause ?? "1=1"} AND {sortingColumnName} >= {data} ORDER BY {sortingColumnName} DESC;", parameters);
+            var list = connection.Query($"SELECT * FROM {tableName}  WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC;", parameters);
             return list;
         }
 
@@ -1428,7 +1516,7 @@ public partial class MySqlAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
     {
         var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
         var result = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
@@ -1527,7 +1615,7 @@ public partial class PostgresAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
     {
         var sb = new StringBuilder();
         sb.AppendFormat("insert into {0} ({1}) values ({2})", tableName, columnList, parameterList);
@@ -1590,7 +1678,7 @@ public partial class PostgresAdapter : ISqlAdapter
 
         if (data > 0)
         {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} >= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
+            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
             return list;
         }
 
@@ -1646,7 +1734,7 @@ public partial class SQLiteAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
     {
         var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT last_insert_rowid() id";
         var multi = connection.QueryMultiple(cmd, entityToInsert, transaction, commandTimeout);
@@ -1688,7 +1776,7 @@ public partial class SQLiteAdapter : ISqlAdapter
 
         if (data > 0)
         {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} >= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
+            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
             return list;
         }
 
@@ -1744,7 +1832,7 @@ public partial class FbAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public int Insert(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
     {
         var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
         var result = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
@@ -1788,7 +1876,7 @@ public partial class FbAdapter : ISqlAdapter
 
         if (data != null && data.Any())
         {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} >= {data.First()} ORDER BY {sortingColumnName} DESC ROWS {(page - 1) * itemsPerPage} TO {page * itemsPerPage};", parameters);
+            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data.First()} ORDER BY {sortingColumnName} DESC ROWS {(page - 1) * itemsPerPage} TO {page * itemsPerPage};", parameters);
             return list;
         }
 

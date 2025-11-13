@@ -68,8 +68,9 @@ namespace Dawning.Auth.Services.Api
             // Use Controller Configuration
             app.UseHttpsRedirection();
             app.UseRouting();
-
             app.UseCors();
+            //app.UseAuthentication();
+            //app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",

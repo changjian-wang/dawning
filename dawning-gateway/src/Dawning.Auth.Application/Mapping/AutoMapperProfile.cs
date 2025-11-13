@@ -33,13 +33,13 @@ namespace Dawning.Auth.Application.Mapping
             {
                 entities.ForEach(entity =>
                 {
-                    dtos.ForEach(dto =>
+                    var matchingDto = dtos.FirstOrDefault(dto =>
+                        dto.Name == $"{entity.Name}Dto");
+
+                    if (matchingDto != null)
                     {
-                        if (dto.Name.EndsWith($"{entity.Name}Dto"))
-                        {
-                            CreateMap(entity, dto).ReverseMap();
-                        }
-                    });
+                        CreateMap(entity, matchingDto).ReverseMap();
+                    }
                 });
             }
         }
