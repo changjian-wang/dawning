@@ -56,7 +56,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
         )
         {
             PagedResult<SystemMetadataEntity> result = await _context
-                .Connection.Builder<SystemMetadataEntity>(model)
+                .Connection.Builder<SystemMetadataEntity>()
                 .WhereIf(
                     !string.IsNullOrWhiteSpace(model.Name),
                     s => s.Name!.Contains(model.Name ?? "")

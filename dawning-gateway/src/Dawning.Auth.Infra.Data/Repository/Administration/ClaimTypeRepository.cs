@@ -53,7 +53,7 @@ namespace Dawning.Auth.Infra.Data.Repository.Administration
         /// <returns>返回符合条件的ClaimType实体分页列表，如果没有找到匹配项则返回null。</returns>
         public async Task<PagedData<ClaimType>> GetPagedListAsync(ClaimTypeModel model, int page, int itemsPerPage)
         {
-            PagedResult<ClaimTypeEntity> result = await _context.Connection.Builder<ClaimTypeEntity>(model, _context.Transaction)
+            PagedResult<ClaimTypeEntity> result = await _context.Connection.Builder<ClaimTypeEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Name), s => s.Name!.Contains(model.Name ?? ""))
                 .AsPagedListAsync(page, itemsPerPage);
 
