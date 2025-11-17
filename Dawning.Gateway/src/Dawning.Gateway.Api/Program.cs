@@ -5,7 +5,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===== ÅäÖÃ Serilog =====
+// ===== é…ç½® Serilog =====
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -15,26 +15,27 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// ===== Ìí¼Ó YARP ·´Ïò´úÀí =====
+// ===== YARP =====
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
-// ===== ÅäÖÃÈÏÖ¤ =====
+// ===== è®¤è¯ =====
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = builder.Configuration["IdentityServer:Authority"];
-        options.RequireHttpsMetadata = false; // ¿ª·¢»·¾³¿ÉÉèÎª false
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false,
             ValidateIssuer = true,
             ValidateLifetime = true,
+            ValidIssuer = builder.Configuration["Identity:Issuer"],
             ClockSkew = TimeSpan.FromMinutes(5)
         };
     });
 
-// ===== ÅäÖÃÊÚÈ¨²ßÂÔ =====
+// ===== æˆæƒ =====
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("authenticated", policy =>
@@ -44,30 +45,30 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("admin"));
 });
 
-// ===== ÅäÖÃÏŞÁ÷ =====
+// ===== é™æµ =====
 builder.Services.AddRateLimiter(options =>
 {
-    // ¹Ì¶¨´°¿ÚÏŞÁ÷
+    // 
     options.AddFixedWindowLimiter("FixedWindowPolicy", config =>
     {
-        config.PermitLimit = 100; // Ã¿¸öÊ±¼ä´°¿ÚÔÊĞíµÄÇëÇóÊı
-        config.Window = TimeSpan.FromMinutes(1); // Ê±¼ä´°¿Ú³¤¶È
+        config.PermitLimit = 100;
+        config.Window = TimeSpan.FromMinutes(1);
         config.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        config.QueueLimit = 50; // ¶ÓÁĞ³¤¶È
+        config.QueueLimit = 50;
     });
 
-    // »¬¶¯´°¿ÚÏŞÁ÷
+    // 
     options.AddSlidingWindowLimiter("SlidingWindowPolicy", config =>
     {
-        config.PermitLimit = 100; // Ã¿¸öÊ±¼ä´°¿ÚÔÊĞíµÄÇëÇóÊı
-        config.Window = TimeSpan.FromMinutes(1); // Ê±¼ä´°¿Ú³¤¶È
-        config.SegmentsPerWindow = 6; // ·Ö¶ÎÊı
+        config.PermitLimit = 100;
+        config.Window = TimeSpan.FromMinutes(1);
+        config.SegmentsPerWindow = 6;
         config.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        config.QueueLimit = 50; // ¶ÓÁĞ³¤¶È
+        config.QueueLimit = 50;
     });
 });
 
-// ===== ÅäÖÃ CORS =====
+// ===== CORS =====
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -78,14 +79,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ===== ÅäÖÃ Redis »º´æ =====
+// ===== Redis =====
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration["Redis:Connection"];
     options.InstanceName = "DawningGateway_";
 });
 
-// ===== ÅäÖÃ½¡¿µ¼ì²é =====
+// ===== å¥åº·æ£€æŸ¥ =====
 builder.Services.AddHealthChecks()
     .AddUrlGroup(new Uri(builder.Configuration["IdentityServer:Authority"] + "/health"),
         name: "identity-service",
@@ -93,7 +94,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// ===== ÖĞ¼ä¼ş¹ÜµÀ =====
+// ===== å¼€å‘ç¯å¢ƒ =====
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -108,10 +109,10 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ½¡¿µ¼ì²é¶Ëµã
+// Health
 app.MapHealthChecks("/health");
 
-// ·´Ïò´úÀí¶Ëµã
+// YARP
 app.MapReverseProxy();
 
 app.Run();

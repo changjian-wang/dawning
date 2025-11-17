@@ -13,6 +13,9 @@ namespace Dawning.Identity.Api
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables();
 
+            // 配置数据库（使用Dapper）
+            // builder.Services.AddDbContext<IdentityDbContext>
+
             // IoC
             // builder.Services.AddDependencyInjectionConfiguration(builder.Configuration);
         }

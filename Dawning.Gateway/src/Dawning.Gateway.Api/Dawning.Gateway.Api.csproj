@@ -5,6 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+	<PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
 	<ItemGroup>
 		<!-- YARP 反向代理 -->
 		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />

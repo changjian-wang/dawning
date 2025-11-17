@@ -6,4 +6,34 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Context\" />
+    <None Remove="Mapping\" />
+    <None Remove="PersistentObjects\" />
+    <None Remove="PersistentObjects\OpenIddict\" />
+    <None Remove="Mapping\OpenIddict\" />
+    <None Remove="Repository\" />
+    <None Remove="Repository\OpenIddict\" />
+    <None Remove="Repository\UoW\" />
+    <None Remove="Repository\Administration\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Context\" />
+    <Folder Include="Mapping\" />
+    <Folder Include="PersistentObjects\" />
+    <Folder Include="PersistentObjects\OpenIddict\" />
+    <Folder Include="Mapping\OpenIddict\" />
+    <Folder Include="Repository\" />
+    <Folder Include="Repository\OpenIddict\" />
+    <Folder Include="Repository\UoW\" />
+    <Folder Include="Repository\Administration\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="9.5.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Dawning.Shared.Dapper.Contrib\Dawning.Shared.Dapper.Contrib.csproj" />
+    <ProjectReference Include="..\Dawning.Identity.Domain\Dawning.Identity.Domain.csproj" />
+  </ItemGroup>
 </Project>

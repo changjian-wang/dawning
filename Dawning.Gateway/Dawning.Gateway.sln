@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Logging", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Resilience", "src\Shared\Dawning.Shared.Resilience\Dawning.Shared.Resilience.csproj", "{9A435F51-68FD-418E-B960-99A4A8A24B85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Dapper.Contrib", "src\Shared\Dawning.Shared.Dapper.Contrib\Dawning.Shared.Dapper.Contrib.csproj", "{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Dapper.Contrib.Attributes", "src\Shared\Dawning.Shared.Dapper.Contrib.Attributes\Dawning.Shared.Dapper.Contrib.Attributes.csproj", "{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +91,14 @@ Global
 		{9A435F51-68FD-418E-B960-99A4A8A24B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A435F51-68FD-418E-B960-99A4A8A24B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A435F51-68FD-418E-B960-99A4A8A24B85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +117,8 @@ Global
 		{49EACE6B-2EC7-43AA-AD35-703728249451} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
 		{F1EF255A-C919-4403-AA31-520D92ECE637} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
 		{9A435F51-68FD-418E-B960-99A4A8A24B85} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
+		{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
+		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {811233D0-C22B-4D48-8BAB-C28A124261A0}
