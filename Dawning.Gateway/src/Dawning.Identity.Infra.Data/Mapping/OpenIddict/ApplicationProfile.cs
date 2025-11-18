@@ -10,84 +10,87 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
     {
         public ApplicationProfile()
         {
-            var listConverter = new JsonListConverter();
-            var dictConverter = new JsonDictionaryConverter();
-
             CreateMap<ApplicationEntity, Application>(MemberList.Destination)
             .ForMember(dest => dest.Permissions,
-                opt => opt.ConvertUsing(listConverter, src => src.PermissionsJson))
+                opt => opt.MapFrom(src => DeserializeList(src.PermissionsJson)))
             .ForMember(dest => dest.RedirectUris,
-                opt => opt.ConvertUsing(listConverter, src => src.RedirectUrisJson))
+                opt => opt.MapFrom(src => DeserializeList(src.RedirectUrisJson)))
             .ForMember(dest => dest.PostLogoutRedirectUris,
-                opt => opt.ConvertUsing(listConverter, src => src.PostLogoutRedirectUrisJson))
+                opt => opt.MapFrom(src => DeserializeList(src.PostLogoutRedirectUrisJson)))
             .ForMember(dest => dest.Requirements,
-                opt => opt.ConvertUsing(listConverter, src => src.RequirementsJson))
+                opt => opt.MapFrom(src => DeserializeList(src.RequirementsJson)))
             .ForMember(dest => dest.Properties,
-                opt => opt.ConvertUsing(dictConverter, src => src.PropertiesJson))
+                opt => opt.MapFrom(src => DeserializeDictionary(src.PropertiesJson)))
             .ReverseMap()
             .ForMember(dest => dest.PermissionsJson,
-                opt => opt.MapFrom(src =>
-                    src.Permissions != null && src.Permissions.Count > 0
-                        ? JsonSerializer.Serialize(src.Permissions) : null))
+                opt => opt.MapFrom(src => SerializeList(src.Permissions)))
             .ForMember(dest => dest.RedirectUrisJson,
-                opt => opt.MapFrom(src =>
-                    src.RedirectUris != null && src.RedirectUris.Count > 0
-                        ? JsonSerializer.Serialize(src.RedirectUris) : null))
+                opt => opt.MapFrom(src => SerializeList(src.RedirectUris)))
             .ForMember(dest => dest.PostLogoutRedirectUrisJson,
-                opt => opt.MapFrom(src =>
-                    src.PostLogoutRedirectUris != null && src.PostLogoutRedirectUris.Count > 0
-                        ? JsonSerializer.Serialize(src.PostLogoutRedirectUris) : null))
+                opt => opt.MapFrom(src => SerializeList(src.PostLogoutRedirectUris)))
             .ForMember(dest => dest.RequirementsJson,
-                opt => opt.MapFrom(src =>
-                    src.Requirements != null && src.Requirements.Count > 0
-                        ? JsonSerializer.Serialize(src.Requirements) : null))
+                opt => opt.MapFrom(src => SerializeList(src.Requirements)))
             .ForMember(dest => dest.PropertiesJson,
-                opt => opt.MapFrom(src =>
-                    src.Properties != null && src.Properties.Count > 0
-                        ? JsonSerializer.Serialize(src.Properties) : null));
+                opt => opt.MapFrom(src => SerializeDictionary(src.Properties)));
         }
-    }
 
-    /// <summary>
-    /// JSON List 转换器
-    /// </summary>
-    public class JsonListConverter : IValueConverter<string?, List<string>>
-    {
-        public List<string> Convert(string? sourceMember, ResolutionContext context)
+        /// <summary>
+        /// 反序列化 JSON 为 List
+        /// </summary>
+        private static List<string> DeserializeList(string? json)
         {
-            if (string.IsNullOrEmpty(sourceMember))
+            if (string.IsNullOrEmpty(json))
                 return new List<string>();
 
             try
             {
-                return JsonSerializer.Deserialize<List<string>>(sourceMember) ?? new List<string>();
+                return JsonSerializer.Deserialize<List<string>>(json) ?? new List<string>();
             }
             catch
             {
                 return new List<string>();
             }
         }
-    }
 
-    /// <summary>
-    /// JSON Dictionary 转换器
-    /// </summary>
-    public class JsonDictionaryConverter : IValueConverter<string?, Dictionary<string, string>>
-    {
-        public Dictionary<string, string> Convert(string? sourceMember, ResolutionContext context)
+        /// <summary>
+        /// 反序列化 JSON 为 Dictionary
+        /// </summary>
+        private static Dictionary<string, string> DeserializeDictionary(string? json)
         {
-            if (string.IsNullOrEmpty(sourceMember))
+            if (string.IsNullOrEmpty(json))
                 return new Dictionary<string, string>();
 
             try
             {
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(sourceMember)
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
                     ?? new Dictionary<string, string>();
             }
             catch
             {
                 return new Dictionary<string, string>();
             }
+        }
+
+        /// <summary>
+        /// 序列化 List 为 JSON
+        /// </summary>
+        private static string? SerializeList(List<string>? list)
+        {
+            if (list == null || list.Count == 0)
+                return null;
+
+            return JsonSerializer.Serialize(list);
+        }
+
+        /// <summary>
+        /// 序列化 Dictionary 为 JSON
+        /// </summary>
+        private static string? SerializeDictionary(Dictionary<string, string>? dict)
+        {
+            if (dict == null || dict.Count == 0)
+                return null;
+
+            return JsonSerializer.Serialize(dict);
         }
     }
 }
