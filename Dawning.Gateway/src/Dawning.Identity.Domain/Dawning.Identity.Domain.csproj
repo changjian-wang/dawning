@@ -15,8 +15,6 @@
     <None Remove="Interfaces\Administration\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Interfaces\OpenIddict\" />
     <Folder Include="Aggregates\OpenIddict\" />
     <Folder Include="Interfaces\UoW\" />
     <Folder Include="Interfaces\Administration\" />
