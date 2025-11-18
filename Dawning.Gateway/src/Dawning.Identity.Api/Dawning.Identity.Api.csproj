@@ -15,6 +15,7 @@
 		<!-- 新增 IdentityServer4 包 -->
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />
 	  <ProjectReference Include="..\Shared\Dawning.Shared.Authentication\Dawning.Shared.Authentication.csproj" />
 	</ItemGroup>
 </Project>
