@@ -1,6 +1,8 @@
 ﻿using Dapper;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.OpenIddict;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.OpenIddict;
 using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
@@ -22,70 +25,114 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 
         public AuthorizationRepository(DbContext context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _context = context;
         }
 
-        public async Task<Authorization?> GetByIdAsync(Guid id)
+        /// <summary>
+        /// 根据ID异步获取Authorization
+        /// </summary>
+        public async Task<Authorization> GetAsync(Guid id)
         {
-            var entity = await _context.Connection.GetAsync<AuthorizationEntity>(id, _context.Transaction);
-            return entity?.ToModel();
+            AuthorizationEntity entity = await _context.Connection.GetAsync<AuthorizationEntity>(id, _context.Transaction);
+            return entity?.ToModel() ?? new Authorization();
         }
 
+        /// <summary>
+        /// 根据Subject获取Authorization列表
+        /// </summary>
         public async Task<IEnumerable<Authorization>> GetBySubjectAsync(string subject)
         {
-            var sql = "SELECT * FROM openiddict_authorizations WHERE subject = @Subject";
-            var entities = await _context.Connection.QueryAsync<AuthorizationEntity>(
-                sql,
-                new { Subject = subject },
-                _context.Transaction
-            );
-            return entities?.ToModels() ?? Enumerable.Empty<Authorization>();
+            var result = await _context.Connection.Builder<AuthorizationEntity>(_context.Transaction)
+                .WhereIf(!string.IsNullOrWhiteSpace(subject), a => a.Subject == subject)
+                .AsListAsync();
+
+            return result?.ToModels() ?? new List<Authorization>();
         }
 
+        /// <summary>
+        /// 根据ApplicationId获取Authorization列表
+        /// </summary>
         public async Task<IEnumerable<Authorization>> GetByApplicationIdAsync(Guid applicationId)
         {
-            var sql = "SELECT * FROM openiddict_authorizations WHERE application_id = @ApplicationId";
-            var entities = await _context.Connection.QueryAsync<AuthorizationEntity>(
-                sql,
-                new { ApplicationId = applicationId },
-                _context.Transaction
-            );
-            return entities?.ToModels() ?? Enumerable.Empty<Authorization>();
+            var result = await _context.Connection.Builder<AuthorizationEntity>(_context.Transaction)
+                .WhereIf(applicationId != Guid.Empty, a => a.ApplicationId == applicationId)
+                .AsListAsync();
+
+            return result?.ToModels() ?? new List<Authorization>();
         }
 
+        /// <summary>
+        /// 获取分页列表
+        /// </summary>
+        public async Task<PagedData<Authorization>> GetPagedListAsync(AuthorizationModel model, int page, int itemsPerPage)
+        {
+            PagedResult<AuthorizationEntity> result = await _context.Connection.Builder<AuthorizationEntity>(_context.Transaction)
+                .WhereIf(!string.IsNullOrWhiteSpace(model.Subject), a => a.Subject!.Contains(model.Subject ?? ""))
+                .WhereIf(model.ApplicationId.HasValue, a => a.ApplicationId == model.ApplicationId)
+                .WhereIf(!string.IsNullOrWhiteSpace(model.Status), a => a.Status == model.Status)
+                .WhereIf(!string.IsNullOrWhiteSpace(model.Type), a => a.Type == model.Type)
+                .AsPagedListAsync(page, itemsPerPage);
+
+            PagedData<Authorization> pagedData = new PagedData<Authorization>
+            {
+                PageIndex = page,
+                PageSize = itemsPerPage,
+                TotalCount = result.TotalItems,
+                Items = result.Values.ToModels()
+            };
+
+            return pagedData;
+        }
+
+        /// <summary>
+        /// 获取所有Authorization
+        /// </summary>
         public async Task<IEnumerable<Authorization>> GetAllAsync()
         {
-            var entities = await _context.Connection.GetAllAsync<AuthorizationEntity>(_context.Transaction);
-            return entities?.ToModels() ?? Enumerable.Empty<Authorization>();
+            var list = await _context.Connection.GetAllAsync<AuthorizationEntity>(_context.Transaction);
+            return list?.ToModels() ?? new List<Authorization>();
         }
 
-        public async Task<int> InsertAsync(Authorization authorization)
+        /// <summary>
+        /// 异步插入Authorization
+        /// </summary>
+        public async ValueTask<int> InsertAsync(Authorization model)
         {
-            if (authorization == null)
-                throw new ArgumentNullException(nameof(authorization));
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
 
-            var entity = authorization.ToEntity();
+            AuthorizationEntity entity = model.ToEntity();
             return await _context.Connection.InsertAsync(entity, _context.Transaction);
         }
 
-        public async Task<bool> UpdateAsync(Authorization authorization)
+        /// <summary>
+        /// 异步更新Authorization
+        /// </summary>
+        public async ValueTask<bool> UpdateAsync(Authorization model)
         {
-            if (authorization == null)
-                throw new ArgumentNullException(nameof(authorization));
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
 
-            var entity = authorization.ToEntity();
+            AuthorizationEntity entity = model.ToEntity();
             return await _context.Connection.UpdateAsync(entity, _context.Transaction);
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        /// <summary>
+        /// 异步删除Authorization
+        /// </summary>
+        public async ValueTask<bool> DeleteAsync(Authorization model)
         {
-            return await _context.Connection.DeleteAsync(new AuthorizationEntity { Id = id }, _context.Transaction);
-        }
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
 
-        public async Task<long> CountAsync()
-        {
-            var sql = "SELECT COUNT(*) FROM openiddict_authorizations";
-            return await _context.Connection.ExecuteScalarAsync<long>(sql, transaction: _context.Transaction);
+            AuthorizationEntity entity = model.ToEntity();
+            return await _context.Connection.DeleteAsync(entity, _context.Transaction);
         }
     }
 }
