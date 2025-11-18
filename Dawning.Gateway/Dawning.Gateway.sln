@@ -37,6 +37,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Dapper.Contr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Dapper.Contrib.Attributes", "src\Shared\Dawning.Shared.Dapper.Contrib.Attributes\Dawning.Shared.Dapper.Contrib.Attributes.csproj", "{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Identity.Infra.CrossCutting.IoC", "src\Dawning.Identity.Infra.CrossCutting.IoC\Dawning.Identity.Infra.CrossCutting.IoC.csproj", "{F0DCC629-8CD0-472B-B53B-681697089B44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Identity.Infra.CrossCutting.Mapping", "src\Dawning.Identity.Infra.CrossCutting.Mapping\Dawning.Identity.Infra.CrossCutting.Mapping.csproj", "{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Utils", "src\Shared\Dawning.Shared.Utils\Dawning.Shared.Utils.csproj", "{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +105,18 @@ Global
 		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0DCC629-8CD0-472B-B53B-681697089B44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0DCC629-8CD0-472B-B53B-681697089B44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0DCC629-8CD0-472B-B53B-681697089B44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0DCC629-8CD0-472B-B53B-681697089B44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +137,9 @@ Global
 		{9A435F51-68FD-418E-B960-99A4A8A24B85} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
 		{E5F58065-FEE4-4EFD-9F83-F39DDE76CE1B} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
 		{F05CBD8C-80C4-42AB-B5D8-A7174E3B978B} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
+		{F0DCC629-8CD0-472B-B53B-681697089B44} = {1B6BAD2E-C431-4147-985A-567781A1A7DC}
+		{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207} = {1B6BAD2E-C431-4147-985A-567781A1A7DC}
+		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {811233D0-C22B-4D48-8BAB-C28A124261A0}

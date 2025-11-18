@@ -12,10 +12,15 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
 
-		<!-- 新增 IdentityServer4 包 -->
+		<!-- 日志 -->
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />
+	  <ProjectReference Include="..\Dawning.Identity.Infra.CrossCutting.IoC\Dawning.Identity.Infra.CrossCutting.IoC.csproj" />
+	  <ProjectReference Include="..\Dawning.Identity.Infra.CrossCutting.Mapping\Dawning.Identity.Infra.CrossCutting.Mapping.csproj" />
 	  <ProjectReference Include="..\Shared\Dawning.Shared.Authentication\Dawning.Shared.Authentication.csproj" />
 	</ItemGroup>
 </Project>
