@@ -58,13 +58,13 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
         /// 创建时间
         /// </summary>
         [IgnoreUpdate]
-        [Column("created")]
+        [Column("created_at")]
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column("updated")]
+        [Column("updated_at")]
         public DateTime? Updated { get; set; }
     }
 }

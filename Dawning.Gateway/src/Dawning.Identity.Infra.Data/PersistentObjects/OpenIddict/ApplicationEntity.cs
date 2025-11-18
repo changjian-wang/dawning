@@ -52,9 +52,16 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
         [Column("properties")]
         public string? PropertiesJson { get; set; }
 
-        [Column("created_at")]
+        /// <summary>
+        /// 时间戳
+        /// </summary>
+        [Column("timestamp")]
         [IgnoreUpdate]
         [DefaultSortName]
+        public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+        [Column("created_at")]
+        [IgnoreUpdate]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Column("updated_at")]
