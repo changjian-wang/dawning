@@ -72,7 +72,7 @@ namespace Dawning.Identity.Api.Configurations
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                options.RoutePrefix = "swagger";
+                options.RoutePrefix = "";
                 options.SwaggerEndpoint($"/swagger/{Name}/swagger.json", Title);
                 options.DocumentTitle = Title;
             });

@@ -14,7 +14,7 @@ namespace Dawning.Identity.Api
                 .ReadFrom.Configuration(builder.Configuration)
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
-                .WriteTo.File("Logs/gateway-.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("Logs/identity-.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
             builder.Host.UseSerilog();
