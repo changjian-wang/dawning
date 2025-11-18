@@ -38,7 +38,7 @@ namespace Dawning.Identity.Application.Dtos.OpenIddict
         /// <summary>
         /// 时间戳
         /// </summary>
-        public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
         /// 创建时间
