@@ -13,6 +13,25 @@ export default function setupUserLoginInfoGuard(router: Router) {
         next();
       } else {
         try {
+          // 尝试从 token 中恢复用户信息
+          const token = localStorage.getItem('id_token') || localStorage.getItem('access_token');
+          if (token) {
+            // 从 JWT 解析用户信息
+            const { parseJwtToken } = await import('@/api/auth');
+            const userInfo = parseJwtToken(token);
+            if (userInfo) {
+              userStore.setInfo({
+                name: userInfo.name || userInfo.sub,
+                email: userInfo.email,
+                role: userInfo.role || 'admin',
+                accountId: userInfo.sub,
+              });
+              next();
+              return;
+            }
+          }
+          
+          // 如果无法从 token 恢复，尝试获取用户信息
           await userStore.info();
           next();
         } catch (error) {

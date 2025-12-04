@@ -67,6 +67,7 @@ module.exports = {
     'no-param-reassign': 0,
     'prefer-regex-literals': 0,
     'import/no-extraneous-dependencies': 0,
+    'camelcase': 0, // 允许下划线命名 (OAuth 字段)
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }]
   },
 };

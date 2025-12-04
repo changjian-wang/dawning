@@ -72,7 +72,11 @@
   import { useStorage } from '@vueuse/core';
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
-  import type { LoginData } from '@/api/user';
+
+  export interface LoginData {
+    username: string;
+    password: string;
+  }
 
   const router = useRouter();
   const { t } = useI18n();
