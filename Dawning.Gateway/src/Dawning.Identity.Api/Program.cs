@@ -5,7 +5,7 @@ namespace Dawning.Identity.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +28,14 @@ namespace Dawning.Identity.Api
 
             // ===== Dependency Injection =====
             builder.Services.AddDependencyInjectionConfiguration();
+
+            // ===== OpenIddict Configuration =====
+            // 使用基于 Dapper + MySQL 的自定义 Stores
+            builder.Services.AddOpenIddictConfiguration(builder.Configuration);
+
+            // ===== User Authentication Service =====
+            builder.Services.AddScoped<Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService, 
+                Dawning.Identity.Application.Services.Authentication.UserAuthenticationService>();
 
             // ===== Database Configuration =====
             builder.Services.AddDatabaseConfiguration(builder.Configuration);
@@ -68,6 +76,9 @@ namespace Dawning.Identity.Api
             // ===== Health Checks =====
             builder.Services.AddHealthChecks();
 
+            // ===== Database Seeder =====
+            builder.Services.AddScoped<Dawning.Identity.Api.Data.DatabaseSeeder>();
+
             // Build the app
             var app = builder.Build();
 
@@ -90,8 +101,10 @@ namespace Dawning.Identity.Api
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("AllowAll");
-            // app.UseAuthentication();  // If authentication is needed
-            // app.UseAuthorization();   // If authorization is needed
+            
+            // 启用认证和授权
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             // ===== Map Endpoints =====
             app.MapControllers();
@@ -103,6 +116,21 @@ namespace Dawning.Identity.Api
                 httpContext.Response.StatusCode = 500;
                 return Results.Problem("An unexpected error occurred.");
             });
+
+            // ===== Database Seeding =====
+            using (var scope = app.Services.CreateScope())
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<Dawning.Identity.Api.Data.DatabaseSeeder>();
+                try
+                {
+                    await seeder.SeedAsync();
+                    Log.Information("Database seeding completed successfully");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "An error occurred while seeding the database");
+                }
+            }
 
             // Run the app
             app.Run();

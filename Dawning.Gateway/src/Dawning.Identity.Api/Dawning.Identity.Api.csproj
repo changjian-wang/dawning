@@ -16,6 +16,14 @@
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+
+		<!-- OpenIddict -->
+		<PackageReference Include="OpenIddict.AspNetCore" Version="5.8.0" />
+		<PackageReference Include="OpenIddict.Core" Version="5.8.0" />
+		<PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.8.0" />
+		<PackageReference Include="OpenIddict.Validation.AspNetCore" Version="5.8.0" />
+		<PackageReference Include="OpenIddict.Quartz" Version="5.8.0" />
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.8.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />

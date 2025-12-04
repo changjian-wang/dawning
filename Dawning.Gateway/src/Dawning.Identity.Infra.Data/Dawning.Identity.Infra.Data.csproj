@@ -25,6 +25,7 @@
   <ItemGroup>
     <PackageReference Include="MySql.Data" Version="9.5.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="OpenIddict.Core" Version="5.8.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shared\Dawning.Shared.Dapper.Contrib\Dawning.Shared.Dapper.Contrib.csproj" />
