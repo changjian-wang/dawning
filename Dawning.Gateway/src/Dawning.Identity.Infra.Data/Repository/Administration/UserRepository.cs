@@ -92,53 +92,6 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取用户列表（游标分页）
-        /// </summary>
-        public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(int pageSize, long? cursor = null)
-        {
-            // 按timestamp降序排序（游标分页）
-            var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
-                .WhereIf(true, u => u.IsDeleted == false)  // 默认不包含已删除的用户
-                .OrderByDescending(u => u.Timestamp)
-                .AsPagedListByCursorAsync(pageSize, cursor, ascending: false);
-
-            return new CursorPagedData<User>
-            {
-                PageSize = result.ItemsPerPage,
-                HasNextPage = result.HasNextPage,
-                NextCursor = result.NextCursor,
-                Items = result.Values.ToModels()
-            };
-        }
-
-        /// <summary>
-        /// 获取分页用户列表（自定义配置）
-        /// </summary>
-        public async Task<PagedData<User>> GetPagedListWithOptionsAsync(int page, int itemsPerPage, PaginationOptions domainOptions)
-        {
-            // 将Domain层的配置转换为Dapper层的配置
-            var dapperOptions = new SqlMapperExtensions.PagedOptions
-            {
-                MaxPageNumber = domainOptions.MaxPageNumber,
-                MaxCursorPageSize = domainOptions.MaxCursorPageSize,
-                DefaultPageSize = domainOptions.DefaultPageSize
-            };
-
-            // 使用自定义PagedOptions配置
-            var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
-                .WhereIf(true, u => u.IsDeleted == false)
-                .OrderBy(u => u.CreatedAt)
-                .AsPagedListAsync(page, itemsPerPage, dapperOptions);
-
-            return new PagedData<User>
-            {
-                PageIndex = result.Page,
-                PageSize = result.ItemsPerPage,
-                TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
-            };
-        }
-
         /// <summary>
         /// 异步插入用户
         /// </summary>

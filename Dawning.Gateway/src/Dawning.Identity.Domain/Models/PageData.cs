@@ -28,40 +28,4 @@ namespace Dawning.Identity.Domain.Models
         /// </summary>
         public IEnumerable<T> Items { get; init; } = new List<T>();
     }
-
-    /// <summary>
-    /// 游标分页数据（用于大数据集场景）
-    /// </summary>
-    public class CursorPagedData<T> where T : class, new()
-    {
-        /// <summary>
-        /// 每页数量
-        /// </summary>
-        public int PageSize { get; init; }
-
-        /// <summary>
-        /// 是否有下一页
-        /// </summary>
-        public bool HasNextPage { get; init; }
-
-        /// <summary>
-        /// 下一页的游标值
-        /// </summary>
-        public object? NextCursor { get; init; }
-
-        /// <summary>
-        /// 数据列表
-        /// </summary>
-        public IEnumerable<T> Items { get; init; } = new List<T>();
-    }
-
-    /// <summary>
-    /// 分页配置选项（Domain层定义，避免依赖基础设施层）
-    /// </summary>
-    public class PaginationOptions
-    {
-        public int MaxPageNumber { get; set; } = 10000;
-        public int MaxCursorPageSize { get; set; } = 1000;
-        public int DefaultPageSize { get; set; } = 10;
-    }
 }

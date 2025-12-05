@@ -27,16 +27,6 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         Task<PagedData<UserDto>> GetPagedListAsync(UserModel model, int page, int itemsPerPage);
 
         /// <summary>
-        /// 获取用户列表（游标分页）
-        /// </summary>
-        Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(int pageSize, long? cursor = null);
-
-        /// <summary>
-        /// 获取分页用户列表（自定义配置）
-        /// </summary>
-        Task<PagedData<UserDto>> GetPagedListWithOptionsAsync(int page, int itemsPerPage, PaginationOptions options);
-
-        /// <summary>
         /// 创建用户
         /// </summary>
         Task<UserDto> CreateAsync(CreateUserDto dto, Guid? operatorId = null);

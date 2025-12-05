@@ -68,38 +68,6 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取用户列表（游标分页）
-        /// </summary>
-        public async Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(int pageSize, long? cursor = null)
-        {
-            var pagedData = await _userRepository.GetPagedListByCursorAsync(pageSize, cursor);
-
-            return new CursorPagedData<UserDto>
-            {
-                PageSize = pagedData.PageSize,
-                HasNextPage = pagedData.HasNextPage,
-                NextCursor = pagedData.NextCursor,
-                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u))
-            };
-        }
-
-        /// <summary>
-        /// 获取分页用户列表（自定义配置）
-        /// </summary>
-        public async Task<PagedData<UserDto>> GetPagedListWithOptionsAsync(int page, int itemsPerPage, PaginationOptions options)
-        {
-            var pagedData = await _userRepository.GetPagedListWithOptionsAsync(page, itemsPerPage, options);
-
-            return new PagedData<UserDto>
-            {
-                PageIndex = pagedData.PageIndex,
-                PageSize = pagedData.PageSize,
-                TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u))
-            };
-        }
-
-        /// <summary>
         /// 创建用户
         /// </summary>
         public async Task<UserDto> CreateAsync(CreateUserDto dto, Guid? operatorId = null)
