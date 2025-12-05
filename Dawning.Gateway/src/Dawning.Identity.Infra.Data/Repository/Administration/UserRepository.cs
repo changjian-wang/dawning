@@ -92,6 +92,26 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
+        /// 获取用户列表（游标分页）
+        /// </summary>
+        public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(int pageSize, long? cursor = null)
+        {
+            // 按timestamp降序排序（游标分页）
+            var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
+                .WhereIf(true, u => u.IsDeleted == false)  // 默认不包含已删除的用户
+                .OrderByDescending(u => u.Timestamp)
+                .AsPagedListByCursorAsync(pageSize, cursor, ascending: false);
+
+            return new CursorPagedData<User>
+            {
+                PageSize = result.ItemsPerPage,
+                HasNextPage = result.HasNextPage,
+                NextCursor = result.NextCursor,
+                Items = result.Values.ToModels()
+            };
+        }
+
+        /// <summary>
         /// 异步插入用户
         /// </summary>
         public async ValueTask<int> InsertAsync(User model)

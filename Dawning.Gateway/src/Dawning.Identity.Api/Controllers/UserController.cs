@@ -323,6 +323,52 @@ namespace Dawning.Identity.Api.Controllers
             }
         }
 
+        /// <summary>
+        /// 获取用户列表（游标分页 - 测试端点）
+        /// </summary>
+        /// <remarks>
+        /// 游标分页适用于大数据集场景，性能优于传统OFFSET分页。
+        /// 使用示例：
+        /// 1. 第一页：GET /api/user/cursor?pageSize=10
+        /// 2. 下一页：GET /api/user/cursor?pageSize=10&cursor={上一页返回的nextCursor}
+        /// </remarks>
+        [HttpGet("cursor")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserListByCursor(
+            [FromQuery] int pageSize = 10,
+            [FromQuery] long? cursor = null)
+        {
+            try
+            {
+                // 调用Service层的游标分页方法
+                var result = await _userService.GetPagedListByCursorAsync(pageSize, cursor);
+
+                _logger.LogInformation("User list retrieved by cursor: pageSize {PageSize}, hasNext {HasNext}", 
+                    pageSize, result.HasNextPage);
+
+                return Ok(new
+                {
+                    code = 0,
+                    message = "Success",
+                    data = new
+                    {
+                        list = result.Items,
+                        pagination = new
+                        {
+                            pageSize = result.PageSize,
+                            hasNextPage = result.HasNextPage,
+                            nextCursor = result.NextCursor
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user list by cursor");
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
         #region 辅助方法
 
         /// <summary>
