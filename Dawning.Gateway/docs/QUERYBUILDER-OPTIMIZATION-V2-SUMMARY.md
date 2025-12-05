@@ -323,35 +323,69 @@ var topDepartments = _connection.Builder<User>()
 ### 何时使用原生 SQL
 
 ⚠️ **建议场景**：
-- 分组聚合（GroupBy + Having）
-- 多表关联（Join）
-- 复杂子查询
-- 窗口函数
-- 数据库特定功能
+- 数据库特定功能（窗口函数、CTE 等）
+- 极简单的单表聚合（但优先考虑 C# 聚合）
+
+❌ **不推荐场景**（应该分离查询 + C# 处理）：
+- ~~分组聚合（GroupBy + Having）~~ → 查询数据 + LINQ 聚合
+- ~~多表关联（Join）~~ → 分离查询 + C# 内存关联
+- ~~复杂子查询~~ → 分步查询 + C# 组合
+
+**架构理念**：
+- 数据库做擅长的：简单、快速的单表查询（带索引）
+- C# 做擅长的：内存关联、聚合、复杂逻辑
+- 优势：可缓存、可优化、易维护、支持分库分表
 
 ### 混合使用策略
 
 ```csharp
-// 方案：QueryBuilder 构建条件 + 原生 SQL 聚合
-var conditions = _connection.Builder<User>()
-    .Where(x => x.IsActive)
-    .Where(x => x.CreatedAt >= DateTime.Now.AddDays(-30));
+// ✅ 推荐：分离查询 + C# 内存关联/聚合
+public class UserOrderService
+{
+    public List<UserOrderStats> GetUserOrderStatistics()
+    {
+        // 1. 查询用户（QueryBuilder，简单高效）
+        var users = _connection.Builder<User>()
+            .Where(x => x.IsActive)
+            .Select(x => new { x.Id, x.Username })
+            .AsList()
+            .ToList();
 
-// 获取条件参数（假设有提取方法）
-// var whereClause = conditions.GetWhereClause();
-// var parameters = conditions.GetParameters();
+        var userIds = users.Select(x => x.Id).ToList();
 
-// 执行复杂统计
-var stats = _connection.Query<RoleStats>($@"
-    SELECT 
-        Role,
-        COUNT(*) as UserCount,
-        AVG(Salary) as AvgSalary
-    FROM Users
-    WHERE {whereClause}
-    GROUP BY Role
-    HAVING COUNT(*) > 10
-", parameters).ToList();
+        // 2. 查询订单（QueryBuilder + IN，带索引查询）
+        var orders = _connection.Builder<Order>()
+            .Where(x => userIds.Contains(x.UserId))
+            .Where(x => x.Status == "Completed")
+            .Select(x => new { x.UserId, x.Amount })
+            .AsList()
+            .ToList();
+
+        // 3. C# 内存聚合（LINQ，性能极高）
+        var orderStats = orders
+            .GroupBy(o => o.UserId)
+            .ToDictionary(
+                g => g.Key,
+                g => new { Count = g.Count(), Total = g.Sum(o => o.Amount) }
+            );
+
+        // 4. 内存关联（O(1) 字典查找）
+        return users.Select(u => new UserOrderStats
+        {
+            UserId = u.Id,
+            Username = u.Username,
+            OrderCount = orderStats.TryGetValue(u.Id, out var stats) ? stats.Count : 0,
+            TotalAmount = orderStats.TryGetValue(u.Id, out var s) ? s.Total : 0m
+        }).ToList();
+    }
+}
+
+// 性能优势：
+// ✅ 两次简单查询（带索引，毫秒级）
+// ✅ C# 内存操作（微秒级）
+// ✅ 可独立缓存用户和订单
+// ✅ 支持分库分表
+// ✅ 易于维护和调试
 ```
 
 ---
