@@ -84,6 +84,22 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
+        /// 获取分页用户列表（自定义配置）
+        /// </summary>
+        public async Task<PagedData<UserDto>> GetPagedListWithOptionsAsync(int page, int itemsPerPage, PaginationOptions options)
+        {
+            var pagedData = await _userRepository.GetPagedListWithOptionsAsync(page, itemsPerPage, options);
+
+            return new PagedData<UserDto>
+            {
+                PageIndex = pagedData.PageIndex,
+                PageSize = pagedData.PageSize,
+                TotalCount = pagedData.TotalCount,
+                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u))
+            };
+        }
+
+        /// <summary>
         /// 创建用户
         /// </summary>
         public async Task<UserDto> CreateAsync(CreateUserDto dto, Guid? operatorId = null)

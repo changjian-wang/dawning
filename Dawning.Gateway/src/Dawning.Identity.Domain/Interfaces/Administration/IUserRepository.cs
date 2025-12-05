@@ -37,6 +37,11 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         Task<CursorPagedData<User>> GetPagedListByCursorAsync(int pageSize, long? cursor = null);
 
         /// <summary>
+        /// 获取分页用户列表（自定义配置）
+        /// </summary>
+        Task<PagedData<User>> GetPagedListWithOptionsAsync(int page, int itemsPerPage, PaginationOptions options);
+
+        /// <summary>
         /// 异步插入用户
         /// </summary>
         ValueTask<int> InsertAsync(User model);

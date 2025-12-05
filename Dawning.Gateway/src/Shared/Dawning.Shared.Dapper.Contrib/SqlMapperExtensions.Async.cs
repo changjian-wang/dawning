@@ -328,14 +328,21 @@ namespace Dawning.Shared.Dapper.Contrib
 
             public async Task<PagedResult<TEntity>> AsPagedListAsync(int page, int itemsPerPage)
             {
+                return await AsPagedListAsync(page, itemsPerPage, PagedOptions.Default);
+            }
+
+            public async Task<PagedResult<TEntity>> AsPagedListAsync(int page, int itemsPerPage, PagedOptions options)
+            {
                 if (page < 1) page = 1;
-                if (itemsPerPage < 1) itemsPerPage = 1;
+                if (itemsPerPage < 1) itemsPerPage = options.DefaultPageSize;
+
+                var maxPage = options?.MaxPageNumber ?? MaxPageNumber;
 
                 // ✅ Page number protection
-                if (page > MaxPageNumber)
+                if (page > maxPage)
                 {
                     throw new InvalidOperationException(
-                        $"Page number {page} exceeds maximum allowed {MaxPageNumber}. " +
+                        $"Page number {page} exceeds maximum allowed {maxPage}. " +
                         "Consider using filters to narrow down results or contact support for large dataset access.");
                 }
 
@@ -386,8 +393,22 @@ namespace Dawning.Shared.Dapper.Contrib
             /// <returns>CursorPagedResult with data and cursor info</returns>
             public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(int itemsPerPage, object? lastCursorValue = null, bool ascending = false)
             {
-                if (itemsPerPage < 1) itemsPerPage = 1;
-                if (itemsPerPage > 1000) itemsPerPage = 1000; // Reasonable limit for cursor pagination
+                return await AsPagedListByCursorAsync(itemsPerPage, lastCursorValue, ascending, PagedOptions.Default);
+            }
+
+            /// <summary>
+            /// Cursor-based pagination for large datasets with custom options.
+            /// </summary>
+            public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(int itemsPerPage, object? lastCursorValue, bool ascending, PagedOptions options)
+            {
+                if (itemsPerPage < 1) itemsPerPage = options.DefaultPageSize;
+
+                var maxPageSize = options?.MaxCursorPageSize ?? 1000;
+                if (itemsPerPage > maxPageSize)
+                {
+                    throw new InvalidOperationException(
+                        $"Page size {itemsPerPage} exceeds maximum allowed {maxPageSize} for cursor pagination.");
+                }
 
                 var type = typeof(TEntity);
                 var name = GetTableName(type);

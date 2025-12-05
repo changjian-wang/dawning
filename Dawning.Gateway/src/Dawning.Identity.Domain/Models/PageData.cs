@@ -54,4 +54,14 @@ namespace Dawning.Identity.Domain.Models
         /// </summary>
         public IEnumerable<T> Items { get; init; } = new List<T>();
     }
+
+    /// <summary>
+    /// 分页配置选项（Domain层定义，避免依赖基础设施层）
+    /// </summary>
+    public class PaginationOptions
+    {
+        public int MaxPageNumber { get; set; } = 10000;
+        public int MaxCursorPageSize { get; set; } = 1000;
+        public int DefaultPageSize { get; set; } = 10;
+    }
 }

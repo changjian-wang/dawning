@@ -1309,6 +1309,75 @@ namespace Dawning.Shared.Dapper.Contrib
             public object? NextCursor { get; set; }
         }
 
+        /// <summary>
+        /// Pagination configuration options
+        /// </summary>
+        public class PagedOptions
+        {
+            /// <summary>
+            /// Maximum allowed page number (default: 10000)
+            /// Prevents malicious deep pagination requests
+            /// </summary>
+            public int MaxPageNumber { get; set; } = 10000;
+
+            /// <summary>
+            /// Maximum items per page for cursor pagination (default: 1000)
+            /// </summary>
+            public int MaxCursorPageSize { get; set; } = 1000;
+
+            /// <summary>
+            /// Default items per page (default: 10)
+            /// </summary>
+            public int DefaultPageSize { get; set; } = 10;
+
+            /// <summary>
+            /// Enable parallel COUNT query execution (default: false)
+            /// Note: Only works with databases supporting MARS (e.g., SQL Server)
+            /// MySQL does not support MARS and will execute sequentially
+            /// </summary>
+            public bool EnableParallelCount { get; set; } = false;
+
+            /// <summary>
+            /// Enable delayed join optimization for deep pagination (default: false)
+            /// Uses covering index scan with later table join for better performance
+            /// </summary>
+            public bool EnableDelayedJoin { get; set; } = false;
+
+            /// <summary>
+            /// Preferred pagination strategy (default: Offset)
+            /// </summary>
+            public PaginationStrategy Strategy { get; set; } = PaginationStrategy.Offset;
+
+            /// <summary>
+            /// Global singleton instance for default configuration
+            /// </summary>
+            public static PagedOptions Default { get; } = new PagedOptions();
+        }
+
+        /// <summary>
+        /// Pagination strategy enumeration
+        /// </summary>
+        public enum PaginationStrategy
+        {
+            /// <summary>
+            /// Traditional OFFSET/LIMIT pagination
+            /// Supports page jumping but slower for deep pagination
+            /// </summary>
+            Offset = 0,
+
+            /// <summary>
+            /// Cursor-based pagination (keyset pagination)
+            /// Better performance for large datasets but no page jumping
+            /// </summary>
+            Cursor = 1,
+
+            /// <summary>
+            /// Automatic strategy selection based on context
+            /// Uses Offset for small page numbers, Cursor for deep pagination
+            /// </summary>
+            Auto = 2
+        }
+
         #endregion
     }
 

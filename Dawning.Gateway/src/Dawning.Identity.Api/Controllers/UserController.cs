@@ -1,6 +1,7 @@
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Authentication;
+using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -365,6 +366,61 @@ namespace Dawning.Identity.Api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user list by cursor");
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// 测试自定义PagedOptions配置
+        /// </summary>
+        [HttpGet("custom-config")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserListWithCustomConfig(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? maxPageNumber = null,
+            [FromQuery] int? maxCursorPageSize = null)
+        {
+            try
+            {
+                var options = new PaginationOptions
+                {
+                    MaxPageNumber = maxPageNumber ?? 5000,  // 测试自定义最大页数
+                    MaxCursorPageSize = maxCursorPageSize ?? 500,  // 测试自定义游标分页限制
+                    DefaultPageSize = 20  // 测试自定义默认页大小
+                };
+
+                // 通过Service层传递options
+                var result = await _userService.GetPagedListWithOptionsAsync(page, pageSize, options);
+
+                _logger.LogInformation("User list retrieved with custom config: page {Page}, total {Total}", 
+                    page, result.TotalCount);
+
+                return Ok(new
+                {
+                    code = 0,
+                    message = "Success (custom config applied)",
+                    config = new
+                    {
+                        maxPageNumber = options.MaxPageNumber,
+                        maxCursorPageSize = options.MaxCursorPageSize,
+                        defaultPageSize = options.DefaultPageSize
+                    },
+                    data = new
+                    {
+                        list = result.Items,
+                        pagination = new
+                        {
+                            page = result.PageIndex,
+                            pageSize = result.PageSize,
+                            total = result.TotalCount
+                        }
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user list with custom config");
                 return StatusCode(500, new { code = 500, message = "Internal server error" });
             }
         }
