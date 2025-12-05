@@ -783,10 +783,15 @@ namespace Dawning.Shared.Dapper.Contrib
             private readonly IDbTransaction? _transaction;
             private readonly int? _commandTimeout;
             private readonly List<string> _conditions = new List<string>();
+            private readonly List<(string Column, bool Descending)> _orderByList = new List<(string, bool)>();
             private string _orderBy = "";
             private bool _orderByDescending = true;
             private ISqlAdapter sqlAdapter;
             private readonly Dictionary<string, object?> _parameters = new Dictionary<string, object?>();
+            private int? _takeCount;
+            private int? _skipCount;
+            private readonly List<string> _selectColumns = new List<string>();
+            private bool _distinct = false;
 
             public QueryBuilder(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout)
             {
@@ -797,6 +802,18 @@ namespace Dawning.Shared.Dapper.Contrib
                 SetDefaultOrder();
             }
 
+            /// <summary>
+            /// Add WHERE condition (always applied)
+            /// </summary>
+            public QueryBuilder<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
+            {
+                Visit(predicate, _conditions);
+                return this;
+            }
+
+            /// <summary>
+            /// Add WHERE condition conditionally
+            /// </summary>
             public QueryBuilder<TEntity> WhereIf(bool exists, Expression<Func<TEntity, bool>> predicate)
             {
                 if (exists)
@@ -811,6 +828,8 @@ namespace Dawning.Shared.Dapper.Contrib
             {
                 _orderBy = GetMemberName(expression);
                 _orderByDescending = false;
+                _orderByList.Clear();
+                _orderByList.Add((_orderBy, false));
                 return this;
             }
 
@@ -818,6 +837,74 @@ namespace Dawning.Shared.Dapper.Contrib
             {
                 _orderBy = GetMemberName(expression);
                 _orderByDescending = true;
+                _orderByList.Clear();
+                _orderByList.Add((_orderBy, true));
+                return this;
+            }
+
+            /// <summary>
+            /// Add secondary ascending sort
+            /// </summary>
+            public QueryBuilder<TEntity> ThenBy<T>(Expression<Func<TEntity, T>> expression)
+            {
+                var column = GetMemberName(expression);
+                _orderByList.Add((column, false));
+                return this;
+            }
+
+            /// <summary>
+            /// Add secondary descending sort
+            /// </summary>
+            public QueryBuilder<TEntity> ThenByDescending<T>(Expression<Func<TEntity, T>> expression)
+            {
+                var column = GetMemberName(expression);
+                _orderByList.Add((column, true));
+                return this;
+            }
+
+            /// <summary>
+            /// Dynamic sort by column name (string)
+            /// </summary>
+            /// <param name="columnName">Column name (property name or [Column] attribute name)</param>
+            /// <param name="ascending">Sort direction: true for ASC, false for DESC</param>
+            public QueryBuilder<TEntity> OrderBy(string columnName, bool ascending = true)
+            {
+                // Validate column name exists
+                var property = typeof(TEntity).GetProperties()
+                    .FirstOrDefault(p => 
+                        p.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase) ||
+                        (p.GetCustomAttribute<ColumnAttribute>()?.Name?.Equals(columnName, StringComparison.OrdinalIgnoreCase) ?? false));
+
+                if (property == null)
+                {
+                    throw new ArgumentException($"Column '{columnName}' not found in entity {typeof(TEntity).Name}");
+                }
+
+                var actualColumnName = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                _orderBy = actualColumnName;
+                _orderByDescending = !ascending;
+                _orderByList.Clear();
+                _orderByList.Add((actualColumnName, !ascending));
+                return this;
+            }
+
+            /// <summary>
+            /// Add secondary sort by column name (string)
+            /// </summary>
+            public QueryBuilder<TEntity> ThenBy(string columnName, bool ascending = true)
+            {
+                var property = typeof(TEntity).GetProperties()
+                    .FirstOrDefault(p => 
+                        p.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase) ||
+                        (p.GetCustomAttribute<ColumnAttribute>()?.Name?.Equals(columnName, StringComparison.OrdinalIgnoreCase) ?? false));
+
+                if (property == null)
+                {
+                    throw new ArgumentException($"Column '{columnName}' not found in entity {typeof(TEntity).Name}");
+                }
+
+                var actualColumnName = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                _orderByList.Add((actualColumnName, !ascending));
                 return this;
             }
 
@@ -880,19 +967,184 @@ namespace Dawning.Shared.Dapper.Contrib
                 // 转换参数
                 var parameters = ConvertToDynamicParameters();
 
-                // 构建 SQL
-                var sql = $"SELECT * FROM {name} WHERE {whereClause}";
+                // 构建 SELECT 子句
+                var selectClause = BuildSelectClause();
 
-                // 添加排序
-                if (!string.IsNullOrEmpty(_orderBy))
-                {
-                    sql += $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
-                }
+                // 构建 SQL
+                var distinctKeyword = _distinct ? "DISTINCT " : "";
+                var sql = $"SELECT {distinctKeyword}{selectClause} FROM {name} WHERE {whereClause}";
+
+                // 添加排序（支持多列）
+                sql += BuildOrderByClause();
+
+                // 添加 SKIP/TAKE
+                sql = ApplySkipTake(sql);
 
                 var list = _connection.Query(sql, parameters, _transaction, commandTimeout: _commandTimeout);
                 IEnumerable<TEntity> entities = GetListImpl<TEntity>(list, type);
 
                 return entities;
+            }
+
+            /// <summary>
+            /// Get the first entity or null
+            /// </summary>
+            public TEntity? FirstOrDefault()
+            {
+                var type = typeof(TEntity);
+                var name = GetTableName(type);
+
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                var parameters = ConvertToDynamicParameters();
+
+                // 构建 SELECT 子句
+                var selectClause = BuildSelectClause();
+                var distinctKeyword = _distinct ? "DISTINCT " : "";
+
+                // 使用数据库特定的 LIMIT 语法
+                var sql = $"SELECT {distinctKeyword}{selectClause} FROM {name} WHERE {whereClause}";
+                sql += BuildOrderByClause();
+
+                if (sqlAdapter is MySqlAdapter || sqlAdapter is PostgresAdapter || sqlAdapter is SQLiteAdapter)
+                {
+                    sql += " LIMIT 1";
+                }
+                else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
+                {
+                    sql = sql.Replace("SELECT *", "SELECT TOP 1 *");
+                }
+                else if (sqlAdapter is FbAdapter)
+                {
+                    sql = sql.Replace("SELECT *", "SELECT FIRST 1 *");
+                }
+
+                var result = _connection.Query(sql, parameters, _transaction, commandTimeout: _commandTimeout).FirstOrDefault();
+                if (result == null) return null;
+
+                return GetListImpl<TEntity>(new[] { result }, type).FirstOrDefault();
+            }
+
+            /// <summary>
+            /// Get total count
+            /// </summary>
+            public long Count()
+            {
+                var name = GetTableName(typeof(TEntity));
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                var parameters = ConvertToDynamicParameters();
+
+                var sql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
+                var count = _connection.ExecuteScalar(sql, parameters, _transaction, _commandTimeout);
+                return count != null ? Convert.ToInt64(count) : 0;
+            }
+
+            /// <summary>
+            /// Check if any records exist
+            /// </summary>
+            public bool Any()
+            {
+                return Count() > 0;
+            }
+
+            /// <summary>
+            /// Check if no records exist
+            /// </summary>
+            public bool None()
+            {
+                return Count() == 0;
+            }
+
+            /// <summary>
+            /// Limit the number of results
+            /// </summary>
+            public QueryBuilder<TEntity> Take(int count)
+            {
+                _takeCount = count;
+                return this;
+            }
+
+            /// <summary>
+            /// Skip the specified number of results
+            /// </summary>
+            public QueryBuilder<TEntity> Skip(int count)
+            {
+                _skipCount = count;
+                return this;
+            }
+
+            /// <summary>
+            /// Select specific columns (projection)
+            /// </summary>
+            /// <param name="selector">Column selector expression</param>
+            public QueryBuilder<TEntity> Select<TResult>(Expression<Func<TEntity, TResult>> selector)
+            {
+                _selectColumns.Clear();
+
+                // Parse expression to extract column names
+                if (selector.Body is NewExpression newExpr)
+                {
+                    // Anonymous type: new { x.Id, x.Name }
+                    foreach (var arg in newExpr.Arguments)
+                    {
+                        var columnName = GetMemberName(arg);
+                        _selectColumns.Add(columnName);
+                    }
+                }
+                else if (selector.Body is MemberExpression memberExpr)
+                {
+                    // Single property: x => x.Id
+                    var columnName = GetMemberName(memberExpr);
+                    _selectColumns.Add(columnName);
+                }
+                else if (selector.Body is UnaryExpression unaryExpr && unaryExpr.Operand is MemberExpression unaryMember)
+                {
+                    // Convert expression: x => (object)x.Id
+                    var columnName = GetMemberName(unaryMember);
+                    _selectColumns.Add(columnName);
+                }
+                else
+                {
+                    throw new NotSupportedException(
+                        $"Select expression type '{selector.Body.GetType().Name}' is not supported. " +
+                        "Use: Select(x => x.Id) or Select(x => new {{ x.Id, x.Name }})");
+                }
+
+                return this;
+            }
+
+            /// <summary>
+            /// Select specific columns by names
+            /// </summary>
+            public QueryBuilder<TEntity> Select(params string[] columnNames)
+            {
+                _selectColumns.Clear();
+
+                foreach (var columnName in columnNames)
+                {
+                    var property = typeof(TEntity).GetProperties()
+                        .FirstOrDefault(p => 
+                            p.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase) ||
+                            (p.GetCustomAttribute<ColumnAttribute>()?.Name?.Equals(columnName, StringComparison.OrdinalIgnoreCase) ?? false));
+
+                    if (property == null)
+                    {
+                        throw new ArgumentException($"Column '{columnName}' not found in entity {typeof(TEntity).Name}");
+                    }
+
+                    var actualColumnName = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                    _selectColumns.Add(actualColumnName);
+                }
+
+                return this;
+            }
+
+            /// <summary>
+            /// Enable DISTINCT for the query (remove duplicate rows)
+            /// </summary>
+            public QueryBuilder<TEntity> Distinct()
+            {
+                _distinct = true;
+                return this;
             }
 
             private void Visit(Expression expression, List<string> conditions)
@@ -1268,6 +1520,107 @@ namespace Dawning.Shared.Dapper.Contrib
                 }
 
                 return parameters;
+            }
+
+            /// <summary>
+            /// Build SELECT clause (supports column projection)
+            /// </summary>
+            private string BuildSelectClause()
+            {
+                if (_selectColumns.Count == 0)
+                {
+                    return "*";
+                }
+
+                var columnParts = new List<string>();
+                foreach (var column in _selectColumns)
+                {
+                    columnParts.Add(sqlAdapter.ConvertColumnName(column));
+                }
+
+                return string.Join(", ", columnParts);
+            }
+
+            /// <summary>
+            /// Build ORDER BY clause (supports multiple columns)
+            /// </summary>
+            private string BuildOrderByClause()
+            {
+                if (_orderByList.Count == 0 && string.IsNullOrEmpty(_orderBy))
+                {
+                    return string.Empty;
+                }
+
+                var orderByParts = new List<string>();
+
+                if (_orderByList.Count > 0)
+                {
+                    foreach (var (column, descending) in _orderByList)
+                    {
+                        orderByParts.Add($"{sqlAdapter.ConvertColumnName(column)} {(descending ? "DESC" : "ASC")}");
+                    }
+                }
+                else if (!string.IsNullOrEmpty(_orderBy))
+                {
+                    orderByParts.Add($"{sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}");
+                }
+
+                return orderByParts.Count > 0 ? $" ORDER BY {string.Join(", ", orderByParts)}" : string.Empty;
+            }
+
+            /// <summary>
+            /// Apply SKIP/TAKE (database-specific syntax)
+            /// </summary>
+            private string ApplySkipTake(string sql)
+            {
+                if (_skipCount == null && _takeCount == null)
+                {
+                    return sql;
+                }
+
+                // MySQL, PostgreSQL, SQLite
+                if (sqlAdapter is MySqlAdapter || sqlAdapter is PostgresAdapter || sqlAdapter is SQLiteAdapter)
+                {
+                    if (_takeCount.HasValue)
+                    {
+                        sql += $" LIMIT {_takeCount.Value}";
+                    }
+                    if (_skipCount.HasValue)
+                    {
+                        sql += $" OFFSET {_skipCount.Value}";
+                    }
+                }
+                // SQL Server 2012+ (requires ORDER BY)
+                else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
+                {
+                    if (!sql.Contains("ORDER BY"))
+                    {
+                        throw new InvalidOperationException("OFFSET/FETCH requires ORDER BY clause in SQL Server");
+                    }
+                    sql += $" OFFSET {_skipCount ?? 0} ROWS";
+                    if (_takeCount.HasValue)
+                    {
+                        sql += $" FETCH NEXT {_takeCount.Value} ROWS ONLY";
+                    }
+                }
+                // Firebird
+                else if (sqlAdapter is FbAdapter)
+                {
+                    if (_skipCount.HasValue && _takeCount.HasValue)
+                    {
+                        sql = sql.Replace("SELECT *", $"SELECT FIRST {_takeCount.Value} SKIP {_skipCount.Value} *");
+                    }
+                    else if (_takeCount.HasValue)
+                    {
+                        sql = sql.Replace("SELECT *", $"SELECT FIRST {_takeCount.Value} *");
+                    }
+                    else if (_skipCount.HasValue)
+                    {
+                        sql = sql.Replace("SELECT *", $"SELECT SKIP {_skipCount.Value} *");
+                    }
+                }
+
+                return sql;
             }
         }
 
