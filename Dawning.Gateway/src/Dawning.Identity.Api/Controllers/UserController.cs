@@ -374,6 +374,7 @@ namespace Dawning.Identity.Api.Controllers
         /// 测试自定义PagedOptions配置
         /// </summary>
         [HttpGet("custom-config")]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserListWithCustomConfig(
             [FromQuery] int page = 1,
