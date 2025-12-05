@@ -376,6 +376,73 @@ namespace Dawning.Shared.Dapper.Contrib
                 };
             }
 
+            /// <summary>
+            /// Cursor-based pagination for large datasets. Better performance than OFFSET pagination.
+            /// No page jumping support - only next/previous navigation.
+            /// </summary>
+            /// <param name="itemsPerPage">Number of items per page</param>
+            /// <param name="lastCursorValue">Last cursor value from previous page (null for first page)</param>
+            /// <param name="ascending">Sort direction (true for ASC, false for DESC, default is DESC)</param>
+            /// <returns>CursorPagedResult with data and cursor info</returns>
+            public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(int itemsPerPage, object? lastCursorValue = null, bool ascending = false)
+            {
+                if (itemsPerPage < 1) itemsPerPage = 1;
+                if (itemsPerPage > 1000) itemsPerPage = 1000; // Reasonable limit for cursor pagination
+
+                var type = typeof(TEntity);
+                var name = GetTableName(type);
+
+                if (string.IsNullOrEmpty(_orderBy))
+                {
+                    throw new InvalidOperationException(
+                        "A cursor column must be specified for cursor-based pagination. Use OrderBy() or OrderByDescending().");
+                }
+
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                var parameters = ConvertToDynamicParameters();
+
+                // Fetch itemsPerPage + 1 to detect if there's a next page
+                var list = await sqlAdapter.RetrieveCursorPaginatedDataAsync(
+                    _connection,
+                    _transaction,
+                    _commandTimeout,
+                    name,
+                    _orderBy,
+                    itemsPerPage + 1,
+                    lastCursorValue,
+                    whereClause,
+                    parameters,
+                    ascending);
+
+                var entities = GetListImpl<TEntity>(list, type).ToList();
+                bool hasNextPage = entities.Count > itemsPerPage;
+
+                if (hasNextPage)
+                {
+                    entities = entities.Take(itemsPerPage).ToList();
+                }
+
+                // Get cursor value from last item
+                object? nextCursor = null;
+                if (entities.Any())
+                {
+                    var lastEntity = entities.Last();
+                    var cursorProperty = type.GetProperty(_orderBy);
+                    if (cursorProperty != null)
+                    {
+                        nextCursor = cursorProperty.GetValue(lastEntity);
+                    }
+                }
+
+                return new CursorPagedResult<TEntity>
+                {
+                    Values = entities,
+                    ItemsPerPage = itemsPerPage,
+                    HasNextPage = hasNextPage,
+                    NextCursor = nextCursor
+                };
+            }
+
             public async Task<IEnumerable<TEntity>> AsListAsync()
             {
                 var type = typeof(TEntity);
@@ -421,6 +488,22 @@ public partial interface ISqlAdapter
     /// </summary>
     /// <returns></returns>
     Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters);
+
+    /// <summary>
+    /// Retrieve cursor-based paginated data (for large datasets, better performance than OFFSET)
+    /// </summary>
+    /// <param name="connection">Database connection</param>
+    /// <param name="transaction">Transaction</param>
+    /// <param name="commandTimeout">Command timeout</param>
+    /// <param name="tableName">Table name</param>
+    /// <param name="cursorColumnName">Cursor column name (unique, indexed, such as ID or Timestamp)</param>
+    /// <param name="itemsPerPage">Items per page</param>
+    /// <param name="lastCursorValue">Last cursor value from previous page (null for first page)</param>
+    /// <param name="whereClause">WHERE clause</param>
+    /// <param name="parameters">Parameters</param>
+    /// <param name="ascending">Sort direction (true for ASC, false for DESC)</param>
+    /// <returns>Paginated data</returns>
+    Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false);
 }
 
 public partial class SqlServerAdapter
@@ -483,6 +566,26 @@ public partial class SqlServerAdapter
                      ORDER BY {sortingColumnName} DESC 
                      OFFSET {(page - 1) * itemsPerPage} ROWS 
                      FETCH NEXT {itemsPerPage} ROWS ONLY";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
+    }
+
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    {
+        var baseWhereClause = whereClause ?? "1=1";
+        var cursorCondition = lastCursorValue != null 
+            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
+            : "1=1";
+        
+        if (lastCursorValue != null)
+        {
+            parameters.Add("__cursor", lastCursorValue);
+        }
+
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {baseWhereClause} AND {cursorCondition}
+                     ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
+                     OFFSET 0 ROWS FETCH NEXT {itemsPerPage} ROWS ONLY";
         
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
@@ -551,6 +654,29 @@ public partial class SqlCeServerAdapter
         
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
+
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    {
+        var baseWhereClause = whereClause ?? "1=1";
+        var cursorCondition = lastCursorValue != null 
+            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
+            : "1=1";
+        
+        if (lastCursorValue != null)
+        {
+            parameters.Add("__cursor", lastCursorValue);
+        }
+
+        // SQL CE uses ROW_NUMBER() for pagination
+        var sql = $@"SELECT * FROM (
+                        SELECT *, ROW_NUMBER() OVER (ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}) AS RowNum 
+                        FROM {tableName}
+                        WHERE {baseWhereClause} AND {cursorCondition}
+                     ) AS t
+                     WHERE RowNum BETWEEN 1 AND {itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
+    }
 }
 
 public partial class MySqlAdapter
@@ -611,6 +737,26 @@ public partial class MySqlAdapter
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
+    }
+
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    {
+        var baseWhereClause = whereClause ?? "1=1";
+        var cursorCondition = lastCursorValue != null 
+            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
+            : "1=1";
+        
+        if (lastCursorValue != null)
+        {
+            parameters.Add("__cursor", lastCursorValue);
+        }
+
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {baseWhereClause} AND {cursorCondition}
+                     ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
+                     LIMIT {itemsPerPage}";
         
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
@@ -696,6 +842,26 @@ public partial class PostgresAdapter
         
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
+
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    {
+        var baseWhereClause = whereClause ?? "1=1";
+        var cursorCondition = lastCursorValue != null 
+            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
+            : "1=1";
+        
+        if (lastCursorValue != null)
+        {
+            parameters.Add("__cursor", lastCursorValue);
+        }
+
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {baseWhereClause} AND {cursorCondition}
+                     ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
+                     LIMIT {itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
+    }
 }
 
 public partial class SQLiteAdapter
@@ -754,6 +920,26 @@ public partial class SQLiteAdapter
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
+    }
+
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    {
+        var baseWhereClause = whereClause ?? "1=1";
+        var cursorCondition = lastCursorValue != null 
+            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
+            : "1=1";
+        
+        if (lastCursorValue != null)
+        {
+            parameters.Add("__cursor", lastCursorValue);
+        }
+
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {baseWhereClause} AND {cursorCondition}
+                     ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
+                     LIMIT {itemsPerPage}";
         
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
@@ -817,6 +1003,26 @@ public partial class FbAdapter
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      ROWS {(page - 1) * itemsPerPage + 1} TO {page * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
+    }
+
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    {
+        var baseWhereClause = whereClause ?? "1=1";
+        var cursorCondition = lastCursorValue != null 
+            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
+            : "1=1";
+        
+        if (lastCursorValue != null)
+        {
+            parameters.Add("__cursor", lastCursorValue);
+        }
+
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {baseWhereClause} AND {cursorCondition}
+                     ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
+                     ROWS 1 TO {itemsPerPage}";
         
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }

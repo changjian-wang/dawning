@@ -1282,6 +1282,33 @@ namespace Dawning.Shared.Dapper.Contrib
             public long TotalItems { get; set; }
         }
 
+        /// <summary>
+        /// Cursor-based pagination result (for large datasets)
+        /// </summary>
+        /// <typeparam name="T">Entity type</typeparam>
+        public class CursorPagedResult<T>
+        {
+            /// <summary>
+            /// List of entities in current page
+            /// </summary>
+            public IEnumerable<T> Values { get; set; } = new List<T>();
+
+            /// <summary>
+            /// Number of items per page
+            /// </summary>
+            public int ItemsPerPage { get; set; }
+
+            /// <summary>
+            /// Whether there is a next page
+            /// </summary>
+            public bool HasNextPage { get; set; }
+
+            /// <summary>
+            /// Cursor value for next page (null if no next page)
+            /// </summary>
+            public object? NextCursor { get; set; }
+        }
+
         #endregion
     }
 
