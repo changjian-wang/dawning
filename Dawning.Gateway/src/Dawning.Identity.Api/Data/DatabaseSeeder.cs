@@ -199,11 +199,17 @@ namespace Dawning.Identity.Api.Data
         /// </summary>
         private async Task SeedUsersAsync()
         {
-            // 检查是否存在 admin 用户
-            var adminUser = await _userService.GetByUsernameAsync("admin");
-            if (adminUser != null)
+            // 查询是否已存在 admin 用户（包含已删除的）
+            var allUsersModel = new Dawning.Identity.Domain.Models.Administration.UserModel
             {
-                _logger.LogInformation("Admin user 'admin' already exists");
+                Username = "admin",
+                IncludeDeleted = true
+            };
+            var existingAdmins = await _userService.GetPagedListAsync(allUsersModel, 1, 10);
+            
+            if (existingAdmins.Items.Any())
+            {
+                _logger.LogInformation("Admin user already exists, skipping creation");
                 return;
             }
 
