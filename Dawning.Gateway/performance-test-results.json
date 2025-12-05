@@ -1,0 +1,119 @@
+[
+  {
+    "Success": 10,
+    "Min": 29.0,
+    "Url": "http://localhost:5202/api/user?pageIndex=1&pageSize=10",
+    "Max": 58.0,
+    "Times": [
+      51,
+      58,
+      41,
+      34,
+      36,
+      36,
+      31,
+      30,
+      34,
+      29
+    ],
+    "Median": 36,
+    "Failed": 0,
+    "Average": 38.0,
+    "Name": "OFFSET 分页 - 第1页 (pageIndex=1, pageSize=10)"
+  },
+  {
+    "Success": 10,
+    "Min": 26.0,
+    "Url": "http://localhost:5202/api/user?pageIndex=100&pageSize=10",
+    "Max": 47.0,
+    "Times": [
+      34,
+      30,
+      30,
+      26,
+      36,
+      36,
+      47,
+      33,
+      45,
+      29
+    ],
+    "Median": 34,
+    "Failed": 0,
+    "Average": 34.6,
+    "Name": "OFFSET 分页 - 深分页 (pageIndex=100, pageSize=10)"
+  },
+  {
+    "Success": 10,
+    "Min": 29.0,
+    "Url": "http://localhost:5202/api/user/cursor?pageSize=10",
+    "Max": 36.0,
+    "Times": [
+      36,
+      31,
+      29,
+      35,
+      33,
+      32,
+      29,
+      29,
+      33,
+      29
+    ],
+    "Median": 32,
+    "Failed": 0,
+    "Average": 31.6,
+    "Name": "Cursor 分页 - 第1页 (pageSize=10)"
+  },
+  {
+    "Success": 5,
+    "Min": 27.0,
+    "Url": "http://localhost:5202/api/user?pageIndex=1&pageSize=10",
+    "Max": 76.0,
+    "Times": [
+      36,
+      27,
+      28,
+      64,
+      76
+    ],
+    "Median": 36,
+    "Failed": 0,
+    "Average": 46.2,
+    "Name": "OFFSET 分页 - pageSize=10"
+  },
+  {
+    "Success": 5,
+    "Min": 26.0,
+    "Url": "http://localhost:5202/api/user?pageIndex=1&pageSize=50",
+    "Max": 35.0,
+    "Times": [
+      35,
+      29,
+      31,
+      26,
+      27
+    ],
+    "Median": 29,
+    "Failed": 0,
+    "Average": 29.6,
+    "Name": "OFFSET 分页 - pageSize=50"
+  },
+  {
+    "Success": 5,
+    "Min": 29.0,
+    "Url": "http://localhost:5202/api/user?pageIndex=1&pageSize=100",
+    "Max": 36.0,
+    "Times": [
+      31,
+      36,
+      29,
+      35,
+      33
+    ],
+    "Median": 33,
+    "Failed": 0,
+    "Average": 32.8,
+    "Name": "OFFSET 分页 - pageSize=100"
+  }
+]

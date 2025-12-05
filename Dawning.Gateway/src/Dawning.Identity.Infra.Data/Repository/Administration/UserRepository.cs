@@ -92,6 +92,48 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
+        /// 获取用户列表（Cursor 分页）
+        /// </summary>
+        public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(UserModel model, long? cursor, int pageSize)
+        {
+            var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
+
+            // 默认不包含已删除的用户
+            builder = builder.WhereIf(!model.IncludeDeleted, u => u.IsDeleted == false);
+
+            // 应用过滤条件
+            builder = builder
+                .WhereIf(!string.IsNullOrWhiteSpace(model.Username), u => u.Username!.Contains(model.Username ?? ""))
+                .WhereIf(!string.IsNullOrWhiteSpace(model.Email), u => u.Email!.Contains(model.Email ?? ""))
+                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), u => u.DisplayName!.Contains(model.DisplayName ?? ""))
+                .WhereIf(!string.IsNullOrWhiteSpace(model.Role), u => u.Role == model.Role)
+                .WhereIf(model.IsActive.HasValue, u => u.IsActive == model.IsActive!.Value);
+
+            // 如果提供了游标，添加游标条件
+            if (cursor.HasValue)
+            {
+                builder = builder.Where(u => u.Timestamp < cursor.Value);
+            }
+
+            // 按 Timestamp 降序排序，获取指定数量 + 1（用于判断是否有下一页）
+            var items = builder
+                .OrderByDescending(u => u.Timestamp)
+                .Take(pageSize + 1)
+                .AsList();
+
+            var hasNextPage = items.Count() > pageSize;
+            var resultItems = items.Take(pageSize).ToModels().ToList();
+            var nextCursor = hasNextPage && resultItems.Any() ? resultItems.Last().Timestamp : (long?)null;
+
+            return new CursorPagedData<User>
+            {
+                PageSize = pageSize,
+                HasNextPage = hasNextPage,
+                NextCursor = nextCursor,
+                Items = resultItems
+            };
+        }
+
         /// <summary>
         /// 异步插入用户
         /// </summary>

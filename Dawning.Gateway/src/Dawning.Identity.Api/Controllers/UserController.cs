@@ -136,6 +136,56 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
+        /// 获取用户列表（Cursor 分页）
+        /// </summary>
+        [HttpGet("cursor")]
+        [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserListByCursor(
+            [FromQuery] string? username,
+            [FromQuery] string? email,
+            [FromQuery] string? displayName,
+            [FromQuery] string? role,
+            [FromQuery] bool? isActive,
+            [FromQuery] long? cursor,
+            [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var model = new UserModel
+                {
+                    Username = username,
+                    Email = email,
+                    DisplayName = displayName,
+                    Role = role,
+                    IsActive = isActive
+                };
+
+                var result = await _userService.GetPagedListByCursorAsync(model, cursor, pageSize);
+
+                _logger.LogInformation("User list by cursor retrieved: pageSize {PageSize}, hasNextPage {HasNextPage}, cursor {Cursor}", 
+                    pageSize, result.HasNextPage, cursor);
+
+                return Ok(new
+                {
+                    code = 0,
+                    message = "Success",
+                    data = new
+                    {
+                        items = result.Items,
+                        pageSize = result.PageSize,
+                        hasNextPage = result.HasNextPage,
+                        nextCursor = result.NextCursor
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user list by cursor");
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
         /// 根据ID获取用户详情
         /// </summary>
         [HttpGet("{id:guid}")]
