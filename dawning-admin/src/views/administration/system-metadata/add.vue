@@ -77,7 +77,7 @@
     ? route.params.id[0]
     : route.params.id || '';
   const form = reactive<ISystemMetadata>({ ...metadata.form.create() });
-    const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
+  const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
     name: [
       {
         required: true,
@@ -105,7 +105,7 @@
 
   const handleSubmit = async () => {
     const result = await metadata.api.update(form);
-    if (result) router.push({ name: "SystemMetadata" });
+    if (result) router.push({ name: 'SystemMetadata' });
   };
 </script>
 

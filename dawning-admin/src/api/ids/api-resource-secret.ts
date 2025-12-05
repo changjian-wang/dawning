@@ -1,3 +1,3 @@
 export interface IApiResourceSecret {
-    apiResourceId: string;
+  apiResourceId: string;
 }

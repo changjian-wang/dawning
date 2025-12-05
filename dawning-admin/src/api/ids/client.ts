@@ -9,14 +9,14 @@ import { IClientProperty } from './client-property';
 import { IClientScope } from './client-scope';
 import { IClientSecret } from './client-secret';
 import { IClientRedirectUri } from './client-redirect-uri';
-import { 
-  AccessTokenType, 
+import {
+  AccessTokenType,
   GrantType,
   GrantTypes,
-  RedirectType, 
+  RedirectType,
   RedirectTypes,
-  TokenExpiration, 
-  TokenUsage 
+  TokenExpiration,
+  TokenUsage,
 } from '../constants';
 
 export interface IClient {
@@ -149,7 +149,9 @@ export const client = {
     }),
 
     // SPA客户端预设
-    createSpa: (overrides: Partial<IClientWithLoginURI> = {}): IClientWithLoginURI => ({
+    createSpa: (
+      overrides: Partial<IClientWithLoginURI> = {}
+    ): IClientWithLoginURI => ({
       ...client.form.createWithLoginURI(),
       clientName: 'SPA Application',
       requireClientSecret: false,
@@ -162,7 +164,9 @@ export const client = {
     }),
 
     // Web应用客户端预设
-    createWebApp: (overrides: Partial<IClientWithLoginURI> = {}): IClientWithLoginURI => ({
+    createWebApp: (
+      overrides: Partial<IClientWithLoginURI> = {}
+    ): IClientWithLoginURI => ({
       ...client.form.createWithLoginURI(),
       clientName: 'Web Application',
       requireClientSecret: true,
@@ -175,7 +179,9 @@ export const client = {
     }),
 
     // API客户端预设
-    createApi: (overrides: Partial<IClientWithLoginURI> = {}): IClientWithLoginURI => ({
+    createApi: (
+      overrides: Partial<IClientWithLoginURI> = {}
+    ): IClientWithLoginURI => ({
       ...client.form.createWithLoginURI(),
       clientName: 'API Client',
       requireClientSecret: true,
@@ -188,7 +194,9 @@ export const client = {
     }),
 
     // 移动应用客户端预设
-    createMobile: (overrides: Partial<IClientWithLoginURI> = {}): IClientWithLoginURI => ({
+    createMobile: (
+      overrides: Partial<IClientWithLoginURI> = {}
+    ): IClientWithLoginURI => ({
       ...client.form.createWithLoginURI(),
       clientName: 'Mobile Application',
       requireClientSecret: false,
@@ -259,7 +267,9 @@ export const client = {
     },
 
     redirectType: (redirectType: string): redirectType is RedirectType => {
-      return Object.values(RedirectTypes).includes(redirectType as RedirectType);
+      return Object.values(RedirectTypes).includes(
+        redirectType as RedirectType
+      );
     },
   },
 
@@ -275,7 +285,7 @@ export const client = {
     size: number
   ): Promise<IPagedData<IClient>> {
     const response = await http.post<IPagedData<IClient>>(
-      `/api/client/get-paged-list?page=${page}&size=${size}`, 
+      `/api/client/get-paged-list?page=${page}&size=${size}`,
       model
     );
     return response.data;

@@ -37,18 +37,18 @@
               {{ '重置' }}
             </a-button>
             <a-button
-                type="primary"
-                class="add"
-                @click="
-                  () => {
-                    $router.push('api-resource/add');
-                  }
-                "
-              >
-                <template #icon>
-                  <icon-plus />
-                </template>
-              </a-button>
+              type="primary"
+              class="add"
+              @click="
+                () => {
+                  $router.push('api-resource/add');
+                }
+              "
+            >
+              <template #icon>
+                <icon-plus />
+              </template>
+            </a-button>
           </a-space>
         </a-col>
       </a-row>

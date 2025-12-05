@@ -2,7 +2,13 @@
   <div class="container">
     <Breadcrumb :items="['认证授权', '客户端', '基本信息']" />
 
-    <a-form ref="formRef" class="form" layout="horizontal" auto-label-width :model="form">
+    <a-form
+      ref="formRef"
+      class="form"
+      layout="horizontal"
+      auto-label-width
+      :model="form"
+    >
       <a-card class="general-card">
         <template #title>
           {{ '基本信息' }}
@@ -223,9 +229,7 @@
           </a-col>
           <a-col :span="24" style="text-align: center">
             <a-button type="primary">
-              <template #icon>
-                <icon-plus /> </template
-              >添加
+              <template #icon> <icon-plus /> </template>添加
             </a-button>
           </a-col>
         </a-row>

@@ -69,9 +69,7 @@
           </a-tab-pane>
           <a-tab-pane :key="2" title="声明">
             <a-card class="general-card">
-              <a-row :gutter="80">
-                
-              </a-row>
+              <a-row :gutter="80"> </a-row>
             </a-card>
           </a-tab-pane>
           <a-tab-pane :key="3" title="属性">

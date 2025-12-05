@@ -47,8 +47,7 @@ const ADMINISTRATION: AppRouteRecordRaw = {
     {
       path: 'system-metadata/:id/info',
       name: 'SystemMetadataInfo',
-      component: () =>
-        import('@/views/administration/system-metadata/add.vue'),
+      component: () => import('@/views/administration/system-metadata/add.vue'),
       meta: {
         locale: 'menu.add',
         requiresAuth: true,
@@ -114,10 +113,11 @@ const ADMINISTRATION: AppRouteRecordRaw = {
         {
           path: 'api-resource/add',
           name: 'ApiResourceAdd',
-          component: () => import('@/views/administration/ids/api-resource/add.vue'),
+          component: () =>
+            import('@/views/administration/ids/api-resource/add.vue'),
           meta: {
             locale: 'menu.add',
-            requiresAuth: true, 
+            requiresAuth: true,
             roles: ['*'],
             hideInMenu: true,
           },

@@ -1,3 +1,3 @@
 export interface IApiResourceClaim {
-    apiResourceId: string;
+  apiResourceId: string;
 }

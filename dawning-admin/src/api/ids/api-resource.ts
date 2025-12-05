@@ -1,21 +1,21 @@
-import { IApiResourceClaim } from "./api-resource-claim";
-import { IApiResourceProperty } from "./api-resource-property";
-import { IApiResourceScope } from "./api-resource-scope";
-import { IApiResourceSecret } from "./api-resource-secret";
+import { IApiResourceClaim } from './api-resource-claim';
+import { IApiResourceProperty } from './api-resource-property';
+import { IApiResourceScope } from './api-resource-scope';
+import { IApiResourceSecret } from './api-resource-secret';
 
-export interface IApiResource { 
-    id: string;
-    enabled: boolean;
-    name: string;
-    displayName: string;
-    description: string;
-    allowedAccessTokenSigningAlgorithms: string;
-    showInDiscoveryDocument: boolean;
-    secrets: IApiResourceSecret[];
-    scopes: IApiResourceScope[];
-    claims: IApiResourceClaim[];
-    properties: IApiResourceProperty[];
-    nonEditable: boolean;
+export interface IApiResource {
+  id: string;
+  enabled: boolean;
+  name: string;
+  displayName: string;
+  description: string;
+  allowedAccessTokenSigningAlgorithms: string;
+  showInDiscoveryDocument: boolean;
+  secrets: IApiResourceSecret[];
+  scopes: IApiResourceScope[];
+  claims: IApiResourceClaim[];
+  properties: IApiResourceProperty[];
+  nonEditable: boolean;
 }
 
 /**
@@ -26,44 +26,45 @@ export interface IApiResource {
  * 4. 增加类型安全，方便后续拓展和维护。
  */
 export class ApiResource implements IApiResource {
-    id: string;
-    enabled: boolean;
-    name: string;
-    displayName: string;
-    description: string;
-    allowedAccessTokenSigningAlgorithms: string;
-    showInDiscoveryDocument: boolean;
-    secrets: IApiResourceSecret[];
-    scopes: IApiResourceScope[];
-    claims: IApiResourceClaim[];
-    properties: IApiResourceProperty[];
-    nonEditable: boolean;
+  id: string;
+  enabled: boolean;
+  name: string;
+  displayName: string;
+  description: string;
+  allowedAccessTokenSigningAlgorithms: string;
+  showInDiscoveryDocument: boolean;
+  secrets: IApiResourceSecret[];
+  scopes: IApiResourceScope[];
+  claims: IApiResourceClaim[];
+  properties: IApiResourceProperty[];
+  nonEditable: boolean;
 
-    constructor({
-        id = '',
-        enabled = false,
-        name = '',
-        displayName = '',
-        description = '',
-        allowedAccessTokenSigningAlgorithms = '',
-        showInDiscoveryDocument = true,
-        secrets = [],
-        scopes = [],
-        claims = [],
-        properties = [],
-        nonEditable = false,
-    }: Partial<IApiResource> = {}) {
-        this.id = id;
-        this.enabled = enabled;
-        this.name = name;
-        this.displayName = displayName;
-        this.description = description;
-        this.allowedAccessTokenSigningAlgorithms = allowedAccessTokenSigningAlgorithms;
-        this.showInDiscoveryDocument = showInDiscoveryDocument;
-        this.secrets = secrets;
-        this.scopes = scopes;
-        this.claims = claims;
-        this.properties = properties;
-        this.nonEditable = nonEditable;
-    }
+  constructor({
+    id = '',
+    enabled = false,
+    name = '',
+    displayName = '',
+    description = '',
+    allowedAccessTokenSigningAlgorithms = '',
+    showInDiscoveryDocument = true,
+    secrets = [],
+    scopes = [],
+    claims = [],
+    properties = [],
+    nonEditable = false,
+  }: Partial<IApiResource> = {}) {
+    this.id = id;
+    this.enabled = enabled;
+    this.name = name;
+    this.displayName = displayName;
+    this.description = description;
+    this.allowedAccessTokenSigningAlgorithms =
+      allowedAccessTokenSigningAlgorithms;
+    this.showInDiscoveryDocument = showInDiscoveryDocument;
+    this.secrets = secrets;
+    this.scopes = scopes;
+    this.claims = claims;
+    this.properties = properties;
+    this.nonEditable = nonEditable;
+  }
 }

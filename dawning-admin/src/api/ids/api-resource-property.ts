@@ -1,5 +1,5 @@
-import { IProperty } from "./property";
+import { IProperty } from './property';
 
 export interface IApiResourceProperty extends IProperty {
-    apiResourceId?: string;
+  apiResourceId?: string;
 }

@@ -173,7 +173,11 @@
   import { reactive, ref, onMounted, onUnmounted } from 'vue';
   import { Modal, PaginationProps } from '@arco-design/web-vue';
   import { FieldRule } from '@arco-design/web-vue';
-import { ISystemMetadata, ISystemMetadataModel, metadata } from '@/api/administration/system-metadata';
+  import {
+    ISystemMetadata,
+    ISystemMetadataModel,
+    metadata,
+  } from '@/api/administration/system-metadata';
 
   const visible = ref(false);
   const formRef = ref<any>(null);

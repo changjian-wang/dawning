@@ -101,7 +101,7 @@
 
   const handleSubmit = async () => {
     const result = await updateClaimType(form);
-    if (result) router.push({ name: "ClaimType" })
+    if (result) router.push({ name: 'ClaimType' });
   };
 </script>
 

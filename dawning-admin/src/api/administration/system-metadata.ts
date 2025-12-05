@@ -29,48 +29,60 @@ export const metadata = {
       description: '',
       nonEditable: false,
     }),
-    
+
     reset: (target: ISystemMetadata) => {
       Object.assign(target, metadata.form.create());
     },
-    
+
     isValid: (form: ISystemMetadata): boolean => {
       return !!(form.name?.trim() && form.key?.trim() && form.value?.trim());
-    }
+    },
   },
   api: {
     // API 方法
     async get(id: string): Promise<ISystemMetadata> {
-      const response = await http.get<ISystemMetadata>(`/api/system-metadata/get/${id}`);
+      const response = await http.get<ISystemMetadata>(
+        `/api/system-metadata/get/${id}`
+      );
       return response.data;
     },
-  
+
     async getPagedList(model: any, page: number, size: number): Promise<any> {
       const response = await http.post<any>(
-        `/api/system-metadata/get-paged-list?page=${page}&size=${size}`, 
+        `/api/system-metadata/get-paged-list?page=${page}&size=${size}`,
         model
       );
       return response.data;
     },
-  
+
     async getAll(): Promise<ISystemMetadata[]> {
-      const response = await http.get<ISystemMetadata[]>('/api/system-metadata/get-all');
+      const response = await http.get<ISystemMetadata[]>(
+        '/api/system-metadata/get-all'
+      );
       return response.data;
     },
-  
+
     async create(model: ISystemMetadata): Promise<number> {
-      const response = await http.post<number>('/api/system-metadata/insert', model);
+      const response = await http.post<number>(
+        '/api/system-metadata/insert',
+        model
+      );
       return response.data;
     },
-  
+
     async update(model: ISystemMetadata): Promise<boolean> {
-      const response = await http.put<boolean>('/api/system-metadata/update', model);
+      const response = await http.put<boolean>(
+        '/api/system-metadata/update',
+        model
+      );
       return response.data;
     },
-  
+
     async delete(id: string): Promise<boolean> {
-      const response = await http.delete<boolean>(`/api/system-metadata/delete/${id}`);
+      const response = await http.delete<boolean>(
+        `/api/system-metadata/delete/${id}`
+      );
       return response.data;
-    }
-  }
+    },
+  },
 };

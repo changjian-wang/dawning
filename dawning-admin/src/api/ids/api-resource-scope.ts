@@ -1,5 +1,5 @@
 export interface IApiResourceScope {
-    id: string;
-    scope: string;
-    apiResourceId: string;
+  id: string;
+  scope: string;
+  apiResourceId: string;
 }
