@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Collections.Concurrent;
@@ -1489,16 +1489,14 @@ public partial class SqlServerAdapter : ISqlAdapter
     /// <returns></returns>
     public IEnumerable<dynamic> RetrieveCurrentPaginatedData(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM (SELECT {sortingColumnName} FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC OFFSET {(page - 1) * itemsPerPage} ROWS FETCH NEXT {itemsPerPage} ROWS ONLY) AS t";
-        var data = connection.ExecuteScalar<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC OFFSET {(page - 1) * itemsPerPage} ROWS FETCH NEXT {itemsPerPage} ROWS ONLY;", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard OFFSET FETCH NEXT
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     OFFSET {(page - 1) * itemsPerPage} ROWS 
+                     FETCH NEXT {itemsPerPage} ROWS ONLY";
+        
+        return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
     }
 
     /// <summary>
@@ -1589,16 +1587,15 @@ public partial class SqlCeServerAdapter : ISqlAdapter
     /// <returns></returns>
     public IEnumerable<dynamic> RetrieveCurrentPaginatedData(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName} FROM (SELECT {sortingColumnName}, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS row_num FROM {tableName} WHERE {whereClause ?? "1=1"}) AS t WHERE row_num BETWEEN {(page - 1) * itemsPerPage + 1} AND {page * itemsPerPage}";
-        var data = connection.ExecuteScalar<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = connection.Query($"SELECT * FROM {tableName}  WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC;", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with ROW_NUMBER pagination
+        var sql = $@"SELECT * FROM (
+                        SELECT *, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS RowNum
+                        FROM {tableName}
+                        WHERE {whereClause ?? "1=1"}
+                     ) AS t
+                     WHERE RowNum BETWEEN {(page - 1) * itemsPerPage + 1} AND {page * itemsPerPage}";
+        
+        return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
     }
 
     /// <summary>
@@ -1688,16 +1685,13 @@ public partial class MySqlAdapter : ISqlAdapter
     /// <returns></returns>
     public IEnumerable<dynamic> RetrieveCurrentPaginatedData(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT `{sortingColumnName}` FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY `{sortingColumnName}` DESC LIMIT {(page - 1) * itemsPerPage}, 1";
-        var data = connection.ExecuteScalar<long>(cmd, parameters, transaction, commandTimeout);
-
-        if (data > 0)
-        {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage}", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard LIMIT OFFSET
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY `{sortingColumnName}` DESC 
+                     LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
     }
 
     /// <summary>
@@ -1807,16 +1801,13 @@ public partial class PostgresAdapter : ISqlAdapter
     /// <returns></returns>
     public IEnumerable<dynamic> RetrieveCurrentPaginatedData(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        var data = connection.ExecuteScalar<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard LIMIT OFFSET (PostgresAdapter)
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
     }
 
     /// <summary>
@@ -1905,16 +1896,13 @@ public partial class SQLiteAdapter : ISqlAdapter
     /// <returns></returns>
     public IEnumerable<dynamic> RetrieveCurrentPaginatedData(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        var data = connection.ExecuteScalar<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard LIMIT OFFSET (SQLiteAdapter)
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
     }
 
     /// <summary>
@@ -2005,16 +1993,13 @@ public partial class FbAdapter : ISqlAdapter
     /// <returns></returns>
     public IEnumerable<dynamic> RetrieveCurrentPaginatedData(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC ROWS {(page - 1) * itemsPerPage + 1} TO {(page * itemsPerPage)}";
-        var data = connection.Query(cmd, parameters);
-
-        if (data != null && data.Any())
-        {
-            var list = connection.Query($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} >= {data.First()} ORDER BY {sortingColumnName} DESC ROWS {(page - 1) * itemsPerPage} TO {page * itemsPerPage};", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with Firebird ROWS syntax
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     ROWS {(page - 1) * itemsPerPage + 1} TO {page * itemsPerPage}";
+        
+        return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
     }
 
     /// <summary>

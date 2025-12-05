@@ -321,10 +321,23 @@ namespace Dawning.Shared.Dapper.Contrib
         /// <typeparam name="TEntity"></typeparam>
         public partial class QueryBuilder<TEntity> where TEntity : class, new()
         {
+            /// <summary>
+            /// Maximum allowed page number to prevent performance issues and malicious requests
+            /// </summary>
+            private const int MaxPageNumber = 10000;
+
             public async Task<PagedResult<TEntity>> AsPagedListAsync(int page, int itemsPerPage)
             {
                 if (page < 1) page = 1;
                 if (itemsPerPage < 1) itemsPerPage = 1;
+
+                // ✅ Page number protection
+                if (page > MaxPageNumber)
+                {
+                    throw new InvalidOperationException(
+                        $"Page number {page} exceeds maximum allowed {MaxPageNumber}. " +
+                        "Consider using filters to narrow down results or contact support for large dataset access.");
+                }
 
                 var type = typeof(TEntity);
                 var name = GetTableName(type);
@@ -338,6 +351,11 @@ namespace Dawning.Shared.Dapper.Contrib
                         "A sorting column must be specified for pagination.");
                 }
 
+                // ✅ Execute COUNT first, then data query (MySQL doesn't support MARS - Multiple Active Result Sets)
+                var countSql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
+                var count = await _connection.ExecuteScalarAsync(countSql, parameters, _transaction, _commandTimeout);
+                long totalCount = count != null ? Convert.ToInt64(count) : 0;
+
                 var list = await sqlAdapter.RetrieveCurrentPaginatedDataAsync(
                     _connection,
                     _transaction,
@@ -348,10 +366,6 @@ namespace Dawning.Shared.Dapper.Contrib
                     itemsPerPage,
                     whereClause,
                     parameters);
-
-                var countSql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
-                var count = await _connection.ExecuteScalarAsync(countSql, parameters, _transaction, _commandTimeout);
-                long totalCount = count != null ? Convert.ToInt64(count) : 0;
 
                 return new PagedResult<TEntity>
                 {
@@ -463,16 +477,14 @@ public partial class SqlServerAdapter
     /// <returns></returns>
     public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM (SELECT {sortingColumnName} FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC OFFSET {(page - 1) * itemsPerPage} ROWS FETCH NEXT {itemsPerPage} ROWS ONLY) AS t";
-        var data = await connection.ExecuteScalarAsync<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = await connection.QueryAsync($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC OFFSET {(page - 1) * itemsPerPage} ROWS FETCH NEXT {itemsPerPage} ROWS ONLY;", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard OFFSET FETCH NEXT
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     OFFSET {(page - 1) * itemsPerPage} ROWS 
+                     FETCH NEXT {itemsPerPage} ROWS ONLY";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
 
@@ -529,16 +541,15 @@ public partial class SqlCeServerAdapter
     /// <returns></returns>
     public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName} FROM (SELECT {sortingColumnName}, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS row_num FROM {tableName} WHERE {whereClause ?? "1=1"}) AS t WHERE row_num BETWEEN {(page - 1) * itemsPerPage + 1} AND {page * itemsPerPage}";
-        var data = await connection.ExecuteScalarAsync<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = await connection.QueryAsync($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC;", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with ROW_NUMBER pagination
+        var sql = $@"SELECT * FROM (
+                        SELECT *, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS RowNum
+                        FROM {tableName}
+                        WHERE {whereClause ?? "1=1"}
+                     ) AS t
+                     WHERE RowNum BETWEEN {(page - 1) * itemsPerPage + 1} AND {page * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
 
@@ -595,16 +606,13 @@ public partial class MySqlAdapter
     /// <returns></returns>
     public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT `{sortingColumnName}` FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC LIMIT {(page - 1) * itemsPerPage}, 1";
-        var data = await connection.ExecuteScalarAsync<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = await connection.QueryAsync($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage}", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard LIMIT OFFSET
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
 
@@ -680,16 +688,13 @@ public partial class PostgresAdapter
     /// <returns></returns>
     public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        var data = await connection.ExecuteScalarAsync<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = await connection.QueryAsync($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard LIMIT OFFSET
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
 
@@ -744,16 +749,13 @@ public partial class SQLiteAdapter
     /// <returns></returns>
     public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM {tableName} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        var data = await connection.ExecuteScalarAsync<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = await connection.QueryAsync($"SELECT * FROM {tableName} WHERE {whereClause} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage};", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with standard LIMIT OFFSET
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
 
@@ -810,15 +812,12 @@ public partial class FbAdapter
     /// <returns></returns>
     public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
     {
-        string cmd = $"SELECT MIN({sortingColumnName}) FROM {tableName} WHERE {whereClause ?? "1=1"} ORDER BY {sortingColumnName} DESC ROWS {(page - 1) * itemsPerPage + 1} TO {(page * itemsPerPage)}";
-        var data = await connection.ExecuteScalarAsync<long>(cmd, parameters);
-
-        if (data > 0)
-        {
-            var list = await connection.QueryAsync($"SELECT * FROM {tableName} WHERE {whereClause ?? "1=1"} AND {sortingColumnName} <= {data} ORDER BY {sortingColumnName} DESC ROWS {(page - 1) * itemsPerPage} TO {page * itemsPerPage};", parameters);
-            return list;
-        }
-
-        return new List<dynamic>();
+        // ✅ Simplified: Single query with Firebird ROWS syntax
+        var sql = $@"SELECT * FROM {tableName} 
+                     WHERE {whereClause ?? "1=1"} 
+                     ORDER BY {sortingColumnName} DESC 
+                     ROWS {(page - 1) * itemsPerPage + 1} TO {page * itemsPerPage}";
+        
+        return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
