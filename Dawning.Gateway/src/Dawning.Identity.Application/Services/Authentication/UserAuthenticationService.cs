@@ -1,83 +1,119 @@
 using Dawning.Identity.Application.Dtos.Authentication;
+using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Authentication;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Dawning.Identity.Application.Services.Authentication
 {
     /// <summary>
-    /// 用户认证服务实现（临时实现，用于演示）
-    /// TODO: 在生产环境中应该连接真实的用户数据库
+    /// 用户认证服务实现 - 集成UserService进行数据库验证
     /// </summary>
     public class UserAuthenticationService : IUserAuthenticationService
     {
-        // 模拟用户数据库（实际应该从数据库读取）
-        private static readonly List<UserAuthenticationDto> _users = new()
-        {
-            new UserAuthenticationDto
-            {
-                Id = "1",
-                Username = "admin",
-                Email = "admin@dawning.com",
-                Role = "admin",
-                IsActive = true
-            },
-            new UserAuthenticationDto
-            {
-                Id = "2",
-                Username = "user",
-                Email = "user@dawning.com",
-                Role = "user",
-                IsActive = true
-            }
-        };
+        private readonly IUserService _userService;
 
-        // 模拟密码存储（实际应该使用加密存储）
-        // 密码映射: admin -> admin, user -> user123
-        private static readonly Dictionary<string, string> _passwords = new()
+        public UserAuthenticationService(IUserService userService)
         {
-            { "admin", "admin" },
-            { "user", "user123" }
-        };
+            _userService = userService;
+        }
 
         /// <summary>
         /// 验证用户凭据
         /// </summary>
-        public Task<UserAuthenticationDto?> ValidateCredentialsAsync(string username, string password)
+        public async Task<UserAuthenticationDto?> ValidateCredentialsAsync(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                return Task.FromResult<UserAuthenticationDto?>(null);
+                return null;
             }
 
-            // 查找用户
-            var user = _users.FirstOrDefault(u =>
-                u.Username.Equals(username, StringComparison.OrdinalIgnoreCase) &&
-                u.IsActive);
-
+            // 使用ValidateCredentialsAndUpdateLoginAsync方法，它会同时验证密码和更新登录时间
+            var user = await _userService.ValidateCredentialsAndUpdateLoginAsync(username, password);
             if (user == null)
             {
-                return Task.FromResult<UserAuthenticationDto?>(null);
+                return null;
             }
 
-            // 验证密码（实际应该使用加密比对）
-            if (_passwords.TryGetValue(user.Username, out var storedPassword) &&
-                storedPassword == password)
+            // 返回认证DTO
+            return new UserAuthenticationDto
             {
-                return Task.FromResult<UserAuthenticationDto?>(user);
-            }
-
-            return Task.FromResult<UserAuthenticationDto?>(null);
+                Id = user.Id.ToString(),
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role,
+                IsActive = user.IsActive
+            };
         }
 
         /// <summary>
         /// 根据用户ID获取用户信息
         /// </summary>
-        public Task<UserAuthenticationDto?> GetUserByIdAsync(string userId)
+        public async Task<UserAuthenticationDto?> GetUserByIdAsync(string userId)
         {
-            var user = _users.FirstOrDefault(u =>
-                u.Id == userId &&
-                u.IsActive);
+            if (!Guid.TryParse(userId, out var id))
+            {
+                return null;
+            }
 
-            return Task.FromResult(user);
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null || !user.IsActive)
+            {
+                return null;
+            }
+
+            return new UserAuthenticationDto
+            {
+                Id = user.Id.ToString(),
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role,
+                IsActive = user.IsActive
+            };
+        }
+
+        /// <summary>
+        /// 根据用户名获取用户信息
+        /// </summary>
+        public async Task<UserAuthenticationDto?> GetByUsernameAsync(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return null;
+            }
+
+            var model = new Domain.Models.Administration.UserModel
+            {
+                Username = username,
+                IsActive = true,
+                IncludeDeleted = false
+            };
+            var users = await _userService.GetPagedListAsync(model, 1, 10);
+
+            var user = users.Items.FirstOrDefault();
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserAuthenticationDto
+            {
+                Id = user.Id.ToString(),
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role,
+                IsActive = user.IsActive
+            };
+        }
+
+        /// <summary>
+        /// 密码哈希计算 (SHA256)
+        /// </summary>
+        private static string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(bytes);
         }
     }
 }

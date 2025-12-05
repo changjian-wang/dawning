@@ -9,7 +9,9 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
     {
         const string NAME_SPACE = "Dawning.Identity";
         const string APPLICATION_ASSEMBLY_NAME = $"{NAME_SPACE}.Application";
+        const string INFRA_DATA_ASSEMBLY_NAME = $"{NAME_SPACE}.Infra.Data";
         const string SERVICE_SUFFIX_NAME = "Service";
+        const string REPOSITORY_SUFFIX_NAME = "Repository";
 
         /// <summary>
         /// 注册应用服务
@@ -19,7 +21,7 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
             // 注册 UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // 扫描并注册程序集中的服务
+            // 扫描并注册程序集中的服务和仓储
             foreach (var assembly in LoadAssemblies())
             {
                 RegisterServices(services, assembly);
@@ -46,10 +48,10 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         }
 
         /// <summary>
-        /// 判断是否为 Service
+        /// 判断是否为 Service 或 Repository
         /// </summary>
         private static bool IsServiceOrRepository(Type type) =>
-            type.Name.EndsWith(SERVICE_SUFFIX_NAME);
+            type.Name.EndsWith(SERVICE_SUFFIX_NAME) || type.Name.EndsWith(REPOSITORY_SUFFIX_NAME);
 
         /// <summary>
         /// 获取相关接口（只返回项目内部的接口）
@@ -63,8 +65,7 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         private static IEnumerable<Assembly> LoadAssemblies()
         {
             yield return Assembly.Load(APPLICATION_ASSEMBLY_NAME);
-            // 如果需要也可以加载数据层程序集
-            //yield return Assembly.Load(INFRA_DATA_ASSEMBLY_NAME);
+            yield return Assembly.Load(INFRA_DATA_ASSEMBLY_NAME);
         }
     }
 }

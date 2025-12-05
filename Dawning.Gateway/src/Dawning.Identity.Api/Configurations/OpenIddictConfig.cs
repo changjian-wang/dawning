@@ -1,6 +1,7 @@
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Infra.Data.Stores;
 using OpenIddict.Abstractions;
+using OpenIddict.Validation.AspNetCore;
 using ApplicationEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Application;
 
 namespace Dawning.Identity.Api.Configurations
@@ -15,6 +16,13 @@ namespace Dawning.Identity.Api.Configurations
         /// </summary>
         public static IServiceCollection AddOpenIddictConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
+            // 添加默认 Authentication Scheme
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+            });
+
             // 注册自定义 Stores（基于 Dapper Repository）
             services.AddScoped<IOpenIddictApplicationStore<ApplicationEntity>, OpenIddictApplicationStore>();
             services.AddScoped<IOpenIddictScopeStore<Scope>, OpenIddictScopeStore>();

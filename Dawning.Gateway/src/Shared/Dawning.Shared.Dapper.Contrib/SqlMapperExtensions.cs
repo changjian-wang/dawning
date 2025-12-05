@@ -275,6 +275,11 @@ namespace Dawning.Shared.Dapper.Contrib
                         {
                             property.SetValue(obj, val is Guid guid ? guid : Guid.Parse(val.ToString()!), null);
                         }
+                        else if (property.PropertyType == typeof(DateTime) || property.PropertyType == typeof(DateTime?))
+                        {
+                            // 直接设置DateTime，避免Convert.ChangeType的类型转换问题
+                            property.SetValue(obj, val is DateTime dt ? dt : DateTime.Parse(val.ToString()!), null);
+                        }
                         else if (property.PropertyType.IsEnum)
                         {
                             property.SetValue(obj, Enum.ToObject(property.PropertyType, val), null);
