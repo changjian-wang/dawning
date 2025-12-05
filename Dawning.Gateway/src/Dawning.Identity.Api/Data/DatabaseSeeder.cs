@@ -12,15 +12,18 @@ namespace Dawning.Identity.Api.Data
     {
         private readonly IApplicationService _applicationService;
         private readonly IScopeService _scopeService;
+        private readonly Dawning.Identity.Application.Interfaces.Administration.IUserService _userService;
         private readonly ILogger<DatabaseSeeder> _logger;
 
         public DatabaseSeeder(
             IApplicationService applicationService,
             IScopeService scopeService,
+            Dawning.Identity.Application.Interfaces.Administration.IUserService userService,
             ILogger<DatabaseSeeder> logger)
         {
             _applicationService = applicationService;
             _scopeService = scopeService;
+            _userService = userService;
             _logger = logger;
         }
 
@@ -33,6 +36,7 @@ namespace Dawning.Identity.Api.Data
             {
                 await SeedScopesAsync();
                 await SeedApplicationsAsync();
+                await SeedUsersAsync();
                 _logger.LogInformation("Database seeding completed successfully");
             }
             catch (Exception ex)
@@ -187,6 +191,42 @@ namespace Dawning.Identity.Api.Data
             else
             {
                 _logger.LogInformation("Application '{ClientId}' already exists", apiClientId);
+            }
+        }
+
+        /// <summary>
+        /// 初始化默认用户
+        /// </summary>
+        private async Task SeedUsersAsync()
+        {
+            // 检查是否存在 admin 用户
+            var adminUser = await _userService.GetByUsernameAsync("admin");
+            if (adminUser != null)
+            {
+                _logger.LogInformation("Admin user 'admin' already exists");
+                return;
+            }
+
+            // 创建默认管理员用户
+            var createUserDto = new Dawning.Identity.Application.Dtos.User.CreateUserDto
+            {
+                Username = "admin",
+                Password = "admin", // 密码：admin
+                Email = "admin@dawning.com",
+                DisplayName = "Administrator",
+                Role = "admin",
+                IsActive = true
+            };
+
+            try
+            {
+                await _userService.CreateAsync(createUserDto, null);
+                _logger.LogInformation("Admin user created successfully (username: admin, password: admin)");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to create admin user");
+                throw;
             }
         }
     }

@@ -25,6 +25,7 @@ export default {
   'navbar.action.locale': '切换为中文',
   // --begin--
   'menu.administration': '管理',
+  'menu.administration.user': '用户管理',
   'menu.administration.ids': '认证授权服务',
   'menu.administration.ids.client': '客户端',
   'menu.administration.ids.api.resource': 'API资源',

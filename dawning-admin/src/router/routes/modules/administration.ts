@@ -13,6 +13,16 @@ const ADMINISTRATION: AppRouteRecordRaw = {
   },
   children: [
     {
+      path: 'user',
+      name: 'User',
+      component: () => import('@/views/administration/user/index.vue'),
+      meta: {
+        locale: 'menu.administration.user',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'claim-type',
       name: 'ClaimType',
       component: () => import('@/views/administration/claim-type/index.vue'),
