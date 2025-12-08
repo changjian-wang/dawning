@@ -1,10 +1,13 @@
+using Dapper;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Authentication;
+using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Controllers
@@ -19,15 +22,21 @@ namespace Dawning.Identity.Api.Controllers
     {
         private readonly IUserAuthenticationService _userAuthenticationService;
         private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
         private readonly ILogger<UserController> _logger;
 
         public UserController(
             IUserAuthenticationService userAuthenticationService,
             IUserService userService,
+            IUserRepository userRepository,
+            IConfiguration configuration,
             ILogger<UserController> logger)
         {
             _userAuthenticationService = userAuthenticationService;
             _userService = userService;
+            _userRepository = userRepository;
+            _configuration = configuration;
             _logger = logger;
         }
 
@@ -371,6 +380,69 @@ namespace Dawning.Identity.Api.Controllers
             {
                 _logger.LogError(ex, "Error checking email");
                 return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// 强制重置管理员账号（仅开发环境）
+        /// </summary>
+        /// <remarks>
+        /// 警告：该接口仅用于开发环境！
+        /// 会删除所有现有用户并创建新的admin账号。
+        /// 生产环境请移除此端点！
+        /// </remarks>
+        [HttpPost("dev-reset-admin")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        public async Task<IActionResult> DevResetAdmin()
+        {
+            try
+            {
+#if !DEBUG
+                return BadRequest(new { code = 400, message = "This endpoint is only available in development mode" });
+#endif
+                _logger.LogWarning("DEV MODE: Force resetting all users and creating new admin");
+
+                // 直接使用SQL硬删除所有用户（包括软删除的）
+                var connectionString = _configuration.GetConnectionString("MySQL");
+                using (var connection = new MySqlConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+                    var deletedCount = await connection.ExecuteAsync("DELETE FROM `user`");
+                    _logger.LogInformation("Hard deleted {Count} users from database", deletedCount);
+                }
+
+                // 创建新的管理员账号
+                var createUserDto = new CreateUserDto
+                {
+                    Username = "admin",
+                    Password = "admin",
+                    Email = "admin@dawning.com",
+                    DisplayName = "Administrator",
+                    Role = "admin",
+                    IsActive = true
+                };
+
+                var admin = await _userService.CreateAsync(createUserDto, null);
+                
+                _logger.LogInformation("Admin account reset successfully: {Username}", admin.Username);
+
+                return Ok(new 
+                { 
+                    code = 0, 
+                    data = admin,
+                    message = "Admin account reset successfully. Username: admin, Password: admin"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting admin account");
+                return StatusCode(500, new 
+                { 
+                    code = 500, 
+                    message = "Failed to reset admin account",
+                    error = ex.Message 
+                });
             }
         }
 
