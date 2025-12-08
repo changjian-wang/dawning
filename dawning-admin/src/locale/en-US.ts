@@ -25,6 +25,8 @@ export default {
   'navbar.action.locale': 'Switch to English',
   // --begin--
   'menu.administration': 'Administration',
+  'menu.administration.user': 'User Management',
+  'menu.administration.system.metadata': 'System Metadata',
   'menu.administration.openiddict': 'Authorization and Authentication Service',
   'menu.administration.openiddict.application': 'Applications',
   'menu.administration.openiddict.scope': 'Scopes',

@@ -26,6 +26,7 @@ export default {
   // --begin--
   'menu.administration': '管理',
   'menu.administration.user': '用户管理',
+  'menu.administration.system.metadata': '元数据',
   'menu.administration.openiddict': '认证授权服务',
   'menu.administration.openiddict.application': '应用程序',
   'menu.administration.openiddict.scope': '作用域',
