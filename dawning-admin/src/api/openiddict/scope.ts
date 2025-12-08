@@ -1,0 +1,139 @@
+import { http } from '../interceptor';
+import { IPagedData } from '../paged-data';
+
+/**
+ * OpenIddict 作用域
+ */
+export interface IScope {
+  id?: string;
+  name: string;
+  displayName?: string;
+  description?: string;
+  resources?: string[];
+  properties?: Record<string, string>;
+  timestamp?: number;
+  createdAt?: string;
+}
+
+/**
+ * 作用域查询模型
+ */
+export interface IScopeQuery {
+  name?: string;
+  displayName?: string;
+}
+
+/**
+ * 创建作用域DTO
+ */
+export interface ICreateScopeDto {
+  name: string;
+  displayName?: string;
+  description?: string;
+  resources?: string[];
+}
+
+/**
+ * 更新作用域DTO
+ */
+export interface IUpdateScopeDto extends ICreateScopeDto {
+  id: string;
+}
+
+class ScopeApi {
+  /**
+   * 获取作用域详情
+   */
+  async get(id: string): Promise<IScope> {
+    const response = await http.get<{ data: IScope }>(
+      `/api/openiddict/scope/get/${id}`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 根据名称获取作用域
+   */
+  async getByName(name: string): Promise<IScope> {
+    const response = await http.get<{ data: IScope }>(
+      `/api/openiddict/scope/get-by-name/${name}`
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 根据名称列表获取作用域
+   */
+  async getByNames(names: string[]): Promise<IScope[]> {
+    const response = await http.post<{ data: IScope[] }>(
+      '/api/openiddict/scope/get-by-names',
+      names
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 获取分页列表
+   */
+  async getPagedList(
+    query: IScopeQuery,
+    page: number = 1,
+    size: number = 10
+  ): Promise<IPagedData<IScope>> {
+    const response = await http.post<{ data: IPagedData<IScope> }>(
+      `/api/openiddict/scope/get-paged-list?page=${page}&size=${size}`,
+      query
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 获取所有作用域
+   */
+  async getAll(): Promise<IScope[]> {
+    const response = await http.get<{ data: IScope[] }>(
+      '/api/openiddict/scope/get-all'
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 创建作用域
+   */
+  async create(dto: ICreateScopeDto): Promise<number> {
+    const response = await http.post<{ data: number }>(
+      '/api/openiddict/scope/insert',
+      {
+        name: dto.name,
+        displayName: dto.displayName,
+        description: dto.description,
+        resources: dto.resources || [],
+        properties: {},
+      }
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 更新作用域
+   */
+  async update(dto: IUpdateScopeDto): Promise<number> {
+    const response = await http.put<{ data: number }>(
+      '/api/openiddict/scope/update',
+      dto
+    );
+    return response.data.data;
+  }
+
+  /**
+   * 删除作用域
+   */
+  async delete(id: string): Promise<number> {
+    const response = await http.delete<{ data: number }>(
+      `/api/openiddict/scope/delete/${id}`
+    );
+    return response.data.data;
+  }
+}
+
+export const scope = new ScopeApi();

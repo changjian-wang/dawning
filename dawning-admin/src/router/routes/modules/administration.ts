@@ -88,6 +88,17 @@ const ADMINISTRATION: AppRouteRecordRaw = {
           },
         },
         {
+          path: 'scope',
+          name: 'Scope',
+          component: () =>
+            import('@/views/administration/openiddict/scope/index.vue'),
+          meta: {
+            locale: 'menu.administration.openiddict.scope',
+            requiresAuth: true,
+            roles: ['*'],
+          },
+        },
+        {
           path: 'client',
           name: 'Client',
           component: () =>

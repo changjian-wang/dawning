@@ -26,6 +26,8 @@ export default {
   // --begin--
   'menu.administration': 'Administration',
   'menu.administration.openiddict': 'Authorization and Authentication Service',
+  'menu.administration.openiddict.application': 'Applications',
+  'menu.administration.openiddict.scope': 'Scopes',
   'menu.administration.openiddict.client': 'Clients',
   'menu.administration.openiddict.api.resource': 'API Resources',
   'menu.administration.openiddict.identity.resource': 'Identity Resources',

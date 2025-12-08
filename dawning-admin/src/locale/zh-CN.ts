@@ -28,6 +28,7 @@ export default {
   'menu.administration.user': '用户管理',
   'menu.administration.openiddict': '认证授权服务',
   'menu.administration.openiddict.application': '应用程序',
+  'menu.administration.openiddict.scope': '作用域',
   'menu.administration.openiddict.client': '客户端',
   'menu.administration.openiddict.api.resource': 'API资源',
   'menu.administration.openiddict.identity.resource': '身份资源',
