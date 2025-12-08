@@ -90,7 +90,8 @@
       };
 
       const renderSubMenu = () => {
-        function travel(_route: RouteRecordRaw[], nodes = []) {
+        function travel(_route: RouteRecordRaw[]) {
+          const nodes: any[] = [];
           if (_route) {
             _route.forEach((element) => {
               // This is demo, modify nodes as needed
@@ -113,15 +114,15 @@
                     onClick: () => goto(element),
                   }, () => t(element?.meta?.locale || ''))
                 );
-              nodes.push(node as never);
+              nodes.push(node);
             });
-          }
-          return nodes;
-        }
-        return travel(menuTree.value);
-      };
+      }
+      return nodes;
+    }
+    return travel(menuTree.value);
+  };
 
-      return () => h('a-menu' as any, {
+  return () => h('a-menu' as any, {
         mode: topMenu.value ? 'horizontal' : 'vertical',
         collapsed: collapsed.value,
         'onUpdate:collapsed': (val: boolean) => { collapsed.value = val; },
