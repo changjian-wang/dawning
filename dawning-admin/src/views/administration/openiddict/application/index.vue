@@ -379,7 +379,7 @@
         pagination.pageSize
       );
       tableData.value = result.items;
-      pagination.total = result.total;
+      pagination.total = result.totalCount;
     } catch (error) {
       Message.error('加载数据失败');
       console.error(error);
