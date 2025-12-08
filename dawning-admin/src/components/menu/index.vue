@@ -1,5 +1,5 @@
 <script lang="tsx">
-  import { defineComponent, ref, h, compile, computed } from 'vue';
+  import { defineComponent, ref, h, compile, computed, resolveComponent } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
   import type { RouteMeta } from 'vue-router';
@@ -90,6 +90,9 @@
       };
 
       const renderSubMenu = () => {
+        const ASubMenu = resolveComponent('ASubMenu');
+        const AMenuItem = resolveComponent('AMenuItem');
+        
         function travel(_route: RouteRecordRaw[]) {
           const nodes: any[] = [];
           if (_route) {
@@ -100,7 +103,7 @@
                 : null;
               const node =
                 element?.children && element?.children.length !== 0 ? (
-                  h('a-sub-menu' as any, {
+                  h(ASubMenu, {
                     key: element?.name,
                     icon,
                   }, {
@@ -108,7 +111,7 @@
                     title: () => h(compile(t(element?.meta?.locale || ''))),
                   })
                 ) : (
-                  h('a-menu-item' as any, {
+                  h(AMenuItem, {
                     key: element?.name,
                     icon,
                     onClick: () => goto(element),
@@ -122,7 +125,9 @@
     return travel(menuTree.value);
   };
 
-  return () => h('a-menu' as any, {
+  return () => {
+    const AMenu = resolveComponent('AMenu');
+    const menu = h(AMenu, {
         mode: topMenu.value ? 'horizontal' : 'vertical',
         collapsed: collapsed.value,
         'onUpdate:collapsed': (val: boolean) => { collapsed.value = val; },
@@ -135,7 +140,9 @@
         levelIndent: 34,
         style: 'height: 100%;width:100%;',
         onCollapse: setCollapse,
-      }, () => renderSubMenu());
+      }, renderSubMenu());
+    return menu;
+  };
     },
   });
 </script>
