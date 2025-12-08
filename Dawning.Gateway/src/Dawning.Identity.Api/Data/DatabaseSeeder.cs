@@ -1,5 +1,6 @@
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
+using Dawning.Identity.Domain.Core.Security;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -102,7 +103,7 @@ namespace Dawning.Identity.Api.Data
                 {
                     Id = Guid.NewGuid(),
                     ClientId = adminClientId,
-                    ClientSecret = null, // 公共客户端不需要密钥
+                    ClientSecret = null, // 公共客户端不需要密钥（SPA应用）
                     DisplayName = "Dawning Admin",
                     Type = ClientTypes.Public, // SPA 应用使用 Public 类型
                     ConsentType = ConsentTypes.Implicit, // 隐式同意
@@ -161,7 +162,7 @@ namespace Dawning.Identity.Api.Data
                 {
                     Id = Guid.NewGuid(),
                     ClientId = apiClientId,
-                    ClientSecret = "dawning-api-secret", // TODO: 应该使用加密存储
+                    ClientSecret = PasswordHasher.Hash("dawning-api-secret"), // 使用 PBKDF2 哈希
                     DisplayName = "Dawning API",
                     Type = ClientTypes.Confidential, // 服务端应用使用 Confidential 类型
                     ConsentType = ConsentTypes.Implicit,
@@ -199,11 +200,8 @@ namespace Dawning.Identity.Api.Data
         /// </summary>
         private async Task SeedUsersAsync()
         {
-            // 检查系统中是否已存在任何用户（包括已删除的）
-            var allUsersModel = new Dawning.Identity.Domain.Models.Administration.UserModel
-            {
-                IncludeDeleted = true
-            };
+            // 检查系统中是否已存在任何用户
+            var allUsersModel = new Dawning.Identity.Domain.Models.Administration.UserModel();
 
             var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);
             if (existingUsers.TotalCount > 0)

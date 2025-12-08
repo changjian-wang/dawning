@@ -48,7 +48,7 @@ namespace Dawning.Identity.Api
                 .AddJsonOptions(options =>
                 {
                     // Configure JSON serialization options
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null; // keep original property names
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // use camelCase for JSON
                     options.JsonSerializerOptions.WriteIndented = true; // format output
                 });
 

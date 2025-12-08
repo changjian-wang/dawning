@@ -203,6 +203,26 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
+        /// 重置密码（管理员功能）
+        /// </summary>
+        public async Task<bool> ResetPasswordAsync(Guid userId, string newPassword)
+        {
+            var user = await _userRepository.GetAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"User with ID '{userId}' not found.");
+            }
+
+            // 直接更新密码，不需要验证旧密码
+            user.PasswordHash = HashPassword(newPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            var result = await _userRepository.UpdateAsync(user);
+
+            return result;
+        }
+
+        /// <summary>
         /// 检查用户名是否存在
         /// </summary>
         public async Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null)
@@ -271,7 +291,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
             // 从数据库获取用户（包含PasswordHash）
             var user = await _userRepository.GetByUsernameAsync(username);
-            if (user == null || !user.IsActive || user.IsDeleted)
+            if (user == null || !user.IsActive)
             {
                 return null;
             }
@@ -295,8 +315,16 @@ namespace Dawning.Identity.Application.Services.Administration
             var user = await ValidatePasswordAsync(username, password);
             if (user != null)
             {
-                // TODO: 更新最后登录时间 - 需要解决UnitOfWork事务问题
-                // await UpdateLastLoginAsync(user.Id);
+                // 在独立事务中更新最后登录时间，避免影响主事务
+                try
+                {
+                    await UpdateLastLoginAsync(user.Id);
+                }
+                catch
+                {
+                    // 记录错误但不影响登录流程
+                    // 可以使用日志记录: _logger.LogWarning(ex, "Failed to update last login time for user {UserId}", user.Id);
+                }
             }
             return user;
         }

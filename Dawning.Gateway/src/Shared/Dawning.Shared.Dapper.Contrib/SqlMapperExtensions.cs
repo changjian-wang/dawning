@@ -72,7 +72,7 @@ namespace Dawning.Shared.Dapper.Contrib
 
         private static List<PropertyInfo> ComputedPropertiesCache(Type type)
         {
-            if (ComputedProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo> pi))
+            if (ComputedProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo>? pi) && pi != null)
             {
                 return pi.ToList();
             }
@@ -85,7 +85,7 @@ namespace Dawning.Shared.Dapper.Contrib
 
         private static List<PropertyInfo> IgnoreUpdatePropertiesCache(Type type)
         {
-            if (IgnoreUpdateProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo> pi))
+            if (IgnoreUpdateProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo>? pi) && pi != null)
             {
                 return pi.ToList();
             }
@@ -98,7 +98,7 @@ namespace Dawning.Shared.Dapper.Contrib
 
         private static List<PropertyInfo> ExplicitKeyPropertiesCache(Type type)
         {
-            if (ExplicitKeyProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo> pi))
+            if (ExplicitKeyProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo>? pi) && pi != null)
             {
                 return pi.ToList();
             }
@@ -111,7 +111,7 @@ namespace Dawning.Shared.Dapper.Contrib
 
         private static List<PropertyInfo> KeyPropertiesCache(Type type)
         {
-            if (KeyProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo> pi))
+            if (KeyProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo>? pi) && pi != null)
             {
                 return pi.ToList();
             }
@@ -134,7 +134,7 @@ namespace Dawning.Shared.Dapper.Contrib
 
         private static List<PropertyInfo> TypePropertiesCache(Type type)
         {
-            if (TypeProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo> pis))
+            if (TypeProperties.TryGetValue(type.TypeHandle, out IEnumerable<PropertyInfo>? pis) && pis != null)
             {
                 return pis.ToList();
             }
@@ -335,12 +335,12 @@ namespace Dawning.Shared.Dapper.Contrib
         /// Specify a custom table name mapper based on the POCO type name
         /// </summary>
 #pragma warning disable CA2211 // Non-constant fields should not be visible - I agree with you, but we can't do that until we break the API
-        public static TableNameMapperDelegate TableNameMapper;
+        public static TableNameMapperDelegate? TableNameMapper;
 #pragma warning restore CA2211 // Non-constant fields should not be visible
 
         private static string GetTableName(Type type)
         {
-            if (TypeTableName.TryGetValue(type.TypeHandle, out string name)) return name;
+            if (TypeTableName.TryGetValue(type.TypeHandle, out string? name) && name != null) return name;
 
             if (TableNameMapper != null)
             {
@@ -600,7 +600,7 @@ namespace Dawning.Shared.Dapper.Contrib
         /// Please note that this callback is global and will be used by all the calls that require a database specific adapter.
         /// </summary>
 #pragma warning disable CA2211 // Non-constant fields should not be visible - I agree with you, but we can't do that until we break the API
-        public static GetDatabaseTypeDelegate GetDatabaseType;
+        public static GetDatabaseTypeDelegate? GetDatabaseType;
 #pragma warning restore CA2211 // Non-constant fields should not be visible
 
         private static ISqlAdapter GetFormatter(IDbConnection connection)

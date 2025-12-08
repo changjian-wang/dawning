@@ -43,7 +43,7 @@
         /// <summary>
         /// 错误响应
         /// </summary>
-        public static ApiResponse<T> Error(int code, string message, T data = default)
+        public static ApiResponse<T> Error(int code, string message, T? data = default)
         {
             return new ApiResponse<T>
             {

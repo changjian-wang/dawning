@@ -23,7 +23,7 @@ builder.Services.AddReverseProxy()
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration["IdentityServer:Authority"];
+        options.Authority = builder.Configuration["Identity:Authority"];
         options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -88,7 +88,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 // ===== 健康检查 =====
 builder.Services.AddHealthChecks()
-    .AddUrlGroup(new Uri(builder.Configuration["IdentityServer:Authority"] + "/health"),
+    .AddUrlGroup(new Uri(builder.Configuration["Identity:Authority"] + "/health"),
         name: "identity-service",
         timeout: TimeSpan.FromSeconds(5));
 

@@ -41,7 +41,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         public async Task<User?> GetByUsernameAsync(string username)
         {
             var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(username), u => u.Username == username && u.IsDeleted == false)
+                .WhereIf(!string.IsNullOrWhiteSpace(username), u => u.Username == username)
                 .AsListAsync();
 
             return result.FirstOrDefault()?.ToModel();
@@ -53,7 +53,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         public async Task<User?> GetByEmailAsync(string email)
         {
             var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(email), u => u.Email == email && u.IsDeleted == false)
+                .WhereIf(!string.IsNullOrWhiteSpace(email), u => u.Email == email)
                 .AsListAsync();
 
             return result.FirstOrDefault()?.ToModel();
@@ -65,9 +65,6 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         public async Task<PagedData<User>> GetPagedListAsync(UserModel model, int page, int itemsPerPage)
         {
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
-
-            // 默认不包含已删除的用户
-            builder = builder.WhereIf(!model.IncludeDeleted, u => u.IsDeleted == false);
 
             // 应用过滤条件
             builder = builder
@@ -97,9 +94,6 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(UserModel model, long? cursor, int pageSize)
         {
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
-
-            // 默认不包含已删除的用户
-            builder = builder.WhereIf(!model.IncludeDeleted, u => u.IsDeleted == false);
 
             // 应用过滤条件
             builder = builder
@@ -173,7 +167,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步删除用户（软删除）
+        /// 异步删除用户
         /// </summary>
         public async ValueTask<bool> DeleteAsync(User model)
         {
@@ -182,11 +176,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 throw new ArgumentNullException(nameof(model));
             }
 
-            // 软删除
-            model.IsDeleted = true;
-            model.UpdatedAt = DateTime.UtcNow;
-
-            return await UpdateAsync(model);
+            return await _context.Connection.DeleteAsync(model);
         }
 
         /// <summary>
@@ -204,11 +194,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             if (excludeUserId.HasValue)
             {
                 var excludeId = excludeUserId.Value;
-                builder = builder.WhereIf(true, u => u.Username == username && u.IsDeleted == false && u.Id != excludeId);
+                builder = builder.WhereIf(true, u => u.Username == username && u.Id != excludeId);
             }
             else
             {
-                builder = builder.WhereIf(true, u => u.Username == username && u.IsDeleted == false);
+                builder = builder.WhereIf(true, u => u.Username == username);
             }
 
             var result = await builder.AsListAsync();
@@ -230,11 +220,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             if (excludeUserId.HasValue)
             {
                 var excludeId = excludeUserId.Value;
-                builder = builder.WhereIf(true, u => u.Email == email && u.IsDeleted == false && u.Id != excludeId);
+                builder = builder.WhereIf(true, u => u.Email == email && u.Id != excludeId);
             }
             else
             {
-                builder = builder.WhereIf(true, u => u.Email == email && u.IsDeleted == false);
+                builder = builder.WhereIf(true, u => u.Email == email);
             }
 
             var result = await builder.AsListAsync();

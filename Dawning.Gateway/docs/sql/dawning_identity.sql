@@ -1,4 +1,4 @@
--- ====================================================
+`openiddict_applications`-- ====================================================
 -- Dawning Identity Database Creation Script
 -- Date: 2025-11-18
 -- Description: 创建 Dawning Identity 数据库

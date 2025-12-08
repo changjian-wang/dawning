@@ -958,11 +958,11 @@
   import dayjs from 'dayjs';
   import { v7 as uuidv7 } from 'uuid';
   import { FormInstance } from '@arco-design/web-vue';
-  import { client, IClientWithLoginURI, IRedirectUri } from '@/api/ids/client';
-  import { ClientSecret, IClientSecret } from '@/api/ids/client-secret';
-  import { IClientRedirectUri } from '@/api/ids/client-redirect-uri';
-  import { IClientPostLogoutRedirectUri } from '@/api/ids/client-post-logout-redirect-uri';
-  import { IClientClaim } from '@/api/ids/client-claim';
+  import { client, IClientWithLoginURI, IRedirectUri } from '@/api/openiddict/client';
+  import { ClientSecret, IClientSecret } from '@/api/openiddict/client-secret';
+  import { IClientRedirectUri } from '@/api/openiddict/client-redirect-uri';
+  import { IClientPostLogoutRedirectUri } from '@/api/openiddict/client-post-logout-redirect-uri';
+  import { IClientClaim } from '@/api/openiddict/client-claim';
   import { claimType, IClaimType } from '@/api/administration/claim-type';
   import _, { forEach } from 'lodash';
   import CryptoJS from 'crypto-js';

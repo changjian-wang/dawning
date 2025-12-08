@@ -52,6 +52,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         Task<bool> ChangePasswordAsync(ChangePasswordDto dto);
 
         /// <summary>
+        /// 重置密码（管理员功能）
+        /// </summary>
+        Task<bool> ResetPasswordAsync(Guid userId, string newPassword);
+
+        /// <summary>
         /// 检查用户名是否存在
         /// </summary>
         Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null);

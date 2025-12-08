@@ -69,9 +69,31 @@ namespace Dawning.Identity.Api.Configurations
                     }
                     else
                     {
-                        // 生产环境应该使用真实证书
-                        // TODO: 配置生产证书
-                        throw new InvalidOperationException("Production certificates must be configured.");
+                        // 生产环境使用真实证书
+                        var certConfig = configuration.GetSection("OpenIddict:Certificates").Get<CertificateConfig>();
+                        
+                        if (certConfig == null)
+                        {
+                            throw new InvalidOperationException("Certificate configuration is required when UseDevelopmentCertificate=false");
+                        }
+
+                        var signingCert = CertificateLoader.LoadCertificate(certConfig.Signing);
+                        if (signingCert == null)
+                        {
+                            throw new InvalidOperationException("Signing certificate could not be loaded");
+                        }
+                        options.AddSigningCertificate(signingCert);
+
+                        var encryptionCert = CertificateLoader.LoadCertificate(certConfig.Encryption);
+                        if (encryptionCert != null)
+                        {
+                            options.AddEncryptionCertificate(encryptionCert);
+                        }
+                        else
+                        {
+                            // 如果没有配置加密证书，使用签名证书
+                            options.AddEncryptionCertificate(signingCert);
+                        }
                     }
 
                     // 注册作用域

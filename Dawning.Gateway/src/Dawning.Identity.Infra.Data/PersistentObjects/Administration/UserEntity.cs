@@ -65,12 +65,6 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 是否已删除
-        /// </summary>
-        [Column("is_deleted")]
-        public bool IsDeleted { get; set; } = false;
-
-        /// <summary>
         /// 邮箱是否已验证
         /// </summary>
         [Column("email_confirmed")]

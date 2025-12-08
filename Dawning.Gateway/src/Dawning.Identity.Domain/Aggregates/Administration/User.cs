@@ -54,11 +54,6 @@ namespace Dawning.Identity.Domain.Aggregates.Administration
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 是否已删除（软删除）
-        /// </summary>
-        public bool IsDeleted { get; set; } = false;
-
-        /// <summary>
         /// 邮箱是否已验证
         /// </summary>
         public bool EmailConfirmed { get; set; } = false;

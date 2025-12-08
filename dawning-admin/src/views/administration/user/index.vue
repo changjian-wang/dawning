@@ -9,7 +9,7 @@
         <a-row :gutter="12">
           <a-col :span="6">
             <a-form-item label="用户名">
-              <a-input v-model="model.userName" placeholder="请输入用户名..."></a-input>
+              <a-input v-model="model.username" placeholder="请输入用户名..."></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="6">
@@ -18,8 +18,11 @@
             </a-form-item>
           </a-col>
           <a-col :span="6">
-            <a-form-item label="手机号">
-              <a-input v-model="model.phoneNumber" placeholder="请输入手机号..."></a-input>
+            <a-form-item label="角色">
+              <a-select v-model="model.role" placeholder="请选择角色" allow-clear>
+                <a-option value="admin">管理员</a-option>
+                <a-option value="user">普通用户</a-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :flex="30" style="text-align: right">
@@ -36,11 +39,7 @@
                 </template>
                 {{ '重置' }}
               </a-button>
-              <a-button
-                type="primary"
-                class="add"
-                @click="handleAdd"
-              >
+              <a-button type="primary" class="add" @click="handleAdd">
                 <template #icon>
                   <icon-plus />
                 </template>
@@ -57,51 +56,22 @@
           :bordered="false"
           :loading="loading"
         >
-          <template #emailConfirmed="{ record }">
-            <a-tag v-if="record.emailConfirmed" color="green">
-              <icon-check /> 已验证
+          <template #isActive="{ record }">
+            <a-tag v-if="record.isActive" color="green">
+              <icon-check /> 正常
             </a-tag>
             <a-tag v-else color="red">
-              <icon-close /> 未验证
+              <icon-close /> 禁用
             </a-tag>
-          </template>
-          <template #phoneNumberConfirmed="{ record }">
-            <a-tag v-if="record.phoneNumberConfirmed" color="green">
-              <icon-check /> 已验证
-            </a-tag>
-            <a-tag v-else color="red">
-              <icon-close /> 未验证
-            </a-tag>
-          </template>
-          <template #lockoutEnabled="{ record }">
-            <a-tag v-if="record.lockoutEnabled" color="orange">
-              <icon-lock /> 已锁定
-            </a-tag>
-            <a-tag v-else color="green">
-              <icon-unlock /> 正常
-            </a-tag>
-          </template>
-          <template #twoFactorEnabled="{ record }">
-            <div v-if="record.twoFactorEnabled">
-              <icon-check style="color: green" />
-            </div>
-            <div v-else>
-              <icon-close />
-            </div>
           </template>
           <template #optional="{ record }">
             <a-space>
-              <a-button
-                type="primary"
-                @click="handleEdit(record)"
-              >
+              <a-button type="primary" @click="handleEdit(record)">
                 <template #icon>
                   <icon-edit />
                 </template>
               </a-button>
-              <a-button
-                @click="handleView(record)"
-              >
+              <a-button @click="handleView(record)">
                 <template #icon>
                   <icon-eye />
                 </template>
@@ -115,12 +85,6 @@
                 <template #content>
                   <a-doption @click="handleResetPassword(record)">
                     <icon-refresh /> 重置密码
-                  </a-doption>
-                  <a-doption v-if="!record.lockoutEnabled" @click="handleLock(record)">
-                    <icon-lock /> 锁定账户
-                  </a-doption>
-                  <a-doption v-else @click="handleUnlock(record)">
-                    <icon-unlock /> 解锁账户
                   </a-doption>
                   <a-doption @click="handleDelete(record)">
                     <icon-delete /> 删除
@@ -145,9 +109,9 @@
       <a-form ref="formRef" :rules="rules" :model="form">
         <a-row :gutter="24">
           <a-col :span="12">
-            <a-form-item field="userName" label="用户名" validate-trigger="blur">
+            <a-form-item field="username" label="用户名" validate-trigger="blur">
               <a-input
-                v-model="form.userName"
+                v-model="form.username"
                 placeholder="请输入用户名"
                 :disabled="isEdit"
               ></a-input>
@@ -169,6 +133,14 @@
               ></a-input>
             </a-form-item>
           </a-col>
+          <a-col :span="12">
+            <a-form-item field="displayName" label="显示名称">
+              <a-input
+                v-model="form.displayName"
+                placeholder="请输入显示名称"
+              ></a-input>
+            </a-form-item>
+          </a-col>
           <a-col v-if="!isEdit" :span="12">
             <a-form-item field="password" label="密码" validate-trigger="blur">
               <a-input-password
@@ -178,51 +150,29 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="邮箱已验证">
-              <a-switch v-model="form.emailConfirmed">
-                <template #checked-icon>
-                  <icon-check />
-                </template>
-                <template #unchecked-icon>
-                  <icon-close />
-                </template>
-              </a-switch>
+            <a-form-item field="role" label="角色">
+              <a-select v-model="form.role" placeholder="请选择角色">
+                <a-option value="admin">管理员</a-option>
+                <a-option value="user">普通用户</a-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="手机已验证">
-              <a-switch v-model="form.phoneNumberConfirmed">
-                <template #checked-icon>
-                  <icon-check />
-                </template>
-                <template #unchecked-icon>
-                  <icon-close />
-                </template>
+            <a-form-item label="账户状态">
+              <a-switch v-model="form.isActive">
+                <template #checked>启用</template>
+                <template #unchecked>禁用</template>
               </a-switch>
             </a-form-item>
           </a-col>
-          <a-col :span="12">
-            <a-form-item label="启用两步验证">
-              <a-switch v-model="form.twoFactorEnabled">
-                <template #checked-icon>
-                  <icon-check />
-                </template>
-                <template #unchecked-icon>
-                  <icon-close />
-                </template>
-              </a-switch>
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="允许锁定">
-              <a-switch v-model="form.lockoutEnabled">
-                <template #checked-icon>
-                  <icon-check />
-                </template>
-                <template #unchecked-icon>
-                  <icon-close />
-                </template>
-              </a-switch>
+          <a-col :span="24">
+            <a-form-item field="remark" label="备注">
+              <a-textarea
+                v-model="form.remark"
+                placeholder="请输入备注"
+                :max-length="200"
+                show-word-limit
+              ></a-textarea>
             </a-form-item>
           </a-col>
         </a-row>
@@ -249,7 +199,7 @@
         <a-form-item label="新密码">
           <a-input-password
             v-model="resetPasswordForm.newPassword"
-            placeholder="请输入新密码"
+            placeholder="请输入新密码（至少6个字符）"
           ></a-input-password>
         </a-form-item>
       </a-form>
@@ -280,7 +230,12 @@
   const columns = reactive([
     {
       title: '用户名',
-      dataIndex: 'userName',
+      dataIndex: 'username',
+      width: 150,
+    },
+    {
+      title: '显示名称',
+      dataIndex: 'displayName',
       width: 150,
     },
     {
@@ -294,27 +249,14 @@
       width: 130,
     },
     {
-      title: '邮箱验证',
-      dataIndex: 'emailConfirmed',
-      slotName: 'emailConfirmed',
-      width: 100,
-    },
-    {
-      title: '手机验证',
-      dataIndex: 'phoneNumberConfirmed',
-      slotName: 'phoneNumberConfirmed',
-      width: 100,
-    },
-    {
-      title: '两步验证',
-      dataIndex: 'twoFactorEnabled',
-      slotName: 'twoFactorEnabled',
+      title: '角色',
+      dataIndex: 'role',
       width: 100,
     },
     {
       title: '账户状态',
-      dataIndex: 'lockoutEnabled',
-      slotName: 'lockoutEnabled',
+      dataIndex: 'isActive',
+      slotName: 'isActive',
       width: 100,
     },
     {
@@ -331,11 +273,11 @@
   ]);
 
   const data = reactive<IUser[]>([]);
-  const form = reactive<ICreateUserModel | IUpdateUserModel>({ ...user.form.create() });
+  const form = reactive<any>({ ...user.form.create() });
   const resetPasswordForm = reactive({ newPassword: '' });
   
   const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
-    userName: [
+    username: [
       {
         required: true,
         message: '用户名不能为空',
@@ -343,16 +285,6 @@
       {
         minLength: 3,
         message: '用户名至少3个字符',
-      },
-    ],
-    email: [
-      {
-        required: true,
-        message: '邮箱不能为空',
-      },
-      {
-        type: 'email',
-        message: '邮箱格式不正确',
       },
     ],
     password: [
@@ -367,10 +299,11 @@
     ],
   };
 
-  const model = reactive<IUserModel>({
-    userName: '',
+  const model: IUserModel = reactive({
+    username: '',
     email: '',
-    phoneNumber: '',
+    role: undefined,
+    isActive: undefined,
   });
 
   const pagination = reactive<PaginationProps>({
@@ -433,19 +366,18 @@
 
   const handleView = (record: IUser) => {
     viewData.value = [
-      { label: '用户名', value: record.userName },
-      { label: '邮箱', value: record.email },
+      { label: '用户名', value: record.username },
+      { label: '显示名称', value: record.displayName || '-' },
+      { label: '邮箱', value: record.email || '-' },
       { label: '手机号', value: record.phoneNumber || '-' },
+      { label: '角色', value: record.role },
+      { label: '账户状态', value: record.isActive ? '启用' : '禁用' },
       { label: '邮箱已验证', value: record.emailConfirmed ? '是' : '否' },
       { label: '手机已验证', value: record.phoneNumberConfirmed ? '是' : '否' },
-      { label: '两步验证', value: record.twoFactorEnabled ? '启用' : '未启用' },
-      { label: '允许锁定', value: record.lockoutEnabled ? '是' : '否' },
-      { label: '锁定截止', value: record.lockoutEnd || '-' },
-      { label: '失败次数', value: record.accessFailedCount },
+      { label: '最后登录', value: record.lastLoginAt || '-' },
       { label: '创建时间', value: record.createdAt || '-' },
-      { label: '创建人', value: record.createdBy || '-' },
       { label: '更新时间', value: record.updatedAt || '-' },
-      { label: '更新人', value: record.updatedBy || '-' },
+      { label: '备注', value: record.remark || '-' },
     ];
     viewModalVisible.value = true;
   };
@@ -468,8 +400,9 @@
       }
       modalVisible.value = false;
       fetchData();
-    } catch (error) {
-      Message.error(isEdit.value ? '更新失败' : '创建失败');
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || (isEdit.value ? '更新失败' : '创建失败');
+      Message.error(errorMsg);
       console.error(error);
     }
   };
@@ -484,9 +417,10 @@
   };
 
   const handleReset = () => {
-    model.userName = '';
+    model.username = '';
     model.email = '';
-    model.phoneNumber = '';
+    model.role = undefined;
+    model.isActive = undefined;
     pagination.current = 1;
     fetchData();
   };
@@ -497,14 +431,15 @@
     const modal = (window as any).$modal;
     modal.confirm({
       title: '确认删除',
-      content: `确定要删除用户 "${record.userName}" 吗？此操作不可恢复。`,
+      content: `确定要删除用户 "${record.username}" 吗？此操作不可恢复。`,
       onOk: async () => {
         try {
-          await user.api.delete(record.id as string);
+          await user.api.delete(record.id);
           Message.success('删除成功');
           fetchData();
-        } catch (error) {
-          Message.error('删除失败');
+        } catch (error: any) {
+          const errorMsg = error?.response?.data?.message || '删除失败';
+          Message.error(errorMsg);
           console.error(error);
         }
       },
@@ -512,7 +447,7 @@
   };
 
   const handleResetPassword = (record: IUser) => {
-    currentUserId.value = record.id || '';
+    currentUserId.value = record.id;
     resetPasswordForm.newPassword = '';
     resetPasswordVisible.value = true;
   };
@@ -528,53 +463,12 @@
       Message.success('密码重置成功');
       resetPasswordVisible.value = false;
       return true;
-    } catch (error) {
-      Message.error('密码重置失败');
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || '密码重置失败';
+      Message.error(errorMsg);
       console.error(error);
       return false;
     }
-  };
-
-  const handleLock = (record: IUser) => {
-    if (!record.id) return;
-    
-    const modal = (window as any).$modal;
-    modal.confirm({
-      title: '确认锁定',
-      content: `确定要锁定用户 "${record.userName}" 吗？`,
-      onOk: async () => {
-        try {
-          const lockoutEnd = new Date();
-          lockoutEnd.setFullYear(lockoutEnd.getFullYear() + 100); // 锁定100年
-          await user.api.lock(record.id as string, lockoutEnd.toISOString());
-          Message.success('锁定成功');
-          fetchData();
-        } catch (error) {
-          Message.error('锁定失败');
-          console.error(error);
-        }
-      },
-    });
-  };
-
-  const handleUnlock = (record: IUser) => {
-    if (!record.id) return;
-    
-    const modal = (window as any).$modal;
-    modal.confirm({
-      title: '确认解锁',
-      content: `确定要解锁用户 "${record.userName}" 吗？`,
-      onOk: async () => {
-        try {
-          await user.api.unlock(record.id as string);
-          Message.success('解锁成功');
-          fetchData();
-        } catch (error) {
-          Message.error('解锁失败');
-          console.error(error);
-        }
-      },
-    });
   };
 </script>
 

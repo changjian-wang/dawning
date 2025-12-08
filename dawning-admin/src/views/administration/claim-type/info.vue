@@ -80,10 +80,8 @@
   import { onMounted, reactive } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import {
-    ClaimType,
-    IClaimType,
-    getClaimType,
-    updateClaimType,
+    claimType,
+    type IClaimType,
   } from '@/api/administration/claim-type';
 
   const router = useRouter();
@@ -91,16 +89,15 @@
   const id: string = Array.isArray(route.params.id)
     ? route.params.id[0]
     : route.params.id || '';
-  const defaultForm = new ClaimType();
-  const form = reactive<IClaimType>({ ...defaultForm });
+  const form = reactive<IClaimType>(claimType.form.create());
 
   onMounted(async () => {
-    const claimType = await getClaimType(id);
-    Object.assign(form, { ...claimType });
+    const response = await claimType.api.get(id);
+    Object.assign(form, response);
   });
 
   const handleSubmit = async () => {
-    const result = await updateClaimType(form);
+    const result = await claimType.api.update(form);
     if (result) router.push({ name: 'ClaimType' });
   };
 </script>

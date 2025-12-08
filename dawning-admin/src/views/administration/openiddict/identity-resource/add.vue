@@ -82,13 +82,19 @@
 </template>
 
 <script lang="ts" setup>
-  import IdentityResource from '@/api/ids/identity-resource';
+  import { IdentityResourceClaim, type IIdentityResourceClaim } from '@/api/openiddict/identity-resource-claim';
   import { FormInstance } from '@arco-design/web-vue';
   import { reactive, ref } from 'vue';
 
   const activeKey = ref(1);
-  const form = reactive<IdentityResource>(new IdentityResource());
-  const formRef = ref<FormInstance | null>(null); // 明确表单引用类型
+  const form = reactive<any>({
+    displayName: '',
+    description: '',
+    required: false,
+    showInDiscoveryDocument: true,
+    emphasize: false,
+  });
+  const formRef = ref<FormInstance | null>(null);
   const rules = {};
   const claimTypes = ref([]);
 

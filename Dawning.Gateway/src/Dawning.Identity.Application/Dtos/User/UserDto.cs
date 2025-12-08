@@ -64,4 +64,12 @@ namespace Dawning.Identity.Application.Dtos.User
         public string OldPassword { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
     }
+
+    /// <summary>
+    /// 重置密码请求（简化版，用于API路由参数）
+    /// </summary>
+    public class ResetPasswordRequest
+    {
+        public string NewPassword { get; set; } = string.Empty;
+    }
 }

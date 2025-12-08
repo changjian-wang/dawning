@@ -31,10 +31,5 @@ namespace Dawning.Identity.Domain.Models.Administration
         /// 是否激活
         /// </summary>
         public bool? IsActive { get; set; }
-
-        /// <summary>
-        /// 是否包含已删除用户
-        /// </summary>
-        public bool IncludeDeleted { get; set; } = false;
     }
 }

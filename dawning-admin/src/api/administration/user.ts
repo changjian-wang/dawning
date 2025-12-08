@@ -1,54 +1,62 @@
 import { http } from '../interceptor';
 import { IPagedData } from '../paged-data';
 
+// 用户DTO（匹配后端UserDto）
 export interface IUser {
-  id?: string | null;
-  userName: string;
-  normalizedUserName: string;
-  email: string;
-  normalizedEmail: string;
-  emailConfirmed: boolean;
-  phoneNumber: string;
-  phoneNumberConfirmed: boolean;
-  twoFactorEnabled: boolean;
-  lockoutEnabled: boolean;
-  lockoutEnd?: string | null;
-  accessFailedCount: number;
-  timestamp?: number;
-  createdBy?: string;
-  createdAt?: string;
-  updatedBy?: string;
-  updatedAt?: string;
-}
-
-export interface IUserModel {
-  userName?: string;
+  id: string;
+  username: string;
   email?: string;
   phoneNumber?: string;
-  emailConfirmed?: boolean;
-  lockoutEnabled?: boolean;
+  displayName?: string;
+  avatar?: string;
+  role: string;
+  isActive: boolean;
+  emailConfirmed: boolean;
+  phoneNumberConfirmed: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt?: string;
+  remark?: string;
+  timestamp: number;
 }
 
+// 查询模型
+export interface IUserModel {
+  username?: string;
+  email?: string;
+  displayName?: string;
+  role?: string;
+  isActive?: boolean;
+}
+
+// 创建用户请求
 export interface ICreateUserModel {
-  userName: string;
-  email: string;
-  phoneNumber?: string;
+  username: string;
   password: string;
-  emailConfirmed?: boolean;
-  phoneNumberConfirmed?: boolean;
-  twoFactorEnabled?: boolean;
-  lockoutEnabled?: boolean;
+  email?: string;
+  phoneNumber?: string;
+  displayName?: string;
+  avatar?: string;
+  role?: string;
+  isActive?: boolean;
+  remark?: string;
 }
 
+// 更新用户请求
 export interface IUpdateUserModel {
   id: string;
-  userName: string;
-  email: string;
+  email?: string;
   phoneNumber?: string;
-  emailConfirmed?: boolean;
-  phoneNumberConfirmed?: boolean;
-  twoFactorEnabled?: boolean;
-  lockoutEnabled?: boolean;
+  displayName?: string;
+  avatar?: string;
+  role?: string;
+  isActive?: boolean;
+  remark?: string;
+}
+
+// 重置密码请求
+export interface IResetPasswordModel {
+  newPassword: string;
 }
 
 // 统一的 user 对象
@@ -56,14 +64,15 @@ export const user = {
   // 表单工厂
   form: {
     create: (): ICreateUserModel => ({
-      userName: '',
+      username: '',
+      password: '',
       email: '',
       phoneNumber: '',
-      password: '',
-      emailConfirmed: false,
-      phoneNumberConfirmed: false,
-      twoFactorEnabled: false,
-      lockoutEnabled: false,
+      displayName: '',
+      avatar: '',
+      role: 'user',
+      isActive: true,
+      remark: '',
     }),
 
     reset: (target: ICreateUserModel) => {
@@ -71,87 +80,94 @@ export const user = {
     },
 
     clone: (source: IUser): IUpdateUserModel => ({
-      id: source.id || '',
-      userName: source.userName,
+      id: source.id,
       email: source.email,
       phoneNumber: source.phoneNumber,
-      emailConfirmed: source.emailConfirmed,
-      phoneNumberConfirmed: source.phoneNumberConfirmed,
-      twoFactorEnabled: source.twoFactorEnabled,
-      lockoutEnabled: source.lockoutEnabled,
+      displayName: source.displayName,
+      avatar: source.avatar,
+      role: source.role,
+      isActive: source.isActive,
+      remark: source.remark,
     }),
 
     isValid: (form: ICreateUserModel | IUpdateUserModel): boolean => {
-      return !!(
-        form.userName?.trim() &&
-        form.email?.trim() &&
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
-      );
+      if ('username' in form) {
+        return !!(
+          form.username?.trim() &&
+          form.password?.trim()
+        );
+      }
+      return true;
     },
   },
   
   api: {
-    // API 方法
+    // 获取用户详情
     async get(id: string): Promise<IUser> {
-      const response = await http.get<IUser>(`/api/user/${id}`);
-      return response.data;
+      const response = await http.get(`/api/user/${id}`);
+      return response.data.data;
     },
 
+    // 获取用户列表（分页）
     async getPagedList(
       model: IUserModel,
       page: number,
-      size: number
+      pageSize: number
     ): Promise<IPagedData<IUser>> {
-      const response = await http.get<IPagedData<IUser>>(
+      const response = await http.get(
         `/api/user`,
         {
           params: {
             page,
-            size,
+            pageSize,
             ...model,
           },
         }
       );
-      return response.data;
+      // 后端返回格式：{ code, message, data: { list, pagination } }
+      const { list, pagination } = response.data.data;
+      return {
+        items: list,
+        totalCount: pagination.total,
+        pageIndex: pagination.current,
+        pageSize: pagination.pageSize,
+      };
     },
 
-    async getAll(): Promise<IUser[]> {
-      const response = await http.get<IUser[]>('/api/user/all');
-      return response.data;
+    // 创建用户
+    async create(model: ICreateUserModel): Promise<IUser> {
+      const response = await http.post('/api/user', model);
+      return response.data.data;
     },
 
-    async create(model: ICreateUserModel): Promise<string> {
-      const response = await http.post<string>('/api/user', model);
-      return response.data;
+    // 更新用户
+    async update(model: IUpdateUserModel): Promise<IUser> {
+      const response = await http.put(`/api/user/${model.id}`, model);
+      return response.data.data;
     },
 
-    async update(model: IUpdateUserModel): Promise<boolean> {
-      const response = await http.put<boolean>(`/api/user/${model.id}`, model);
-      return response.data;
-    },
-
+    // 删除用户
     async delete(id: string): Promise<boolean> {
-      const response = await http.delete<boolean>(`/api/user/${id}`);
-      return response.data;
+      const response = await http.delete(`/api/user/${id}`);
+      return response.data.code === 0;
     },
 
+    // 重置密码
     async resetPassword(id: string, newPassword: string): Promise<boolean> {
-      const response = await http.post<boolean>(`/api/user/${id}/reset-password`, {
+      const response = await http.post(`/api/user/${id}/reset-password`, {
         newPassword,
       });
-      return response.data;
+      return response.data.code === 0;
     },
 
-    async lock(id: string, lockoutEnd: string): Promise<boolean> {
-      const response = await http.post<boolean>(`/api/user/${id}/lock`, {
-        lockoutEnd,
+    // 修改密码
+    async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<boolean> {
+      const response = await http.post('/api/user/change-password', {
+        userId,
+        oldPassword,
+        newPassword,
       });
-      return response.data;
-    },
-
-    async unlock(id: string): Promise<boolean> {
-      const response = await http.post<boolean>(`/api/user/${id}/unlock`);
-      return response.data;
+      return response.data.code === 0;
     },
   },
 };

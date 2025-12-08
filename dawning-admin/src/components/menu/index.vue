@@ -95,27 +95,23 @@
             _route.forEach((element) => {
               // This is demo, modify nodes as needed
               const icon = element?.meta?.icon
-                ? () => h(compile(`<${element?.meta?.icon}/>`))
+                ? () => h(compile(`<${element?.meta?.icon}/>`)) as any
                 : null;
               const node =
                 element?.children && element?.children.length !== 0 ? (
-                  <a-sub-menu
-                    key={element?.name}
-                    v-slots={{
-                      icon,
-                      title: () => h(compile(t(element?.meta?.locale || ''))),
-                    }}
-                  >
-                    {travel(element?.children)}
-                  </a-sub-menu>
+                  h('a-sub-menu' as any, {
+                    key: element?.name,
+                    icon,
+                  }, {
+                    default: () => travel(element?.children || []),
+                    title: () => h(compile(t(element?.meta?.locale || ''))),
+                  })
                 ) : (
-                  <a-menu-item
-                    key={element?.name}
-                    v-slots={{ icon }}
-                    onClick={() => goto(element)}
-                  >
-                    {t(element?.meta?.locale || '')}
-                  </a-menu-item>
+                  h('a-menu-item' as any, {
+                    key: element?.name,
+                    icon,
+                    onClick: () => goto(element),
+                  }, () => t(element?.meta?.locale || ''))
                 );
               nodes.push(node as never);
             });
@@ -125,22 +121,20 @@
         return travel(menuTree.value);
       };
 
-      return () => (
-        <a-menu
-          mode={topMenu.value ? 'horizontal' : 'vertical'}
-          v-model:collapsed={collapsed.value}
-          v-model:open-keys={openKeys.value}
-          show-collapse-button={appStore.device !== 'mobile'}
-          auto-open={false}
-          selected-keys={selectedKey.value}
-          auto-open-selected={true}
-          level-indent={34}
-          style="height: 100%;width:100%;"
-          onCollapse={setCollapse}
-        >
-          {renderSubMenu()}
-        </a-menu>
-      );
+      return () => h('a-menu' as any, {
+        mode: topMenu.value ? 'horizontal' : 'vertical',
+        collapsed: collapsed.value,
+        'onUpdate:collapsed': (val: boolean) => { collapsed.value = val; },
+        openKeys: openKeys.value,
+        'onUpdate:openKeys': (val: string[]) => { openKeys.value = val; },
+        showCollapseButton: appStore.device !== 'mobile',
+        autoOpen: false,
+        selectedKeys: selectedKey.value,
+        autoOpenSelected: true,
+        levelIndent: 34,
+        style: 'height: 100%;width:100%;',
+        onCollapse: setCollapse,
+      }, () => renderSubMenu());
     },
   });
 </script>

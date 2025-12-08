@@ -22,7 +22,6 @@ namespace Dawning.Identity.Application.Mapping.Administration
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.EmailConfirmed, opt => opt.Ignore())
                 .ForMember(dest => dest.PhoneNumberConfirmed, opt => opt.Ignore())
                 .ForMember(dest => dest.LastLoginAt, opt => opt.Ignore());

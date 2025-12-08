@@ -1,5 +1,6 @@
 ﻿using System;
 using Dawning.Identity.Domain.Core.Interfaces;
+using Dawning.Identity.Domain.Core.Security;
 
 namespace Dawning.Identity.Domain.Aggregates.OpenIddict
 {
@@ -78,8 +79,13 @@ namespace Dawning.Identity.Domain.Aggregates.OpenIddict
         /// </summary>
         public bool ValidateClientSecret(string secret)
         {
-            // TODO: 实现密钥哈希验证
-            return ClientSecret == secret;
+            if (string.IsNullOrEmpty(ClientSecret))
+            {
+                return false;
+            }
+
+            // 使用 PBKDF2 验证密钥哈希
+            return PasswordHasher.Verify(secret, ClientSecret);
         }
 
         /// <summary>

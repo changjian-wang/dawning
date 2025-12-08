@@ -73,10 +73,10 @@ namespace Dawning.Identity.Api.Controllers
                 var userInfo = new UserInfoDto
                 {
                     Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    Role = user.Role,
-                    Name = user.Username, // 暂时使用 username 作为显示名称
+                    Username = user.Username!,
+                    Email = user.Email!,
+                    Role = user.Role!,
+                    Name = user.Username!, // 暂时使用 username 作为显示名称
                     Avatar = null, // 暂无头像功能
                     CreatedAt = DateTime.UtcNow, // 暂时返回当前时间
                     IsActive = user.IsActive
@@ -346,6 +346,35 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
+        /// 重置密码（管理员功能）
+        /// </summary>
+        [HttpPost("{id:guid}/reset-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ResetPassword(Guid id, [FromBody] ResetPasswordRequest request)
+        {
+            try
+            {
+                var result = await _userService.ResetPasswordAsync(id, request.NewPassword);
+
+                _logger.LogInformation("Password reset for user: {UserId}", id);
+
+                return Ok(new { code = 0, message = "Password reset successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Failed to reset password: {Message}", ex.Message);
+                return NotFound(new { code = 404, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error resetting password for user: {UserId}", id);
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
         /// 检查用户名是否存在
         /// </summary>
         [HttpGet("check-username")]
@@ -408,7 +437,7 @@ namespace Dawning.Identity.Api.Controllers
                 using (var connection = new MySqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    var deletedCount = await connection.ExecuteAsync("DELETE FROM `user`");
+                    var deletedCount = await connection.ExecuteAsync("DELETE FROM `users`");
                     _logger.LogInformation("Hard deleted {Count} users from database", deletedCount);
                 }
 
@@ -465,8 +494,8 @@ namespace Dawning.Identity.Api.Controllers
             {
                 _logger.LogInformation("Attempting to initialize admin account");
 
-                // 检查系统中是否已存在任何用户（包括已删除的）
-                var allUsersModel = new UserModel { IncludeDeleted = true };
+                // 检查系统中是否已存在任何用户
+                var allUsersModel = new UserModel();
                 var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);
                 
                 if (existingUsers.TotalCount > 0)

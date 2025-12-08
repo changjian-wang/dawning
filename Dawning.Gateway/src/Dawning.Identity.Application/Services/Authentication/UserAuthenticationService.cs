@@ -85,8 +85,7 @@ namespace Dawning.Identity.Application.Services.Authentication
             var model = new Domain.Models.Administration.UserModel
             {
                 Username = username,
-                IsActive = true,
-                IncludeDeleted = false
+                IsActive = true
             };
             var users = await _userService.GetPagedListAsync(model, 1, 10);
 
