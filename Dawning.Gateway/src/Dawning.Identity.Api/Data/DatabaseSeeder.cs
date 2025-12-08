@@ -199,41 +199,21 @@ namespace Dawning.Identity.Api.Data
         /// </summary>
         private async Task SeedUsersAsync()
         {
-            // 查询是否已存在 admin 用户（包含已删除的）
+            // 检查系统中是否已存在任何用户（包括已删除的）
             var allUsersModel = new Dawning.Identity.Domain.Models.Administration.UserModel
             {
-                Username = "admin",
                 IncludeDeleted = true
             };
-            var existingAdmins = await _userService.GetPagedListAsync(allUsersModel, 1, 10);
-            
-            if (existingAdmins.Items.Any())
+
+            var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);
+            if (existingUsers.TotalCount > 0)
             {
-                _logger.LogInformation("Admin user already exists, skipping creation");
+                _logger.LogInformation("Users already exist in system, skipping default user creation");
+                _logger.LogInformation("To initialize admin account, please call POST /api/user/initialize-admin");
                 return;
             }
 
-            // 创建默认管理员用户
-            var createUserDto = new Dawning.Identity.Application.Dtos.User.CreateUserDto
-            {
-                Username = "admin",
-                Password = "admin", // 密码：admin
-                Email = "admin@dawning.com",
-                DisplayName = "Administrator",
-                Role = "admin",
-                IsActive = true
-            };
-
-            try
-            {
-                await _userService.CreateAsync(createUserDto, null);
-                _logger.LogInformation("Admin user created successfully (username: admin, password: admin)");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to create admin user");
-                throw;
-            }
+            _logger.LogInformation("No users found in system. Use POST /api/user/initialize-admin to create admin account");
         }
     }
 }

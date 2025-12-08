@@ -375,8 +375,73 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取用户列表（游标分页 - 测试端点）
+        /// 初始化管理员账号（只能调用一次）
         /// </summary>
+        /// <remarks>
+        /// 该接口用于系统首次部署时创建初始管理员账号。
+        /// 如果系统中已存在任何用户，该接口将返回错误。
+        /// 默认账号密码：admin/admin
+        /// </remarks>
+        [HttpPost("initialize-admin")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> InitializeAdmin()
+        {
+            try
+            {
+                _logger.LogInformation("Attempting to initialize admin account");
+
+                // 检查系统中是否已存在任何用户（包括已删除的）
+                var allUsersModel = new UserModel { IncludeDeleted = true };
+                var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);
+                
+                if (existingUsers.TotalCount > 0)
+                {
+                    _logger.LogWarning("Admin initialization failed: System already has users");
+                    return Conflict(new 
+                    { 
+                        code = 409, 
+                        message = "System already initialized. Admin account cannot be created again.",
+                        error = "ALREADY_INITIALIZED"
+                    });
+                }
+
+                // 创建初始管理员账号
+                var createUserDto = new CreateUserDto
+                {
+                    Username = "admin",
+                    Password = "admin",
+                    Email = "admin@dawning.com",
+                    DisplayName = "Administrator",
+                    Role = "admin",
+                    IsActive = true
+                };
+
+                var admin = await _userService.CreateAsync(createUserDto, null);
+                
+                _logger.LogInformation("Admin account initialized successfully: {Username}", admin.Username);
+
+                return Ok(new 
+                { 
+                    code = 0, 
+                    data = admin,
+                    message = "Admin account initialized successfully. Please change the default password immediately."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error initializing admin account");
+                return StatusCode(500, new 
+                { 
+                    code = 500, 
+                    message = "Failed to initialize admin account",
+                    error = ex.Message 
+                });
+            }
+        }
+
         #region 辅助方法
 
         /// <summary>
