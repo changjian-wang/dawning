@@ -11,6 +11,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         ISystemMetadataRepository SystemMetadata { get; }
         IRoleRepository Role { get; }
         IUserRoleRepository UserRole { get; }
+        IAuditLogRepository AuditLog { get; }
 
         // OpenIddict
         IApplicationRepository Application { get; }

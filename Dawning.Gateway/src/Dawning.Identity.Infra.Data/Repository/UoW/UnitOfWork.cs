@@ -26,6 +26,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             SystemMetadata = new SystemMetadataRepository(_context);
             Role = new RoleRepository(_context);
             UserRole = new UserRoleRepository(_context);
+            AuditLog = new AuditLogRepository(_context);
 
             // OpenIddict
             Application = new ApplicationRepository(_context);
@@ -39,6 +40,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public ISystemMetadataRepository SystemMetadata { get; }
         public IRoleRepository Role { get; }
         public IUserRoleRepository UserRole { get; }
+        public IAuditLogRepository AuditLog { get; }
 
         // OpenIddict
         public IApplicationRepository Application { get; }

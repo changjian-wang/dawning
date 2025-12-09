@@ -1,4 +1,5 @@
 using Dapper;
+using Dawning.Identity.Api.Helpers;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Authentication;
@@ -25,19 +26,22 @@ namespace Dawning.Identity.Api.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserController> _logger;
+        private readonly AuditLogHelper _auditLogHelper;
 
         public UserController(
             IUserAuthenticationService userAuthenticationService,
             IUserService userService,
             IUserRepository userRepository,
             IConfiguration configuration,
-            ILogger<UserController> logger)
+            ILogger<UserController> logger,
+            AuditLogHelper auditLogHelper)
         {
             _userAuthenticationService = userAuthenticationService;
             _userService = userService;
             _userRepository = userRepository;
             _configuration = configuration;
             _logger = logger;
+            _auditLogHelper = auditLogHelper;
         }
 
         /// <summary>
@@ -238,6 +242,15 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("User created: {Username}", user.Username);
 
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "Create",
+                    entityType: "User",
+                    entityId: user.Id,
+                    description: $"Created user: {user.Username}",
+                    newValues: new { user.Username, user.Email, user.Role, user.IsActive },
+                    statusCode: 201);
+
                 return CreatedAtAction(
                     nameof(GetUserById),
                     new { id = user.Id },
@@ -271,9 +284,22 @@ namespace Dawning.Identity.Api.Controllers
                 // 获取当前操作者ID
                 var operatorId = GetCurrentUserId();
 
+                // 获取更新前的用户信息
+                var oldUser = await _userRepository.GetAsync(id);
+                var oldValues = oldUser != null ? new { oldUser.Username, oldUser.Email, oldUser.Role, oldUser.IsActive } : null;
+
                 var user = await _userService.UpdateAsync(dto, operatorId);
 
                 _logger.LogInformation("User updated: {UserId}", id);
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "Update",
+                    entityType: "User",
+                    entityId: id,
+                    description: $"Updated user: {user.Username}",
+                    oldValues: oldValues,
+                    newValues: new { user.Username, user.Email, user.Role, user.IsActive });
 
                 return Ok(new { code = 0, message = "User updated successfully", data = user });
             }
@@ -303,9 +329,21 @@ namespace Dawning.Identity.Api.Controllers
                 // 获取当前操作者ID
                 var operatorId = GetCurrentUserId();
 
+                // 获取被删除的用户信息
+                var user = await _userRepository.GetAsync(id);
+                var userInfo = user != null ? new { user.Username, user.Email } : null;
+
                 var result = await _userService.DeleteAsync(id, operatorId);
 
                 _logger.LogInformation("User deleted: {UserId}", id);
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "Delete",
+                    entityType: "User",
+                    entityId: id,
+                    description: $"Deleted user: {userInfo?.Username}",
+                    oldValues: userInfo);
 
                 return Ok(new { code = 0, message = "User deleted successfully" });
             }
@@ -334,6 +372,13 @@ namespace Dawning.Identity.Api.Controllers
                 var result = await _userService.ChangePasswordAsync(dto);
 
                 _logger.LogInformation("Password changed for user: {UserId}", dto.UserId);
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "ChangePassword",
+                    entityType: "User",
+                    entityId: dto.UserId,
+                    description: "User changed their password");
 
                 return Ok(new { code = 0, message = "Password changed successfully" });
             }
@@ -364,6 +409,16 @@ namespace Dawning.Identity.Api.Controllers
                 var result = await _userService.ResetPasswordAsync(id, request.NewPassword);
 
                 _logger.LogInformation("Password reset for user: {UserId}", id);
+
+                // 获取用户信息
+                var user = await _userRepository.GetAsync(id);
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "ResetPassword",
+                    entityType: "User",
+                    entityId: id,
+                    description: $"Admin reset password for user: {user?.Username}");
 
                 return Ok(new { code = 0, message = "Password reset successfully" });
             }

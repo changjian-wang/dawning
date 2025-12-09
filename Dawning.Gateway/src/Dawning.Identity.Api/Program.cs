@@ -37,6 +37,10 @@ namespace Dawning.Identity.Api
             builder.Services.AddScoped<Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService, 
                 Dawning.Identity.Application.Services.Authentication.UserAuthenticationService>();
 
+            // ===== Audit Log Helper =====
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<Dawning.Identity.Api.Helpers.AuditLogHelper>();
+
             // ===== Database Configuration =====
             builder.Services.AddDatabaseConfiguration(builder.Configuration);
 

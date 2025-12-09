@@ -1,6 +1,7 @@
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
+using Dawning.Identity.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,13 @@ namespace Dawning.Identity.Api.Controllers.Administration
     {
         private readonly IRoleService _roleService;
         private readonly ILogger<RoleController> _logger;
+        private readonly AuditLogHelper _auditLogHelper;
 
-        public RoleController(IRoleService roleService, ILogger<RoleController> logger)
+        public RoleController(IRoleService roleService, ILogger<RoleController> logger, AuditLogHelper auditLogHelper)
         {
             _roleService = roleService;
             _logger = logger;
+            _auditLogHelper = auditLogHelper;
         }
 
         /// <summary>
@@ -159,6 +162,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 _logger.LogInformation("Role created: {RoleName}", role.Name);
 
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "Create",
+                    entityType: "Role",
+                    entityId: role.Id,
+                    description: $"Created role: {role.Name}",
+                    newValues: new { role.Name, role.Description, Permissions = role.Permissions },
+                    statusCode: 201);
+
                 return CreatedAtAction(
                     nameof(GetById),
                     new { id = role.Id },
@@ -188,9 +200,22 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 dto.Id = id;
                 var operatorId = GetCurrentUserId();
+
+                // 获取更新前的角色信息
+                var oldRole = await _roleService.GetAsync(id);
+
                 var role = await _roleService.UpdateAsync(dto, operatorId);
 
                 _logger.LogInformation("Role updated: {RoleId}", id);
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "Update",
+                    entityType: "Role",
+                    entityId: id,
+                    description: $"Updated role: {role.Name}",
+                    oldValues: oldRole != null ? new { oldRole.Name, oldRole.Description, Permissions = oldRole.Permissions } : null,
+                    newValues: new { role.Name, role.Description, Permissions = role.Permissions });
 
                 return Ok(new { code = 0, message = "Role updated successfully", data = role });
             }
@@ -217,9 +242,21 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var operatorId = GetCurrentUserId();
+
+                // 获取删除前的角色信息
+                var role = await _roleService.GetAsync(id);
+
                 await _roleService.DeleteAsync(id, operatorId);
 
                 _logger.LogInformation("Role deleted: {RoleId}", id);
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "Delete",
+                    entityType: "Role",
+                    entityId: id,
+                    description: $"Deleted role: {role?.Name}",
+                    oldValues: role != null ? new { role.Name, role.Description, Permissions = role.Permissions } : null);
 
                 return Ok(new { code = 0, message = "Role deleted successfully" });
             }
