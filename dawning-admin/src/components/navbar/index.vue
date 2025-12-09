@@ -148,9 +148,14 @@
         <a-dropdown trigger="click">
           <a-avatar
             :size="32"
-            :style="{ marginRight: '8px', cursor: 'pointer' }"
+            :style="{ marginRight: '8px', cursor: 'pointer', backgroundColor: '#165dff' }"
           >
-            <img alt="avatar" :src="avatar" />
+            <template v-if="!avatar">
+              <span style="font-size: 14px; font-weight: 500; color: #fff;">
+                {{ userInitial }}
+              </span>
+            </template>
+            <img v-else alt="avatar" :src="avatar" />
           </a-avatar>
           <template #content>
             <a-doption>
@@ -211,6 +216,10 @@
   const locales = [...LOCALE_OPTIONS];
   const avatar = computed(() => {
     return userStore.avatar;
+  });
+  const userInitial = computed(() => {
+    const name = userStore.name || 'U';
+    return name.charAt(0).toUpperCase();
   });
   const theme = computed(() => {
     return appStore.theme;

@@ -7,55 +7,71 @@
         'menu.administration.openiddict.application',
       ]"
     />
-    <a-card class="general-card" :title="$t('menu.administration.openiddict.application')">
-      <!-- 搜索表单 -->
-      <a-row :gutter="20" class="search-row">
-        <a-col :span="6">
-          <a-input
-            v-model="searchForm.clientId"
-            placeholder="客户端ID"
-            allow-clear
-          />
-        </a-col>
-        <a-col :span="6">
-          <a-input
-            v-model="searchForm.displayName"
-            placeholder="显示名称"
-            allow-clear
-          />
-        </a-col>
-        <a-col :span="6">
-          <a-select
-            v-model="searchForm.type"
-            placeholder="客户端类型"
-            allow-clear
-          >
-            <a-option value="">全部</a-option>
-            <a-option value="confidential">Confidential (机密)</a-option>
-            <a-option value="public">Public (公共)</a-option>
-          </a-select>
-        </a-col>
-        <a-col :span="6">
-          <a-space>
-            <a-button type="primary" @click="handleSearch">
-              <template #icon><icon-search /></template>
-              查询
-            </a-button>
-            <a-button @click="handleReset">
-              <template #icon><icon-refresh /></template>
-              重置
-            </a-button>
-            <a-button type="primary" @click="handleAdd">
-              <template #icon><icon-plus /></template>
-              新增
-            </a-button>
-          </a-space>
-        </a-col>
-      </a-row>
-
-      <a-divider />
-
-      <!-- 数据表格 -->
+    <a-card class="general-card search-card">
+      <a-form :model="searchForm" layout="inline" class="search-form">
+        <a-row :gutter="[16, 16]" style="width: 100%">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="clientId" label="客户端ID" class="form-item-block">
+              <a-input
+                v-model="searchForm.clientId"
+                placeholder="请输入客户端ID"
+                allow-clear
+              >
+                <template #prefix>
+                  <icon-code />
+                </template>
+              </a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="displayName" label="显示名称" class="form-item-block">
+              <a-input
+                v-model="searchForm.displayName"
+                placeholder="请输入显示名称"
+                allow-clear
+              >
+                <template #prefix>
+                  <icon-apps />
+                </template>
+              </a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="type" label="类型" class="form-item-block">
+              <a-select
+                v-model="searchForm.type"
+                placeholder="请选择类型"
+                allow-clear
+              >
+                <template #prefix>
+                  <icon-safe />
+                </template>
+                <a-option value="">全部</a-option>
+                <a-option value="confidential">Confidential (机密)</a-option>
+                <a-option value="public">Public (公共)</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="24" :lg="6" :xl="6" class="action-col">
+            <a-space :size="12">
+              <a-button type="primary" @click="handleSearch">
+                <template #icon><icon-search /></template>
+                查询
+              </a-button>
+              <a-button @click="handleReset">
+                <template #icon><icon-refresh /></template>
+                重置
+              </a-button>
+              <a-button type="primary" status="success" @click="handleAdd">
+                <template #icon><icon-plus /></template>
+                新增
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-card>
+    <a-card class="general-card table-card">
       <a-table
         :columns="columns"
         :data="tableData"
@@ -110,23 +126,23 @@
 
         <template #operations="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">
-              <template #icon><icon-eye /></template>
+            <a-button type="text" size="medium" @click="handleView(record)">
+              <template #icon><icon-eye :size="18" /></template>
             </a-button>
             <a-button
               type="text"
-              size="small"
+              size="medium"
               status="warning"
               @click="handleEdit(record)"
             >
-              <template #icon><icon-edit /></template>
+              <template #icon><icon-edit :size="18" /></template>
             </a-button>
             <a-popconfirm
               content="确定要删除此应用程序吗？"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
+              <a-button type="text" size="medium" status="danger">
+                <template #icon><icon-delete :size="18" /></template>
               </a-button>
             </a-popconfirm>
           </a-space>
@@ -203,7 +219,9 @@
             <a-checkbox value="authorization_code"
               >授权码模式 (Authorization Code)</a-checkbox
             >
-            <a-checkbox value="refresh_token">刷新令牌 (Refresh Token)</a-checkbox>
+            <a-checkbox value="refresh_token"
+              >刷新令牌 (Refresh Token)</a-checkbox
+            >
           </a-checkbox-group>
         </a-form-item>
 
@@ -369,6 +387,66 @@
     type: [{ required: true, message: '请选择客户端类型' }],
   };
 
+  // ========== 辅助函数（定义在使用之前） ==========
+
+  // 重置表单
+  const resetForm = () => {
+    formData.clientId = '';
+    formData.clientSecret = '';
+    formData.displayName = '';
+    formData.type = 'public';
+    formData.consentType = 'implicit';
+    selectedGrantTypes.value = [];
+    selectedScopes.value = [];
+    redirectUrisText.value = '';
+    postLogoutRedirectUrisText.value = '';
+  };
+
+  // 构建权限列表
+  const buildPermissions = (): string[] => {
+    const permissions: string[] = [];
+
+    // 授权类型
+    selectedGrantTypes.value.forEach((grant) => {
+      permissions.push(`gt:${grant}`);
+    });
+
+    // 端点
+    permissions.push('ept:token');
+    if (selectedGrantTypes.value.includes('authorization_code')) {
+      permissions.push('ept:authorization');
+    }
+
+    // 作用域
+    selectedScopes.value.forEach((scope) => {
+      permissions.push(`scp:${scope}`);
+    });
+
+    return permissions;
+  };
+
+  // 解析权限列表
+  const parsePermissions = (permissions: string[]) => {
+    selectedGrantTypes.value = [];
+    selectedScopes.value = [];
+
+    permissions.forEach((perm) => {
+      if (perm.startsWith('gt:')) {
+        selectedGrantTypes.value.push(perm.substring(3));
+      } else if (perm.startsWith('scp:')) {
+        selectedScopes.value.push(perm.substring(4));
+      }
+    });
+  };
+
+  // 格式化权限显示
+  const formatPermission = (perm: string): string => {
+    if (perm.startsWith('gt:')) return `授权:${perm.substring(3)}`;
+    if (perm.startsWith('ept:')) return `端点:${perm.substring(4)}`;
+    if (perm.startsWith('scp:')) return `作用域:${perm.substring(4)}`;
+    return perm;
+  };
+
   // 加载数据
   const loadData = async () => {
     loading.value = true;
@@ -382,7 +460,6 @@
       pagination.total = result.totalCount;
     } catch (error) {
       Message.error('加载数据失败');
-      console.error(error);
     } finally {
       loading.value = false;
     }
@@ -505,64 +582,6 @@
     resetForm();
   };
 
-  // 重置表单
-  const resetForm = () => {
-    formData.clientId = '';
-    formData.clientSecret = '';
-    formData.displayName = '';
-    formData.type = 'public';
-    formData.consentType = 'implicit';
-    selectedGrantTypes.value = [];
-    selectedScopes.value = [];
-    redirectUrisText.value = '';
-    postLogoutRedirectUrisText.value = '';
-  };
-
-  // 构建权限列表
-  const buildPermissions = (): string[] => {
-    const permissions: string[] = [];
-
-    // 授权类型
-    selectedGrantTypes.value.forEach((grant) => {
-      permissions.push(`gt:${grant}`);
-    });
-
-    // 端点
-    permissions.push('ept:token');
-    if (selectedGrantTypes.value.includes('authorization_code')) {
-      permissions.push('ept:authorization');
-    }
-
-    // 作用域
-    selectedScopes.value.forEach((scope) => {
-      permissions.push(`scp:${scope}`);
-    });
-
-    return permissions;
-  };
-
-  // 解析权限列表
-  const parsePermissions = (permissions: string[]) => {
-    selectedGrantTypes.value = [];
-    selectedScopes.value = [];
-
-    permissions.forEach((perm) => {
-      if (perm.startsWith('gt:')) {
-        selectedGrantTypes.value.push(perm.substring(3));
-      } else if (perm.startsWith('scp:')) {
-        selectedScopes.value.push(perm.substring(4));
-      }
-    });
-  };
-
-  // 格式化权限显示
-  const formatPermission = (perm: string): string => {
-    if (perm.startsWith('gt:')) return `授权:${perm.substring(3)}`;
-    if (perm.startsWith('ept:')) return `端点:${perm.substring(4)}`;
-    if (perm.startsWith('scp:')) return `作用域:${perm.substring(4)}`;
-    return perm;
-  };
-
   onMounted(() => {
     loadData();
   });
@@ -571,13 +590,73 @@
 <style scoped lang="less">
   .container {
     padding: 20px;
-  }
 
-  .search-row {
-    margin-bottom: 16px;
-  }
+    .search-card {
+      margin-bottom: 16px;
+    }
 
-  .general-card {
-    margin-top: 16px;
+    .search-form {
+      :deep(.arco-form-item) {
+        margin-bottom: 0;
+      }
+
+      .form-item-block {
+        width: 100%;
+        
+        :deep(.arco-form-item-wrapper-col) {
+          width: 100%;
+        }
+      }
+
+      .action-col {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+
+        :deep(.arco-btn) {
+          font-weight: 500;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+
+          &.arco-btn-primary {
+            &:not(.arco-btn-status-success) {
+              background-color: #165dff;
+              border-color: #165dff;
+
+              &:hover {
+                background-color: #4080ff;
+                border-color: #4080ff;
+              }
+            }
+
+            &.arco-btn-status-success {
+              background-color: #00b42a;
+              border-color: #00b42a;
+
+              &:hover {
+                background-color: #23c343;
+                border-color: #23c343;
+              }
+            }
+          }
+
+          &.arco-btn-secondary {
+            &:hover {
+              background-color: #f2f3f5;
+            }
+          }
+        }
+      }
+    }
+
+    .table-card {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+    }
+
+    :deep(.arco-table-th) {
+      background-color: #f7f8fa;
+      font-weight: 600;
+    }
   }
 </style>

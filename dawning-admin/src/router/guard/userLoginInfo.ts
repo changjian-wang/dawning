@@ -14,7 +14,9 @@ export default function setupUserLoginInfoGuard(router: Router) {
       } else {
         try {
           // 尝试从 token 中恢复用户信息
-          const token = localStorage.getItem('id_token') || localStorage.getItem('access_token');
+          const token =
+            localStorage.getItem('id_token') ||
+            localStorage.getItem('access_token');
           if (token) {
             // 从 JWT 解析用户信息
             const { parseJwtToken } = await import('@/api/auth');
@@ -30,7 +32,7 @@ export default function setupUserLoginInfoGuard(router: Router) {
               return;
             }
           }
-          
+
           // 如果无法从 token 恢复，尝试获取用户信息
           await userStore.info();
           next();

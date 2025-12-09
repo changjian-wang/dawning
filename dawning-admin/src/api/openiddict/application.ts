@@ -51,105 +51,94 @@ export interface IUpdateApplicationDto extends ICreateApplicationDto {
   id: string;
 }
 
-class ApplicationApi {
+export const application = {
   /**
    * 获取应用程序详情
    */
   async get(id: string): Promise<IApplication> {
-    const response = await http.get<{ data: IApplication }>(
-      `/api/openiddict/application/get/${id}`
-    );
-    return response.data.data;
-  }
+    const response = await http.get(`/api/openiddict/application/get/${id}`);
+    return response.data;
+  },
 
   /**
    * 根据ClientId获取应用程序
    */
   async getByClientId(clientId: string): Promise<IApplication> {
-    const response = await http.get<{ data: IApplication }>(
+    const response = await http.get(
       `/api/openiddict/application/get-by-client-id/${clientId}`
     );
-    return response.data.data;
-  }
+    return response.data;
+  },
 
   /**
    * 获取分页列表
    */
   async getPagedList(
     query: IApplicationQuery,
-    page: number = 1,
-    size: number = 10
+    page = 1,
+    size = 10
   ): Promise<IPagedData<IApplication>> {
-    const response = await http.post<{ data: IPagedData<IApplication> }>(
+    const response = await http.post(
       `/api/openiddict/application/get-paged-list?page=${page}&size=${size}`,
       query
     );
-    return response.data.data;
-  }
+    // 后端直接返回 PagedData 格式: { pageIndex, pageSize, totalCount, items }
+    return response.data;
+  },
 
   /**
    * 获取所有应用程序
    */
   async getAll(): Promise<IApplication[]> {
-    const response = await http.get<{ data: IApplication[] }>(
-      '/api/openiddict/application/get-all'
-    );
-    return response.data.data;
-  }
+    const response = await http.get('/api/openiddict/application/get-all');
+    return response.data;
+  },
 
   /**
    * 创建应用程序
    */
   async create(dto: ICreateApplicationDto): Promise<number> {
-    const response = await http.post<{ data: number }>(
-      '/api/openiddict/application/insert',
-      {
-        clientId: dto.clientId,
-        clientSecret: dto.clientSecret,
-        displayName: dto.displayName,
-        type: dto.type,
-        consentType: dto.consentType,
-        permissions: dto.permissions,
-        redirectUris: dto.redirectUris,
-        postLogoutRedirectUris: dto.postLogoutRedirectUris,
-        requirements: [],
-        properties: {},
-      }
-    );
-    return response.data.data;
-  }
+    const response = await http.post('/api/openiddict/application/insert', {
+      clientId: dto.clientId,
+      clientSecret: dto.clientSecret,
+      displayName: dto.displayName,
+      type: dto.type,
+      consentType: dto.consentType,
+      permissions: dto.permissions,
+      redirectUris: dto.redirectUris,
+      postLogoutRedirectUris: dto.postLogoutRedirectUris,
+      requirements: [],
+      properties: {},
+    });
+    return response.data;
+  },
 
   /**
    * 更新应用程序
    */
   async update(dto: IUpdateApplicationDto): Promise<number> {
-    const response = await http.put<{ data: number }>(
-      '/api/openiddict/application/update',
-      dto
-    );
-    return response.data.data;
-  }
+    const response = await http.put('/api/openiddict/application/update', dto);
+    return response.data;
+  },
 
   /**
    * 删除应用程序
    */
   async delete(id: string): Promise<number> {
-    const response = await http.delete<{ data: number }>(
+    const response = await http.delete(
       `/api/openiddict/application/delete/${id}`
     );
-    return response.data.data;
-  }
+    return response.data;
+  },
 
   /**
    * 更新客户端密钥
    */
   async updateSecret(id: string, newSecret: string): Promise<number> {
-    const response = await http.post<{ data: number }>(
+    const response = await http.post(
       '/api/openiddict/application/update-secret',
       { id, newSecret }
     );
-    return response.data.data;
-  }
-}
-
-export const application = new ApplicationApi();
+    return response.data;
+  },
+};

@@ -40,100 +40,86 @@ export interface IUpdateScopeDto extends ICreateScopeDto {
   id: string;
 }
 
-class ScopeApi {
+export const scope = {
   /**
    * 获取作用域详情
    */
   async get(id: string): Promise<IScope> {
-    const response = await http.get<{ data: IScope }>(
-      `/api/openiddict/scope/get/${id}`
-    );
-    return response.data.data;
-  }
+    const response = await http.get(`/api/openiddict/scope/get/${id}`);
+    return response.data;
+  },
 
   /**
    * 根据名称获取作用域
    */
   async getByName(name: string): Promise<IScope> {
-    const response = await http.get<{ data: IScope }>(
+    const response = await http.get(
       `/api/openiddict/scope/get-by-name/${name}`
     );
-    return response.data.data;
-  }
+    return response.data;
+  },
 
   /**
    * 根据名称列表获取作用域
    */
   async getByNames(names: string[]): Promise<IScope[]> {
-    const response = await http.post<{ data: IScope[] }>(
+    const response = await http.post(
       '/api/openiddict/scope/get-by-names',
       names
     );
-    return response.data.data;
-  }
+    return response.data;
+  },
 
   /**
    * 获取分页列表
    */
   async getPagedList(
     query: IScopeQuery,
-    page: number = 1,
-    size: number = 10
+    page = 1,
+    size = 10
   ): Promise<IPagedData<IScope>> {
-    const response = await http.post<{ data: IPagedData<IScope> }>(
+    const response = await http.post(
       `/api/openiddict/scope/get-paged-list?page=${page}&size=${size}`,
       query
     );
-    return response.data.data;
-  }
+    return response.data;
+  },
 
   /**
    * 获取所有作用域
    */
   async getAll(): Promise<IScope[]> {
-    const response = await http.get<{ data: IScope[] }>(
-      '/api/openiddict/scope/get-all'
-    );
-    return response.data.data;
-  }
+    const response = await http.get('/api/openiddict/scope/get-all');
+    return response.data;
+  },
 
   /**
    * 创建作用域
    */
   async create(dto: ICreateScopeDto): Promise<number> {
-    const response = await http.post<{ data: number }>(
-      '/api/openiddict/scope/insert',
-      {
-        name: dto.name,
-        displayName: dto.displayName,
-        description: dto.description,
-        resources: dto.resources || [],
-        properties: {},
-      }
-    );
-    return response.data.data;
-  }
+    const response = await http.post('/api/openiddict/scope/insert', {
+      name: dto.name,
+      displayName: dto.displayName,
+      description: dto.description,
+      resources: dto.resources || [],
+      properties: {},
+    });
+    return response.data;
+  },
 
   /**
    * 更新作用域
    */
   async update(dto: IUpdateScopeDto): Promise<number> {
-    const response = await http.put<{ data: number }>(
-      '/api/openiddict/scope/update',
-      dto
-    );
-    return response.data.data;
-  }
+    const response = await http.put('/api/openiddict/scope/update', dto);
+    return response.data;
+  },
 
   /**
    * 删除作用域
    */
   async delete(id: string): Promise<number> {
-    const response = await http.delete<{ data: number }>(
-      `/api/openiddict/scope/delete/${id}`
-    );
-    return response.data.data;
-  }
-}
-
-export const scope = new ScopeApi();
+    const response = await http.delete(`/api/openiddict/scope/delete/${id}`);
+    return response.data;
+  },
+};

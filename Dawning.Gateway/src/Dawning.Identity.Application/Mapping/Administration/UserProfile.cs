@@ -1,4 +1,5 @@
 using AutoMapper;
+using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Domain.Aggregates.Administration;
 
@@ -13,6 +14,7 @@ namespace Dawning.Identity.Application.Mapping.Administration
         {
             // Domain Model -> DTO
             CreateMap<User, UserDto>();
+            CreateMap<UserDto, UserWithRolesDto>();
 
             // DTO -> Domain Model
             CreateMap<CreateUserDto, User>()

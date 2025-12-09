@@ -23,6 +23,38 @@ const ADMINISTRATION: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'role',
+      name: 'Role',
+      component: () => import('@/views/administration/role/index.vue'),
+      meta: {
+        locale: 'menu.administration.role',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: 'application',
+      name: 'Application',
+      component: () =>
+        import('@/views/administration/openiddict/application/index.vue'),
+      meta: {
+        locale: 'menu.administration.application',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: 'scope',
+      name: 'Scope',
+      component: () =>
+        import('@/views/administration/openiddict/scope/index.vue'),
+      meta: {
+        locale: 'menu.administration.scope',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'claim-type',
       name: 'ClaimType',
       component: () => import('@/views/administration/claim-type/index.vue'),

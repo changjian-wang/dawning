@@ -958,7 +958,11 @@
   import dayjs from 'dayjs';
   import { v7 as uuidv7 } from 'uuid';
   import { FormInstance } from '@arco-design/web-vue';
-  import { client, IClientWithLoginURI, IRedirectUri } from '@/api/openiddict/client';
+  import {
+    client,
+    IClientWithLoginURI,
+    IRedirectUri,
+  } from '@/api/openiddict/client';
   import { ClientSecret, IClientSecret } from '@/api/openiddict/client-secret';
   import { IClientRedirectUri } from '@/api/openiddict/client-redirect-uri';
   import { IClientPostLogoutRedirectUri } from '@/api/openiddict/client-post-logout-redirect-uri';

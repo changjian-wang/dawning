@@ -14,11 +14,17 @@ export interface HttpResponse<T = unknown> {
 
 // 错误码常量
 const ERROR_CODES = {
-  SUCCESS: 20000,
+  SUCCESS: 0, // 后端返回 0 或 20000 表示成功
+  SUCCESS_ALT: 20000, // 备用成功码（OpenIddict API 使用）
   ILLEGAL_TOKEN: 50008,
   OTHER_CLIENT_LOGIN: 50012,
   TOKEN_EXPIRED: 50014,
 } as const;
+
+// 检查是否为成功状态码（导出供其他模块使用）
+export const isSuccessCode = (code: number): boolean => {
+  return code === ERROR_CODES.SUCCESS || code === ERROR_CODES.SUCCESS_ALT;
+};
 
 // 需要自动登出的错误码
 const LOGOUT_ERROR_CODES: number[] = [
@@ -96,8 +102,8 @@ axios.interceptors.response.use(
       return response;
     }
 
-    // 检查业务状态码
-    if (data.code !== ERROR_CODES.SUCCESS) {
+    // 检查业务状态码（支持 0 和 20000）
+    if (!isSuccessCode(data.code)) {
       // 显示错误消息
       Message.error({
         content: data.msg || 'Error',

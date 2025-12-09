@@ -21,9 +21,9 @@ namespace Dawning.Identity.Application.Dtos.User
         public string Email { get; set; } = string.Empty;
 
         /// <summary>
-        /// 角色
+        /// 角色列表
         /// </summary>
-        public string Role { get; set; } = string.Empty;
+        public List<string> Roles { get; set; } = new();
 
         /// <summary>
         /// 显示名称

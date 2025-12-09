@@ -2,6 +2,7 @@
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dawning.Identity.Api.Controllers.OpenIddict
@@ -11,6 +12,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
     /// </summary>
     [ApiController]
     [Route("api/openiddict/scope")]
+    [Authorize(Roles = "admin,super_admin")]
     public class ScopeController : ControllerBase
     {
         private readonly IScopeService _service;

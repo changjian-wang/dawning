@@ -1,4 +1,5 @@
 export default {
+  'menu.administration.user': '用户管理',
   'user.management.title': '用户管理',
   'user.form.userName': '用户名',
   'user.form.email': '邮箱',

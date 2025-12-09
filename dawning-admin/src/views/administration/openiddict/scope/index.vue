@@ -7,44 +7,55 @@
         'menu.administration.openiddict.scope',
       ]"
     />
-    <a-card class="general-card" :title="$t('menu.administration.openiddict.scope')">
-      <!-- 搜索表单 -->
-      <a-row :gutter="20" class="search-row">
-        <a-col :span="6">
-          <a-input
-            v-model="searchForm.name"
-            placeholder="作用域名称"
-            allow-clear
-          />
-        </a-col>
-        <a-col :span="6">
-          <a-input
-            v-model="searchForm.displayName"
-            placeholder="显示名称"
-            allow-clear
-          />
-        </a-col>
-        <a-col :span="12">
-          <a-space>
-            <a-button type="primary" @click="handleSearch">
-              <template #icon><icon-search /></template>
-              查询
-            </a-button>
-            <a-button @click="handleReset">
-              <template #icon><icon-refresh /></template>
-              重置
-            </a-button>
-            <a-button type="primary" @click="handleAdd">
-              <template #icon><icon-plus /></template>
-              新增
-            </a-button>
-          </a-space>
-        </a-col>
-      </a-row>
-
-      <a-divider />
-
-      <!-- 数据表格 -->
+    <a-card class="general-card search-card">
+      <a-form :model="searchForm" layout="inline" class="search-form">
+        <a-row :gutter="[16, 16]" style="width: 100%">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="name" label="作用域名称" class="form-item-block">
+              <a-input
+                v-model="searchForm.name"
+                placeholder="请输入作用域名称"
+                allow-clear
+              >
+                <template #prefix>
+                  <icon-apps />
+                </template>
+              </a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="displayName" label="显示名称" class="form-item-block">
+              <a-input
+                v-model="searchForm.displayName"
+                placeholder="请输入显示名称"
+                allow-clear
+              >
+                <template #prefix>
+                  <icon-tag />
+                </template>
+              </a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="24" :lg="12" :xl="12" class="action-col">
+            <a-space :size="12">
+              <a-button type="primary" @click="handleSearch">
+                <template #icon><icon-search /></template>
+                查询
+              </a-button>
+              <a-button @click="handleReset">
+                <template #icon><icon-refresh /></template>
+                重置
+              </a-button>
+              <a-button type="primary" status="success" @click="handleAdd">
+                <template #icon><icon-plus /></template>
+                新增
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-card>
+    <a-card class="general-card table-card">
       <a-table
         :columns="columns"
         :data="tableData"
@@ -81,23 +92,23 @@
 
         <template #operations="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">
-              <template #icon><icon-eye /></template>
+            <a-button type="text" size="medium" @click="handleView(record)">
+              <template #icon><icon-eye :size="18" /></template>
             </a-button>
             <a-button
               type="text"
-              size="small"
+              size="medium"
               status="warning"
               @click="handleEdit(record)"
             >
-              <template #icon><icon-edit /></template>
+              <template #icon><icon-edit :size="18" /></template>
             </a-button>
             <a-popconfirm
               content="确定要删除此作用域吗？"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
+              <a-button type="text" size="medium" status="danger">
+                <template #icon><icon-delete :size="18" /></template>
               </a-button>
             </a-popconfirm>
           </a-space>
@@ -219,7 +230,12 @@
     { title: '作用域名称', dataIndex: 'name', width: 150 },
     { title: '显示名称', dataIndex: 'displayName', width: 150 },
     { title: '描述', dataIndex: 'description' },
-    { title: '关联资源', dataIndex: 'resources', slotName: 'resources', width: 200 },
+    {
+      title: '关联资源',
+      dataIndex: 'resources',
+      slotName: 'resources',
+      width: 200,
+    },
     {
       title: '创建时间',
       dataIndex: 'createdAt',
@@ -294,6 +310,14 @@
     loadData();
   };
 
+  // 重置表单
+  const resetForm = () => {
+    formData.name = '';
+    formData.displayName = '';
+    formData.description = '';
+    formData.resources = [];
+  };
+
   // 新增
   const handleAdd = () => {
     isEdit.value = false;
@@ -365,14 +389,6 @@
     resetForm();
   };
 
-  // 重置表单
-  const resetForm = () => {
-    formData.name = '';
-    formData.displayName = '';
-    formData.description = '';
-    formData.resources = [];
-  };
-
   onMounted(() => {
     loadData();
   });
@@ -381,13 +397,73 @@
 <style scoped lang="less">
   .container {
     padding: 20px;
-  }
 
-  .search-row {
-    margin-bottom: 16px;
-  }
+    .search-card {
+      margin-bottom: 16px;
+    }
 
-  .general-card {
-    margin-top: 16px;
+    .search-form {
+      :deep(.arco-form-item) {
+        margin-bottom: 0;
+      }
+
+      .form-item-block {
+        width: 100%;
+        
+        :deep(.arco-form-item-wrapper-col) {
+          width: 100%;
+        }
+      }
+
+      .action-col {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+
+        :deep(.arco-btn) {
+          font-weight: 500;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+
+          &.arco-btn-primary {
+            &:not(.arco-btn-status-success) {
+              background-color: #165dff;
+              border-color: #165dff;
+
+              &:hover {
+                background-color: #4080ff;
+                border-color: #4080ff;
+              }
+            }
+
+            &.arco-btn-status-success {
+              background-color: #00b42a;
+              border-color: #00b42a;
+
+              &:hover {
+                background-color: #23c343;
+                border-color: #23c343;
+              }
+            }
+          }
+
+          &.arco-btn-secondary {
+            &:hover {
+              background-color: #f2f3f5;
+            }
+          }
+        }
+      }
+    }
+
+    .table-card {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+    }
+
+    :deep(.arco-table-th) {
+      background-color: #f7f8fa;
+      font-weight: 600;
+    }
   }
 </style>

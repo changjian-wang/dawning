@@ -82,7 +82,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { IdentityResourceClaim, type IIdentityResourceClaim } from '@/api/openiddict/identity-resource-claim';
+  import {
+    IdentityResourceClaim,
+    type IIdentityResourceClaim,
+  } from '@/api/openiddict/identity-resource-claim';
   import { FormInstance } from '@arco-design/web-vue';
   import { reactive, ref } from 'vue';
 

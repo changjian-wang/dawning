@@ -1,4 +1,5 @@
 using AutoMapper;
+using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
@@ -7,6 +8,7 @@ using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -327,6 +329,53 @@ namespace Dawning.Identity.Application.Services.Administration
                 }
             }
             return user;
+        }
+
+        /// <summary>
+        /// 获取用户的所有角色
+        /// </summary>
+        public async Task<IEnumerable<RoleDto>> GetUserRolesAsync(Guid userId)
+        {
+            var roles = await _uow.UserRole.GetUserRolesAsync(userId);
+            return roles.Select(r => _mapper.Map<RoleDto>(r));
+        }
+
+        /// <summary>
+        /// 获取用户详情（含角色）
+        /// </summary>
+        public async Task<UserWithRolesDto?> GetUserWithRolesAsync(Guid userId)
+        {
+            var user = await GetByIdAsync(userId);
+            if (user == null) return null;
+
+            var roles = await GetUserRolesAsync(userId);
+
+            var userWithRoles = _mapper.Map<UserWithRolesDto>(user);
+            userWithRoles.Roles = roles.ToList();
+
+            return userWithRoles;
+        }
+
+        /// <summary>
+        /// 为用户分配角色
+        /// </summary>
+        public async Task<bool> AssignRolesAsync(Guid userId, IEnumerable<Guid> roleIds, Guid? operatorId = null)
+        {
+            var user = await _userRepository.GetAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException($"User with ID '{userId}' not found.");
+            }
+
+            return await _uow.UserRole.AssignRolesAsync(userId, roleIds, operatorId);
+        }
+
+        /// <summary>
+        /// 移除用户的角色
+        /// </summary>
+        public async Task<bool> RemoveRoleAsync(Guid userId, Guid roleId)
+        {
+            return await _uow.UserRole.RemoveRoleAsync(userId, roleId);
         }
     }
 }

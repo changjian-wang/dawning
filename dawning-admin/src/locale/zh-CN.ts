@@ -3,7 +3,12 @@ import localeLogin from '@/views/login/locale/zh-CN';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 
+import localeUser from '@/views/administration/user/locale/zh-CN';
+import localeRole from '@/views/administration/role/locale/zh-CN';
+import localeApplication from '@/views/administration/openiddict/application/locale/zh-CN';
+import localeScope from '@/views/administration/openiddict/scope/locale/zh-CN';
 import localeClaimType from '@/views/administration/claim-type/locale/zh-CN';
+import localeSystemMetadata from '@/views/administration/system-metadata/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
 
@@ -25,22 +30,21 @@ export default {
   'navbar.action.locale': '切换为中文',
   // --begin--
   'menu.administration': '管理',
-  'menu.administration.user': '用户管理',
-  'menu.administration.system.metadata': '元数据',
-  'menu.administration.openiddict': '认证授权服务',
-  'menu.administration.openiddict.application': '应用程序',
-  'menu.administration.openiddict.scope': '作用域',
-  'menu.administration.openiddict.client': '客户端',
-  'menu.administration.openiddict.api.resource': 'API资源',
-  'menu.administration.openiddict.identity.resource': '身份资源',
   'menu.data.list': '数据列表',
   'menu.add': '新增信息',
   'menu.info': '基本信息',
   'page.title.search.box': '查询条件',
   'page.title.data.list': '数据列表',
   'page.button.search': '搜索',
+  'searchTable.form.search': '查询',
+  'searchTable.form.reset': '重置',
   // --end--
+  ...localeUser,
+  ...localeRole,
+  ...localeApplication,
+  ...localeScope,
   ...localeClaimType,
+  ...localeSystemMetadata,
 
   ...localeSettings,
   ...localeMessageBox,

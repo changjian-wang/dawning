@@ -1,7 +1,9 @@
+using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Interfaces.Administration
@@ -80,5 +82,25 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         /// 验证用户凭据并更新登录时间
         /// </summary>
         Task<UserDto?> ValidateCredentialsAndUpdateLoginAsync(string username, string password);
+
+        /// <summary>
+        /// 获取用户的所有角色
+        /// </summary>
+        Task<IEnumerable<RoleDto>> GetUserRolesAsync(Guid userId);
+
+        /// <summary>
+        /// 获取用户详情（含角色）
+        /// </summary>
+        Task<UserWithRolesDto?> GetUserWithRolesAsync(Guid userId);
+
+        /// <summary>
+        /// 为用户分配角色
+        /// </summary>
+        Task<bool> AssignRolesAsync(Guid userId, IEnumerable<Guid> roleIds, Guid? operatorId = null);
+
+        /// <summary>
+        /// 移除用户的角色
+        /// </summary>
+        Task<bool> RemoveRoleAsync(Guid userId, Guid roleId);
     }
 }

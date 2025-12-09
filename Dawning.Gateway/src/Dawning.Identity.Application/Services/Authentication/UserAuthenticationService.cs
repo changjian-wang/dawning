@@ -35,13 +35,17 @@ namespace Dawning.Identity.Application.Services.Authentication
                 return null;
             }
 
+            // 加载用户角色
+            var userRoles = await _userService.GetUserRolesAsync(user.Id);
+            var roleNames = userRoles.Select(r => r.Name).ToList();
+
             // 返回认证DTO
             return new UserAuthenticationDto
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
                 Email = user.Email,
-                Role = user.Role,
+                Roles = roleNames,
                 IsActive = user.IsActive
             };
         }
@@ -62,12 +66,16 @@ namespace Dawning.Identity.Application.Services.Authentication
                 return null;
             }
 
+            // 加载用户角色
+            var userRoles = await _userService.GetUserRolesAsync(id);
+            var roleNames = userRoles.Select(r => r.Name).ToList();
+
             return new UserAuthenticationDto
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
                 Email = user.Email,
-                Role = user.Role,
+                Roles = roleNames,
                 IsActive = user.IsActive
             };
         }
@@ -95,12 +103,16 @@ namespace Dawning.Identity.Application.Services.Authentication
                 return null;
             }
 
+            // 加载用户角色
+            var userRoles = await _userService.GetUserRolesAsync(user.Id);
+            var roleNames = userRoles.Select(r => r.Name).ToList();
+
             return new UserAuthenticationDto
             {
                 Id = user.Id.ToString(),
                 Username = user.Username,
                 Email = user.Email,
-                Role = user.Role,
+                Roles = roleNames,
                 IsActive = user.IsActive
             };
         }

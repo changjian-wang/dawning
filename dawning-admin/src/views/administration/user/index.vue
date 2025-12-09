@@ -1,86 +1,108 @@
 <template>
   <div class="user-management">
     <div class="container">
-      <Breadcrumb :items="['管理', '用户管理']" />
-      <a-card class="general-card">
-        <template #title>
-          {{ $t('page.title.search.box') }}
-        </template>
-        <a-row :gutter="12">
-          <a-col :span="6">
-            <a-form-item label="用户名">
-              <a-input v-model="model.username" placeholder="请输入用户名..."></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="邮箱">
-              <a-input v-model="model.email" placeholder="请输入邮箱..."></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="角色">
-              <a-select v-model="model.role" placeholder="请选择角色" allow-clear>
-                <a-option value="admin">管理员</a-option>
-                <a-option value="user">普通用户</a-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :flex="30" style="text-align: right">
-            <a-space direction="horizontal" :size="18">
-              <a-button type="primary" @click="handleSearch">
-                <template #icon>
-                  <icon-search />
-                </template>
-                {{ '查询' }}
-              </a-button>
-              <a-button @click="handleReset">
-                <template #icon>
-                  <icon-refresh />
-                </template>
-                {{ '重置' }}
-              </a-button>
-              <a-button type="primary" class="add" @click="handleAdd">
-                <template #icon>
-                  <icon-plus />
-                </template>
-                {{ '新增' }}
-              </a-button>
-            </a-space>
-          </a-col>
-        </a-row>
-        <a-divider style="margin-top: 0"></a-divider>
+      <Breadcrumb
+        :items="['menu.administration', 'menu.administration.user']"
+      />
+      <a-card class="general-card search-card">
+        <a-form :model="model" layout="inline" class="search-form">
+          <a-row :gutter="[16, 16]" style="width: 100%">
+            <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+              <a-form-item field="username" label="用户名" class="form-item-block">
+                <a-input
+                  v-model="model.username"
+                  placeholder="请输入用户名"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-user />
+                  </template>
+                </a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+              <a-form-item field="email" label="邮箱" class="form-item-block">
+                <a-input
+                  v-model="model.email"
+                  placeholder="请输入邮箱"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-email />
+                  </template>
+                </a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+              <a-form-item field="role" label="角色" class="form-item-block">
+                <a-select
+                  v-model="model.role"
+                  placeholder="请选择角色"
+                  allow-clear
+                >
+                  <template #prefix>
+                    <icon-safe />
+                  </template>
+                  <a-option value="admin">管理员</a-option>
+                  <a-option value="user">普通用户</a-option>
+                  <a-option value="manager">管理者</a-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :xs="24" :sm="12" :md="24" :lg="6" :xl="6" class="action-col">
+              <a-space :size="12">
+                <a-button type="primary" @click="handleSearch">
+                  <template #icon><icon-search /></template>
+                  查询
+                </a-button>
+                <a-button @click="handleReset">
+                  <template #icon><icon-refresh /></template>
+                  重置
+                </a-button>
+                <a-button type="primary" status="success" @click="handleAdd">
+                  <template #icon><icon-plus /></template>
+                  新增
+                </a-button>
+              </a-space>
+            </a-col>
+          </a-row>
+        </a-form>
+      </a-card>
+      <a-card class="general-card table-card">
         <a-table
           :columns="columns"
           :data="data"
-          :pagination="{ ...pagination, onChange: handlePaginationChange }"
+          :pagination="pagination"
           :bordered="false"
           :loading="loading"
+          @page-change="handlePaginationChange"
         >
           <template #isActive="{ record }">
-            <a-tag v-if="record.isActive" color="green">
-              <icon-check /> 正常
+            <a-tag v-if="record.isActive" color="arcoblue" size="small">
+              <template #icon><icon-check-circle-fill /></template>
+              启用
             </a-tag>
-            <a-tag v-else color="red">
-              <icon-close /> 禁用
+            <a-tag v-else color="red" size="small">
+              <template #icon><icon-close-circle-fill /></template>
+              禁用
             </a-tag>
           </template>
           <template #optional="{ record }">
             <a-space>
-              <a-button type="primary" @click="handleEdit(record)">
-                <template #icon>
-                  <icon-edit />
-                </template>
+              <a-button type="text" size="medium" @click="handleView(record)">
+                <template #icon><icon-eye :size="18" /></template>
               </a-button>
-              <a-button @click="handleView(record)">
-                <template #icon>
-                  <icon-eye />
-                </template>
+              <a-button
+                type="text"
+                size="medium"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit :size="18" /></template>
               </a-button>
               <a-dropdown>
-                <a-button>
-                  <template #icon>
-                    <icon-more />
-                  </template>
+                <a-button type="text" size="medium">
+                  <template #icon><icon-more :size="18" /></template>
                 </a-button>
                 <template #content>
                   <a-doption @click="handleResetPassword(record)">
@@ -109,7 +131,11 @@
       <a-form ref="formRef" :rules="rules" :model="form">
         <a-row :gutter="24">
           <a-col :span="12">
-            <a-form-item field="username" label="用户名" validate-trigger="blur">
+            <a-form-item
+              field="username"
+              label="用户名"
+              validate-trigger="blur"
+            >
               <a-input
                 v-model="form.username"
                 placeholder="请输入用户名"
@@ -119,10 +145,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-item field="email" label="邮箱" validate-trigger="blur">
-              <a-input
-                v-model="form.email"
-                placeholder="请输入邮箱"
-              ></a-input>
+              <a-input v-model="form.email" placeholder="请输入邮箱"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -275,7 +298,7 @@
   const data = reactive<IUser[]>([]);
   const form = reactive<any>({ ...user.form.create() });
   const resetPasswordForm = reactive({ newPassword: '' });
-  
+
   const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
     username: [
       {
@@ -324,14 +347,18 @@
         pagination.pageSize || 10
       );
 
+      console.log('API Result:', result);
+      console.log('Items:', result.items);
+
       pagination.total = result.totalCount;
       pagination.current = result.pageIndex;
       pagination.pageSize = result.pageSize;
 
       data.splice(0, data.length, ...result.items);
+      console.log('Data after splice:', data);
     } catch (error) {
       Message.error('加载数据失败');
-      console.error(error);
+      console.error('Fetch error:', error);
     } finally {
       loading.value = false;
     }
@@ -401,7 +428,9 @@
       modalVisible.value = false;
       fetchData();
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.message || (isEdit.value ? '更新失败' : '创建失败');
+      const errorMsg =
+        error?.response?.data?.message ||
+        (isEdit.value ? '更新失败' : '创建失败');
       Message.error(errorMsg);
       console.error(error);
     }
@@ -427,7 +456,7 @@
 
   const handleDelete = (record: IUser) => {
     if (!record.id) return;
-    
+
     const modal = (window as any).$modal;
     modal.confirm({
       title: '确认删除',
@@ -453,13 +482,19 @@
   };
 
   const handleResetPasswordSubmit = async () => {
-    if (!resetPasswordForm.newPassword || resetPasswordForm.newPassword.length < 6) {
+    if (
+      !resetPasswordForm.newPassword ||
+      resetPasswordForm.newPassword.length < 6
+    ) {
       Message.warning('密码至少6个字符');
       return false;
     }
 
     try {
-      await user.api.resetPassword(currentUserId.value, resetPasswordForm.newPassword);
+      await user.api.resetPassword(
+        currentUserId.value,
+        resetPasswordForm.newPassword
+      );
       Message.success('密码重置成功');
       resetPasswordVisible.value = false;
       return true;
@@ -474,10 +509,107 @@
 
 <style scoped lang="less">
   .user-management {
+    .search-card {
+      margin-bottom: 16px;
+    }
+
+    .search-form {
+      :deep(.arco-form-item) {
+        margin-bottom: 0;
+      }
+
+      .form-item-block {
+        width: 100%;
+        
+        :deep(.arco-form-item-wrapper-col) {
+          width: 100%;
+        }
+      }
+
+      .action-col {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+
+        :deep(.arco-space) {
+          flex-wrap: wrap;
+        }
+
+        :deep(.arco-btn) {
+          font-weight: 500;
+          border-radius: 4px;
+          transition: all 0.3s ease;
+
+          &.arco-btn-primary {
+            &:not(.arco-btn-status-success) {
+              background-color: #165dff;
+              border-color: #165dff;
+
+              &:hover {
+                background-color: #4080ff;
+                border-color: #4080ff;
+              }
+            }
+
+            &.arco-btn-status-success {
+              background-color: #00b42a;
+              border-color: #00b42a;
+
+              &:hover {
+                background-color: #23c343;
+                border-color: #23c343;
+              }
+            }
+          }
+
+          &.arco-btn-secondary {
+            &:hover {
+              background-color: #f2f3f5;
+            }
+          }
+        }
+      }
+    }
+
+    .table-card {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
     :deep(.arco-table-th) {
+      background-color: #f7f8fa;
+      font-weight: 600;
+      color: #1d2129;
+
       &:last-child {
         .arco-table-th-item-title {
           margin: 0 auto;
+        }
+      }
+    }
+
+    :deep(.arco-table-tr) {
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #f7f8fa;
+        transform: scale(1.002);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .user-management {
+      .search-form {
+        .action-col {
+          justify-content: flex-start;
+          margin-top: 8px;
+
+          :deep(.arco-btn) {
+            flex: 1;
+            min-width: auto;
+          }
         }
       }
     }

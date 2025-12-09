@@ -12,6 +12,7 @@ export interface ISystemMetadata {
 
 export interface ISystemMetadataModel {
   name: string;
+  key: string;
   displayName: string;
   type: string;
   description: string;

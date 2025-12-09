@@ -1,5 +1,12 @@
 <script lang="tsx">
-  import { defineComponent, ref, h, compile, computed, resolveComponent } from 'vue';
+  import {
+    defineComponent,
+    ref,
+    h,
+    compile,
+    computed,
+    resolveComponent,
+  } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
   import type { RouteMeta } from 'vue-router';
@@ -92,7 +99,7 @@
       const renderSubMenu = () => {
         const ASubMenu = resolveComponent('ASubMenu');
         const AMenuItem = resolveComponent('AMenuItem');
-        
+
         function travel(_route: RouteRecordRaw[]) {
           const nodes: any[] = [];
           if (_route) {
@@ -102,47 +109,61 @@
                 ? () => h(compile(`<${element?.meta?.icon}/>`)) as any
                 : null;
               const node =
-                element?.children && element?.children.length !== 0 ? (
-                  h(ASubMenu, {
-                    key: element?.name,
-                    icon,
-                  }, {
-                    default: () => travel(element?.children || []),
-                    title: () => h(compile(t(element?.meta?.locale || ''))),
-                  })
-                ) : (
-                  h(AMenuItem, {
-                    key: element?.name,
-                    icon,
-                    onClick: () => goto(element),
-                  }, () => t(element?.meta?.locale || ''))
-                );
+                element?.children && element?.children.length !== 0
+                  ? h(
+                      ASubMenu,
+                      {
+                        key: element?.name,
+                        icon,
+                      },
+                      {
+                        default: () => travel(element?.children || []),
+                        title: () => h(compile(t(element?.meta?.locale || ''))),
+                      }
+                    )
+                  : h(
+                      AMenuItem,
+                      {
+                        key: element?.name,
+                        icon,
+                        onClick: () => goto(element),
+                      },
+                      () => t(element?.meta?.locale || '')
+                    );
               nodes.push(node);
             });
-      }
-      return nodes;
-    }
-    return travel(menuTree.value);
-  };
+          }
+          return nodes;
+        }
+        return travel(menuTree.value);
+      };
 
-  return () => {
-    const AMenu = resolveComponent('AMenu');
-    const menu = h(AMenu, {
-        mode: topMenu.value ? 'horizontal' : 'vertical',
-        collapsed: collapsed.value,
-        'onUpdate:collapsed': (val: boolean) => { collapsed.value = val; },
-        openKeys: openKeys.value,
-        'onUpdate:openKeys': (val: string[]) => { openKeys.value = val; },
-        showCollapseButton: appStore.device !== 'mobile',
-        autoOpen: false,
-        selectedKeys: selectedKey.value,
-        autoOpenSelected: true,
-        levelIndent: 34,
-        style: 'height: 100%;width:100%;',
-        onCollapse: setCollapse,
-      }, renderSubMenu());
-    return menu;
-  };
+      return () => {
+        const AMenu = resolveComponent('AMenu');
+        const menu = h(
+          AMenu,
+          {
+            'mode': topMenu.value ? 'horizontal' : 'vertical',
+            'collapsed': collapsed.value,
+            'onUpdate:collapsed': (val: boolean) => {
+              collapsed.value = val;
+            },
+            'openKeys': openKeys.value,
+            'onUpdate:openKeys': (val: string[]) => {
+              openKeys.value = val;
+            },
+            'showCollapseButton': appStore.device !== 'mobile',
+            'autoOpen': false,
+            'selectedKeys': selectedKey.value,
+            'autoOpenSelected': true,
+            'levelIndent': 34,
+            'style': 'height: 100%;width:100%;',
+            'onCollapse': setCollapse,
+          },
+          renderSubMenu()
+        );
+        return menu;
+      };
     },
   });
 </script>

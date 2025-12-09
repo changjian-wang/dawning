@@ -190,8 +190,13 @@ namespace Dawning.Identity.Api.Controllers
 
             identity.SetClaim(Claims.Subject, user.Id)
                     .SetClaim(Claims.Name, user.Username)
-                    .SetClaim(Claims.Email, user.Email ?? string.Empty)
-                    .SetClaim(Claims.Role, user.Role ?? "user");
+                    .SetClaim(Claims.Email, user.Email ?? string.Empty);
+
+            // 添加所有用户角色作为 role claims
+            foreach (var role in user.Roles)
+            {
+                identity.AddClaim(new Claim(Claims.Role, role));
+            }
 
             // 设置作用域
             identity.SetScopes(request.GetScopes());

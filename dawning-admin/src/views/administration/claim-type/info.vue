@@ -79,10 +79,7 @@
 <script lang="ts" setup>
   import { onMounted, reactive } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import {
-    claimType,
-    type IClaimType,
-  } from '@/api/administration/claim-type';
+  import { claimType, type IClaimType } from '@/api/administration/claim-type';
 
   const router = useRouter();
   const route = useRoute();

@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import { http, isSuccessCode } from '../interceptor';
 import { IPagedData } from '../paged-data';
 
 // 用户DTO（匹配后端UserDto）
@@ -45,6 +45,7 @@ export interface ICreateUserModel {
 // 更新用户请求
 export interface IUpdateUserModel {
   id: string;
+  username?: string; // 用于显示，不可修改
   email?: string;
   phoneNumber?: string;
   displayName?: string;
@@ -81,6 +82,7 @@ export const user = {
 
     clone: (source: IUser): IUpdateUserModel => ({
       id: source.id,
+      username: source.username, // 用于显示，不会发送到服务器
       email: source.email,
       phoneNumber: source.phoneNumber,
       displayName: source.displayName,
@@ -91,21 +93,20 @@ export const user = {
     }),
 
     isValid: (form: ICreateUserModel | IUpdateUserModel): boolean => {
-      if ('username' in form) {
-        return !!(
-          form.username?.trim() &&
-          form.password?.trim()
-        );
+      if ('password' in form) {
+        // 创建用户时需要验证用户名和密码
+        return !!(form.username?.trim() && form.password?.trim());
       }
+      // 更新用户时不需要验证
       return true;
     },
   },
-  
+
   api: {
     // 获取用户详情
     async get(id: string): Promise<IUser> {
       const response = await http.get(`/api/user/${id}`);
-      return response.data.data;
+      return response.data;
     },
 
     // 获取用户列表（分页）
@@ -114,18 +115,15 @@ export const user = {
       page: number,
       pageSize: number
     ): Promise<IPagedData<IUser>> {
-      const response = await http.get(
-        `/api/user`,
-        {
-          params: {
-            page,
-            pageSize,
-            ...model,
-          },
-        }
-      );
-      // 后端返回格式：{ code, message, data: { list, pagination } }
-      const { list, pagination } = response.data.data;
+      const response = await http.get(`/api/user`, {
+        params: {
+          page,
+          pageSize,
+          ...model,
+        },
+      });
+      // 拦截器返回 { code, message, data }，response.data 包含 { list, pagination }
+      const { list, pagination } = response.data;
       return {
         items: list,
         totalCount: pagination.total,
@@ -137,19 +135,19 @@ export const user = {
     // 创建用户
     async create(model: ICreateUserModel): Promise<IUser> {
       const response = await http.post('/api/user', model);
-      return response.data.data;
+      return response.data;
     },
 
     // 更新用户
     async update(model: IUpdateUserModel): Promise<IUser> {
       const response = await http.put(`/api/user/${model.id}`, model);
-      return response.data.data;
+      return response.data;
     },
 
     // 删除用户
     async delete(id: string): Promise<boolean> {
       const response = await http.delete(`/api/user/${id}`);
-      return response.data.code === 0;
+      return isSuccessCode(response.code);
     },
 
     // 重置密码
@@ -157,17 +155,21 @@ export const user = {
       const response = await http.post(`/api/user/${id}/reset-password`, {
         newPassword,
       });
-      return response.data.code === 0;
+      return isSuccessCode(response.code);
     },
 
     // 修改密码
-    async changePassword(userId: string, oldPassword: string, newPassword: string): Promise<boolean> {
+    async changePassword(
+      userId: string,
+      oldPassword: string,
+      newPassword: string
+    ): Promise<boolean> {
       const response = await http.post('/api/user/change-password', {
         userId,
         oldPassword,
         newPassword,
       });
-      return response.data.code === 0;
+      return isSuccessCode(response.code);
     },
   },
 };

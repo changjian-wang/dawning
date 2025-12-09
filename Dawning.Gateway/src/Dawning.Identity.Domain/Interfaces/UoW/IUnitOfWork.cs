@@ -9,6 +9,8 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         // Administration
         IClaimTypeRepository ClaimType { get; }
         ISystemMetadataRepository SystemMetadata { get; }
+        IRoleRepository Role { get; }
+        IUserRoleRepository UserRole { get; }
 
         // OpenIddict
         IApplicationRepository Application { get; }

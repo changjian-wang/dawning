@@ -3,7 +3,12 @@ import localeLogin from '@/views/login/locale/en-US';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 
+import localeUser from '@/views/administration/user/locale/en-US';
+import localeRole from '@/views/administration/role/locale/en-US';
+import localeApplication from '@/views/administration/openiddict/application/locale/en-US';
+import localeScope from '@/views/administration/openiddict/scope/locale/en-US';
 import localeClaimType from '@/views/administration/claim-type/locale/en-US';
+import localeSystemMetadata from '@/views/administration/system-metadata/locale/en-US';
 
 import localeSettings from './en-US/settings';
 
@@ -25,22 +30,21 @@ export default {
   'navbar.action.locale': 'Switch to English',
   // --begin--
   'menu.administration': 'Administration',
-  'menu.administration.user': 'User Management',
-  'menu.administration.system.metadata': 'System Metadata',
-  'menu.administration.openiddict': 'Authorization and Authentication Service',
-  'menu.administration.openiddict.application': 'Applications',
-  'menu.administration.openiddict.scope': 'Scopes',
-  'menu.administration.openiddict.client': 'Clients',
-  'menu.administration.openiddict.api.resource': 'API Resources',
-  'menu.administration.openiddict.identity.resource': 'Identity Resources',
   'menu.data.list': 'Data List',
   'menu.add': 'Add',
   'menu.info': 'Info',
   'page.title.search.box': 'Search Box',
   'page.title.data.list': 'Data List',
   'page.button.search': 'Search',
+  'searchTable.form.search': 'Search',
+  'searchTable.form.reset': 'Reset',
   // --end--
+  ...localeUser,
+  ...localeRole,
+  ...localeApplication,
+  ...localeScope,
   ...localeClaimType,
+  ...localeSystemMetadata,
 
   ...localeSettings,
   ...localeMessageBox,

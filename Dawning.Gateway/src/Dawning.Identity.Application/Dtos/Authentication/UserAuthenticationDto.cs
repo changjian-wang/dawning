@@ -21,9 +21,9 @@ namespace Dawning.Identity.Application.Dtos.Authentication
         public string? Email { get; set; }
 
         /// <summary>
-        /// 角色
+        /// 角色列表（从user_roles表加载）
         /// </summary>
-        public string? Role { get; set; }
+        public List<string> Roles { get; set; } = new();
 
         /// <summary>
         /// 是否启用

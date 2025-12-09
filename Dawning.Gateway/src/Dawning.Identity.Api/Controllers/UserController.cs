@@ -75,7 +75,7 @@ namespace Dawning.Identity.Api.Controllers
                     Id = user.Id,
                     Username = user.Username!,
                     Email = user.Email!,
-                    Role = user.Role!,
+                    Roles = user.Roles,
                     Name = user.Username!, // 暂时使用 username 作为显示名称
                     Avatar = null, // 暂无头像功能
                     CreatedAt = DateTime.UtcNow, // 暂时返回当前时间
@@ -96,6 +96,7 @@ namespace Dawning.Identity.Api.Controllers
         /// 获取用户列表（分页）
         /// </summary>
         [HttpGet]
+        [Authorize(Roles = "admin,super_admin,user_manager,auditor")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetUserList(
             [FromQuery] string? username,
@@ -223,6 +224,7 @@ namespace Dawning.Identity.Api.Controllers
         /// 创建用户
         /// </summary>
         [HttpPost]
+        [Authorize(Roles = "admin,super_admin,user_manager")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
@@ -257,6 +259,7 @@ namespace Dawning.Identity.Api.Controllers
         /// 更新用户
         /// </summary>
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "admin,super_admin,user_manager")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto dto)
@@ -290,6 +293,7 @@ namespace Dawning.Identity.Api.Controllers
         /// 删除用户
         /// </summary>
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "admin,super_admin,user_manager")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(Guid id)
@@ -349,6 +353,7 @@ namespace Dawning.Identity.Api.Controllers
         /// 重置密码（管理员功能）
         /// </summary>
         [HttpPost("{id:guid}/reset-password")]
+        [Authorize(Roles = "admin,super_admin,user_manager")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -540,6 +545,104 @@ namespace Dawning.Identity.Api.Controllers
                     message = "Failed to initialize admin account",
                     error = ex.Message 
                 });
+            }
+        }
+
+        /// <summary>
+        /// 获取用户的角色列表
+        /// </summary>
+        [HttpGet("{id:guid}/roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUserRoles(Guid id)
+        {
+            try
+            {
+                var roles = await _userService.GetUserRolesAsync(id);
+                return Ok(new { code = 0, message = "Success", data = roles });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving roles for user: {UserId}", id);
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// 获取用户详情（含角色）
+        /// </summary>
+        [HttpGet("{id:guid}/with-roles")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetUserWithRoles(Guid id)
+        {
+            try
+            {
+                var user = await _userService.GetUserWithRolesAsync(id);
+                if (user == null)
+                {
+                    return NotFound(new { code = 404, message = "User not found" });
+                }
+
+                return Ok(new { code = 0, message = "Success", data = user });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user with roles: {UserId}", id);
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// 为用户分配角色
+        /// </summary>
+        [HttpPost("{id:guid}/roles")]
+        [Authorize(Roles = "admin,super_admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AssignRoles(Guid id, [FromBody] Dawning.Identity.Application.Dtos.Administration.AssignRolesDto dto)
+        {
+            try
+            {
+                var operatorId = GetCurrentUserId();
+                await _userService.AssignRolesAsync(id, dto.RoleIds, operatorId);
+
+                _logger.LogInformation("Roles assigned to user: {UserId}", id);
+
+                return Ok(new { code = 0, message = "Roles assigned successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Failed to assign roles: {Message}", ex.Message);
+                return BadRequest(new { code = 400, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error assigning roles to user: {UserId}", id);
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// 移除用户的角色
+        /// </summary>
+        [HttpDelete("{userId:guid}/roles/{roleId:guid}")]
+        [Authorize(Roles = "admin,super_admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> RemoveRole(Guid userId, Guid roleId)
+        {
+            try
+            {
+                await _userService.RemoveRoleAsync(userId, roleId);
+
+                _logger.LogInformation("Role removed from user: {UserId}, Role: {RoleId}", userId, roleId);
+
+                return Ok(new { code = 0, message = "Role removed successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing role from user: {UserId}, Role: {RoleId}", userId, roleId);
+                return StatusCode(500, new { code = 500, message = "Internal server error" });
             }
         }
 
