@@ -484,6 +484,56 @@ namespace Dawning.Shared.Dapper.Contrib
 
                 return entities;
             }
+
+            /// <summary>
+            /// Execute query and return results as a List
+            /// </summary>
+            public async Task<List<TEntity>> ToListAsync()
+            {
+                var entities = await AsListAsync();
+                return entities.ToList();
+            }
+
+            /// <summary>
+            /// Execute query and return first result or default
+            /// </summary>
+            public async Task<TEntity?> FirstOrDefaultAsync()
+            {
+                var type = typeof(TEntity);
+                var name = GetTableName(type);
+
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                var parameters = ConvertToDynamicParameters();
+
+                // Build SELECT clause
+                string selectClause = "*";
+                if (_selectColumns.Count > 0)
+                {
+                    selectClause = string.Join(", ", _selectColumns.Select(c => sqlAdapter.ConvertColumnName(c)));
+                }
+
+                var sql = $"SELECT {selectClause} FROM {name} WHERE {whereClause}";
+
+                // Add ORDER BY if specified
+                if (_orderByList.Count > 0)
+                {
+                    var orderByParts = _orderByList.Select(o => 
+                        $"{sqlAdapter.ConvertColumnName(o.Column)} {(o.Descending ? "DESC" : "ASC")}");
+                    sql += $" ORDER BY {string.Join(", ", orderByParts)}";
+                }
+                else if (!string.IsNullOrEmpty(_orderBy))
+                {
+                    sql += $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
+                }
+
+                // Limit to 1 result for efficiency
+                sql += " LIMIT 1";
+
+                var list = await _connection.QueryAsync(sql, parameters, _transaction, commandTimeout: _commandTimeout);
+                var entities = GetListImpl<TEntity>(list, type);
+
+                return entities.FirstOrDefault();
+            }
         }
     }
 }

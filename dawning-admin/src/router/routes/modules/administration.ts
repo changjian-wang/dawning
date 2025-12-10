@@ -33,6 +33,16 @@ const ADMINISTRATION: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'permission',
+      name: 'Permission',
+      component: () => import('@/views/administration/permission/index.vue'),
+      meta: {
+        locale: 'menu.administration.permission',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
       path: 'application',
       name: 'Application',
       component: () =>
@@ -95,6 +105,17 @@ const ADMINISTRATION: AppRouteRecordRaw = {
         requiresAuth: true,
         roles: ['*'],
         hideInMenu: true,
+      },
+    },
+    {
+      path: 'audit-log',
+      name: 'AuditLog',
+      component: () => import('@/views/administration/audit-log/index.vue'),
+      meta: {
+        locale: 'menu.administration.auditLog',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin', 'auditor'],
+        icon: 'icon-history',
       },
     },
   ],

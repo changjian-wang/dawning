@@ -27,10 +27,14 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             Role = new RoleRepository(_context);
             UserRole = new UserRoleRepository(_context);
             AuditLog = new AuditLogRepository(_context);
+            Permission = new PermissionRepository(_context);
+            RolePermission = new RolePermissionRepository(_context);
 
             // OpenIddict
             Application = new ApplicationRepository(_context);
             Scope = new ScopeRepository(_context);
+            ApiResource = new ApiResourceRepository(_context);
+            IdentityResource = new IdentityResourceRepository(_context);
             Authorization = new AuthorizationRepository(_context);
             Token = new TokenRepository(_context);
         }
@@ -41,10 +45,14 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public IRoleRepository Role { get; }
         public IUserRoleRepository UserRole { get; }
         public IAuditLogRepository AuditLog { get; }
+        public IPermissionRepository Permission { get; }
+        public IRolePermissionRepository RolePermission { get; }
 
         // OpenIddict
         public IApplicationRepository Application { get; }
         public IScopeRepository Scope { get; }
+        public IApiResourceRepository ApiResource { get; }
+        public IIdentityResourceRepository IdentityResource { get; }
         public IAuthorizationRepository Authorization { get; }
         public ITokenRepository Token { get; }
 

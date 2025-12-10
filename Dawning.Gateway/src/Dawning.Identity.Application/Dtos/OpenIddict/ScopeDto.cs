@@ -44,5 +44,10 @@ namespace Dawning.Identity.Application.Dtos.OpenIddict
         /// 创建时间
         /// </summary>
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// 操作者ID (用于审计日志)
+        /// </summary>
+        public Guid? OperatorId { get; set; }
     }
 }

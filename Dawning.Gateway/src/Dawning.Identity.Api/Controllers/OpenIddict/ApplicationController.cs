@@ -4,6 +4,7 @@ using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Controllers.OpenIddict
 {
@@ -12,7 +13,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
     /// </summary>
     [ApiController]
     [Route("api/openiddict/application")]
-    [Authorize(Roles = "admin,super_admin")]
+    [Authorize]
     public class ApplicationController : ControllerBase
     {
         private readonly IApplicationService _service;
@@ -29,109 +30,190 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
+        /// 从JWT Claims中获取操作员ID
+        /// </summary>
+        private Guid GetOperatorId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? User.FindFirst("sub")?.Value
+                           ?? User.FindFirst("user_id")?.Value;
+
+            return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+        }
+
+        /// <summary>
         /// Retrieves an application by its unique identifier.
         /// </summary>
-        [HttpGet("get/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var result = await _service.GetAsync(id);
-            if (result == null || result.Id == null)
+            try
             {
-                return Ok(ApiResponse<ApplicationDto>.Error(40404, "Application not found"));
+                var result = await _service.GetAsync(id);
+                if (result == null || result.Id == null)
+                {
+                    return Ok(ApiResponse<ApplicationDto>.Error(40404, "Application not found"));
+                }
+                return Ok(ApiResponse<ApplicationDto>.Success(result));
             }
-            return Ok(ApiResponse<ApplicationDto>.Success(result));
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<ApplicationDto>.Error(50000, $"Error retrieving application: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves an application by its client ID.
         /// </summary>
-        [HttpGet("get-by-client-id/{clientId}")]
+        [HttpGet("by-client-id/{clientId}")]
         public async Task<IActionResult> GetByClientIdAsync(string clientId)
         {
-            if (string.IsNullOrWhiteSpace(clientId))
+            try
             {
-                return Ok(ApiResponse<ApplicationDto>.Error(40001, "Invalid client ID"));
-            }
+                if (string.IsNullOrWhiteSpace(clientId))
+                {
+                    return Ok(ApiResponse<ApplicationDto>.Error(40001, "Invalid client ID"));
+                }
 
-            var result = await _service.GetByClientIdAsync(clientId);
-            if (result == null)
-            {
-                return Ok(ApiResponse<ApplicationDto>.Error(40404, "Application not found"));
+                var result = await _service.GetByClientIdAsync(clientId);
+                if (result == null)
+                {
+                    return Ok(ApiResponse<ApplicationDto>.Error(40404, "Application not found"));
+                }
+                return Ok(ApiResponse<ApplicationDto>.Success(result));
             }
-            return Ok(ApiResponse<ApplicationDto>.Success(result));
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<ApplicationDto>.Error(50000, $"Error retrieving application: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves a paged list of applications.
         /// </summary>
-        [HttpPost("get-paged-list")]
+        [HttpPost("paged")]
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] ApplicationModel model,
             [FromQuery] int page = 1,
             [FromQuery] int size = 10)
         {
-            if (page < 1 || size < 1)
+            try
             {
-                return Ok(ApiResponse.Error(40001, "Invalid page or size parameters"));
-            }
+                if (page < 1 || size < 1)
+                {
+                    return Ok(ApiResponse.Error(40001, "Invalid page or size parameters"));
+                }
 
-            var result = await _service.GetPagedListAsync(model, page, size);
-            return Ok(ApiResponse<object>.Success(result));
+                var result = await _service.GetPagedListAsync(model, page, size);
+                return Ok(ApiResponse<object>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse.Error(50000, $"Error retrieving applications: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves all applications.
         /// </summary>
-        [HttpGet("get-all")]
+        [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _service.GetAllAsync();
-            return Ok(ApiResponse<IEnumerable<ApplicationDto>>.Success(result ?? []));
+            try
+            {
+                var result = await _service.GetAllAsync();
+                return Ok(ApiResponse<IEnumerable<ApplicationDto>>.Success(result ?? []));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse.Error(50000, $"Error retrieving applications: {ex.Message}"));
+            }
         }
 
         /// <summary>
-        /// Inserts a new application.
+        /// Creates a new application.
         /// </summary>
-        [HttpPost("insert")]
-        public async Task<IActionResult> InsertAsync([FromBody] ApplicationDto applicationDto)
+        [HttpPost]
+        public async Task<IActionResult> CreateAsync([FromBody] ApplicationDto applicationDto)
         {
-            if (applicationDto == null || string.IsNullOrWhiteSpace(applicationDto.ClientId))
+            try
             {
-                return Ok(ApiResponse<int>.Error(40002, "Invalid application data or missing client ID"));
-            }
+                if (applicationDto == null || string.IsNullOrWhiteSpace(applicationDto.ClientId))
+                {
+                    return Ok(ApiResponse<int>.Error(40002, "Invalid application data or missing client ID"));
+                }
 
-            var result = await _service.InsertAsync(applicationDto);
-            return Ok(ApiResponse<int>.Success(result, "Application created successfully"));
+                var result = await _service.InsertAsync(applicationDto);
+                return Ok(ApiResponse<int>.Success(result, "Application created successfully"));
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(ApiResponse<int>.Error(40003, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(ApiResponse<int>.Error(40009, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<int>.Error(50000, $"Error creating application: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Updates an existing application.
         /// </summary>
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] ApplicationDto applicationDto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] ApplicationDto applicationDto)
         {
-            if (applicationDto?.Id == null)
+            try
             {
-                return Ok(ApiResponse<bool>.Error(40003, "Invalid application data or missing ID"));
-            }
+                if (applicationDto?.Id == null || applicationDto.Id != id)
+                {
+                    return Ok(ApiResponse<bool>.Error(40003, "Invalid application data or ID mismatch"));
+                }
 
-            var result = await _service.UpdateAsync(applicationDto);
-            return Ok(ApiResponse<bool>.Success(result, "Application updated successfully"));
+                var result = await _service.UpdateAsync(applicationDto);
+                return Ok(ApiResponse<bool>.Success(result, "Application updated successfully"));
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40003, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40009, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<bool>.Error(50000, $"Error updating application: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Deletes an application by its unique identifier.
         /// </summary>
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            if (id == Guid.Empty)
+            try
             {
-                return Ok(ApiResponse<bool>.Error(40005, "Invalid ID"));
-            }
+                if (id == Guid.Empty)
+                {
+                    return Ok(ApiResponse<bool>.Error(40005, "Invalid ID"));
+                }
 
-            var result = await _service.DeleteAsync(new ApplicationDto { Id = id });
-            return Ok(ApiResponse<bool>.Success(result, "Application deleted successfully"));
+                var result = await _service.DeleteAsync(new ApplicationDto { Id = id });
+                return Ok(ApiResponse<bool>.Success(result, "Application deleted successfully"));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40009, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<bool>.Error(50000, $"Error deleting application: {ex.Message}"));
+            }
         }
     }
 }

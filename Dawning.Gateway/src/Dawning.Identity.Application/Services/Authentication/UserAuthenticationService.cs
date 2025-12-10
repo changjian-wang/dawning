@@ -1,8 +1,7 @@
 using Dawning.Identity.Application.Dtos.Authentication;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Authentication;
-using System.Security.Cryptography;
-using System.Text;
+using Dawning.Identity.Domain.Core.Security;
 
 namespace Dawning.Identity.Application.Services.Authentication
 {
@@ -115,16 +114,6 @@ namespace Dawning.Identity.Application.Services.Authentication
                 Roles = roleNames,
                 IsActive = user.IsActive
             };
-        }
-
-        /// <summary>
-        /// 密码哈希计算 (SHA256)
-        /// </summary>
-        private static string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
         }
     }
 }

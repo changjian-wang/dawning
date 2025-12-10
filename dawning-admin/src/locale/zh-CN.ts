@@ -5,10 +5,15 @@ import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 
 import localeUser from '@/views/administration/user/locale/zh-CN';
 import localeRole from '@/views/administration/role/locale/zh-CN';
+import localePermission from '@/views/administration/permission/locale/zh-CN';
 import localeApplication from '@/views/administration/openiddict/application/locale/zh-CN';
 import localeScope from '@/views/administration/openiddict/scope/locale/zh-CN';
 import localeClaimType from '@/views/administration/claim-type/locale/zh-CN';
+import localeIdsScope from '@/views/ids/scope/locale/zh-CN';
+import localeIdsIdentityResource from '@/views/ids/identity-resource/locale/zh-CN';
+import localeIdsApiResource from '@/views/ids/api-resource/locale/zh-CN';
 import localeSystemMetadata from '@/views/administration/system-metadata/locale/zh-CN';
+import localeAuditLog from '@/views/administration/audit-log/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
 
@@ -41,10 +46,15 @@ export default {
   // --end--
   ...localeUser,
   ...localeRole,
+  ...localePermission,
   ...localeApplication,
   ...localeScope,
   ...localeClaimType,
   ...localeSystemMetadata,
+  ...localeAuditLog,
+  ...localeIdsScope,
+  ...localeIdsIdentityResource,
+  ...localeIdsApiResource,
 
   ...localeSettings,
   ...localeMessageBox,

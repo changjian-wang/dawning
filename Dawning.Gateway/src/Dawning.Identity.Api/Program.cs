@@ -102,6 +102,15 @@ namespace Dawning.Identity.Api
             app.UseSerilogRequestLogging();
 
             // ===== Middleware Configuration =====
+            // 异常处理中间件（必须在最前面）
+            app.UseMiddleware<Dawning.Identity.Api.Middleware.ExceptionHandlingMiddleware>();
+            
+            // 请求日志中间件
+            app.UseMiddleware<Dawning.Identity.Api.Middleware.RequestLoggingMiddleware>();
+            
+            // 性能监控中间件
+            app.UseMiddleware<Dawning.Identity.Api.Middleware.PerformanceMonitoringMiddleware>();
+            
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("AllowAll");

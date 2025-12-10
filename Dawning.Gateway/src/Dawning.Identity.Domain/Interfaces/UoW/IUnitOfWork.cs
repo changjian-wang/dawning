@@ -12,10 +12,14 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         IRoleRepository Role { get; }
         IUserRoleRepository UserRole { get; }
         IAuditLogRepository AuditLog { get; }
+        IPermissionRepository Permission { get; }
+        IRolePermissionRepository RolePermission { get; }
 
         // OpenIddict
         IApplicationRepository Application { get; }
         IScopeRepository Scope { get; }
+        IApiResourceRepository ApiResource { get; }
+        IIdentityResourceRepository IdentityResource { get; }
         IAuthorizationRepository Authorization { get; }
         ITokenRepository Token { get; }
 

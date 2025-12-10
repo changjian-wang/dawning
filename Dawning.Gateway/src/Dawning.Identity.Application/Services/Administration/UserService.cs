@@ -7,11 +7,11 @@ using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
+using Dawning.Identity.Domain.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Services.Administration
@@ -100,6 +100,13 @@ namespace Dawning.Identity.Application.Services.Administration
             if (!string.IsNullOrWhiteSpace(dto.Email) && await _userRepository.EmailExistsAsync(dto.Email))
             {
                 throw new InvalidOperationException($"Email '{dto.Email}' already exists.");
+            }
+
+            // 验证密码复杂度
+            var (isValid, errorMessage) = ValidatePasswordComplexity(dto.Password);
+            if (!isValid)
+            {
+                throw new InvalidOperationException(errorMessage);
             }
 
             // 创建用户实体
@@ -195,6 +202,19 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException("Old password is incorrect.");
             }
 
+            // 验证新密码与旧密码不同
+            if (dto.NewPassword == dto.OldPassword)
+            {
+                throw new InvalidOperationException("新密码不能与旧密码相同。");
+            }
+
+            // 验证密码复杂度
+            var (isValid, errorMessage) = ValidatePasswordComplexity(dto.NewPassword);
+            if (!isValid)
+            {
+                throw new InvalidOperationException(errorMessage);
+            }
+
             // 更新密码
             user.PasswordHash = HashPassword(dto.NewPassword);
             user.UpdatedAt = DateTime.UtcNow;
@@ -213,6 +233,13 @@ namespace Dawning.Identity.Application.Services.Administration
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{userId}' not found.");
+            }
+
+            // 验证密码复杂度
+            var (isValid, errorMessage) = ValidatePasswordComplexity(newPassword);
+            if (!isValid)
+            {
+                throw new InvalidOperationException(errorMessage);
             }
 
             // 直接更新密码，不需要验证旧密码
@@ -240,17 +267,14 @@ namespace Dawning.Identity.Application.Services.Administration
             return await _userRepository.EmailExistsAsync(email, excludeUserId);
         }
 
-        #region 密码哈希辅助方法
+        #region 密码哈希和验证辅助方法
 
         /// <summary>
-        /// 哈希密码（使用SHA256）
+        /// 哈希密码（使用PBKDF2）
         /// </summary>
         private static string HashPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
+            return PasswordHasher.Hash(password);
         }
 
         /// <summary>
@@ -258,8 +282,56 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         private static bool VerifyPassword(string password, string passwordHash)
         {
-            var hash = HashPassword(password);
-            return hash == passwordHash;
+            return PasswordHasher.Verify(password, passwordHash);
+        }
+
+        /// <summary>
+        /// 验证密码复杂度
+        /// </summary>
+        /// <param name="password">待验证的密码</param>
+        /// <returns>验证结果和错误消息</returns>
+        private static (bool IsValid, string ErrorMessage) ValidatePasswordComplexity(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                return (false, "密码不能为空");
+            }
+
+            if (password.Length < 8)
+            {
+                return (false, "密码长度至少为8个字符");
+            }
+
+            if (password.Length > 128)
+            {
+                return (false, "密码长度不能超过128个字符");
+            }
+
+            // 至少包含一个大写字母
+            if (!Regex.IsMatch(password, @"[A-Z]"))
+            {
+                return (false, "密码必须包含至少一个大写字母");
+            }
+
+            // 至少包含一个小写字母
+            if (!Regex.IsMatch(password, @"[a-z]"))
+            {
+                return (false, "密码必须包含至少一个小写字母");
+            }
+
+            // 至少包含一个数字
+            if (!Regex.IsMatch(password, @"[0-9]"))
+            {
+                return (false, "密码必须包含至少一个数字");
+            }
+
+            // 至少包含一个特殊字符
+            if (!Regex.IsMatch(password, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>/?]"))
+            {
+                return (false, "密码必须包含至少一个特殊字符 (!@#$%^&*等)");
+            }
+
+            return (true, string.Empty);
         }
 
         #endregion

@@ -84,6 +84,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 var result = await _auditLogService.GetPagedListAsync(model, page, pageSize);
 
+                _logger.LogInformation("Audit log list retrieved: page {Page}, total {Total}", page, result.TotalCount);
+
                 return Ok(new
                 {
                     code = 0,
@@ -93,9 +95,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
                         list = result.Items,
                         pagination = new
                         {
-                            total = result.TotalCount,
                             current = result.PageIndex,
-                            pageSize = result.PageSize
+                            pageSize = result.PageSize,
+                            total = result.TotalCount
                         }
                     }
                 });

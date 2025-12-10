@@ -4,6 +4,7 @@ using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Controllers.OpenIddict
 {
@@ -29,124 +30,236 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
+        /// Gets the operator ID from JWT claims
+        /// </summary>
+        private Guid GetOperatorId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                           ?? User.FindFirst("sub")
+                           ?? User.FindFirst("user_id");
+
+            if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return userId;
+            }
+
+            return Guid.Empty;
+        }
+
+        /// <summary>
         /// Retrieves a scope by its unique identifier.
         /// </summary>
-        [HttpGet("get/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
-            var result = await _service.GetAsync(id);
-            if (result == null || result.Id == null)
+            try
             {
-                return Ok(ApiResponse<ScopeDto>.Error(40404, "Scope not found"));
+                var result = await _service.GetAsync(id);
+                if (result == null || result.Id == null)
+                {
+                    return Ok(ApiResponse<ScopeDto>.Error(40404, "Scope not found"));
+                }
+                return Ok(ApiResponse<ScopeDto>.Success(result));
             }
-            return Ok(ApiResponse<ScopeDto>.Success(result));
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<ScopeDto>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves a scope by its name.
         /// </summary>
-        [HttpGet("get-by-name/{name}")]
+        [HttpGet("by-name/{name}")]
         public async Task<IActionResult> GetByNameAsync(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            try
             {
-                return Ok(ApiResponse<ScopeDto>.Error(40001, "Invalid scope name"));
-            }
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    return Ok(ApiResponse<ScopeDto>.Error(40001, "Invalid scope name"));
+                }
 
-            var result = await _service.GetByNameAsync(name);
-            if (result == null)
-            {
-                return Ok(ApiResponse<ScopeDto>.Error(40404, "Scope not found"));
+                var result = await _service.GetByNameAsync(name);
+                if (result == null)
+                {
+                    return Ok(ApiResponse<ScopeDto>.Error(40404, "Scope not found"));
+                }
+                return Ok(ApiResponse<ScopeDto>.Success(result));
             }
-            return Ok(ApiResponse<ScopeDto>.Success(result));
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<ScopeDto>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves scopes by their names.
         /// </summary>
-        [HttpPost("get-by-names")]
+        [HttpPost("by-names")]
         public async Task<IActionResult> GetByNamesAsync([FromBody] IEnumerable<string> names)
         {
-            if (names == null || !names.Any())
+            try
             {
-                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(40001, "Invalid scope names"));
-            }
+                if (names == null || !names.Any())
+                {
+                    return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(40001, "Invalid scope names"));
+                }
 
-            var result = await _service.GetByNamesAsync(names);
-            return Ok(ApiResponse<IEnumerable<ScopeDto>>.Success(result ?? []));
+                var result = await _service.GetByNamesAsync(names);
+                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Success(result ?? []));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves a paged list of scopes.
         /// </summary>
-        [HttpPost("get-paged-list")]
+        [HttpPost("paged")]
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] ScopeModel model,
             [FromQuery] int page = 1,
             [FromQuery] int size = 10)
         {
-            if (page < 1 || size < 1)
+            try
             {
-                return Ok(ApiResponse.Error(40001, "Invalid page or size parameters"));
-            }
+                if (page < 1 || size < 1)
+                {
+                    return Ok(ApiResponse.Error(40001, "Invalid page or size parameters"));
+                }
 
-            var result = await _service.GetPagedListAsync(model, page, size);
-            return Ok(ApiResponse<object>.Success(result));
+                var result = await _service.GetPagedListAsync(model, page, size);
+                return Ok(ApiResponse<object>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<object>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Retrieves all scopes.
         /// </summary>
-        [HttpGet("get-all")]
+        [HttpGet]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _service.GetAllAsync();
-            return Ok(ApiResponse<IEnumerable<ScopeDto>>.Success(result ?? []));
+            try
+            {
+                var result = await _service.GetAllAsync();
+                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Success(result ?? []));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Inserts a new scope.
         /// </summary>
-        [HttpPost("insert")]
+        [HttpPost]
         public async Task<IActionResult> InsertAsync([FromBody] ScopeDto scopeDto)
         {
-            if (scopeDto == null || string.IsNullOrWhiteSpace(scopeDto.Name))
+            try
             {
-                return Ok(ApiResponse<int>.Error(40002, "Invalid scope data or missing name"));
-            }
+                if (scopeDto == null || string.IsNullOrWhiteSpace(scopeDto.Name))
+                {
+                    return Ok(ApiResponse<int>.Error(40002, "Invalid scope data or missing name"));
+                }
 
-            var result = await _service.InsertAsync(scopeDto);
-            return Ok(ApiResponse<int>.Success(result, "Scope created successfully"));
+                // Set operator ID for audit
+                scopeDto.OperatorId = GetOperatorId();
+
+                var result = await _service.InsertAsync(scopeDto);
+                return Ok(ApiResponse<int>.Success(result, "Scope created successfully"));
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(ApiResponse<int>.Error(40003, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(ApiResponse<int>.Error(40009, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<int>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Updates an existing scope.
         /// </summary>
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] ScopeDto scopeDto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] ScopeDto scopeDto)
         {
-            if (scopeDto?.Id == null)
+            try
             {
-                return Ok(ApiResponse<bool>.Error(40003, "Invalid scope data or missing ID"));
-            }
+                if (scopeDto == null)
+                {
+                    return Ok(ApiResponse<bool>.Error(40003, "Invalid scope data"));
+                }
 
-            var result = await _service.UpdateAsync(scopeDto);
-            return Ok(ApiResponse<bool>.Success(result, "Scope updated successfully"));
+                // Ensure ID matches route parameter
+                scopeDto.Id = id;
+
+                // Set operator ID for audit
+                scopeDto.OperatorId = GetOperatorId();
+
+                var result = await _service.UpdateAsync(scopeDto);
+                return Ok(ApiResponse<bool>.Success(result, "Scope updated successfully"));
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40003, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40009, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<bool>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
 
         /// <summary>
         /// Deletes a scope by its unique identifier.
         /// </summary>
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
-            if (id == Guid.Empty)
+            try
             {
-                return Ok(ApiResponse<bool>.Error(40005, "Invalid ID"));
-            }
+                if (id == Guid.Empty)
+                {
+                    return Ok(ApiResponse<bool>.Error(40005, "Invalid ID"));
+                }
 
-            var result = await _service.DeleteAsync(new ScopeDto { Id = id });
-            return Ok(ApiResponse<bool>.Success(result, "Scope deleted successfully"));
+                var scopeDto = new ScopeDto
+                {
+                    Id = id,
+                    OperatorId = GetOperatorId()
+                };
+
+                var result = await _service.DeleteAsync(scopeDto);
+                return Ok(ApiResponse<bool>.Success(result, "Scope deleted successfully"));
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40003, ex.Message));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(ApiResponse<bool>.Error(40009, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<bool>.Error(50000, $"Internal server error: {ex.Message}"));
+            }
         }
     }
 }

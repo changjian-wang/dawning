@@ -51,13 +51,133 @@ export interface IUpdateApplicationDto extends ICreateApplicationDto {
   id: string;
 }
 
+/**
+ * 客户端类型预设
+ */
+export const ClientTypePresets = {
+  /**
+   * SPA应用 (React, Vue, Angular)
+   */
+  spa: (): Partial<ICreateApplicationDto> => ({
+    type: 'public',
+    consentType: 'explicit',
+    permissions: [
+      'ept:authorization',
+      'ept:token',
+      'ept:logout',
+      'gt:authorization_code',
+      'gt:refresh_token',
+      'rst:code',
+      'scp:openid',
+      'scp:profile',
+      'scp:email',
+    ],
+    redirectUris: [],
+    postLogoutRedirectUris: [],
+  }),
+
+  /**
+   * 移动应用 (iOS, Android)
+   */
+  mobile: (): Partial<ICreateApplicationDto> => ({
+    type: 'public',
+    consentType: 'explicit',
+    permissions: [
+      'ept:authorization',
+      'ept:token',
+      'ept:logout',
+      'gt:authorization_code',
+      'gt:refresh_token',
+      'rst:code',
+      'scp:openid',
+      'scp:profile',
+      'scp:offline_access',
+    ],
+    redirectUris: [],
+    postLogoutRedirectUris: [],
+  }),
+
+  /**
+   * Web应用 (传统服务器端渲染)
+   */
+  web: (): Partial<ICreateApplicationDto> => ({
+    type: 'confidential',
+    consentType: 'explicit',
+    permissions: [
+      'ept:authorization',
+      'ept:token',
+      'ept:logout',
+      'gt:authorization_code',
+      'gt:refresh_token',
+      'rst:code',
+      'scp:openid',
+      'scp:profile',
+      'scp:email',
+    ],
+    redirectUris: [],
+    postLogoutRedirectUris: [],
+  }),
+
+  /**
+   * API客户端 (机器对机器)
+   */
+  api: (): Partial<ICreateApplicationDto> => ({
+    type: 'confidential',
+    consentType: 'implicit',
+    permissions: [
+      'ept:token',
+      'gt:client_credentials',
+      'scp:api.read',
+      'scp:api.write',
+    ],
+    redirectUris: [],
+    postLogoutRedirectUris: [],
+  }),
+};
+
+/**
+ * OpenIddict权限类型
+ */
+export const PermissionTypes = {
+  // 端点权限
+  Endpoints: {
+    authorization: 'ept:authorization',
+    token: 'ept:token',
+    logout: 'ept:logout',
+    introspection: 'ept:introspection',
+    revocation: 'ept:revocation',
+  },
+  // 授权类型
+  GrantTypes: {
+    authorizationCode: 'gt:authorization_code',
+    clientCredentials: 'gt:client_credentials',
+    refreshToken: 'gt:refresh_token',
+    implicit: 'gt:implicit',
+    password: 'gt:password',
+  },
+  // 响应类型
+  ResponseTypes: {
+    code: 'rst:code',
+    token: 'rst:token',
+    idToken: 'rst:id_token',
+  },
+  // 作用域
+  Scopes: {
+    openid: 'scp:openid',
+    profile: 'scp:profile',
+    email: 'scp:email',
+    roles: 'scp:roles',
+    offlineAccess: 'scp:offline_access',
+  },
+};
+
 export const application = {
   /**
    * 获取应用程序详情
    */
   async get(id: string): Promise<IApplication> {
-    const response = await http.get(`/api/openiddict/application/get/${id}`);
-    return response.data;
+    const response = await http.get(`/api/openiddict/application/${id}`);
+    return response.data.data || response.data;
   },
 
   /**
@@ -65,9 +185,9 @@ export const application = {
    */
   async getByClientId(clientId: string): Promise<IApplication> {
     const response = await http.get(
-      `/api/openiddict/application/get-by-client-id/${clientId}`
+      `/api/openiddict/application/by-client-id/${clientId}`
     );
-    return response.data;
+    return response.data.data || response.data;
   },
 
   /**
@@ -79,26 +199,26 @@ export const application = {
     size = 10
   ): Promise<IPagedData<IApplication>> {
     const response = await http.post(
-      `/api/openiddict/application/get-paged-list?page=${page}&size=${size}`,
+      `/api/openiddict/application/paged?page=${page}&size=${size}`,
       query
     );
-    // 后端直接返回 PagedData 格式: { pageIndex, pageSize, totalCount, items }
-    return response.data;
+    // 后端返回格式: { data: { pageIndex, pageSize, totalCount, items } }
+    return response.data.data || response.data;
   },
 
   /**
    * 获取所有应用程序
    */
   async getAll(): Promise<IApplication[]> {
-    const response = await http.get('/api/openiddict/application/get-all');
-    return response.data;
+    const response = await http.get('/api/openiddict/application');
+    return response.data.data || response.data;
   },
 
   /**
    * 创建应用程序
    */
-  async create(dto: ICreateApplicationDto): Promise<number> {
-    const response = await http.post('/api/openiddict/application/insert', {
+  async create(dto: ICreateApplicationDto): Promise<string> {
+    const response = await http.post('/api/openiddict/application', {
       clientId: dto.clientId,
       clientSecret: dto.clientSecret,
       displayName: dto.displayName,
@@ -110,35 +230,38 @@ export const application = {
       requirements: [],
       properties: {},
     });
-    return response.data;
+    return response.data.data;
   },
 
   /**
    * 更新应用程序
    */
-  async update(dto: IUpdateApplicationDto): Promise<number> {
-    const response = await http.put('/api/openiddict/application/update', dto);
-    return response.data;
+  async update(dto: IUpdateApplicationDto): Promise<boolean> {
+    const response = await http.put(
+      `/api/openiddict/application/${dto.id}`,
+      dto
+    );
+    return response.data.data;
   },
 
   /**
    * 删除应用程序
    */
-  async delete(id: string): Promise<number> {
-    const response = await http.delete(
-      `/api/openiddict/application/delete/${id}`
-    );
-    return response.data;
+  async delete(id: string): Promise<boolean> {
+    const response = await http.delete(`/api/openiddict/application/${id}`);
+    return response.data.data;
   },
 
   /**
-   * 更新客户端密钥
+   * 更新客户端密钥（重新生成哈希）
    */
-  async updateSecret(id: string, newSecret: string): Promise<number> {
-    const response = await http.post(
-      '/api/openiddict/application/update-secret',
-      { id, newSecret }
-    );
-    return response.data;
+  async updateSecret(id: string, newSecret: string): Promise<boolean> {
+    // 通过update接口更新密钥
+    const app = await this.get(id);
+    return this.update({
+      ...app,
+      id,
+      clientSecret: newSecret,
+    } as IUpdateApplicationDto);
   },
 };
