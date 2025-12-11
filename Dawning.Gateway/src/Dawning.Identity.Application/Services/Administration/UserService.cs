@@ -370,9 +370,8 @@ namespace Dawning.Identity.Application.Services.Administration
                 return null;
             }
 
-            // 验证密码
-            var passwordHash = HashPassword(password);
-            if (user.PasswordHash != passwordHash)
+            // 验证密码 - 使用 PasswordHasher.Verify
+            if (!PasswordHasher.Verify(password, user.PasswordHash))
             {
                 return null;
             }

@@ -12,6 +12,18 @@ export default mergeConfig(
       fs: {
         strict: true,
       },
+      proxy: {
+        '/connect': {
+          target: 'http://localhost:5202',
+          changeOrigin: true,
+          secure: false,
+        },
+        '/api': {
+          target: 'http://localhost:5202',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
     plugins: [
       eslint({

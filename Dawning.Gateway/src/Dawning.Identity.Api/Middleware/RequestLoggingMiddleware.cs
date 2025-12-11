@@ -28,50 +28,44 @@ namespace Dawning.Identity.Api.Middleware
             var stopwatch = Stopwatch.StartNew();
             var requestId = Guid.NewGuid().ToString("N");
             
-            // 添加请求ID到响应头
-                context.Response.Headers.Append("X-Request-Id", requestId);            // 记录请求信息
+            // 记录请求信息
             var requestInfo = await FormatRequest(context.Request, requestId);
             _logger.LogInformation(requestInfo);
 
-            // 保存原始响应体流
-            var originalBodyStream = context.Response.Body;
-
-            using (var responseBody = new MemoryStream())
+            // 使用 OnStarting 回调安全地添加响应头
+            context.Response.OnStarting(() =>
             {
-                context.Response.Body = responseBody;
-
-                try
+                if (!context.Response.Headers.ContainsKey("X-Request-Id"))
                 {
-                    // 执行下一个中间件
-                    await _next(context);
-
-                    stopwatch.Stop();
-
-                    // 记录响应信息
-                    var responseInfo = await FormatResponse(context.Response, requestId, stopwatch.ElapsedMilliseconds);
-                    
-                    if (stopwatch.ElapsedMilliseconds > 3000)
-                    {
-                        _logger.LogWarning($"Slow request detected: {responseInfo}");
-                    }
-                    else
-                    {
-                        _logger.LogInformation(responseInfo);
-                    }
-
-                    // 复制响应体到原始流
-                    await responseBody.CopyToAsync(originalBodyStream);
+                    context.Response.Headers["X-Request-Id"] = requestId;
                 }
-                catch (Exception ex)
+                return Task.CompletedTask;
+            });
+
+            try
+            {
+                // 直接执行下一个中间件，不拦截响应体
+                await _next(context);
+
+                stopwatch.Stop();
+
+                // 记录响应基本信息（不读取响应体）
+                var responseInfo = $"[Response {requestId}] Status: {context.Response.StatusCode}, Time: {stopwatch.ElapsedMilliseconds}ms";
+                
+                if (stopwatch.ElapsedMilliseconds > 3000)
                 {
-                    stopwatch.Stop();
-                    _logger.LogError(ex, $"Request {requestId} failed after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}");
-                    throw;
+                    _logger.LogWarning($"Slow request detected: {responseInfo}");
                 }
-                finally
+                else
                 {
-                    context.Response.Body = originalBodyStream;
+                    _logger.LogInformation(responseInfo);
                 }
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                _logger.LogError(ex, $"Request {requestId} failed after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}");
+                throw;
             }
         }
 

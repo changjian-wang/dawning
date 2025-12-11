@@ -9,6 +9,14 @@ namespace Dawning.Identity.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // ===== Kestrel Configuration =====
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.AddServerHeader = false;
+                // 禁用响应体长度验证，避免 OpenIddict Content-Length mismatch 错误
+                options.AllowSynchronousIO = true;
+            });
+
             // ===== Serilog Configuration =====
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
@@ -102,13 +110,9 @@ namespace Dawning.Identity.Api
             app.UseSerilogRequestLogging();
 
             // ===== Middleware Configuration =====
-            // 异常处理中间件（必须在最前面）
+            // 所有中间件已测试
             app.UseMiddleware<Dawning.Identity.Api.Middleware.ExceptionHandlingMiddleware>();
-            
-            // 请求日志中间件
             app.UseMiddleware<Dawning.Identity.Api.Middleware.RequestLoggingMiddleware>();
-            
-            // 性能监控中间件
             app.UseMiddleware<Dawning.Identity.Api.Middleware.PerformanceMonitoringMiddleware>();
             
             app.UseHttpsRedirection();
