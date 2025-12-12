@@ -8,7 +8,11 @@
         <a-form :model="model" layout="inline" class="search-form">
           <a-row :gutter="[16, 16]" style="width: 100%">
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="username" label="用户名" class="form-item-block">
+              <a-form-item
+                field="username"
+                label="用户名"
+                class="form-item-block"
+              >
                 <a-input
                   v-model="model.username"
                   placeholder="请输入用户名"
@@ -49,7 +53,14 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xs="24" :sm="12" :md="24" :lg="6" :xl="6" class="action-col">
+            <a-col
+              :xs="24"
+              :sm="12"
+              :md="24"
+              :lg="6"
+              :xl="6"
+              class="action-col"
+            >
               <a-space :size="12">
                 <a-button type="primary" @click="handleSearch">
                   <template #icon><icon-search /></template>
@@ -99,6 +110,14 @@
                 @click="handleEdit(record)"
               >
                 <template #icon><icon-edit :size="18" /></template>
+              </a-button>
+              <a-button
+                type="text"
+                size="medium"
+                status="success"
+                @click="handleAssignRoles(record)"
+              >
+                <template #icon><icon-user-group :size="18" /></template>
               </a-button>
               <a-dropdown>
                 <a-button type="text" size="medium">
@@ -238,7 +257,9 @@
         <div class="detail-row">
           <span class="label">账户状态</span>
           <span class="value">
-            <a-tag v-if="currentUser?.isActive" color="green" size="small">启用</a-tag>
+            <a-tag v-if="currentUser?.isActive" color="green" size="small"
+              >启用</a-tag
+            >
             <a-tag v-else color="red" size="small">禁用</a-tag>
           </span>
         </div>
@@ -246,7 +267,12 @@
         <div class="detail-row">
           <span class="label">邮箱已验证</span>
           <span class="value">
-            <a-tag v-if="currentUser?.emailConfirmed" color="arcoblue" size="small">是</a-tag>
+            <a-tag
+              v-if="currentUser?.emailConfirmed"
+              color="arcoblue"
+              size="small"
+              >是</a-tag
+            >
             <a-tag v-else color="gray" size="small">否</a-tag>
           </span>
         </div>
@@ -254,7 +280,12 @@
         <div class="detail-row">
           <span class="label">手机已验证</span>
           <span class="value">
-            <a-tag v-if="currentUser?.phoneNumberConfirmed" color="arcoblue" size="small">是</a-tag>
+            <a-tag
+              v-if="currentUser?.phoneNumberConfirmed"
+              color="arcoblue"
+              size="small"
+              >是</a-tag
+            >
             <a-tag v-else color="gray" size="small">否</a-tag>
           </span>
         </div>
@@ -296,11 +327,83 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <!-- 角色分配模态框 -->
+    <a-modal
+      v-model:visible="roleModalVisible"
+      :title="`分配角色 - ${currentUser?.username}`"
+      width="700px"
+      :mask-closable="false"
+      @cancel="handleRoleCancel"
+      @before-ok="handleRoleBeforeOk"
+    >
+      <a-spin :loading="roleLoading" style="width: 100%">
+        <a-transfer
+          :data="allRoles"
+          :target-keys="selectedRoleIds"
+          :title="['可分配角色', '已分配角色']"
+          show-search
+          :filter-option="filterRoleOption"
+          @change="handleRoleChange"
+        >
+          <template #source="{ selectedKeys, onSelect }">
+            <div class="transfer-panel">
+              <div
+                v-for="role in availableRoles"
+                :key="role.value"
+                class="transfer-item"
+                :class="{ selected: selectedKeys.includes(role.value) }"
+                @click="
+                  () => onSelect(role.value, !selectedKeys.includes(role.value))
+                "
+              >
+                <a-checkbox
+                  :model-value="selectedKeys.includes(role.value)"
+                  @click.stop="
+                    () =>
+                      onSelect(role.value, !selectedKeys.includes(role.value))
+                  "
+                />
+                <div class="role-info">
+                  <div class="role-name">{{ role.label }}</div>
+                  <div class="role-code">{{ role.name }}</div>
+                </div>
+              </div>
+            </div>
+          </template>
+          <template #target="{ selectedKeys, onSelect }">
+            <div class="transfer-panel">
+              <div
+                v-for="role in assignedRoles"
+                :key="role.value"
+                class="transfer-item"
+                :class="{ selected: selectedKeys.includes(role.value) }"
+                @click="
+                  () => onSelect(role.value, !selectedKeys.includes(role.value))
+                "
+              >
+                <a-checkbox
+                  :model-value="selectedKeys.includes(role.value)"
+                  @click.stop="
+                    () =>
+                      onSelect(role.value, !selectedKeys.includes(role.value))
+                  "
+                />
+                <div class="role-info">
+                  <div class="role-name">{{ role.label }}</div>
+                  <div class="role-code">{{ role.name }}</div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </a-transfer>
+      </a-spin>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, onMounted, onUnmounted } from 'vue';
+  import { reactive, ref, onMounted, onUnmounted, computed } from 'vue';
   import {
     IUser,
     IUserModel,
@@ -308,17 +411,27 @@
     IUpdateUserModel,
     user,
   } from '@/api/administration/user';
+  import { getAllActiveRoles, type RoleModel } from '@/api/administration/role';
   import { FieldRule, PaginationProps, Message } from '@arco-design/web-vue';
 
   const loading = ref(false);
   const modalVisible = ref(false);
   const viewModalVisible = ref(false);
   const resetPasswordVisible = ref(false);
+  const roleModalVisible = ref(false);
   const isEdit = ref(false);
   const modalTitle = ref('新增用户');
   const formRef = ref<any>(null);
   const currentUserId = ref<string>('');
   const currentUser = ref<IUser | null>(null);
+
+  // 角色分配相关状态
+  const roleLoading = ref(false);
+  const allRoles = ref<Array<{ value: string; label: string; name: string }>>(
+    []
+  );
+  const selectedRoleIds = ref<string[]>([]);
+  const initialRoleIds = ref<string[]>([]);
 
   const columns = reactive([
     {
@@ -416,7 +529,7 @@
         current: pagination.current || 1,
         pageSize: pagination.pageSize || 10,
       });
-      
+
       console.log('🔍 Component - Before API call');
       const result = await user.api.getPagedList(
         model,
@@ -438,8 +551,12 @@
       console.log('✅ Component - data.value length:', data.value.length);
     } catch (error) {
       console.error('❌ Component - Fetch error:', error);
-      console.error('❌ Component - Error stack:', error instanceof Error ? error.stack : 'No stack');
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(
+        '❌ Component - Error stack:',
+        error instanceof Error ? error.stack : 'No stack'
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       Message.error(`加载数据失败: ${errorMessage}`);
     } finally {
       loading.value = false;
@@ -575,6 +692,90 @@
       return false;
     }
   };
+
+  // 角色分配相关计算属性
+  const availableRoles = computed(() => {
+    return allRoles.value.filter(
+      (role) => !selectedRoleIds.value.includes(role.value)
+    );
+  });
+
+  const assignedRoles = computed(() => {
+    return allRoles.value.filter((role) =>
+      selectedRoleIds.value.includes(role.value)
+    );
+  });
+
+  // 角色分配相关处理函数
+  const handleAssignRoles = async (record: IUser) => {
+    currentUser.value = record;
+    roleLoading.value = true;
+    roleModalVisible.value = true;
+
+    try {
+      // 加载所有活动角色
+      const roles = await getAllActiveRoles();
+      allRoles.value = roles.map((role) => ({
+        value: role.id!,
+        label: role.displayName,
+        name: role.name,
+      }));
+
+      // 加载用户当前角色
+      const userRoles = await user.api.getUserRoles(record.id);
+      const userRoleIds = userRoles.map((role: any) => role.id);
+      selectedRoleIds.value = [...userRoleIds];
+      initialRoleIds.value = [...userRoleIds];
+    } catch (error: any) {
+      Message.error('加载角色列表失败');
+      console.error(error);
+      roleModalVisible.value = false;
+    } finally {
+      roleLoading.value = false;
+    }
+  };
+
+  const handleRoleChange = (newTargetKeys: string[]) => {
+    selectedRoleIds.value = newTargetKeys;
+  };
+
+  const filterRoleOption = (inputValue: string, option: any) => {
+    return (
+      option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+      option.name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  };
+
+  const handleRoleBeforeOk = async () => {
+    // 检查是否有变化
+    const hasChanges =
+      selectedRoleIds.value.length !== initialRoleIds.value.length ||
+      !selectedRoleIds.value.every((id) => initialRoleIds.value.includes(id));
+
+    if (!hasChanges) {
+      Message.info('没有变化');
+      return true;
+    }
+
+    try {
+      await user.api.assignRoles(currentUser.value!.id, selectedRoleIds.value);
+      Message.success('角色分配成功');
+      await fetchData();
+      return true;
+    } catch (error: any) {
+      const errorMsg = error?.response?.data?.message || '角色分配失败';
+      Message.error(errorMsg);
+      console.error(error);
+      return false;
+    }
+  };
+
+  const handleRoleCancel = () => {
+    selectedRoleIds.value = [];
+    initialRoleIds.value = [];
+    allRoles.value = [];
+    currentUser.value = null;
+  };
 </script>
 
 <style scoped lang="less">
@@ -590,7 +791,7 @@
 
       .form-item-block {
         width: 100%;
-        
+
         :deep(.arco-form-item-wrapper-col) {
           width: 100%;
         }
@@ -694,6 +895,49 @@
         color: var(--color-text-1);
         line-height: 1.5;
         word-break: break-word;
+      }
+    }
+  }
+
+  .transfer-panel {
+    padding: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+
+    .transfer-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      margin-bottom: 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: var(--color-fill-2);
+      }
+
+      &.selected {
+        background-color: var(--color-primary-light-1);
+      }
+
+      .role-info {
+        flex: 1;
+        margin-left: 8px;
+
+        .role-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--color-text-1);
+          line-height: 1.5;
+        }
+
+        .role-code {
+          font-size: 12px;
+          color: var(--color-text-3);
+          font-family: 'Consolas', 'Monaco', monospace;
+          margin-top: 2px;
+        }
       }
     }
   }

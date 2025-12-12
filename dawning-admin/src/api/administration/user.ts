@@ -115,17 +115,20 @@ export const user = {
       page: number,
       pageSize: number
     ): Promise<IPagedData<IUser>> {
-      const response = await axios.get<{ list: IUser[]; pagination: { total: number; current: number; pageSize: number } }>(`/api/user`, {
+      const response = await axios.get<{
+        list: IUser[];
+        pagination: { total: number; current: number; pageSize: number };
+      }>(`/api/user`, {
         params: {
           page,
           pageSize,
           ...model,
         },
       });
-      
+
       // response.data 现在直接是业务数据 {list, pagination}
       const { list, pagination } = response.data;
-      
+
       return {
         items: list,
         totalCount: pagination.total,
@@ -171,6 +174,18 @@ export const user = {
         oldPassword,
         newPassword,
       });
+      return true;
+    },
+
+    // 获取用户的角色列表
+    async getUserRoles(userId: string): Promise<any[]> {
+      const response = await axios.get(`/api/user/${userId}/roles`);
+      return response.data;
+    },
+
+    // 为用户分配角色
+    async assignRoles(userId: string, roleIds: string[]): Promise<boolean> {
+      await axios.post(`/api/user/${userId}/roles`, { roleIds });
       return true;
     },
   },
