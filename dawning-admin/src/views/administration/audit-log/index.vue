@@ -130,7 +130,9 @@
         
         <template #operations="{ record }">
           <a-button type="text" size="small" @click="handleViewDetail(record)">
-            {{ $t('auditLog.button.view') }}
+            <template #icon>
+              <icon-eye />
+            </template>
           </a-button>
         </template>
       </a-table>
