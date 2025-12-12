@@ -395,6 +395,26 @@ const columns = computed<TableColumnData[]>(() => [
 const fetchData = async () => {
   loading.value = true;
   try {
+    // 格式化日期范围
+    let startDate: string | undefined;
+    let endDate: string | undefined;
+
+    if (searchForm.dateRange?.[0]) {
+      const startValue = searchForm.dateRange[0];
+      startDate =
+        typeof startValue === 'string'
+          ? dayjs(startValue).format('YYYY-MM-DDTHH:mm:ss')
+          : dayjs(startValue as any).format('YYYY-MM-DDTHH:mm:ss');
+    }
+
+    if (searchForm.dateRange?.[1]) {
+      const endValue = searchForm.dateRange[1];
+      endDate =
+        typeof endValue === 'string'
+          ? dayjs(endValue).format('YYYY-MM-DDTHH:mm:ss')
+          : dayjs(endValue as any).format('YYYY-MM-DDTHH:mm:ss');
+    }
+
     const params: AuditLogQueryParams = {
       page: pagination.current,
       pageSize: pagination.pageSize,
@@ -402,20 +422,8 @@ const fetchData = async () => {
       action: searchForm.action,
       entityType: searchForm.entityType,
       ipAddress: searchForm.ipAddress || undefined,
-      startDate: searchForm.dateRange?.[0]
-        ? typeof searchForm.dateRange[0] === 'string'
-          ? dayjs(searchForm.dateRange[0]).format('YYYY-MM-DDTHH:mm:ss')
-          : dayjs(searchForm.dateRange[0] as any).format(
-              'YYYY-MM-DDTHH:mm:ss'
-            )
-        : undefined,
-      endDate: searchForm.dateRange?.[1]
-        ? typeof searchForm.dateRange[1] === 'string'
-          ? dayjs(searchForm.dateRange[1]).format('YYYY-MM-DDTHH:mm:ss')
-          : dayjs(searchForm.dateRange[1] as any).format(
-              'YYYY-MM-DDTHH:mm:ss'
-            )
-        : undefined,
+      startDate,
+      endDate,
     };
 
     const result = await getAuditLogs(params);
