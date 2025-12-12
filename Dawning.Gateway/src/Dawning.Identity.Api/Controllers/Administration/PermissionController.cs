@@ -66,7 +66,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             [FromQuery] string? action,
             [FromQuery] string? category,
             [FromQuery] bool? isActive,
-            [FromQuery] int current = 1,
+            [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20)
         {
             var model = new PermissionModel
@@ -79,7 +79,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 IsActive = isActive
             };
 
-            var result = await _permissionService.GetPagedListAsync(model, current, pageSize);
+            var result = await _permissionService.GetPagedListAsync(model, page, pageSize);
 
             return Ok(ApiResponse<object>.Success(result));
         }
