@@ -52,9 +52,12 @@ export interface CreateSystemLogDto {
  * 分页获取系统日志列表
  */
 export function getSystemLogList(params: SystemLogQueryParams) {
-  return axios.get<PagedResult<SystemLog>>(`${API_BASE_URL}/api/systemlog/paged`, {
-    params,
-  });
+  return axios.get<PagedResult<SystemLog>>(
+    `${API_BASE_URL}/api/systemlog/paged`,
+    {
+      params,
+    }
+  );
 }
 
 /**

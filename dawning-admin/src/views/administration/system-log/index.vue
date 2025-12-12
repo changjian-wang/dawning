@@ -283,136 +283,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Message } from '@arco-design/web-vue';
-import dayjs from 'dayjs';
-import {
-  getSystemLogList,
-  cleanupSystemLogs,
-  type SystemLog,
-  type SystemLogQueryParams,
-} from '@/api/system-log';
+  import { ref, reactive, computed, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { Message } from '@arco-design/web-vue';
+  import dayjs from 'dayjs';
+  import {
+    getSystemLogList,
+    cleanupSystemLogs,
+    type SystemLog,
+    type SystemLogQueryParams,
+  } from '@/api/system-log';
 
-const { t } = useI18n();
+  const { t } = useI18n();
 
-// 查询参数
-const queryParams = reactive<SystemLogQueryParams>({
-  level: '',
-  keyword: '',
-  username: '',
-  ipAddress: '',
-  requestPath: '',
-  startDate: '',
-  endDate: '',
-  page: 1,
-  pageSize: 20,
-});
-
-// 日期范围
-const dateRange = ref<[string, string] | []>([]);
-
-// 表格列定义
-const columns = computed(() => [
-  {
-    title: t('systemLog.level'),
-    dataIndex: 'level',
-    slotName: 'level',
-    width: 100,
-  },
-  {
-    title: t('systemLog.message'),
-    dataIndex: 'message',
-    slotName: 'message',
-    width: 300,
-    ellipsis: true,
-    tooltip: true,
-  },
-  {
-    title: t('systemLog.exception'),
-    dataIndex: 'exception',
-    slotName: 'exception',
-    width: 80,
-    align: 'center' as const,
-  },
-  {
-    title: t('systemLog.requestInfo'),
-    slotName: 'requestInfo',
-    width: 250,
-  },
-  {
-    title: t('systemLog.userInfo'),
-    slotName: 'userInfo',
-    width: 180,
-  },
-  {
-    title: t('common.createdAt'),
-    dataIndex: 'createdAt',
-    slotName: 'createdAt',
-    width: 180,
-  },
-  {
-    title: t('common.actions'),
-    slotName: 'actions',
-    width: 100,
-    fixed: 'right' as const,
-  },
-]);
-
-// 表格数据
-const data = ref<SystemLog[]>([]);
-const loading = ref(false);
-
-// 分页配置
-const pagination = reactive({
-  current: 1,
-  pageSize: 20,
-  total: 0,
-  showTotal: true,
-  showPageSize: true,
-});
-
-// 详情
-const detailVisible = ref(false);
-const currentLog = ref<SystemLog | null>(null);
-
-// 清理
-const cleanupVisible = ref(false);
-const cleanupForm = reactive({
-  beforeDate: '',
-});
-
-// 加载数据
-const fetchData = async () => {
-  loading.value = true;
-  try {
-    const { data: response } = await getSystemLogList({
-      ...queryParams,
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-    });
-
-    if (response.code === 20000) {
-      data.value = response.data.items;
-      pagination.total = response.data.totalCount;
-    }
-  } catch (error) {
-    console.error('Failed to fetch system logs:', error);
-    Message.error(t('common.loadFailed'));
-  } finally {
-    loading.value = false;
-  }
-};
-
-// 搜索
-const handleSearch = () => {
-  pagination.current = 1;
-  fetchData();
-};
-
-// 重置
-const handleReset = () => {
-  Object.assign(queryParams, {
+  // 查询参数
+  const queryParams = reactive<SystemLogQueryParams>({
     level: '',
     keyword: '',
     username: '',
@@ -420,112 +305,231 @@ const handleReset = () => {
     requestPath: '',
     startDate: '',
     endDate: '',
+    page: 1,
+    pageSize: 20,
   });
-  dateRange.value = [];
-  handleSearch();
-};
 
-// 日期范围变化
-const handleDateRangeChange = (value: [string, string] | undefined) => {
-  if (value && value.length === 2) {
-    queryParams.startDate = value[0];
-    queryParams.endDate = value[1];
-  } else {
-    queryParams.startDate = '';
-    queryParams.endDate = '';
-  }
-};
+  // 日期范围
+  const dateRange = ref<[string, string] | []>([]);
 
-// 分页变化
-const handlePageChange = (page: number) => {
-  pagination.current = page;
-  fetchData();
-};
+  // 表格列定义
+  const columns = computed(() => [
+    {
+      title: t('systemLog.level'),
+      dataIndex: 'level',
+      slotName: 'level',
+      width: 100,
+    },
+    {
+      title: t('systemLog.message'),
+      dataIndex: 'message',
+      slotName: 'message',
+      width: 300,
+      ellipsis: true,
+      tooltip: true,
+    },
+    {
+      title: t('systemLog.exception'),
+      dataIndex: 'exception',
+      slotName: 'exception',
+      width: 80,
+      align: 'center' as const,
+    },
+    {
+      title: t('systemLog.requestInfo'),
+      slotName: 'requestInfo',
+      width: 250,
+    },
+    {
+      title: t('systemLog.userInfo'),
+      slotName: 'userInfo',
+      width: 180,
+    },
+    {
+      title: t('common.createdAt'),
+      dataIndex: 'createdAt',
+      slotName: 'createdAt',
+      width: 180,
+    },
+    {
+      title: t('common.actions'),
+      slotName: 'actions',
+      width: 100,
+      fixed: 'right' as const,
+    },
+  ]);
 
-const handlePageSizeChange = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.current = 1;
-  fetchData();
-};
+  // 表格数据
+  const data = ref<SystemLog[]>([]);
+  const loading = ref(false);
 
-// 查看详情
-const handleDetail = (record: SystemLog) => {
-  currentLog.value = record;
-  detailVisible.value = true;
-};
+  // 分页配置
+  const pagination = reactive({
+    current: 1,
+    pageSize: 20,
+    total: 0,
+    showTotal: true,
+    showPageSize: true,
+  });
 
-// 清理日志
-const handleCleanup = () => {
-  cleanupForm.beforeDate = dayjs().subtract(30, 'day').format('YYYY-MM-DD HH:mm:ss');
-  cleanupVisible.value = true;
-};
+  // 详情
+  const detailVisible = ref(false);
+  const currentLog = ref<SystemLog | null>(null);
 
-const handleCleanupConfirm = async () => {
-  if (!cleanupForm.beforeDate) {
-    Message.warning(t('systemLog.selectDate'));
-    return;
-  }
+  // 清理
+  const cleanupVisible = ref(false);
+  const cleanupForm = reactive({
+    beforeDate: '',
+  });
 
-  try {
-    const { data: response } = await cleanupSystemLogs(cleanupForm.beforeDate);
-    if (response.code === 20000) {
-      Message.success(response.message);
-      cleanupVisible.value = false;
-      fetchData();
+  // 加载数据
+  const fetchData = async () => {
+    loading.value = true;
+    try {
+      const { data: response } = await getSystemLogList({
+        ...queryParams,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      });
+
+      if (response.code === 20000) {
+        data.value = response.data.items;
+        pagination.total = response.data.totalCount;
+      }
+    } catch (error) {
+      console.error('Failed to fetch system logs:', error);
+      Message.error(t('common.loadFailed'));
+    } finally {
+      loading.value = false;
     }
-  } catch (error) {
-    console.error('Failed to cleanup logs:', error);
-    Message.error(t('common.operationFailed'));
-  }
-};
+  };
 
-// 格式化日期时间
-const formatDateTime = (dateStr: string) => {
-  return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
-};
+  // 搜索
+  const handleSearch = () => {
+    pagination.current = 1;
+    fetchData();
+  };
 
-// 初始化
-onMounted(() => {
-  fetchData();
-});
+  // 重置
+  const handleReset = () => {
+    Object.assign(queryParams, {
+      level: '',
+      keyword: '',
+      username: '',
+      ipAddress: '',
+      requestPath: '',
+      startDate: '',
+      endDate: '',
+    });
+    dateRange.value = [];
+    handleSearch();
+  };
+
+  // 日期范围变化
+  const handleDateRangeChange = (value: [string, string] | undefined) => {
+    if (value && value.length === 2) {
+      queryParams.startDate = value[0];
+      queryParams.endDate = value[1];
+    } else {
+      queryParams.startDate = '';
+      queryParams.endDate = '';
+    }
+  };
+
+  // 分页变化
+  const handlePageChange = (page: number) => {
+    pagination.current = page;
+    fetchData();
+  };
+
+  const handlePageSizeChange = (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 查看详情
+  const handleDetail = (record: SystemLog) => {
+    currentLog.value = record;
+    detailVisible.value = true;
+  };
+
+  // 清理日志
+  const handleCleanup = () => {
+    cleanupForm.beforeDate = dayjs()
+      .subtract(30, 'day')
+      .format('YYYY-MM-DD HH:mm:ss');
+    cleanupVisible.value = true;
+  };
+
+  const handleCleanupConfirm = async () => {
+    if (!cleanupForm.beforeDate) {
+      Message.warning(t('systemLog.selectDate'));
+      return;
+    }
+
+    try {
+      const { data: response } = await cleanupSystemLogs(
+        cleanupForm.beforeDate
+      );
+      if (response.code === 20000) {
+        Message.success(response.message);
+        cleanupVisible.value = false;
+        fetchData();
+      }
+    } catch (error) {
+      console.error('Failed to cleanup logs:', error);
+      Message.error(t('common.operationFailed'));
+    }
+  };
+
+  // 格式化日期时间
+  const formatDateTime = (dateStr: string) => {
+    return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
+  };
+
+  // 初始化
+  onMounted(() => {
+    fetchData();
+  });
 </script>
 
 <style lang="less" scoped>
-.system-log {
-  padding: 20px;
-}
+  .system-log {
+    padding: 20px;
+  }
 
-.message-cell {
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  .message-cell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 </style>
 
 <style lang="less">
-.detail-content {
-  .detail-row {
-    display: flex;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--color-border-2);
+  .detail-content {
+    .detail-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border-2);
 
-    &:last-child {
-      border-bottom: none;
-    }
+      &:last-child {
+        border-bottom: none;
+      }
 
-    .label {
-      flex-shrink: 0;
-      width: 140px;
-      font-weight: 500;
-      color: var(--color-text-2);
-    }
+      .label {
+        flex-shrink: 0;
+        width: 140px;
+        font-weight: 500;
+        color: var(--color-text-2);
+      }
 
-    .value {
-      flex: 1;
-      color: var(--color-text-1);
-      word-break: break-all;
+      .value {
+        flex: 1;
+        color: var(--color-text-1);
+        word-break: break-all;
+      }
     }
   }
-}
 </style>

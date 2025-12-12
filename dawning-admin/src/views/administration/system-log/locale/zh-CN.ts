@@ -19,5 +19,6 @@ export default {
   'systemLog.cleanup': '清理日志',
   'systemLog.cleanupBeforeDate': '删除此日期之前的日志',
   'systemLog.selectDate': '请选择日期',
-  'systemLog.cleanupWarning': '此操作将永久删除指定日期之前的所有日志，且无法恢复，请谨慎操作！',
+  'systemLog.cleanupWarning':
+    '此操作将永久删除指定日期之前的所有日志，且无法恢复，请谨慎操作！',
 };
