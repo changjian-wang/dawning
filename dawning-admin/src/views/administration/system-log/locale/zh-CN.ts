@@ -21,4 +21,15 @@ export default {
   'systemLog.selectDate': '请选择日期',
   'systemLog.cleanupWarning':
     '此操作将永久删除指定日期之前的所有日志，且无法恢复，请谨慎操作！',
+  
+  // 通用翻译
+  'common.all': '全部',
+  'common.search': '搜索',
+  'common.reset': '重置',
+  'common.advancedSearch': '高级搜索',
+  'common.detail': '详情',
+  'common.system': '系统',
+  'common.createdAt': '创建时间',
+  'common.confirm': '确认',
+  'common.cancel': '取消',
 };
