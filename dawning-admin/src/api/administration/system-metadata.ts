@@ -42,36 +42,30 @@ export const metadata = {
   api: {
     // API 方法
     async get(id: string): Promise<ISystemMetadata> {
-      const response = await axios.get(
+      const response = await axios.get<ISystemMetadata>(
         `/api/system-metadata/get/${id}`
       );
       return response.data;
     },
 
     async getPagedList(model: any, page: number, size: number): Promise<IPagedData<ISystemMetadata>> {
-      const response = await axios.post(
+      const response = await axios.post<IPagedData<ISystemMetadata>>(
         `/api/system-metadata/get-paged-list?page=${page}&size=${size}`,
         model
       );
-      // 响应拦截器返回 {code, message, data: {list, pagination}}
-      const { list, pagination } = response.data;
-      return {
-        items: list,
-        totalCount: pagination.total,
-        pageIndex: pagination.current,
-        pageSize: pagination.pageSize,
-      };
+      // ApiResponse 包装的数据，拦截器解包后直接是 IPagedData 格式
+      return response.data;
     },
 
     async getAll(): Promise<ISystemMetadata[]> {
-      const response = await axios.get(
+      const response = await axios.get<ISystemMetadata[]>(
         '/api/system-metadata/get-all'
       );
       return response.data;
     },
 
     async create(model: ISystemMetadata): Promise<number> {
-      const response = await axios.post(
+      const response = await axios.post<number>(
         '/api/system-metadata/insert',
         model
       );
@@ -79,7 +73,7 @@ export const metadata = {
     },
 
     async update(model: ISystemMetadata): Promise<boolean> {
-      const response = await axios.put(
+      const response = await axios.put<boolean>(
         '/api/system-metadata/update',
         model
       );
@@ -87,7 +81,7 @@ export const metadata = {
     },
 
     async delete(id: string): Promise<boolean> {
-      const response = await axios.delete(
+      const response = await axios.delete<boolean>(
         `/api/system-metadata/delete/${id}`
       );
       return response.data;

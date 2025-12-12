@@ -1,6 +1,7 @@
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
+using Dawning.Identity.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -80,19 +81,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
             var result = await _permissionService.GetPagedListAsync(model, current, pageSize);
 
-            return Ok(new
-            {
-                data = new
-                {
-                    pagination = new
-                    {
-                        total = result.TotalCount,
-                        current = result.PageIndex,
-                        pageSize = result.PageSize
-                    },
-                    list = result.Items
-                }
-            });
+            return Ok(ApiResponse<object>.Success(result));
         }
 
         /// <summary>

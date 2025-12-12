@@ -67,18 +67,12 @@ export const claimType = {
       page: number,
       size: number
     ): Promise<IPagedData<IClaimType>> {
-      const response = await axios.post<{ list: IClaimType[]; pagination: any }>(
+      const response = await axios.post<IPagedData<IClaimType>>(
         `/api/claim-type/get-paged-list?page=${page}&size=${size}`,
         model
       );
-      // 响应拦截器返回 {code, message, data: {list, pagination}}
-      const { list, pagination } = response.data;
-      return {
-        items: list,
-        totalCount: pagination.total,
-        pageIndex: pagination.current,
-        pageSize: pagination.pageSize,
-      };
+      // ApiResponse 包装的数据，拦截器解包后直接是 IPagedData 格式
+      return response.data;
     },
 
     async getAll(): Promise<IClaimType[]> {

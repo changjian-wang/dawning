@@ -78,15 +78,9 @@ export interface PermissionGroup {
  * 获取权限列表（分页）
  */
 export async function getPermissionList(params: PermissionQueryParams): Promise<IPagedData<PermissionModel>> {
-  const response = await axios.get<{ list: PermissionModel[]; pagination: any }>('/api/permission', { params });
-  // 响应拦截器返回 {code, message, data: {list, pagination}}
-  const { list, pagination } = response.data;
-  return {
-    items: list,
-    totalCount: pagination.total,
-    pageIndex: pagination.current,
-    pageSize: pagination.pageSize,
-  };
+  const response = await axios.get<IPagedData<PermissionModel>>('/api/permission', { params });
+  // ApiResponse 包装的数据，拦截器解包后直接是 IPagedData 格式
+  return response.data;
 }
 
 /**
