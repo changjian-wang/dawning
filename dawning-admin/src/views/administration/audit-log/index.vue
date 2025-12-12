@@ -1,7 +1,9 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['menu.administration', 'menu.administration.auditLog']" />
-    
+    <Breadcrumb
+      :items="['menu.administration', 'menu.administration.auditLog']"
+    />
+
     <a-card class="general-card" :title="$t('auditLog.list.title')">
       <!-- 搜索表单 -->
       <a-row>
@@ -14,14 +16,17 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item field="username" :label="$t('auditLog.form.username')">
+                <a-form-item
+                  field="username"
+                  :label="$t('auditLog.form.username')"
+                >
                   <a-input
                     v-model="searchForm.username"
                     :placeholder="$t('auditLog.form.username.placeholder')"
                   />
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="8">
                 <a-form-item field="action" :label="$t('auditLog.form.action')">
                   <a-select
@@ -29,43 +34,70 @@
                     :placeholder="$t('auditLog.form.action.placeholder')"
                     allow-clear
                   >
-                    <a-option value="Create">{{ $t('auditLog.action.Create') }}</a-option>
-                    <a-option value="Update">{{ $t('auditLog.action.Update') }}</a-option>
-                    <a-option value="Delete">{{ $t('auditLog.action.Delete') }}</a-option>
-                    <a-option value="ChangePassword">{{ $t('auditLog.action.ChangePassword') }}</a-option>
-                    <a-option value="ResetPassword">{{ $t('auditLog.action.ResetPassword') }}</a-option>
+                    <a-option value="Create">{{
+                      $t('auditLog.action.Create')
+                    }}</a-option>
+                    <a-option value="Update">{{
+                      $t('auditLog.action.Update')
+                    }}</a-option>
+                    <a-option value="Delete">{{
+                      $t('auditLog.action.Delete')
+                    }}</a-option>
+                    <a-option value="ChangePassword">{{
+                      $t('auditLog.action.ChangePassword')
+                    }}</a-option>
+                    <a-option value="ResetPassword">{{
+                      $t('auditLog.action.ResetPassword')
+                    }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="8">
-                <a-form-item field="entityType" :label="$t('auditLog.form.entityType')">
+                <a-form-item
+                  field="entityType"
+                  :label="$t('auditLog.form.entityType')"
+                >
                   <a-select
                     v-model="searchForm.entityType"
                     :placeholder="$t('auditLog.form.entityType.placeholder')"
                     allow-clear
                   >
-                    <a-option value="User">{{ $t('auditLog.entityType.User') }}</a-option>
-                    <a-option value="Role">{{ $t('auditLog.entityType.Role') }}</a-option>
-                    <a-option value="Application">{{ $t('auditLog.entityType.Application') }}</a-option>
-                    <a-option value="Scope">{{ $t('auditLog.entityType.Scope') }}</a-option>
+                    <a-option value="User">{{
+                      $t('auditLog.entityType.User')
+                    }}</a-option>
+                    <a-option value="Role">{{
+                      $t('auditLog.entityType.Role')
+                    }}</a-option>
+                    <a-option value="Application">{{
+                      $t('auditLog.entityType.Application')
+                    }}</a-option>
+                    <a-option value="Scope">{{
+                      $t('auditLog.entityType.Scope')
+                    }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
-            
+
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item field="ipAddress" :label="$t('auditLog.form.ipAddress')">
+                <a-form-item
+                  field="ipAddress"
+                  :label="$t('auditLog.form.ipAddress')"
+                >
                   <a-input
                     v-model="searchForm.ipAddress"
                     :placeholder="$t('auditLog.form.ipAddress.placeholder')"
                   />
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="8">
-                <a-form-item field="dateRange" :label="$t('auditLog.form.dateRange')">
+                <a-form-item
+                  field="dateRange"
+                  :label="$t('auditLog.form.dateRange')"
+                >
                   <a-range-picker
                     v-model="searchForm.dateRange"
                     style="width: 100%"
@@ -74,7 +106,7 @@
                   />
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="8">
                 <a-form-item>
                   <a-space>
@@ -93,7 +125,7 @@
           </a-form>
         </a-col>
       </a-row>
-      
+
       <!-- 数据表格 -->
       <a-table
         row-key="id"
@@ -109,25 +141,28 @@
             {{ $t(`auditLog.action.${record.action}`) }}
           </a-tag>
         </template>
-        
+
         <template #entityType="{ record }">
           <span v-if="record.entityType">
             {{ $t(`auditLog.entityType.${record.entityType}`) }}
           </span>
           <span v-else>-</span>
         </template>
-        
+
         <template #statusCode="{ record }">
-          <a-tag v-if="record.statusCode" :color="getStatusColor(record.statusCode)">
+          <a-tag
+            v-if="record.statusCode"
+            :color="getStatusColor(record.statusCode)"
+          >
             {{ record.statusCode }}
           </a-tag>
           <span v-else>-</span>
         </template>
-        
+
         <template #createdAt="{ record }">
           {{ formatDateTime(record.createdAt) }}
         </template>
-        
+
         <template #operations="{ record }">
           <a-button type="text" size="small" @click="handleViewDetail(record)">
             <template #icon>
@@ -137,7 +172,7 @@
         </template>
       </a-table>
     </a-card>
-    
+
     <!-- 详情对话框 -->
     <a-modal
       v-model:visible="detailVisible"
@@ -162,7 +197,11 @@
 
         <div class="detail-row">
           <span class="label">{{ $t('auditLog.detail.entityType') }}</span>
-          <span class="value">{{ currentLog.entityType ? $t(`auditLog.entityType.${currentLog.entityType}`) : '-' }}</span>
+          <span class="value">{{
+            currentLog.entityType
+              ? $t(`auditLog.entityType.${currentLog.entityType}`)
+              : '-'
+          }}</span>
         </div>
 
         <div class="detail-row">
@@ -183,7 +222,11 @@
         <div class="detail-row">
           <span class="label">{{ $t('auditLog.detail.statusCode') }}</span>
           <span class="value">
-            <a-tag v-if="currentLog.statusCode" :color="getStatusColor(currentLog.statusCode)" size="small">
+            <a-tag
+              v-if="currentLog.statusCode"
+              :color="getStatusColor(currentLog.statusCode)"
+              size="small"
+            >
               {{ currentLog.statusCode }}
             </a-tag>
             <span v-else>-</span>
@@ -202,30 +245,51 @@
 
         <div class="detail-row">
           <span class="label">{{ $t('auditLog.detail.userAgent') }}</span>
-          <span class="value" style="word-break: break-all">{{ currentLog.userAgent || '-' }}</span>
+          <span class="value" style="word-break: break-all">{{
+            currentLog.userAgent || '-'
+          }}</span>
         </div>
 
         <div class="detail-row">
           <span class="label">{{ $t('auditLog.detail.createdAt') }}</span>
           <span class="value">{{ formatDateTime(currentLog.createdAt) }}</span>
         </div>
-        
+
         <!-- 变更内容 -->
-        <div v-if="currentLog.oldValues || currentLog.newValues" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--color-border-2)">
-          <h3 style="margin-bottom: 16px; font-size: 15px; font-weight: 600">{{ $t('auditLog.detail.changes') }}</h3>
+        <div
+          v-if="currentLog.oldValues || currentLog.newValues"
+          style="
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--color-border-2);
+          "
+        >
+          <h3 style="margin-bottom: 16px; font-size: 15px; font-weight: 600">{{
+            $t('auditLog.detail.changes')
+          }}</h3>
           <a-row :gutter="16">
             <a-col :span="12">
               <div class="change-section">
                 <h4>{{ $t('auditLog.detail.oldValues') }}</h4>
-                <pre v-if="currentLog.oldValues" class="json-display">{{ formatJson(currentLog.oldValues) }}</pre>
-                <a-empty v-else :description="$t('auditLog.detail.noChanges')" />
+                <pre v-if="currentLog.oldValues" class="json-display">{{
+                  formatJson(currentLog.oldValues)
+                }}</pre>
+                <a-empty
+                  v-else
+                  :description="$t('auditLog.detail.noChanges')"
+                />
               </div>
             </a-col>
             <a-col :span="12">
               <div class="change-section">
                 <h4>{{ $t('auditLog.detail.newValues') }}</h4>
-                <pre v-if="currentLog.newValues" class="json-display">{{ formatJson(currentLog.newValues) }}</pre>
-                <a-empty v-else :description="$t('auditLog.detail.noChanges')" />
+                <pre v-if="currentLog.newValues" class="json-display">{{
+                  formatJson(currentLog.newValues)
+                }}</pre>
+                <a-empty
+                  v-else
+                  :description="$t('auditLog.detail.noChanges')"
+                />
               </div>
             </a-col>
           </a-row>
@@ -240,7 +304,11 @@ import { ref, reactive, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Message } from '@arco-design/web-vue';
 import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
-import { getAuditLogs, type AuditLog, type AuditLogQueryParams } from '@/api/audit-log';
+import {
+  getAuditLogs,
+  type AuditLog,
+  type AuditLogQueryParams,
+} from '@/api/audit-log';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
@@ -334,20 +402,24 @@ const fetchData = async () => {
       action: searchForm.action,
       entityType: searchForm.entityType,
       ipAddress: searchForm.ipAddress || undefined,
-      startDate: searchForm.dateRange?.[0] 
-        ? (typeof searchForm.dateRange[0] === 'string' 
-            ? dayjs(searchForm.dateRange[0]).format('YYYY-MM-DDTHH:mm:ss')
-            : dayjs(searchForm.dateRange[0] as any).format('YYYY-MM-DDTHH:mm:ss'))
+      startDate: searchForm.dateRange?.[0]
+        ? typeof searchForm.dateRange[0] === 'string'
+          ? dayjs(searchForm.dateRange[0]).format('YYYY-MM-DDTHH:mm:ss')
+          : dayjs(searchForm.dateRange[0] as any).format(
+              'YYYY-MM-DDTHH:mm:ss'
+            )
         : undefined,
       endDate: searchForm.dateRange?.[1]
-        ? (typeof searchForm.dateRange[1] === 'string'
-            ? dayjs(searchForm.dateRange[1]).format('YYYY-MM-DDTHH:mm:ss')
-            : dayjs(searchForm.dateRange[1] as any).format('YYYY-MM-DDTHH:mm:ss'))
+        ? typeof searchForm.dateRange[1] === 'string'
+          ? dayjs(searchForm.dateRange[1]).format('YYYY-MM-DDTHH:mm:ss')
+          : dayjs(searchForm.dateRange[1] as any).format(
+              'YYYY-MM-DDTHH:mm:ss'
+            )
         : undefined,
     };
-    
+
     const result = await getAuditLogs(params);
-    
+
     tableData.value = result.items;
     pagination.total = result.totalCount;
     pagination.current = result.pageIndex;
@@ -472,7 +544,7 @@ onMounted(() => {
     font-size: 16px;
     font-weight: 500;
   }
-  
+
   h4 {
     margin-bottom: 8px;
     font-size: 14px;
@@ -484,7 +556,7 @@ onMounted(() => {
   padding: 12px;
   background-color: var(--color-fill-2);
   border-radius: 4px;
-  
+
   .json-display {
     margin: 0;
     padding: 12px;
