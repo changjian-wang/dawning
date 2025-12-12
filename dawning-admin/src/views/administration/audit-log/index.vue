@@ -335,10 +335,14 @@ const fetchData = async () => {
       entityType: searchForm.entityType,
       ipAddress: searchForm.ipAddress || undefined,
       startDate: searchForm.dateRange?.[0] 
-        ? dayjs(searchForm.dateRange[0]).format('YYYY-MM-DDTHH:mm:ss')
+        ? (typeof searchForm.dateRange[0] === 'string' 
+            ? dayjs(searchForm.dateRange[0]).format('YYYY-MM-DDTHH:mm:ss')
+            : dayjs(searchForm.dateRange[0] as any).format('YYYY-MM-DDTHH:mm:ss'))
         : undefined,
       endDate: searchForm.dateRange?.[1]
-        ? dayjs(searchForm.dateRange[1]).format('YYYY-MM-DDTHH:mm:ss')
+        ? (typeof searchForm.dateRange[1] === 'string'
+            ? dayjs(searchForm.dateRange[1]).format('YYYY-MM-DDTHH:mm:ss')
+            : dayjs(searchForm.dateRange[1] as any).format('YYYY-MM-DDTHH:mm:ss'))
         : undefined,
     };
     
