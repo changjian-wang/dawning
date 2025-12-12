@@ -191,14 +191,17 @@
           <span class="label">名称</span>
           <span class="value">{{ currentRecord?.name || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">显示名称</span>
           <span class="value">{{ currentRecord?.displayName || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">类型</span>
           <span class="value">{{ currentRecord?.type || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">是否必需</span>
           <span class="value">
@@ -206,6 +209,7 @@
             <a-tag v-else color="gray" size="small">可选</a-tag>
           </span>
         </div>
+
         <div class="detail-row">
           <span class="label">可编辑性</span>
           <span class="value">
@@ -213,6 +217,7 @@
             <a-tag v-else color="orange" size="small">锁定</a-tag>
           </span>
         </div>
+
         <div class="detail-row">
           <span class="label">描述</span>
           <span class="value">{{ currentRecord?.description || '-' }}</span>

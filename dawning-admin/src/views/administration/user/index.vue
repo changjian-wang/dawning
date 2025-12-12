@@ -214,22 +214,27 @@
           <span class="label">用户名</span>
           <span class="value">{{ currentUser?.username || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">显示名称</span>
           <span class="value">{{ currentUser?.displayName || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">邮箱</span>
           <span class="value">{{ currentUser?.email || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">手机号</span>
           <span class="value">{{ currentUser?.phoneNumber || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">角色</span>
           <span class="value">{{ currentUser?.role }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">账户状态</span>
           <span class="value">
@@ -237,6 +242,7 @@
             <a-tag v-else color="red" size="small">禁用</a-tag>
           </span>
         </div>
+
         <div class="detail-row">
           <span class="label">邮箱已验证</span>
           <span class="value">
@@ -244,6 +250,7 @@
             <a-tag v-else color="gray" size="small">否</a-tag>
           </span>
         </div>
+
         <div class="detail-row">
           <span class="label">手机已验证</span>
           <span class="value">
@@ -251,18 +258,22 @@
             <a-tag v-else color="gray" size="small">否</a-tag>
           </span>
         </div>
+
         <div class="detail-row">
           <span class="label">最后登录</span>
           <span class="value">{{ currentUser?.lastLoginAt || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">创建时间</span>
           <span class="value">{{ currentUser?.createdAt || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">更新时间</span>
           <span class="value">{{ currentUser?.updatedAt || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">备注</span>
           <span class="value">{{ currentUser?.remark || '-' }}</span>

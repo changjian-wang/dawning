@@ -167,14 +167,17 @@
           <span class="label">名称</span>
           <span class="value">{{ currentRecord?.name || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">键名</span>
           <span class="value">{{ currentRecord?.key || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">值</span>
           <span class="value">{{ currentRecord?.value || '-' }}</span>
         </div>
+
         <div class="detail-row">
           <span class="label">可编辑性</span>
           <span class="value">
@@ -182,6 +185,7 @@
             <a-tag v-else color="orange" size="small">锁定</a-tag>
           </span>
         </div>
+
         <div class="detail-row">
           <span class="label">描述</span>
           <span class="value">{{ currentRecord?.description || '-' }}</span>
