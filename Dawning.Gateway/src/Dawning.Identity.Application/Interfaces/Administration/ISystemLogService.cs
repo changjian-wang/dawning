@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Dawning.Identity.Application.Dtos.Administration;
-using Dawning.Identity.Domain.Aggregates.Administration.QueryModels;
-using Dawning.Identity.Domain.Aggregates.Shared;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.Administration;
 using Microsoft.AspNetCore.Http;
 
 namespace Dawning.Identity.Application.Interfaces.Administration

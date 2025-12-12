@@ -6,9 +6,9 @@ using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Domain.Aggregates.Administration.QueryModels;
-using Dawning.Identity.Domain.Aggregates.Shared;
-using Dawning.Identity.Domain.Interfaces;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.Administration;
+using Dawning.Identity.Domain.Interfaces.UoW;
 using Microsoft.AspNetCore.Http;
 
 namespace Dawning.Identity.Application.Services.Administration
@@ -91,9 +91,8 @@ namespace Dawning.Identity.Application.Services.Administration
             {
                 Items = _mapper.Map<SystemLogDto[]>(pagedData.Items),
                 TotalCount = pagedData.TotalCount,
-                Page = pagedData.Page,
-                ItemsPerPage = pagedData.ItemsPerPage,
-                TotalPages = pagedData.TotalPages
+                PageIndex = pagedData.PageIndex,
+                PageSize = pagedData.PageSize
             };
         }
 

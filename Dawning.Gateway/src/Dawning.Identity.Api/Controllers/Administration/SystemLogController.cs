@@ -1,6 +1,6 @@
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
-using Dawning.Identity.Domain.Aggregates.Administration.QueryModels;
+using Dawning.Identity.Domain.Models.Administration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
