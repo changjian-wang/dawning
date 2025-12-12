@@ -49,10 +49,12 @@ export interface CreateSystemLogDto {
 /**
  * 分页获取系统日志列表
  */
-export function getSystemLogList(params: SystemLogQueryParams) {
-  return axios.get<IPagedData<SystemLog>>('/api/systemlog/paged', {
-    params,
-  });
+export async function getSystemLogList(
+  params: SystemLogQueryParams
+): Promise<IPagedData<SystemLog>> {
+  const response = await axios.get('/api/systemlog/paged', { params });
+  // response.data 就是拦截器处理后的数据，格式是 IPagedData
+  return response.data as IPagedData<SystemLog>;
 }
 
 /**

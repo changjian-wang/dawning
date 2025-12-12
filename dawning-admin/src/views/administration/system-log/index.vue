@@ -110,6 +110,7 @@
 
       <!-- 数据表格 -->
       <a-table
+        row-key="id"
         :columns="columns"
         :data="data"
         :pagination="pagination"
@@ -168,7 +169,7 @@
 
         <template #actions="{ record }">
           <a-button type="text" size="small" @click="handleDetail(record)">
-            {{ $t('common.detail') }}
+            <icon-eye />
           </a-button>
         </template>
       </a-table>
@@ -386,16 +387,42 @@
   const fetchData = async () => {
     loading.value = true;
     try {
-      const { data: response } = await getSystemLogList({
-        ...queryParams,
+      // 格式化日期范围
+      let startDate: string | undefined;
+      let endDate: string | undefined;
+
+      if (dateRange.value?.[0]) {
+        const startValue = dateRange.value[0];
+        startDate =
+          typeof startValue === 'string'
+            ? dayjs(startValue).format('YYYY-MM-DDTHH:mm:ss')
+            : dayjs(startValue as any).format('YYYY-MM-DDTHH:mm:ss');
+      }
+
+      if (dateRange.value?.[1]) {
+        const endValue = dateRange.value[1];
+        endDate =
+          typeof endValue === 'string'
+            ? dayjs(endValue).format('YYYY-MM-DDTHH:mm:ss')
+            : dayjs(endValue as any).format('YYYY-MM-DDTHH:mm:ss');
+      }
+
+      const params: SystemLogQueryParams = {
         page: pagination.current,
         pageSize: pagination.pageSize,
-      });
+        level: queryParams.level || undefined,
+        keyword: queryParams.keyword || undefined,
+        username: queryParams.username || undefined,
+        ipAddress: queryParams.ipAddress || undefined,
+        requestPath: queryParams.requestPath || undefined,
+        startDate,
+        endDate,
+      };
 
-      if (response.code === 20000) {
-        data.value = response.data.items;
-        pagination.total = response.data.totalCount;
-      }
+      const result = await getSystemLogList(params);
+
+      data.value = result.items;
+      pagination.total = result.totalCount;
     } catch (error) {
       Message.error(t('common.loadFailed'));
     } finally {
@@ -425,15 +452,9 @@
   };
 
   // 日期范围变化
-  const handleDateRangeChange = (value: [string, string] | undefined) => {
-    if (value && value.length === 2) {
-      const [startDate, endDate] = value;
-      queryParams.startDate = startDate;
-      queryParams.endDate = endDate;
-    } else {
-      queryParams.startDate = '';
-      queryParams.endDate = '';
-    }
+  const handleDateRangeChange = () => {
+    // 日期范围变化后自动搜索
+    handleSearch();
   };
 
   // 分页变化
