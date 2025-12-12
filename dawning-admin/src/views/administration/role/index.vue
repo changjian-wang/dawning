@@ -118,6 +118,14 @@
             <a-button
               type="text"
               size="medium"
+              status="success"
+              @click="handleAssignPermissions(record)"
+            >
+              <template #icon><icon-safe :size="18" /></template>
+            </a-button>
+            <a-button
+              type="text"
+              size="medium"
               status="warning"
               @click="handleEdit(record)"
               :disabled="record.isSystem"
@@ -138,12 +146,72 @@
       </a-table>
     </a-card>
 
+    <!-- 权限分配对话框 -->
+    <a-modal
+      v-model:visible="permissionModalVisible"
+      :title="`分配权限 - ${currentRole?.displayName}`"
+      width="800px"
+      @cancel="handlePermissionCancel"
+      @before-ok="handlePermissionBeforeOk"
+    >
+      <a-spin :loading="permissionLoading" style="width: 100%">
+        <div class="permission-assignment">
+          <a-input-search
+            v-model="permissionSearchText"
+            placeholder="搜索权限..."
+            allow-clear
+            style="margin-bottom: 16px"
+          />
+          <a-transfer
+            :data="allPermissions"
+            :target-keys="selectedPermissionIds"
+            :title="['可分配权限', '已分配权限']"
+            :show-search="false"
+            @change="handlePermissionChange"
+          >
+            <template #source="{ filteredData }">
+              <div class="permission-list">
+                <div
+                  v-for="item in filteredData"
+                  :key="item.value"
+                  class="permission-item"
+                  @click="togglePermission(item.value)"
+                >
+                  <a-checkbox :model-value="selectedPermissionIds.includes(item.value)" />
+                  <div class="permission-info">
+                    <div class="permission-name">{{ item.label }}</div>
+                    <div class="permission-code">{{ item.code }}</div>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <template #target="{ filteredData }">
+              <div class="permission-list">
+                <div
+                  v-for="item in filteredData"
+                  :key="item.value"
+                  class="permission-item"
+                  @click="togglePermission(item.value)"
+                >
+                  <a-checkbox :model-value="selectedPermissionIds.includes(item.value)" />
+                  <div class="permission-info">
+                    <div class="permission-name">{{ item.label }}</div>
+                    <div class="permission-code">{{ item.code }}</div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </a-transfer>
+        </div>
+      </a-spin>
+    </a-modal>
+
     <!-- 创建/编辑对话框 -->
     <a-modal
       v-model:visible="modalVisible"
       :title="isEdit ? $t('role.button.edit') : $t('role.button.create')"
-      @ok="handleSubmit"
       @cancel="handleCancel"
+      @before-ok="handleBeforeOk"
       width="600px"
     >
       <a-form ref="formRef" :model="formData" layout="vertical">
@@ -217,6 +285,12 @@ import {
   type RoleModel,
   type RoleQueryParams,
 } from '@/api/administration/role';
+import {
+  getAllActivePermissions,
+  getRolePermissions,
+  assignPermissionsToRole,
+  type PermissionModel,
+} from '@/api/administration/permission';
 import useLoading from '@/hooks/loading';
 
 const { t } = useI18n();
@@ -295,7 +369,15 @@ const modalVisible = ref(false);
 const isEdit = ref(false);
 const formRef = ref();
 const formData = reactive<any>({
-  id: '',
+  i
+
+// 权限分配
+const permissionModalVisible = ref(false);
+const permissionLoading = ref(false);
+const currentRole = ref<RoleModel | null>(null);
+const allPermissions = ref<Array<{ value: string; label: string; code: string }>>([]);
+const selectedPermissionIds = ref<string[]>([]);
+const permissionSearchText = ref('');d: '',
   name: '',
   displayName: '',
   description: '',
@@ -414,11 +496,17 @@ const handleDelete = (record: RoleModel) => {
   });
 };
 
+// 表单验证和提交
+const handleBeforeOk = async () => {
+  const errors = await formRef.value?.validate();
+  if (errors) {
+    return false;
+  }
+  return handleSubmit();
+};
+
 // 提交表单
 const handleSubmit = async () => {
-  const errors = await formRef.value?.validate();
-  if (errors) return;
-
   try {
     if (isEdit.value) {
       await updateRole(formData.id, {
@@ -440,10 +528,12 @@ const handleSubmit = async () => {
     }
     modalVisible.value = false;
     fetchData();
+    return true;
   } catch (err: any) {
     Message.error(
       isEdit.value ? t('role.message.updateFailed') : t('role.message.createFailed')
     );
+    return false;
   }
 };
 
@@ -455,6 +545,80 @@ const handleCancel = () => {
 // 添加权限
 const addPermission = () => {
   formData.permissions.push('');
+};
+
+// 移除权限
+const removePermission = (index: number) => {
+  formData.permissions.splice(index, 1);
+};
+
+// 分配权限
+const handleAssignPermissions = async (record: RoleModel) => {
+  currentRole.value = record;
+  permissionModalVisible.value = true;
+  permissionLoading.value = true;
+  
+  try {
+    // 加载所有权限
+    const permissions = await getAllActivePermissions();
+    allPermissions.value = permissions.map(p => ({
+      value: p.id,
+      label: p.name,
+      code: p.code,
+    }));
+    
+    // 加载角色已有权限
+    const rolePermissions = await getRolePermissions(record.id!);
+    selectedPermissionIds.value = rolePermissions.map(p => p.id);
+  } catch (error) {
+    Message.error('加载权限数据失败');
+  } finally {
+    permissionLoading.value = false;
+  }
+};
+
+// 权限选择变化
+const handlePermissionChange = (newTargetKeys: string[]) => {
+  selectedPermissionIds.value = newTargetKeys;
+};
+
+// 切换权限选择
+const togglePermission = (permissionId: string) => {
+  const index = selectedPermissionIds.value.indexOf(permissionId);
+  if (index > -1) {
+    selectedPermissionIds.value.splice(index, 1);
+  } else {
+    selectedPermissionIds.value.push(permissionId);
+  }
+};
+
+// 权限分配验证和提交
+const handlePermissionBeforeOk = async () => {
+  if (!currentRole.value) return false;
+  
+  try {
+    await assignPermissionsToRole(currentRole.value.id!, selectedPermissionIds.value);
+    Message.success('权限分配成功');
+    fetchData(); // 刷新列表
+    return true;
+  } catch (error) {
+    Message.error('权限分配失败');
+    return false;
+  }
+};
+
+// 取消权限分配
+const handlePermissionCancel = () => {
+  permissionModalVisible.value = false;
+  selectedPermissionIds.value = [];
+};
+
+// 初始化
+fetchData();
+  }
+};
+
+// ormData.permissions.push('');
 };
 
 // 移除权限
@@ -602,6 +766,57 @@ fetchData();
           :deep(.arco-btn) {
             flex: 1;
             min-width: auto;
+          }
+        }
+      }
+    }
+  }
+
+  // 权限分配样式
+  .permission-assignment {
+    :deep(.arco-transfer) {
+      .arco-transfer-view {
+        width: calc(50% - 25px);
+        height: 400px;
+      }
+    }
+
+    .permission-list {
+      padding: 8px;
+      max-height: 360px;
+      overflow-y: auto;
+
+      .permission-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 8px;
+        margin-bottom: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: var(--color-fill-2);
+        }
+
+        .arco-checkbox {
+          margin-right: 8px;
+          margin-top: 2px;
+        }
+
+        .permission-info {
+          flex: 1;
+
+          .permission-name {
+            font-size: 14px;
+            color: var(--color-text-1);
+            margin-bottom: 2px;
+          }
+
+          .permission-code {
+            font-size: 12px;
+            color: var(--color-text-3);
+            font-family: 'Courier New', monospace;
           }
         }
       }
