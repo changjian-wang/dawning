@@ -14,6 +14,7 @@ import localeIdsIdentityResource from '@/views/ids/identity-resource/locale/en-U
 import localeIdsApiResource from '@/views/ids/api-resource/locale/en-US';
 import localeSystemMetadata from '@/views/administration/system-metadata/locale/en-US';
 import localeAuditLog from '@/views/administration/audit-log/locale/en-US';
+import localeSystemLog from '@/views/administration/system-log/locale/en-US';
 
 import localeSettings from './en-US/settings';
 
@@ -52,6 +53,7 @@ export default {
   ...localeClaimType,
   ...localeSystemMetadata,
   ...localeAuditLog,
+  ...localeSystemLog,
   ...localeIdsScope,
   ...localeIdsIdentityResource,
   ...localeIdsApiResource,

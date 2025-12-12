@@ -118,6 +118,17 @@ const ADMINISTRATION: AppRouteRecordRaw = {
         icon: 'icon-history',
       },
     },
+    {
+      path: 'system-log',
+      name: 'SystemLog',
+      component: () => import('@/views/administration/system-log/index.vue'),
+      meta: {
+        locale: 'menu.administration.systemLog',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-file',
+      },
+    },
   ],
 };
 

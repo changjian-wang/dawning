@@ -14,6 +14,7 @@ import localeIdsIdentityResource from '@/views/ids/identity-resource/locale/zh-C
 import localeIdsApiResource from '@/views/ids/api-resource/locale/zh-CN';
 import localeSystemMetadata from '@/views/administration/system-metadata/locale/zh-CN';
 import localeAuditLog from '@/views/administration/audit-log/locale/zh-CN';
+import localeSystemLog from '@/views/administration/system-log/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
 
@@ -52,6 +53,7 @@ export default {
   ...localeClaimType,
   ...localeSystemMetadata,
   ...localeAuditLog,
+  ...localeSystemLog,
   ...localeIdsScope,
   ...localeIdsIdentityResource,
   ...localeIdsApiResource,
