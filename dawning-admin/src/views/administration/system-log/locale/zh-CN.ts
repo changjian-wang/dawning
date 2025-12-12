@@ -32,4 +32,5 @@ export default {
   'common.createdAt': '创建时间',
   'common.confirm': '确认',
   'common.cancel': '取消',
+  'common.actions': '操作',
 };

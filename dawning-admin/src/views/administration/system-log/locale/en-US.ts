@@ -32,4 +32,5 @@ export default {
   'common.createdAt': 'Created At',
   'common.confirm': 'Confirm',
   'common.cancel': 'Cancel',
+  'common.actions': 'Actions',
 };
