@@ -167,34 +167,57 @@
     <!-- 查看详情对话框 -->
     <a-modal
       v-model:visible="detailVisible"
-      title="作用域详情"
-      width="700px"
       :footer="false"
+      width="560px"
+      title="作用域详情"
     >
-      <a-descriptions :column="1" bordered>
-        <a-descriptions-item label="作用域名称">
-          {{ currentRecord?.name }}
-        </a-descriptions-item>
-        <a-descriptions-item label="显示名称">
-          {{ currentRecord?.displayName }}
-        </a-descriptions-item>
-        <a-descriptions-item label="描述">
-          {{ currentRecord?.description || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="关联资源">
-          <a-tag
-            v-for="(resource, index) in currentRecord?.resources"
-            :key="index"
-            style="margin: 2px"
-          >
-            {{ resource }}
-          </a-tag>
-          <span v-if="!currentRecord?.resources?.length">-</span>
-        </a-descriptions-item>
-        <a-descriptions-item label="创建时间">
-          {{ formatDateTime(currentRecord?.createdAt) }}
-        </a-descriptions-item>
-      </a-descriptions>
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">作用域名称</span>
+          <span class="value">
+            <a-tag color="blue" size="small">{{ currentRecord?.name }}</a-tag>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">显示名称</span>
+          <span class="value">{{ currentRecord?.displayName }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">描述</span>
+          <span class="value">{{ currentRecord?.description || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">关联资源</span>
+          <span class="value">
+            <template v-if="currentRecord?.resources?.length">
+              <a-space wrap :size="4">
+                <a-tag
+                  v-for="(resource, index) in currentRecord?.resources"
+                  :key="index"
+                  color="purple"
+                  size="small"
+                >
+                  {{ resource }}
+                </a-tag>
+              </a-space>
+            </template>
+            <span v-else>-</span>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">创建时间</span>
+          <span class="value">{{ formatDateTime(currentRecord?.createdAt) }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">更新时间</span>
+          <span class="value">{{ formatDateTime(currentRecord?.updatedAt) || '-' }}</span>
+        </div>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -464,6 +487,36 @@
     :deep(.arco-table-th) {
       background-color: #f7f8fa;
       font-weight: 600;
+    }
+  }
+
+  // 极简列表风格
+  .detail-content {
+    .detail-row {
+      display: flex;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-border-1);
+      align-items: flex-start;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        width: 90px;
+        flex-shrink: 0;
+        font-size: 14px;
+        color: var(--color-text-3);
+        line-height: 1.5;
+      }
+
+      .value {
+        flex: 1;
+        font-size: 14px;
+        color: var(--color-text-1);
+        line-height: 1.5;
+        word-break: break-word;
+      }
     }
   }
 </style>

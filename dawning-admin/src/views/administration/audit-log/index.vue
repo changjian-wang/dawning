@@ -140,64 +140,77 @@
     <a-modal
       v-model:visible="detailVisible"
       :title="$t('auditLog.detail.title')"
-      width="800px"
+      width="650px"
       :footer="false"
     >
-      <div v-if="currentLog" class="detail-container">
-        <!-- 基本信息 -->
-        <a-descriptions :title="$t('auditLog.detail.basicInfo')" :column="2" bordered>
-          <a-descriptions-item :label="$t('auditLog.detail.username')">
-            {{ currentLog.username || '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.action')">
-            <a-tag :color="getActionColor(currentLog.action)">
+      <div v-if="currentLog" class="detail-content">
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.username') }}</span>
+          <span class="value">{{ currentLog.username || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.action') }}</span>
+          <span class="value">
+            <a-tag :color="getActionColor(currentLog.action)" size="small">
               {{ $t(`auditLog.action.${currentLog.action}`) }}
             </a-tag>
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.entityType')">
-            {{ currentLog.entityType ? $t(`auditLog.entityType.${currentLog.entityType}`) : '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.entityId')">
-            {{ currentLog.entityId || '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.description')" :span="2">
-            {{ currentLog.description || '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.createdAt')" :span="2">
-            {{ formatDateTime(currentLog.createdAt) }}
-          </a-descriptions-item>
-        </a-descriptions>
-        
-        <!-- 请求信息 -->
-        <a-descriptions
-          :title="$t('auditLog.detail.requestInfo')"
-          :column="2"
-          bordered
-          style="margin-top: 20px"
-        >
-          <a-descriptions-item :label="$t('auditLog.detail.ipAddress')">
-            {{ currentLog.ipAddress || '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.statusCode')">
-            <a-tag v-if="currentLog.statusCode" :color="getStatusColor(currentLog.statusCode)">
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.entityType') }}</span>
+          <span class="value">{{ currentLog.entityType ? $t(`auditLog.entityType.${currentLog.entityType}`) : '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.entityId') }}</span>
+          <span class="value">{{ currentLog.entityId || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.description') }}</span>
+          <span class="value">{{ currentLog.description || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.ipAddress') }}</span>
+          <span class="value">{{ currentLog.ipAddress || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.statusCode') }}</span>
+          <span class="value">
+            <a-tag v-if="currentLog.statusCode" :color="getStatusColor(currentLog.statusCode)" size="small">
               {{ currentLog.statusCode }}
             </a-tag>
             <span v-else>-</span>
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.requestMethod')">
-            {{ currentLog.requestMethod || '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.requestPath')">
-            {{ currentLog.requestPath || '-' }}
-          </a-descriptions-item>
-          <a-descriptions-item :label="$t('auditLog.detail.userAgent')" :span="2">
-            <div style="word-break: break-all">{{ currentLog.userAgent || '-' }}</div>
-          </a-descriptions-item>
-        </a-descriptions>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.requestMethod') }}</span>
+          <span class="value">{{ currentLog.requestMethod || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.requestPath') }}</span>
+          <span class="value">{{ currentLog.requestPath || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.userAgent') }}</span>
+          <span class="value" style="word-break: break-all">{{ currentLog.userAgent || '-' }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">{{ $t('auditLog.detail.createdAt') }}</span>
+          <span class="value">{{ formatDateTime(currentLog.createdAt) }}</span>
+        </div>
         
         <!-- 变更内容 -->
-        <div v-if="currentLog.oldValues || currentLog.newValues" style="margin-top: 20px">
-          <h3>{{ $t('auditLog.detail.changes') }}</h3>
+        <div v-if="currentLog.oldValues || currentLog.newValues" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--color-border-2)">
+          <h3 style="margin-bottom: 16px; font-size: 15px; font-weight: 600">{{ $t('auditLog.detail.changes') }}</h3>
           <a-row :gutter="16">
             <a-col :span="12">
               <div class="change-section">
@@ -419,7 +432,35 @@ onMounted(() => {
   padding: 0 20px 20px 20px;
 }
 
-.detail-container {
+// 极简列表风格
+.detail-content {
+  .detail-row {
+    display: flex;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border-1);
+    align-items: flex-start;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      width: 110px;
+      flex-shrink: 0;
+      font-size: 14px;
+      color: var(--color-text-3);
+      line-height: 1.5;
+    }
+
+    .value {
+      flex: 1;
+      font-size: 14px;
+      color: var(--color-text-1);
+      line-height: 1.5;
+      word-break: break-word;
+    }
+  }
+
   h3 {
     margin-bottom: 16px;
     font-size: 16px;

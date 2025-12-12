@@ -257,52 +257,86 @@
     <a-modal
       v-model:visible="detailVisible"
       title="应用程序详情"
-      width="800px"
+      width="600px"
       :footer="false"
     >
-      <a-descriptions :column="2" bordered>
-        <a-descriptions-item label="客户端ID">
-          {{ currentRecord?.clientId }}
-        </a-descriptions-item>
-        <a-descriptions-item label="显示名称">
-          {{ currentRecord?.displayName }}
-        </a-descriptions-item>
-        <a-descriptions-item label="客户端类型">
-          <a-tag
-            :color="currentRecord?.type === 'confidential' ? 'blue' : 'green'"
-          >
-            {{ currentRecord?.type === 'confidential' ? '机密' : '公共' }}
-          </a-tag>
-        </a-descriptions-item>
-        <a-descriptions-item label="同意类型">
-          {{ currentRecord?.consentType }}
-        </a-descriptions-item>
-        <a-descriptions-item label="创建时间" :span="2">
-          {{ formatDateTime(currentRecord?.createdAt) }}
-        </a-descriptions-item>
-        <a-descriptions-item label="权限列表" :span="2">
-          <a-tag
-            v-for="(perm, index) in currentRecord?.permissions"
-            :key="index"
-            style="margin: 2px"
-          >
-            {{ formatPermission(perm) }}
-          </a-tag>
-        </a-descriptions-item>
-        <a-descriptions-item label="重定向URI" :span="2">
-          <div v-for="(uri, index) in currentRecord?.redirectUris" :key="index">
-            {{ uri }}
-          </div>
-        </a-descriptions-item>
-        <a-descriptions-item label="登出重定向URI" :span="2">
-          <div
-            v-for="(uri, index) in currentRecord?.postLogoutRedirectUris"
-            :key="index"
-          >
-            {{ uri }}
-          </div>
-        </a-descriptions-item>
-      </a-descriptions>
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">客户端ID</span>
+          <span class="value">{{ currentRecord?.clientId }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">显示名称</span>
+          <span class="value">{{ currentRecord?.displayName }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">客户端类型</span>
+          <span class="value">
+            <a-tag
+              :color="currentRecord?.type === 'confidential' ? 'blue' : 'green'"
+              size="small"
+            >
+              {{ currentRecord?.type === 'confidential' ? '机密' : '公共' }}
+            </a-tag>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">同意类型</span>
+          <span class="value">{{ currentRecord?.consentType }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">权限列表</span>
+          <span class="value">
+            <a-space wrap :size="4">
+              <a-tag
+                v-for="(perm, index) in currentRecord?.permissions"
+                :key="index"
+                color="purple"
+                size="small"
+              >
+                {{ formatPermission(perm) }}
+              </a-tag>
+            </a-space>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">重定向URI</span>
+          <span class="value">
+            <div v-if="currentRecord?.redirectUris?.length">
+              <div v-for="(uri, index) in currentRecord?.redirectUris" :key="index" style="margin-bottom: 4px">
+                {{ uri }}
+              </div>
+            </div>
+            <span v-else>-</span>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">登出URI</span>
+          <span class="value">
+            <div v-if="currentRecord?.postLogoutRedirectUris?.length">
+              <div
+                v-for="(uri, index) in currentRecord?.postLogoutRedirectUris"
+                :key="index"
+                style="margin-bottom: 4px"
+              >
+                {{ uri }}
+              </div>
+            </div>
+            <span v-else>-</span>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">创建时间</span>
+          <span class="value">{{ formatDateTime(currentRecord?.createdAt) }}</span>
+        </div>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -657,6 +691,36 @@
     :deep(.arco-table-th) {
       background-color: #f7f8fa;
       font-weight: 600;
+    }
+  }
+
+  // 极简列表风格
+  .detail-content {
+    .detail-row {
+      display: flex;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-border-1);
+      align-items: flex-start;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        width: 100px;
+        flex-shrink: 0;
+        font-size: 14px;
+        color: var(--color-text-3);
+        line-height: 1.5;
+      }
+
+      .value {
+        flex: 1;
+        font-size: 14px;
+        color: var(--color-text-1);
+        line-height: 1.5;
+        word-break: break-word;
+      }
     }
   }
 </style>
