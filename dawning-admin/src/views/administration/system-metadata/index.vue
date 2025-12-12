@@ -196,7 +196,7 @@
       slotName: 'optional',
     },
   ]);
-  const data = reactive<ISystemMetadata[]>([]);
+  const data = ref<ISystemMetadata[]>([]);
   const form = reactive<ISystemMetadata>({ ...metadata.form.create() });
 
   const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
@@ -246,7 +246,7 @@
       pagination.current = result.pageIndex;
       pagination.pageSize = result.pageSize;
 
-      data.splice(0, data.length, ...result.items);
+      data.value = result.items || [];
     } catch (error) {
       console.error('加载系统元数据失败:', error);
       // 不显示错误消息，因为后端API可能还未实现
@@ -258,7 +258,7 @@
   });
 
   onUnmounted(() => {
-    data.splice(0, data.length);
+    data.value = [];
     metadata.form.reset(form);
   });
 

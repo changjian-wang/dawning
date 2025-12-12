@@ -84,8 +84,8 @@
   const fetchData = async (contentType: string) => {
     try {
       setLoading(true);
-      const { data } = await queryPopularList({ type: contentType });
-      renderList.value = data;
+      const response = await queryPopularList({ type: contentType });
+      renderList.value = response.data || [];
     } catch (err) {
       // you can report use errorHandler or other
     } finally {

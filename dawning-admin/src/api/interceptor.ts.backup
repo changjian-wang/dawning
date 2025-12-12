@@ -1,36 +1,20 @@
-import axios from 'axios';
-import type { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
-import { getToken, getRefreshToken, isLogin } from '@/utils/auth';
+import { getToken, getRefreshToken } from '@/utils/auth';
 import { refreshAccessToken } from './auth';
 
 export interface HttpResponse<T = unknown> {
   code: number;
-  message?: string;
-  msg?: string;
+  message: string;
   data: T;
 }
 
-// 错误码常量
-const ERROR_CODES = {
-  SUCCESS: 20000,
-  ILLEGAL_TOKEN: 50008,
-  OTHER_CLIENT_LOGIN: 50012,
-  TOKEN_EXPIRED: 50014,
-} as const;
-
-// 需要自动登出的错误码
-const LOGOUT_ERROR_CODES: number[] = [
-  ERROR_CODES.ILLEGAL_TOKEN,
-  ERROR_CODES.OTHER_CLIENT_LOGIN,
-  ERROR_CODES.TOKEN_EXPIRED,
-];
-
-// 设置基础URL
-if (import.meta.env.VITE_API_BASE_URL) {
-  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-}
+// 创建 axios 实例
+const instance: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || '',
+  timeout: 30000,
+});
 
 // Token 刷新相关
 let isRefreshing = false;
@@ -48,18 +32,24 @@ function onTokenRefreshed(token: string) {
 }
 
 // 请求拦截器
-axios.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config: AxiosRequestConfig) => {
+    console.log('🔍 Request Interceptor - URL:', config.url);
+    console.log('🔍 Request Interceptor - Method:', config.method);
     const token = getToken();
     if (token && config.url !== '/connect/token') {
       config.headers = {
         ...config.headers,
         Authorization: `Bearer ${token}`,
       };
+      console.log('🔍 Request Interceptor - Token added');
     }
+
+    console.log('✅ Request Interceptor - Config:', config);
     return config;
   },
   (error: AxiosError) => {
+    console.error('❌ Request Interceptor - Error:', error);
     return Promise.reject(error);
   }
 );
@@ -87,22 +77,26 @@ const showLogoutModal = () => {
 };
 
 // 响应拦截器
-axios.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
+    console.log('🔍 Response Interceptor - Full response:', response);
+    console.log('🔍 Interceptor - Response received!', response);
     const { data } = response;
+    console.log('🔍 Interceptor - Extracted data:', data);
 
     // OAuth 端点直接返回原始响应
     if (response.config.url?.includes('/connect/token')) {
       return response;
     }
 
-    // 如果响应数据不符合标准格式（没有 code 字段），直接返回原始响应
-    if (!data || typeof data !== 'object' || !('code' in data)) {
-      return response;
-    }
+    // 调试日志
+    console.log('🔍 Interceptor - URL:', response.config.url);
+    console.log('🔍 Interceptor - Response data:', data);
+    console.log('🔍 Interceptor - data.code:', data.code);
+    console.log('🔍 Interceptor - data.data:', data.data);
 
-    // 检查业务状态码
-    if (data.code !== ERROR_CODES.SUCCESS) {
+    // 检查业务状态码（统一为 0 表示成功）
+    if (!isSuccessCode(data.code)) {
       // 显示错误消息
       Message.error({
         content: data.message || data.msg || 'Error',
@@ -112,7 +106,7 @@ axios.interceptors.response.use(
       // 处理需要登出的错误码
       const shouldLogout =
         LOGOUT_ERROR_CODES.includes(data.code) &&
-        response.config?.url !== '/api/user/info';
+        response.config.url !== '/api/user/info';
 
       if (shouldLogout) {
         showLogoutModal();
@@ -121,11 +115,14 @@ axios.interceptors.response.use(
       return Promise.reject(new Error(data.message || data.msg || 'Error'));
     }
 
-    // 返回业务数据 - 后端返回 { code: 0, message: "Success", data: {...} }
-    // 我们直接返回 data 字段的内容
-    return { ...response, data: data.data !== undefined ? data.data : data };
+    console.log('✅ Interceptor - Returning:', data);
+    return data; // 返回 data，即 { code, message, data }
   },
   async (error: AxiosError<HttpResponse>) => {
+    console.error('❌ Response Interceptor - Error occurred:', error);
+    console.error('❌ Response Interceptor - Error response:', error.response);
+    console.error('❌ Response Interceptor - Error status:', error.response?.status);
+    
     // 处理 401 未授权错误 - 尝试刷新 token
     if (
       error.response?.status === 401 &&
@@ -163,7 +160,7 @@ axios.interceptors.response.use(
           if (originalRequest?.headers) {
             originalRequest.headers.Authorization = `Bearer ${access_token}`;
           }
-          return axios(originalRequest!);
+          return axiosInstance(originalRequest!);
         } catch (refreshError) {
           // 刷新失败，跳转登录
           isRefreshing = false;
@@ -173,14 +170,14 @@ axios.interceptors.response.use(
         }
       }
 
-      // 如果正在刷新,将请求加入队列
+      // 如果正在刷新，将请求加入队列
       if (isRefreshing) {
         return new Promise((resolve) => {
           subscribeTokenRefresh((token: string) => {
             if (originalRequest?.headers) {
               originalRequest.headers.Authorization = `Bearer ${token}`;
             }
-            resolve(axios(originalRequest!));
+            resolve(axiosInstance(originalRequest!));
           });
         });
       }
@@ -192,7 +189,7 @@ axios.interceptors.response.use(
 
     // 处理网络错误或其他HTTP错误
     const message =
-      error.response?.data?.msg || error.message || 'Request Error';
+      error.response?.data?.message || error.response?.data?.msg || error.message || 'Request Error';
 
     Message.error({
       content: message,
@@ -204,4 +201,42 @@ axios.interceptors.response.use(
 );
 
 // 导出配置好的 axios 实例
-export default axios;
+export default axiosInstance;
+
+// 导出一些常用的请求方法
+// 注意：响应拦截器返回 {code, message, data}，所以这里直接返回 HttpResponse
+export const http = {
+  get: async <T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResponse<T>> => {
+    const response = await axiosInstance.get(url, config);
+    return response as any as HttpResponse<T>;
+  },
+
+  post: async <T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResponse<T>> => {
+    const response = await axiosInstance.post(url, data, config);
+    return response as any as HttpResponse<T>;
+  },
+
+  put: async <T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResponse<T>> => {
+    const response = await axiosInstance.put(url, data, config);
+    return response as any as HttpResponse<T>;
+  },
+
+  delete: async <T = any>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<HttpResponse<T>> => {
+    const response = await axiosInstance.delete(url, config);
+    return response as any as HttpResponse<T>;
+  },
+};

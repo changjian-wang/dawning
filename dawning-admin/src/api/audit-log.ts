@@ -38,7 +38,7 @@ export interface AuditLogQueryParams {
 export async function getAuditLogs(
   params: AuditLogQueryParams
 ): Promise<IPagedData<AuditLog>> {
-  const response = await axios.get('/api/audit-log', { params });
+  const response = await axios.get<{ list: AuditLog[]; pagination: any }>('/api/audit-log', { params });
   // 拦截器返回 { code, message, data }，response.data 包含 { list, pagination }
   const { list, pagination } = response.data;
   return {
@@ -56,5 +56,5 @@ export function getAuditLogById(id: string) {
 
 // 清理指定天数之前的审计日志（仅super_admin）
 export function cleanupOldAuditLogs(daysToKeep: number) {
-  return axios.delete(`/api/audit-log/cleanup?daysToKeep=${daysToKeep}`);
+  return axios.delete<void>(`/api/audit-log/cleanup?daysToKeep=${daysToKeep}`);
 }

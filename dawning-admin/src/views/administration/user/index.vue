@@ -295,7 +295,7 @@
     },
   ]);
 
-  const data = reactive<IUser[]>([]);
+  const data = ref<IUser[]>([]);
   const form = reactive<any>({ ...user.form.create() });
   const resetPasswordForm = reactive({ newPassword: '' });
 
@@ -341,26 +341,39 @@
   const fetchData = async () => {
     loading.value = true;
     try {
+      console.log('🔍 Component - Calling API with:', {
+        model,
+        current: pagination.current || 1,
+        pageSize: pagination.pageSize || 10,
+      });
+      
+      console.log('🔍 Component - Before API call');
       const result = await user.api.getPagedList(
         model,
         pagination.current || 1,
         pagination.pageSize || 10
       );
+      console.log('🔍 Component - After API call');
 
-      console.log('API Result:', result);
-      console.log('Items:', result.items);
+      console.log('🔍 Component - API Result:', result);
+      console.log('🔍 Component - result.items:', result.items);
+      console.log('🔍 Component - result.totalCount:', result.totalCount);
 
       pagination.total = result.totalCount;
       pagination.current = result.pageIndex;
       pagination.pageSize = result.pageSize;
 
-      data.splice(0, data.length, ...result.items);
-      console.log('Data after splice:', data);
+      data.value = result.items || [];
+      console.log('✅ Component - Data assigned:', data.value);
+      console.log('✅ Component - data.value length:', data.value.length);
     } catch (error) {
-      Message.error('加载数据失败');
-      console.error('Fetch error:', error);
+      console.error('❌ Component - Fetch error:', error);
+      console.error('❌ Component - Error stack:', error instanceof Error ? error.stack : 'No stack');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      Message.error(`加载数据失败: ${errorMessage}`);
     } finally {
       loading.value = false;
+      console.log('🔍 Component - Finally block, loading set to false');
     }
   };
 
@@ -374,7 +387,7 @@
   });
 
   onUnmounted(() => {
-    data.splice(0, data.length);
+    data.value = [];
   });
 
   const handleAdd = () => {

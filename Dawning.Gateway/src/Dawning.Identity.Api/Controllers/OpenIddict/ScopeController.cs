@@ -1,4 +1,4 @@
-﻿using Dawning.Identity.Api.Models;
+using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;

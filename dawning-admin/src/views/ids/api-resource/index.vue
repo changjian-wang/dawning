@@ -500,6 +500,23 @@ const formRules = {
   ],
 };
 
+// 重置表单数据
+const resetFormData = () => {
+  Object.assign(formData, {
+    id: undefined,
+    name: '',
+    displayName: '',
+    description: '',
+    enabled: true,
+    allowedAccessTokenSigningAlgorithms: [],
+    showInDiscoveryDocument: true,
+    scopes: [],
+    userClaims: [],
+    properties: {},
+  });
+  formRef.value?.clearValidate();
+};
+
 // 加载数据
 const fetchData = async () => {
   loading.value = true;
@@ -630,23 +647,6 @@ const handleModalOk = async () => {
 // 模态框取消
 const handleModalCancel = () => {
   modalVisible.value = false;
-  formRef.value?.clearValidate();
-};
-
-// 重置表单数据
-const resetFormData = () => {
-  Object.assign(formData, {
-    id: undefined,
-    name: '',
-    displayName: '',
-    description: '',
-    enabled: true,
-    allowedAccessTokenSigningAlgorithms: [],
-    showInDiscoveryDocument: true,
-    scopes: [],
-    userClaims: [],
-    properties: {},
-  });
   formRef.value?.clearValidate();
 };
 

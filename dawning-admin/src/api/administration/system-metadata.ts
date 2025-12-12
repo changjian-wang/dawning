@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 export interface ISystemMetadata {
@@ -42,29 +42,36 @@ export const metadata = {
   api: {
     // API 方法
     async get(id: string): Promise<ISystemMetadata> {
-      const response = await http.get<ISystemMetadata>(
+      const response = await axios.get(
         `/api/system-metadata/get/${id}`
       );
       return response.data;
     },
 
-    async getPagedList(model: any, page: number, size: number): Promise<any> {
-      const response = await http.post<any>(
+    async getPagedList(model: any, page: number, size: number): Promise<IPagedData<ISystemMetadata>> {
+      const response = await axios.post(
         `/api/system-metadata/get-paged-list?page=${page}&size=${size}`,
         model
       );
-      return response.data;
+      // 响应拦截器返回 {code, message, data: {list, pagination}}
+      const { list, pagination } = response.data;
+      return {
+        items: list,
+        totalCount: pagination.total,
+        pageIndex: pagination.current,
+        pageSize: pagination.pageSize,
+      };
     },
 
     async getAll(): Promise<ISystemMetadata[]> {
-      const response = await http.get<ISystemMetadata[]>(
+      const response = await axios.get(
         '/api/system-metadata/get-all'
       );
       return response.data;
     },
 
     async create(model: ISystemMetadata): Promise<number> {
-      const response = await http.post<number>(
+      const response = await axios.post(
         '/api/system-metadata/insert',
         model
       );
@@ -72,7 +79,7 @@ export const metadata = {
     },
 
     async update(model: ISystemMetadata): Promise<boolean> {
-      const response = await http.put<boolean>(
+      const response = await axios.put(
         '/api/system-metadata/update',
         model
       );
@@ -80,7 +87,7 @@ export const metadata = {
     },
 
     async delete(id: string): Promise<boolean> {
-      const response = await http.delete<boolean>(
+      const response = await axios.delete(
         `/api/system-metadata/delete/${id}`
       );
       return response.data;

@@ -58,8 +58,11 @@ namespace Dawning.Identity.Api.Middleware
                         method, path, elapsedMs, context.Response.StatusCode);
                 }
 
-                // 添加性能头到响应
-                context.Response.Headers.Append("X-Response-Time-Ms", elapsedMs.ToString());
+                // 只在响应未开始时添加性能头
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.Headers.Append("X-Response-Time-Ms", elapsedMs.ToString());
+                }
             }
         }
     }

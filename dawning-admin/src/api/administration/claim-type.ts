@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 export interface IClaimType {
@@ -58,7 +58,7 @@ export const claimType = {
   api: {
     // API 方法
     async get(id: string): Promise<IClaimType> {
-      const response = await http.get<IClaimType>(`/api/claim-type/get/${id}`);
+      const response = await axios.get<IClaimType>(`/api/claim-type/get/${id}`);
       return response.data;
     },
 
@@ -67,30 +67,37 @@ export const claimType = {
       page: number,
       size: number
     ): Promise<IPagedData<IClaimType>> {
-      const response = await http.post<IPagedData<IClaimType>>(
+      const response = await axios.post<{ list: IClaimType[]; pagination: any }>(
         `/api/claim-type/get-paged-list?page=${page}&size=${size}`,
         model
       );
-      return response.data;
+      // 响应拦截器返回 {code, message, data: {list, pagination}}
+      const { list, pagination } = response.data;
+      return {
+        items: list,
+        totalCount: pagination.total,
+        pageIndex: pagination.current,
+        pageSize: pagination.pageSize,
+      };
     },
 
     async getAll(): Promise<IClaimType[]> {
-      const response = await http.get<IClaimType[]>('/api/claim-type/get-all');
+      const response = await axios.get<IClaimType[]>('/api/claim-type/get-all');
       return response.data;
     },
 
     async create(model: IClaimType): Promise<number> {
-      const response = await http.post<number>('/api/claim-type/insert', model);
+      const response = await axios.post<number>('/api/claim-type/insert', model);
       return response.data;
     },
 
     async update(model: IClaimType): Promise<boolean> {
-      const response = await http.put<boolean>('/api/claim-type/update', model);
+      const response = await axios.put<boolean>('/api/claim-type/update', model);
       return response.data;
     },
 
     async delete(id: string): Promise<boolean> {
-      const response = await http.delete<boolean>(
+      const response = await axios.delete<boolean>(
         `/api/claim-type/delete/${id}`
       );
       return response.data;

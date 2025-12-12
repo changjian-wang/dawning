@@ -224,7 +224,7 @@
       slotName: 'optional',
     },
   ]);
-  const data = reactive<IClaimType[]>([]);
+  const data = ref<IClaimType[]>([]);
   const form = reactive<IClaimType>({ ...claimType.form.create() });
   const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
     name: [
@@ -260,7 +260,7 @@
       pagination.current = result.pageIndex;
       pagination.pageSize = result.pageSize;
 
-      data.splice(0, data.length, ...result.items);
+      data.value = result.items || [];
     } catch (error) {
       console.error('加载声明类型数据失败:', error);
       // 不显示错误消息，因为后端API可能还未实现
@@ -277,7 +277,7 @@
   });
 
   onUnmounted(() => {
-    data.splice(0, data.length);
+    data.value = [];
     claimType.form.reset(form);
   });
 

@@ -46,7 +46,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     return NotFound(new { code = 404, message = "Role not found" });
                 }
 
-                return Ok(new { code = 0, message = "Success", data = role });
+                return Ok(new { code = 20000, message = "Success", data = role });
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     return NotFound(new { code = 404, message = "Role not found" });
                 }
 
-                return Ok(new { code = 0, message = "Success", data = role });
+                return Ok(new { code = 20000, message = "Success", data = role });
             }
             catch (Exception ex)
             {
@@ -107,7 +107,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 return Ok(new
                 {
-                    code = 0,
+                    code = 20000,
                     message = "Success",
                     data = new
                     {
@@ -138,7 +138,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var roles = await _roleService.GetAllAsync();
-                return Ok(new { code = 0, message = "Success", data = roles });
+                return Ok(new { code = 20000, message = "Success", data = roles });
             }
             catch (Exception ex)
             {
@@ -174,7 +174,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 return CreatedAtAction(
                     nameof(GetById),
                     new { id = role.Id },
-                    new { code = 0, message = "Role created successfully", data = role });
+                    new { code = 20000, message = "Role created successfully", data = role });
             }
             catch (InvalidOperationException ex)
             {
@@ -217,7 +217,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     oldValues: oldRole != null ? new { oldRole.Name, oldRole.Description, Permissions = oldRole.Permissions } : null,
                     newValues: new { role.Name, role.Description, Permissions = role.Permissions });
 
-                return Ok(new { code = 0, message = "Role updated successfully", data = role });
+                return Ok(new { code = 20000, message = "Role updated successfully", data = role });
             }
             catch (InvalidOperationException ex)
             {
@@ -258,7 +258,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     description: $"Deleted role: {role?.Name}",
                     oldValues: role != null ? new { role.Name, role.Description, Permissions = role.Permissions } : null);
 
-                return Ok(new { code = 0, message = "Role deleted successfully" });
+                return Ok(new { code = 20000, message = "Role deleted successfully" });
             }
             catch (InvalidOperationException ex)
             {
@@ -282,7 +282,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var exists = await _roleService.NameExistsAsync(name, excludeRoleId);
-                return Ok(new { code = 0, data = new { exists } });
+                return Ok(new { code = 20000, data = new { exists } });
             }
             catch (Exception ex)
             {

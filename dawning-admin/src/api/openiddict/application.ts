@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 /**
@@ -176,18 +176,18 @@ export const application = {
    * 获取应用程序详情
    */
   async get(id: string): Promise<IApplication> {
-    const response = await http.get(`/api/openiddict/application/${id}`);
-    return response.data.data || response.data;
+    const response = await axios.get<IApplication>(`/api/openiddict/application/${id}`);
+    return response.data;
   },
 
   /**
    * 根据ClientId获取应用程序
    */
   async getByClientId(clientId: string): Promise<IApplication> {
-    const response = await http.get(
+    const response = await axios.get<IApplication>(
       `/api/openiddict/application/by-client-id/${clientId}`
     );
-    return response.data.data || response.data;
+    return response.data;
   },
 
   /**
@@ -198,27 +198,26 @@ export const application = {
     page = 1,
     size = 10
   ): Promise<IPagedData<IApplication>> {
-    const response = await http.post(
+    const response = await axios.post<IPagedData<IApplication>>(
       `/api/openiddict/application/paged?page=${page}&size=${size}`,
       query
     );
-    // 后端返回格式: { data: { pageIndex, pageSize, totalCount, items } }
-    return response.data.data || response.data;
+    return response.data;
   },
 
   /**
    * 获取所有应用程序
    */
   async getAll(): Promise<IApplication[]> {
-    const response = await http.get('/api/openiddict/application');
-    return response.data.data || response.data;
+    const response = await axios.get<IApplication[]>('/api/openiddict/application');
+    return response.data;
   },
 
   /**
    * 创建应用程序
    */
   async create(dto: ICreateApplicationDto): Promise<string> {
-    const response = await http.post('/api/openiddict/application', {
+    const response = await axios.post<string>('/api/openiddict/application', {
       clientId: dto.clientId,
       clientSecret: dto.clientSecret,
       displayName: dto.displayName,
@@ -230,26 +229,26 @@ export const application = {
       requirements: [],
       properties: {},
     });
-    return response.data.data;
+    return response.data;
   },
 
   /**
    * 更新应用程序
    */
   async update(dto: IUpdateApplicationDto): Promise<boolean> {
-    const response = await http.put(
+    const response = await axios.put<boolean>(
       `/api/openiddict/application/${dto.id}`,
       dto
     );
-    return response.data.data;
+    return response.data;
   },
 
   /**
    * 删除应用程序
    */
   async delete(id: string): Promise<boolean> {
-    const response = await http.delete(`/api/openiddict/application/${id}`);
-    return response.data.data;
+    const response = await axios.delete<boolean>(`/api/openiddict/application/${id}`);
+    return response.data;
   },
 
   /**

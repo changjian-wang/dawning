@@ -102,7 +102,7 @@
       slotName: 'optional',
     },
   ];
-  const data = reactive([]);
+  const data = ref([]);
 </script>
 
 <style scoped lang="less"></style>

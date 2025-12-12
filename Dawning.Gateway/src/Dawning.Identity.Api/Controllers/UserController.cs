@@ -128,7 +128,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 return Ok(new
                 {
-                    code = 0,
+                    code = 20000,
                     message = "Success",
                     data = new
                     {
@@ -181,7 +181,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 return Ok(new
                 {
-                    code = 0,
+                    code = 20000,
                     message = "Success",
                     data = new
                     {
@@ -215,7 +215,7 @@ namespace Dawning.Identity.Api.Controllers
                     return NotFound(new { code = 404, message = "User not found" });
                 }
 
-                return Ok(new { code = 0, message = "Success", data = user });
+                return Ok(new { code = 20000, message = "Success", data = user });
             }
             catch (Exception ex)
             {
@@ -254,7 +254,7 @@ namespace Dawning.Identity.Api.Controllers
                 return CreatedAtAction(
                     nameof(GetUserById),
                     new { id = user.Id },
-                    new { code = 0, message = "User created successfully", data = user });
+                    new { code = 20000, message = "User created successfully", data = user });
             }
             catch (InvalidOperationException ex)
             {
@@ -301,7 +301,7 @@ namespace Dawning.Identity.Api.Controllers
                     oldValues: oldValues,
                     newValues: new { user.Username, user.Email, user.Role, user.IsActive });
 
-                return Ok(new { code = 0, message = "User updated successfully", data = user });
+                return Ok(new { code = 20000, message = "User updated successfully", data = user });
             }
             catch (InvalidOperationException ex)
             {
@@ -345,7 +345,7 @@ namespace Dawning.Identity.Api.Controllers
                     description: $"Deleted user: {userInfo?.Username}",
                     oldValues: userInfo);
 
-                return Ok(new { code = 0, message = "User deleted successfully" });
+                return Ok(new { code = 20000, message = "User deleted successfully" });
             }
             catch (InvalidOperationException ex)
             {
@@ -380,7 +380,7 @@ namespace Dawning.Identity.Api.Controllers
                     entityId: dto.UserId,
                     description: "User changed their password");
 
-                return Ok(new { code = 0, message = "Password changed successfully" });
+                return Ok(new { code = 20000, message = "Password changed successfully" });
             }
             catch (InvalidOperationException ex)
             {
@@ -420,7 +420,7 @@ namespace Dawning.Identity.Api.Controllers
                     entityId: id,
                     description: $"Admin reset password for user: {user?.Username}");
 
-                return Ok(new { code = 0, message = "Password reset successfully" });
+                return Ok(new { code = 20000, message = "Password reset successfully" });
             }
             catch (InvalidOperationException ex)
             {
@@ -444,7 +444,7 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 var exists = await _userService.UsernameExistsAsync(username, excludeUserId);
-                return Ok(new { code = 0, data = new { exists } });
+                return Ok(new { code = 20000, data = new { exists } });
             }
             catch (Exception ex)
             {
@@ -463,7 +463,7 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 var exists = await _userService.EmailExistsAsync(email, excludeUserId);
-                return Ok(new { code = 0, data = new { exists } });
+                return Ok(new { code = 20000, data = new { exists } });
             }
             catch (Exception ex)
             {
@@ -518,7 +518,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 return Ok(new 
                 { 
-                    code = 0, 
+                    code = 20000, 
                     data = admin,
                     message = "Admin account reset successfully. Username: admin, Password: admin"
                 });
@@ -586,7 +586,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 return Ok(new 
                 { 
-                    code = 0, 
+                    code = 20000, 
                     data = admin,
                     message = "Admin account initialized successfully. Please change the default password immediately."
                 });
@@ -614,7 +614,7 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 var roles = await _userService.GetUserRolesAsync(id);
-                return Ok(new { code = 0, message = "Success", data = roles });
+                return Ok(new { code = 20000, message = "Success", data = roles });
             }
             catch (Exception ex)
             {
@@ -639,7 +639,7 @@ namespace Dawning.Identity.Api.Controllers
                     return NotFound(new { code = 404, message = "User not found" });
                 }
 
-                return Ok(new { code = 0, message = "Success", data = user });
+                return Ok(new { code = 20000, message = "Success", data = user });
             }
             catch (Exception ex)
             {
@@ -664,7 +664,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("Roles assigned to user: {UserId}", id);
 
-                return Ok(new { code = 0, message = "Roles assigned successfully" });
+                return Ok(new { code = 20000, message = "Roles assigned successfully" });
             }
             catch (InvalidOperationException ex)
             {
@@ -692,7 +692,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("Role removed from user: {UserId}, Role: {RoleId}", userId, roleId);
 
-                return Ok(new { code = 0, message = "Role removed successfully" });
+                return Ok(new { code = 20000, message = "Role removed successfully" });
             }
             catch (Exception ex)
             {

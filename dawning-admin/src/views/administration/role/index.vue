@@ -313,24 +313,25 @@ const formatDateTime = (dateStr: string) => {
 const fetchData = async () => {
   setLoading(true);
   try {
+    console.log('🔷 Role fetchData - Starting...');
     const params: RoleQueryParams = {
       ...searchForm,
       page: pagination.current,
       pageSize: pagination.pageSize,
     };
-    const response = await getRoleList(params);
-    // 响应拦截器已经解包，response.data = { code, message, data: { list, pagination } }
-    // 所以response.data.data = { list, pagination }
-    const result = response.data;
-    if (result && result.list) {
-      tableData.value = result.list;
-      pagination.total = result.pagination?.total || 0;
-    } else {
-      tableData.value = [];
-      pagination.total = 0;
-    }
+    console.log('🔷 Role fetchData - Params:', params);
+    const result = await getRoleList(params);
+    console.log('🔷 Role fetchData - Result:', result);
+    console.log('🔷 Role fetchData - Result.items:', result.items);
+    console.log('🔷 Role fetchData - Result.totalCount:', result.totalCount);
+    // API 已返回标准化的 IPagedData 格式
+    tableData.value = result.items;
+    pagination.total = result.totalCount;
+    console.log('🔷 Role fetchData - tableData.value:', tableData.value);
+    console.log('🔷 Role fetchData - pagination.total:', pagination.total);
   } catch (err: any) {
-    console.error('Error fetching roles:', err);
+    console.error('❌ Error fetching roles:', err);
+    console.error('❌ Error details:', err.response);
     Message.error(err.response?.data?.message || err.message || t('role.message.createFailed'));
     tableData.value = [];
     pagination.total = 0;

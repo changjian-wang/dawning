@@ -7,19 +7,14 @@
     public class ApiResponse<T>
     {
         /// <summary>
-        /// 业务状态码
+        /// 业务状态码（20000表示成功）
         /// </summary>
         public int Code { get; set; } = 20000;
 
         /// <summary>
-        /// HTTP状态码
-        /// </summary>
-        public int Status { get; set; } = 200;
-
-        /// <summary>
         /// 响应消息
         /// </summary>
-        public string Msg { get; set; } = "Success";
+        public string Message { get; set; } = "Success";
 
         /// <summary>
         /// 响应数据
@@ -34,8 +29,7 @@
             return new ApiResponse<T>
             {
                 Code = 20000,
-                Status = 200,
-                Msg = message,
+                Message = message,
                 Data = data
             };
         }
@@ -48,8 +42,7 @@
             return new ApiResponse<T>
             {
                 Code = code,
-                Status = 400,
-                Msg = message,
+                Message = message,
                 Data = data
             };
         }
@@ -70,8 +63,7 @@
             return new ApiResponse
             {
                 Code = 20000,
-                Status = 200,
-                Msg = message,
+                Message = message,
                 Data = null
             };
         }
@@ -87,8 +79,7 @@
             return new ApiResponse
             {
                 Code = code,
-                Status = 400,
-                Msg = message,
+                Message = message,
                 Data = null
             };
         }

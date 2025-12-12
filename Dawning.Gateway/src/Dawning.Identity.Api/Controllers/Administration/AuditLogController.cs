@@ -42,7 +42,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     return NotFound(new { code = 404, message = "Audit log not found" });
                 }
 
-                return Ok(new { code = 0, message = "Success", data = auditLog });
+                return Ok(new { code = 20000, message = "Success", data = auditLog });
             }
             catch (Exception ex)
             {
@@ -88,7 +88,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 return Ok(new
                 {
-                    code = 0,
+                    code = 20000,
                     message = "Success",
                     data = new
                     {
@@ -121,7 +121,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var auditLog = await _auditLogService.CreateAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = auditLog.Id }, 
-                    new { code = 0, message = "Success", data = auditLog });
+                    new { code = 20000, message = "Success", data = auditLog });
             }
             catch (Exception ex)
             {
@@ -145,7 +145,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 return Ok(new
                 {
-                    code = 0,
+                    code = 20000,
                     message = "Success",
                     data = new { deletedCount, cutoffDate, daysToKeep }
                 });

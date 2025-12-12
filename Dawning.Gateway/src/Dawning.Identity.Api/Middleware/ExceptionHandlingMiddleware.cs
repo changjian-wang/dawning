@@ -42,6 +42,13 @@ namespace Dawning.Identity.Api.Middleware
 
         private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            // 检查响应是否已经开始
+            if (context.Response.HasStarted)
+            {
+                // 响应已经开始，无法修改状态码和headers，直接返回
+                return;
+            }
+
             context.Response.ContentType = "application/json";
             
             var response = new ErrorResponse

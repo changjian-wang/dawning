@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/api/interceptor';
 import type { IPagedData } from '../paged-data';
 
 // 角色模型
@@ -44,57 +44,71 @@ export interface RoleQueryParams {
 /**
  * 获取角色列表（分页）
  */
-export function getRoleList(params: RoleQueryParams) {
-  return axios.get<any>('/api/role', { params });
+export async function getRoleList(params: RoleQueryParams): Promise<IPagedData<RoleModel>> {
+  const response = await axios.get<{ list: RoleModel[]; pagination: any }>('/api/role', { params });
+  // 响应拦截器返回 {code, message, data: {list, pagination}}
+  const { list, pagination } = response.data;
+  return {
+    items: list,
+    totalCount: pagination.total,
+    pageIndex: pagination.current,
+    pageSize: pagination.pageSize,
+  };
 }
 
 /**
  * 获取所有活动角色
  */
-export function getAllActiveRoles() {
-  return axios.get<RoleModel[]>('/api/role/all');
+export async function getAllActiveRoles(): Promise<RoleModel[]> {
+  const response = await axios.get<RoleModel[]>('/api/role/all');
+  return response.data;
 }
 
 /**
  * 根据ID获取角色
  */
-export function getRoleById(id: string) {
-  return axios.get<RoleModel>(`/api/role/${id}`);
+export async function getRoleById(id: string): Promise<RoleModel> {
+  const response = await axios.get<RoleModel>(`/api/role/${id}`);
+  return response.data;
 }
 
 /**
  * 根据名称获取角色
  */
-export function getRoleByName(name: string) {
-  return axios.get<RoleModel>(`/api/role/by-name/${name}`);
+export async function getRoleByName(name: string): Promise<RoleModel> {
+  const response = await axios.get<RoleModel>(`/api/role/by-name/${name}`);
+  return response.data;
 }
 
 /**
  * 检查角色名称是否存在
  */
-export function checkRoleName(name: string, excludeId?: string) {
-  return axios.get<boolean>('/api/role/check-name', {
+export async function checkRoleName(name: string, excludeId?: string): Promise<boolean> {
+  const response = await axios.get<boolean>('/api/role/check-name', {
     params: { name, excludeId },
   });
+  return response.data;
 }
 
 /**
  * 创建角色
  */
-export function createRole(data: CreateRoleDto) {
-  return axios.post<RoleModel>('/api/role', data);
+export async function createRole(data: CreateRoleDto): Promise<RoleModel> {
+  const response = await axios.post<RoleModel>('/api/role', data);
+  return response.data;
 }
 
 /**
  * 更新角色
  */
-export function updateRole(id: string, data: UpdateRoleDto) {
-  return axios.put<RoleModel>(`/api/role/${id}`, data);
+export async function updateRole(id: string, data: UpdateRoleDto): Promise<RoleModel> {
+  const response = await axios.put<RoleModel>(`/api/role/${id}`, data);
+  return response.data;
 }
 
 /**
  * 删除角色
  */
-export function deleteRole(id: string) {
-  return axios.delete(`/api/role/${id}`);
+export async function deleteRole(id: string): Promise<void> {
+  await axios.delete<void>(`/api/role/${id}`);
 }

@@ -1,4 +1,4 @@
-import { http, isSuccessCode } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 // 用户DTO（匹配后端UserDto）
@@ -105,7 +105,7 @@ export const user = {
   api: {
     // 获取用户详情
     async get(id: string): Promise<IUser> {
-      const response = await http.get(`/api/user/${id}`);
+      const response = await axios.get<IUser>(`/api/user/${id}`);
       return response.data;
     },
 
@@ -115,15 +115,17 @@ export const user = {
       page: number,
       pageSize: number
     ): Promise<IPagedData<IUser>> {
-      const response = await http.get(`/api/user`, {
+      const response = await axios.get<{ list: IUser[]; pagination: { total: number; current: number; pageSize: number } }>(`/api/user`, {
         params: {
           page,
           pageSize,
           ...model,
         },
       });
-      // 拦截器返回 { code, message, data }，response.data 包含 { list, pagination }
+      
+      // response.data 现在直接是业务数据 {list, pagination}
       const { list, pagination } = response.data;
+      
       return {
         items: list,
         totalCount: pagination.total,
@@ -134,28 +136,28 @@ export const user = {
 
     // 创建用户
     async create(model: ICreateUserModel): Promise<IUser> {
-      const response = await http.post('/api/user', model);
+      const response = await axios.post<IUser>('/api/user', model);
       return response.data;
     },
 
     // 更新用户
     async update(model: IUpdateUserModel): Promise<IUser> {
-      const response = await http.put(`/api/user/${model.id}`, model);
+      const response = await axios.put<IUser>(`/api/user/${model.id}`, model);
       return response.data;
     },
 
     // 删除用户
     async delete(id: string): Promise<boolean> {
-      const response = await http.delete(`/api/user/${id}`);
-      return isSuccessCode(response.code);
+      await axios.delete(`/api/user/${id}`);
+      return true;
     },
 
     // 重置密码
     async resetPassword(id: string, newPassword: string): Promise<boolean> {
-      const response = await http.post(`/api/user/${id}/reset-password`, {
+      await axios.post(`/api/user/${id}/reset-password`, {
         newPassword,
       });
-      return isSuccessCode(response.code);
+      return true;
     },
 
     // 修改密码
@@ -164,12 +166,12 @@ export const user = {
       oldPassword: string,
       newPassword: string
     ): Promise<boolean> {
-      const response = await http.post('/api/user/change-password', {
+      await axios.post('/api/user/change-password', {
         userId,
         oldPassword,
         newPassword,
       });
-      return isSuccessCode(response.code);
+      return true;
     },
   },
 };

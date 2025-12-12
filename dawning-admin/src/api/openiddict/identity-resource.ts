@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 export interface IIdentityResourceClaim {
@@ -45,7 +45,7 @@ export const identityResourceClaim = {
 
   // API 方法
   async get(id: string): Promise<IIdentityResourceClaim> {
-    const response = await http.get<IIdentityResourceClaim>(
+    const response = await axios.get<IIdentityResourceClaim>(
       `/api/identity-resource-claim/get/${id}`
     );
     return response.data;
@@ -54,7 +54,7 @@ export const identityResourceClaim = {
   async getByIdentityResourceId(
     identityResourceId: string
   ): Promise<IIdentityResourceClaim[]> {
-    const response = await http.get<IIdentityResourceClaim[]>(
+    const response = await axios.get<IIdentityResourceClaim[]>(
       `/api/identity-resource-claim/get-by-resource/${identityResourceId}`
     );
     return response.data;
@@ -65,7 +65,7 @@ export const identityResourceClaim = {
     page: number,
     size: number
   ): Promise<IPagedData<IIdentityResourceClaim>> {
-    const response = await http.post<IPagedData<IIdentityResourceClaim>>(
+    const response = await axios.post<IPagedData<IIdentityResourceClaim>>(
       `/api/identity-resource-claim/get-paged-list?page=${page}&size=${size}`,
       model
     );
@@ -73,7 +73,7 @@ export const identityResourceClaim = {
   },
 
   async create(model: IIdentityResourceClaim): Promise<number> {
-    const response = await http.post<number>(
+    const response = await axios.post<number>(
       '/api/identity-resource-claim/insert',
       model
     );
@@ -81,7 +81,7 @@ export const identityResourceClaim = {
   },
 
   async update(model: IIdentityResourceClaim): Promise<boolean> {
-    const response = await http.put<boolean>(
+    const response = await axios.put<boolean>(
       '/api/identity-resource-claim/update',
       model
     );
@@ -89,7 +89,7 @@ export const identityResourceClaim = {
   },
 
   async delete(id: string): Promise<boolean> {
-    const response = await http.delete<boolean>(
+    const response = await axios.delete<boolean>(
       `/api/identity-resource-claim/delete/${id}`
     );
     return response.data;
@@ -98,7 +98,7 @@ export const identityResourceClaim = {
   async deleteByIdentityResourceId(
     identityResourceId: string
   ): Promise<boolean> {
-    const response = await http.delete<boolean>(
+    const response = await axios.delete<boolean>(
       `/api/identity-resource-claim/delete-by-resource/${identityResourceId}`
     );
     return response.data;

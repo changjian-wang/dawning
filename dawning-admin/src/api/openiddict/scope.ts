@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 /**
@@ -45,7 +45,7 @@ export const scope = {
    * 获取作用域详情
    */
   async get(id: string): Promise<IScope> {
-    const response = await http.get(`/api/openiddict/scope/get/${id}`);
+    const response = await axios.get<IScope>(`/api/openiddict/scope/get/${id}`);
     return response.data;
   },
 
@@ -53,7 +53,7 @@ export const scope = {
    * 根据名称获取作用域
    */
   async getByName(name: string): Promise<IScope> {
-    const response = await http.get(
+    const response = await axios.get<IScope>(
       `/api/openiddict/scope/get-by-name/${name}`
     );
     return response.data;
@@ -63,7 +63,7 @@ export const scope = {
    * 根据名称列表获取作用域
    */
   async getByNames(names: string[]): Promise<IScope[]> {
-    const response = await http.post(
+    const response = await axios.post<IScope[]>(
       '/api/openiddict/scope/get-by-names',
       names
     );
@@ -78,7 +78,7 @@ export const scope = {
     page = 1,
     size = 10
   ): Promise<IPagedData<IScope>> {
-    const response = await http.post(
+    const response = await axios.post<IPagedData<IScope>>(
       `/api/openiddict/scope/get-paged-list?page=${page}&size=${size}`,
       query
     );
@@ -89,7 +89,7 @@ export const scope = {
    * 获取所有作用域
    */
   async getAll(): Promise<IScope[]> {
-    const response = await http.get('/api/openiddict/scope/get-all');
+    const response = await axios.get<IScope[]>('/api/openiddict/scope/get-all');
     return response.data;
   },
 
@@ -97,7 +97,7 @@ export const scope = {
    * 创建作用域
    */
   async create(dto: ICreateScopeDto): Promise<number> {
-    const response = await http.post('/api/openiddict/scope/insert', {
+    const response = await axios.post<number>('/api/openiddict/scope/insert', {
       name: dto.name,
       displayName: dto.displayName,
       description: dto.description,
@@ -111,7 +111,7 @@ export const scope = {
    * 更新作用域
    */
   async update(dto: IUpdateScopeDto): Promise<number> {
-    const response = await http.put('/api/openiddict/scope/update', dto);
+    const response = await axios.put<number>('/api/openiddict/scope/update', dto);
     return response.data;
   },
 
@@ -119,7 +119,7 @@ export const scope = {
    * 删除作用域
    */
   async delete(id: string): Promise<number> {
-    const response = await http.delete(`/api/openiddict/scope/delete/${id}`);
+    const response = await axios.delete<number>(`/api/openiddict/scope/delete/${id}`);
     return response.data;
   },
 };

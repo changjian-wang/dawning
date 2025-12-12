@@ -457,12 +457,12 @@ const fetchData = async () => {
       page: pagination.current,
       pageSize: pagination.pageSize,
     };
-    const response = await getPermissionList(params);
-    tableData.value = response.data.items;
-    pagination.total = response.data.totalCount;
+    const result = await getPermissionList(params);
+    tableData.value = result.items;
+    pagination.total = result.totalCount;
 
     // 提取资源选项
-    const resources = new Set(response.data.items.map((item) => item.resource));
+    const resources = new Set(result.items.map((item) => item.resource));
     resourceOptions.value = Array.from(resources).sort();
   } catch (error) {
     Message.error('加载权限列表失败');
@@ -592,7 +592,7 @@ const handleViewGrouped = async () => {
   groupedLoading.value = true;
   try {
     const response = await getGroupedPermissions();
-    groupedPermissions.value = response.data;
+    groupedPermissions.value = response;
   } catch (error) {
     Message.error('加载分组数据失败');
   } finally {

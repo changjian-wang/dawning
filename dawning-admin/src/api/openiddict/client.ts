@@ -1,4 +1,4 @@
-import { http } from '../interceptor';
+import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 import { IClientClaim } from './client-claim';
 import { IClientCorsOrigins } from './client-cors-origin';
@@ -275,7 +275,7 @@ export const client = {
 
   // API 方法
   async get(id: string): Promise<IClient> {
-    const response = await http.get<IClient>(`/api/client/get/${id}`);
+    const response = await axios.get<IClient>(`/api/client/get/${id}`);
     return response.data;
   },
 
@@ -284,7 +284,7 @@ export const client = {
     page: number,
     size: number
   ): Promise<IPagedData<IClient>> {
-    const response = await http.post<IPagedData<IClient>>(
+    const response = await axios.post<IPagedData<IClient>>(
       `/api/client/get-paged-list?page=${page}&size=${size}`,
       model
     );
@@ -292,22 +292,22 @@ export const client = {
   },
 
   async getAll(): Promise<IClient[]> {
-    const response = await http.get<IClient[]>('/api/client/get-all');
+    const response = await axios.get<IClient[]>('/api/client/get-all');
     return response.data;
   },
 
   async create(model: IClient): Promise<string> {
-    const response = await http.post<string>('/api/client/insert', model);
+    const response = await axios.post<string>('/api/client/insert', model);
     return response.data;
   },
 
   async update(model: IClient): Promise<boolean> {
-    const response = await http.put<boolean>('/api/client/update', model);
+    const response = await axios.put<boolean>('/api/client/update', model);
     return response.data;
   },
 
   async delete(id: string): Promise<boolean> {
-    const response = await http.delete<boolean>(`/api/client/delete/${id}`);
+    const response = await axios.delete<boolean>(`/api/client/delete/${id}`);
     return response.data;
   },
 };
