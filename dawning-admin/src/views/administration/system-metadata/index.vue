@@ -161,6 +161,7 @@
       title="系统元数据详情"
       :footer="false"
       width="560px"
+      :body-style="{ padding: '20px 24px' }"
     >
       <div class="detail-content">
         <div class="detail-row">

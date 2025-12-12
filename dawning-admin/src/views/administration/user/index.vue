@@ -208,6 +208,7 @@
       title="用户详情"
       :footer="false"
       width="650px"
+      :body-style="{ padding: '20px 24px' }"
     >
       <div class="detail-content">
         <div class="detail-row">
