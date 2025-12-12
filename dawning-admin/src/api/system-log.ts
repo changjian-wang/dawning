@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { PagedResult } from '@/types/global';
+import type { IPagedData } from './paged-data';
 
 export interface SystemLog {
   id: string;
@@ -50,7 +50,7 @@ export interface CreateSystemLogDto {
  * 分页获取系统日志列表
  */
 export function getSystemLogList(params: SystemLogQueryParams) {
-  return axios.get<PagedResult<SystemLog>>('/api/systemlog/paged', {
+  return axios.get<IPagedData<SystemLog>>('/api/systemlog/paged', {
     params,
   });
 }
