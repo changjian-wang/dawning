@@ -1,6 +1,7 @@
 ﻿using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using System;
+using System.Threading.Tasks;
 
 namespace Dawning.Identity.Domain.Interfaces.UoW
 {
@@ -12,6 +13,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         IRoleRepository Role { get; }
         IUserRoleRepository UserRole { get; }
         IAuditLogRepository AuditLog { get; }
+        ISystemLogRepository SystemLog { get; }
         IPermissionRepository Permission { get; }
         IRolePermissionRepository RolePermission { get; }
 
@@ -27,6 +29,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         void BeginTransaction();
         void Commit();
         void Rollback();
+        Task CommitAsync();
     }
 }
 

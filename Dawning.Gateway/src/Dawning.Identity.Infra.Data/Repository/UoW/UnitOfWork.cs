@@ -5,6 +5,7 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Repository.Administration;
 using Dawning.Identity.Infra.Data.Repository.OpenIddict;
 using System;
+using System.Threading.Tasks;
 
 namespace Dawning.Identity.Infra.Data.Repository.UoW
 {
@@ -27,6 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             Role = new RoleRepository(_context);
             UserRole = new UserRoleRepository(_context);
             AuditLog = new AuditLogRepository(_context);
+            SystemLog = new SystemLogRepository(_context);
             Permission = new PermissionRepository(_context);
             RolePermission = new RolePermissionRepository(_context);
 
@@ -45,6 +47,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public IRoleRepository Role { get; }
         public IUserRoleRepository UserRole { get; }
         public IAuditLogRepository AuditLog { get; }
+        public ISystemLogRepository SystemLog { get; }
         public IPermissionRepository Permission { get; }
         public IRolePermissionRepository RolePermission { get; }
 
@@ -76,6 +79,13 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public void Rollback()
         {
             _context.Rollback();
+        }
+
+        public Task CommitAsync()
+        {
+            // 当前 DbContext 只有同步方法，简单包装为 Task
+            Commit();
+            return Task.CompletedTask;
         }
 
         public void Dispose()

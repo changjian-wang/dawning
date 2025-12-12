@@ -1,0 +1,191 @@
+using Dawning.Identity.Application.Dtos.Administration;
+using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Domain.Aggregates.Administration.QueryModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
+
+namespace Dawning.Identity.Api.Controllers.Administration
+{
+    /// <summary>
+    /// 系统日志管理控制器
+    /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize]
+    public class SystemLogController : ControllerBase
+    {
+        private readonly ISystemLogService _systemLogService;
+        private readonly ILogger<SystemLogController> _logger;
+
+        public SystemLogController(
+            ISystemLogService systemLogService,
+            ILogger<SystemLogController> logger)
+        {
+            _systemLogService = systemLogService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// 分页获取系统日志列表
+        /// </summary>
+        /// <param name="level">日志级别（Information/Warning/Error）</param>
+        /// <param name="keyword">关键字搜索（Message/Exception）</param>
+        /// <param name="userId">用户ID</param>
+        /// <param name="username">用户名</param>
+        /// <param name="ipAddress">IP地址</param>
+        /// <param name="requestPath">请求路径</param>
+        /// <param name="startDate">开始日期</param>
+        /// <param name="endDate">结束日期</param>
+        /// <param name="page">页码（默认1）</param>
+        /// <param name="pageSize">每页条数（默认20）</param>
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPagedList(
+            [FromQuery] string? level = null,
+            [FromQuery] string? keyword = null,
+            [FromQuery] Guid? userId = null,
+            [FromQuery] string? username = null,
+            [FromQuery] string? ipAddress = null,
+            [FromQuery] string? requestPath = null,
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            try
+            {
+                var queryModel = new SystemLogQueryModel
+                {
+                    Level = level,
+                    Keyword = keyword,
+                    UserId = userId,
+                    Username = username,
+                    IpAddress = ipAddress,
+                    RequestPath = requestPath,
+                    StartDate = startDate,
+                    EndDate = endDate
+                };
+
+                var result = await _systemLogService.GetPagedListAsync(queryModel, page, pageSize);
+
+                return Ok(new
+                {
+                    code = 20000,
+                    message = "Success",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting paged system logs");
+                return StatusCode(500, new
+                {
+                    code = 50000,
+                    message = "Failed to retrieve system logs",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 根据ID获取系统日志详情
+        /// </summary>
+        /// <param name="id">日志ID</param>
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            try
+            {
+                var log = await _systemLogService.GetAsync(id);
+                
+                if (log == null)
+                {
+                    return NotFound(new
+                    {
+                        code = 40400,
+                        message = "System log not found"
+                    });
+                }
+
+                return Ok(new
+                {
+                    code = 20000,
+                    message = "Success",
+                    data = log
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting system log {Id}", id);
+                return StatusCode(500, new
+                {
+                    code = 50000,
+                    message = "Failed to retrieve system log",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 删除指定日期之前的日志（管理员功能）
+        /// </summary>
+        /// <param name="beforeDate">截止日期</param>
+        [HttpDelete("cleanup")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> Cleanup([FromQuery] DateTime beforeDate)
+        {
+            try
+            {
+                var count = await _systemLogService.DeleteOlderThanAsync(beforeDate);
+
+                return Ok(new
+                {
+                    code = 20000,
+                    message = $"Successfully deleted {count} log entries",
+                    data = new { deletedCount = count }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cleaning up system logs before {BeforeDate}", beforeDate);
+                return StatusCode(500, new
+                {
+                    code = 50000,
+                    message = "Failed to cleanup system logs",
+                    error = ex.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// 手动记录日志（测试用）
+        /// </summary>
+        [HttpPost("test")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> TestLog([FromBody] CreateSystemLogDto dto)
+        {
+            try
+            {
+                var log = await _systemLogService.CreateAsync(dto);
+
+                return Ok(new
+                {
+                    code = 20000,
+                    message = "Log created successfully",
+                    data = log
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating test log");
+                return StatusCode(500, new
+                {
+                    code = 50000,
+                    message = "Failed to create log",
+                    error = ex.Message
+                });
+            }
+        }
+    }
+}

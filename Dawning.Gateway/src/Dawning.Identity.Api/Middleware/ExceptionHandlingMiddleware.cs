@@ -1,4 +1,6 @@
+using Dawning.Identity.Application.Interfaces.Administration;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
@@ -36,7 +38,41 @@ namespace Dawning.Identity.Api.Middleware
                     context.Request.Method,
                     context.User?.Identity?.Name ?? "Anonymous");
 
+                // 记录异常到数据库
+                await LogExceptionToDatabaseAsync(context, ex);
+
                 await HandleExceptionAsync(context, ex);
+            }
+        }
+
+        /// <summary>
+        /// 记录异常到数据库
+        /// </summary>
+        private async Task LogExceptionToDatabaseAsync(HttpContext context, Exception exception)
+        {
+            try
+            {
+                // 从 HttpContext 获取 ISystemLogService
+                var systemLogService = context.RequestServices.GetService<ISystemLogService>();
+                if (systemLogService != null)
+                {
+                    // 确定状态码
+                    int statusCode = exception switch
+                    {
+                        ArgumentNullException => (int)HttpStatusCode.BadRequest,
+                        ArgumentException => (int)HttpStatusCode.BadRequest,
+                        UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
+                        InvalidOperationException => (int)HttpStatusCode.Conflict,
+                        _ => (int)HttpStatusCode.InternalServerError
+                    };
+
+                    await systemLogService.LogErrorAsync(exception, context, statusCode);
+                }
+            }
+            catch (Exception logEx)
+            {
+                // 记录日志失败不应影响异常处理流程
+                _logger.LogError(logEx, "Failed to log exception to database");
             }
         }
 
