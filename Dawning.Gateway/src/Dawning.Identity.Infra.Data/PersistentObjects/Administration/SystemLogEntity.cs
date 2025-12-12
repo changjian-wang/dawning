@@ -13,6 +13,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
         /// 日志ID
         /// </summary>
         [ExplicitKey]
+        [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
