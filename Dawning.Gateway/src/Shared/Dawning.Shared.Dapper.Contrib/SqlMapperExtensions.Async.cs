@@ -349,7 +349,36 @@ namespace Dawning.Shared.Dapper.Contrib
                 var type = typeof(TEntity);
                 var name = GetTableName(type);
 
-                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                // Build WHERE clause: join conditions with AND when multiple conditions exist
+                string whereClause;
+                if (_conditions.Count > 0)
+                {
+                    // Insert AND between conditions (not before/after AND/OR/parentheses keywords)
+                    var conditionsList = new List<string>();
+                    for (int i = 0; i < _conditions.Count; i++)
+                    {
+                        var condition = _conditions[i];
+                        conditionsList.Add(condition);
+                        
+                        // Add AND between conditions if next item is not AND/OR/(/)
+                        if (i < _conditions.Count - 1)
+                        {
+                            var nextCondition = _conditions[i + 1];
+                            if (nextCondition != "AND" && nextCondition != "OR" && 
+                                nextCondition != "(" && nextCondition != ")" &&
+                                condition != "AND" && condition != "OR" && condition != "(")
+                            {
+                                conditionsList.Add("AND");
+                            }
+                        }
+                    }
+                    whereClause = string.Join(" ", conditionsList);
+                }
+                else
+                {
+                    whereClause = "1=1";
+                }
+
                 var parameters = ConvertToDynamicParameters();
 
                 if (string.IsNullOrEmpty(_orderBy))
@@ -419,7 +448,36 @@ namespace Dawning.Shared.Dapper.Contrib
                         "A cursor column must be specified for cursor-based pagination. Use OrderBy() or OrderByDescending().");
                 }
 
-                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                // Build WHERE clause: join conditions with AND when multiple conditions exist
+                string whereClause;
+                if (_conditions.Count > 0)
+                {
+                    // Insert AND between conditions (not before/after AND/OR/parentheses keywords)
+                    var conditionsList = new List<string>();
+                    for (int i = 0; i < _conditions.Count; i++)
+                    {
+                        var condition = _conditions[i];
+                        conditionsList.Add(condition);
+                        
+                        // Add AND between conditions if next item is not AND/OR/(/)
+                        if (i < _conditions.Count - 1)
+                        {
+                            var nextCondition = _conditions[i + 1];
+                            if (nextCondition != "AND" && nextCondition != "OR" && 
+                                nextCondition != "(" && nextCondition != ")" &&
+                                condition != "AND" && condition != "OR" && condition != "(")
+                            {
+                                conditionsList.Add("AND");
+                            }
+                        }
+                    }
+                    whereClause = string.Join(" ", conditionsList);
+                }
+                else
+                {
+                    whereClause = "1=1";
+                }
+                
                 var parameters = ConvertToDynamicParameters();
 
                 // Fetch itemsPerPage + 1 to detect if there's a next page

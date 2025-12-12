@@ -63,13 +63,48 @@ namespace Dawning.Identity.Api.Controllers.Administration
             [FromQuery] string? entityType,
             [FromQuery] Guid? entityId,
             [FromQuery] string? ipAddress,
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate,
+            [FromQuery] string? startDate,
+            [FromQuery] string? endDate,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
             try
             {
+                // Parse date strings to DateTime
+                DateTime? parsedStartDate = null;
+                DateTime? parsedEndDate = null;
+
+                if (!string.IsNullOrEmpty(startDate))
+                {
+                    if (DateTime.TryParse(startDate, out var start))
+                    {
+                        parsedStartDate = start;
+                    }
+                    else
+                    {
+                        return BadRequest(new { code = 400, message = $"Invalid startDate format: {startDate}" });
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(endDate))
+                {
+                    if (DateTime.TryParse(endDate, out var end))
+                    {
+                        parsedEndDate = end;
+                    }
+                    else
+                    {
+                        return BadRequest(new { code = 400, message = $"Invalid endDate format: {endDate}" });
+                    }
+                }
+
+                _logger.LogInformation(
+                    "GetList called with parameters: userId={UserId}, username={Username}, action={Action}, " +
+                    "entityType={EntityType}, entityId={EntityId}, ipAddress={IpAddress}, " +
+                    "startDate={StartDate}, endDate={EndDate}, page={Page}, pageSize={PageSize}",
+                    userId, username, action, entityType, entityId, ipAddress, 
+                    parsedStartDate, parsedEndDate, page, pageSize);
+
                 var model = new AuditLogModel
                 {
                     UserId = userId,
@@ -78,8 +113,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     EntityType = entityType,
                     EntityId = entityId,
                     IpAddress = ipAddress,
-                    StartDate = startDate,
-                    EndDate = endDate
+                    StartDate = parsedStartDate,
+                    EndDate = parsedEndDate
                 };
 
                 var result = await _auditLogService.GetPagedListAsync(model, page, pageSize);
@@ -104,8 +139,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving audit log list");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                _logger.LogError(ex, "Error retrieving audit log list: {Message}", ex.Message);
+                return StatusCode(500, new { code = 500, message = $"Internal server error: {ex.Message}" });
             }
         }
 
