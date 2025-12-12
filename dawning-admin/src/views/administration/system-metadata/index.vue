@@ -159,9 +159,8 @@
     <a-modal
       v-model:visible="viewVisible"
       title="系统元数据详情"
-      :footer="false"
       width="560px"
-      :body-style="{ padding: '20px 24px' }"
+      :footer="false"
     >
       <div class="detail-content">
         <div class="detail-row">
@@ -433,6 +432,7 @@
         display: flex;
         padding: 14px 0;
         border-bottom: 1px solid var(--color-border-1);
+        align-items: flex-start;
 
         &:last-child {
           border-bottom: none;
@@ -440,16 +440,18 @@
 
         .label {
           width: 90px;
-          color: var(--color-text-3);
-          font-size: 14px;
           flex-shrink: 0;
+          font-size: 14px;
+          color: var(--color-text-3);
+          line-height: 1.5;
         }
 
         .value {
           flex: 1;
-          color: var(--color-text-1);
           font-size: 14px;
-          word-break: break-all;
+          color: var(--color-text-1);
+          line-height: 1.5;
+          word-break: break-word;
         }
       }
     }
