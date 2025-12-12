@@ -397,7 +397,6 @@
         pagination.total = response.data.totalCount;
       }
     } catch (error) {
-      console.error('Failed to fetch system logs:', error);
       Message.error(t('common.loadFailed'));
     } finally {
       loading.value = false;
@@ -428,8 +427,9 @@
   // 日期范围变化
   const handleDateRangeChange = (value: [string, string] | undefined) => {
     if (value && value.length === 2) {
-      queryParams.startDate = value[0];
-      queryParams.endDate = value[1];
+      const [startDate, endDate] = value;
+      queryParams.startDate = startDate;
+      queryParams.endDate = endDate;
     } else {
       queryParams.startDate = '';
       queryParams.endDate = '';
@@ -478,7 +478,6 @@
         fetchData();
       }
     } catch (error) {
-      console.error('Failed to cleanup logs:', error);
       Message.error(t('common.operationFailed'));
     }
   };
