@@ -1,8 +1,6 @@
 import axios from 'axios';
 import type { PagedResult } from '@/types/global';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 export interface SystemLog {
   id: string;
   level: string;
@@ -52,26 +50,23 @@ export interface CreateSystemLogDto {
  * 分页获取系统日志列表
  */
 export function getSystemLogList(params: SystemLogQueryParams) {
-  return axios.get<PagedResult<SystemLog>>(
-    `${API_BASE_URL}/api/systemlog/paged`,
-    {
-      params,
-    }
-  );
+  return axios.get<PagedResult<SystemLog>>('/api/systemlog/paged', {
+    params,
+  });
 }
 
 /**
  * 根据ID获取系统日志详情
  */
 export function getSystemLog(id: string) {
-  return axios.get<SystemLog>(`${API_BASE_URL}/api/systemlog/${id}`);
+  return axios.get<SystemLog>(`/api/systemlog/${id}`);
 }
 
 /**
  * 删除指定日期之前的日志
  */
 export function cleanupSystemLogs(beforeDate: string) {
-  return axios.delete(`${API_BASE_URL}/api/systemlog/cleanup`, {
+  return axios.delete('/api/systemlog/cleanup', {
     params: { beforeDate },
   });
 }
@@ -80,5 +75,5 @@ export function cleanupSystemLogs(beforeDate: string) {
  * 创建测试日志
  */
 export function createTestLog(data: CreateSystemLogDto) {
-  return axios.post(`${API_BASE_URL}/api/systemlog/test`, data);
+  return axios.post('/api/systemlog/test', data);
 }
