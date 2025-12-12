@@ -178,6 +178,47 @@
         </a-form>
       </a-modal>
     </div>
+
+    <!-- 查看详情弹窗 -->
+    <a-modal
+      v-model:visible="viewVisible"
+      title="声明类型详情"
+      :footer="false"
+      width="560px"
+    >
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">名称</span>
+          <span class="value">{{ currentRecord?.name || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">显示名称</span>
+          <span class="value">{{ currentRecord?.displayName || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">类型</span>
+          <span class="value">{{ currentRecord?.type || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">是否必需</span>
+          <span class="value">
+            <a-tag v-if="currentRecord?.required" color="green" size="small">必需</a-tag>
+            <a-tag v-else color="gray" size="small">可选</a-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">可编辑性</span>
+          <span class="value">
+            <a-tag v-if="!currentRecord?.nonEditable" color="arcoblue" size="small">可编辑</a-tag>
+            <a-tag v-else color="orange" size="small">锁定</a-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">描述</span>
+          <span class="value">{{ currentRecord?.description || '-' }}</span>
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -188,9 +229,11 @@
     IClaimTypeModel,
     claimType,
   } from '@/api/administration/claim-type';
-  import { FieldRule, Modal, PaginationProps } from '@arco-design/web-vue';
+  import { FieldRule, PaginationProps } from '@arco-design/web-vue';
 
   const visible = ref(false);
+  const viewVisible = ref(false);
+  const currentRecord = ref<IClaimType | null>(null);
   const formRef = ref<any>(null);
   const columns = reactive([
     {
@@ -316,10 +359,8 @@
   };
 
   const handleView = (record: IClaimType) => {
-    Modal.info({
-      title: '查看声明类型',
-      content: `名称: ${record.name}\n显示名称: ${record.displayName}\n类型: ${record.type}\n描述: ${record.description}`,
-    });
+    currentRecord.value = record;
+    viewVisible.value = true;
   };
 
   const handleEdit = (record: IClaimType) => {
@@ -410,6 +451,32 @@
 
     :deep(.arco-table-tr:hover) {
       background-color: #f7f8fa;
+    }
+
+    .detail-content {
+      .detail-row {
+        display: flex;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--color-border-1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          width: 90px;
+          color: var(--color-text-3);
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .value {
+          flex: 1;
+          color: var(--color-text-1);
+          font-size: 14px;
+          word-break: break-all;
+        }
+      }
     }
   }
 </style>

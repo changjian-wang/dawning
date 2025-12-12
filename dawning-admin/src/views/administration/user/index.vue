@@ -207,9 +207,67 @@
       v-model:visible="viewModalVisible"
       title="用户详情"
       :footer="false"
-      width="800px"
+      width="650px"
     >
-      <a-descriptions :data="viewData" :column="2" bordered />
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">用户名</span>
+          <span class="value">{{ currentUser?.username || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">显示名称</span>
+          <span class="value">{{ currentUser?.displayName || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">邮箱</span>
+          <span class="value">{{ currentUser?.email || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">手机号</span>
+          <span class="value">{{ currentUser?.phoneNumber || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">角色</span>
+          <span class="value">{{ currentUser?.role }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">账户状态</span>
+          <span class="value">
+            <a-tag v-if="currentUser?.isActive" color="green" size="small">启用</a-tag>
+            <a-tag v-else color="red" size="small">禁用</a-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">邮箱已验证</span>
+          <span class="value">
+            <a-tag v-if="currentUser?.emailConfirmed" color="arcoblue" size="small">是</a-tag>
+            <a-tag v-else color="gray" size="small">否</a-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">手机已验证</span>
+          <span class="value">
+            <a-tag v-if="currentUser?.phoneNumberConfirmed" color="arcoblue" size="small">是</a-tag>
+            <a-tag v-else color="gray" size="small">否</a-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">最后登录</span>
+          <span class="value">{{ currentUser?.lastLoginAt || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">创建时间</span>
+          <span class="value">{{ currentUser?.createdAt || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">更新时间</span>
+          <span class="value">{{ currentUser?.updatedAt || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">备注</span>
+          <span class="value">{{ currentUser?.remark || '-' }}</span>
+        </div>
+      </div>
     </a-modal>
 
     <!-- 重置密码弹窗 -->
@@ -249,6 +307,7 @@
   const modalTitle = ref('新增用户');
   const formRef = ref<any>(null);
   const currentUserId = ref<string>('');
+  const currentUser = ref<IUser | null>(null);
 
   const columns = reactive([
     {
@@ -405,20 +464,7 @@
   };
 
   const handleView = (record: IUser) => {
-    viewData.value = [
-      { label: '用户名', value: record.username },
-      { label: '显示名称', value: record.displayName || '-' },
-      { label: '邮箱', value: record.email || '-' },
-      { label: '手机号', value: record.phoneNumber || '-' },
-      { label: '角色', value: record.role },
-      { label: '账户状态', value: record.isActive ? '启用' : '禁用' },
-      { label: '邮箱已验证', value: record.emailConfirmed ? '是' : '否' },
-      { label: '手机已验证', value: record.phoneNumberConfirmed ? '是' : '否' },
-      { label: '最后登录', value: record.lastLoginAt || '-' },
-      { label: '创建时间', value: record.createdAt || '-' },
-      { label: '更新时间', value: record.updatedAt || '-' },
-      { label: '备注', value: record.remark || '-' },
-    ];
+    currentUser.value = record;
     viewModalVisible.value = true;
   };
 
@@ -608,6 +654,32 @@
       &:hover {
         background-color: #f7f8fa;
         transform: scale(1.002);
+      }
+    }
+
+    .detail-content {
+      .detail-row {
+        display: flex;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--color-border-1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          width: 110px;
+          color: var(--color-text-3);
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .value {
+          flex: 1;
+          color: var(--color-text-1);
+          font-size: 14px;
+          word-break: break-all;
+        }
       }
     }
   }

@@ -154,12 +154,46 @@
         </a-form>
       </a-modal>
     </div>
+
+    <!-- 查看详情弹窗 -->
+    <a-modal
+      v-model:visible="viewVisible"
+      title="系统元数据详情"
+      :footer="false"
+      width="560px"
+    >
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">名称</span>
+          <span class="value">{{ currentRecord?.name || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">键名</span>
+          <span class="value">{{ currentRecord?.key || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">值</span>
+          <span class="value">{{ currentRecord?.value || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">可编辑性</span>
+          <span class="value">
+            <a-tag v-if="!currentRecord?.nonEditable" color="arcoblue" size="small">可编辑</a-tag>
+            <a-tag v-else color="orange" size="small">锁定</a-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">描述</span>
+          <span class="value">{{ currentRecord?.description || '-' }}</span>
+        </div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { reactive, ref, onMounted, onUnmounted } from 'vue';
-  import { Modal, PaginationProps } from '@arco-design/web-vue';
+  import { PaginationProps } from '@arco-design/web-vue';
   import { FieldRule } from '@arco-design/web-vue';
   import {
     ISystemMetadata,
@@ -168,6 +202,8 @@
   } from '@/api/administration/system-metadata';
 
   const visible = ref(false);
+  const viewVisible = ref(false);
+  const currentRecord = ref<ISystemMetadata | null>(null);
   const formRef = ref<any>(null);
   const columns = reactive([
     {
@@ -297,10 +333,8 @@
   };
 
   const handleView = (record: ISystemMetadata) => {
-    Modal.info({
-      title: '查看系统元数据',
-      content: `名称: ${record.name}\n键: ${record.key}\n值: ${record.value}\n描述: ${record.description}`,
-    });
+    currentRecord.value = record;
+    viewVisible.value = true;
   };
 
   const handleEdit = (record: ISystemMetadata) => {
@@ -391,6 +425,32 @@
 
     :deep(.arco-table-tr:hover) {
       background-color: #f7f8fa;
+    }
+
+    .detail-content {
+      .detail-row {
+        display: flex;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--color-border-1);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          width: 90px;
+          color: var(--color-text-3);
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .value {
+          flex: 1;
+          color: var(--color-text-1);
+          font-size: 14px;
+          word-break: break-all;
+        }
+      }
     }
   }
 </style>
