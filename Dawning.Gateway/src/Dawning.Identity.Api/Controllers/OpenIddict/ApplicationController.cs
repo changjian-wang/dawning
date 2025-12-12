@@ -95,16 +95,16 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] ApplicationModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int size = 10)
+            [FromQuery] int pageSize = 10)
         {
             try
             {
-                if (page < 1 || size < 1)
+                if (page < 1 || pageSize < 1)
                 {
-                    return Ok(ApiResponse.Error(40001, "Invalid page or size parameters"));
+                    return Ok(ApiResponse.Error(40001, "Invalid page or pageSize parameters"));
                 }
 
-                var result = await _service.GetPagedListAsync(model, page, size);
+                var result = await _service.GetPagedListAsync(model, page, pageSize);
                 return Ok(ApiResponse<object>.Success(result));
             }
             catch (Exception ex)
