@@ -34,10 +34,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
             var permission = await _permissionService.GetAsync(id);
             if (permission == null)
             {
-                return NotFound(new { message = $"权限 ID '{id}' 不存在" });
+                return NotFound(ApiResponse.Error(40400, $"权限 ID '{id}' 不存在"));
             }
 
-            return Ok(new { data = permission });
+            return Ok(ApiResponse<object>.Success(permission));
         }
 
         /// <summary>
@@ -49,10 +49,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
             var permission = await _permissionService.GetByCodeAsync(code);
             if (permission == null)
             {
-                return NotFound(new { message = $"权限代码 '{code}' 不存在" });
+                return NotFound(ApiResponse.Error(40400, $"权限代码 '{code}' 不存在"));
             }
 
-            return Ok(new { data = permission });
+            return Ok(ApiResponse<object>.Success(permission));
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> GetAllAsync()
         {
             var permissions = await _permissionService.GetAllAsync();
-            return Ok(new { data = permissions });
+            return Ok(ApiResponse<object>.Success(permissions));
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> GetGroupedPermissionsAsync()
         {
             var groups = await _permissionService.GetGroupedPermissionsAsync();
-            return Ok(new { data = groups });
+            return Ok(ApiResponse<object>.Success(groups));
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> GetByRoleIdAsync(Guid roleId)
         {
             var permissions = await _permissionService.GetByRoleIdAsync(roleId);
-            return Ok(new { data = permissions });
+            return Ok(ApiResponse<object>.Success(permissions));
         }
 
         /// <summary>
@@ -124,11 +124,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var operatorId = GetOperatorId();
                 var permission = await _permissionService.CreateAsync(dto, operatorId);
-                return Ok(new { data = permission, message = "权限创建成功" });
+                return Ok(ApiResponse<object>.Success(permission, "权限创建成功"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
         }
 
@@ -140,18 +140,18 @@ namespace Dawning.Identity.Api.Controllers.Administration
         {
             if (id != dto.Id)
             {
-                return BadRequest(new { message = "ID 不匹配" });
+                return BadRequest(ApiResponse.Error(40000, "ID 不匹配"));
             }
 
             try
             {
                 var operatorId = GetOperatorId();
                 var permission = await _permissionService.UpdateAsync(dto, operatorId);
-                return Ok(new { data = permission, message = "权限更新成功" });
+                return Ok(ApiResponse<object>.Success(permission, "权限更新成功"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
         }
 
@@ -164,11 +164,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 await _permissionService.DeleteAsync(id);
-                return Ok(new { message = "权限删除成功" });
+                return Ok(ApiResponse.Success("权限删除成功"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
         }
 
@@ -184,11 +184,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var operatorId = GetOperatorId();
                 await _permissionService.AssignPermissionsToRoleAsync(roleId, permissionIds, operatorId);
-                return Ok(new { message = "权限分配成功" });
+                return Ok(ApiResponse.Success("权限分配成功"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
         }
 
@@ -203,11 +203,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 await _permissionService.RemovePermissionsFromRoleAsync(roleId, permissionIds);
-                return Ok(new { message = "权限移除成功" });
+                return Ok(ApiResponse.Success("权限移除成功"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
         }
 
@@ -218,7 +218,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> HasPermissionAsync(Guid roleId, string permissionCode)
         {
             var hasPermission = await _permissionService.HasPermissionAsync(roleId, permissionCode);
-            return Ok(new { data = hasPermission });
+            return Ok(ApiResponse<object>.Success(hasPermission));
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> GetUserPermissionCodesAsync(Guid userId)
         {
             var permissionCodes = await _permissionService.GetUserPermissionCodesAsync(userId);
-            return Ok(new { data = permissionCodes });
+            return Ok(ApiResponse<object>.Success(permissionCodes));
         }
 
         /// <summary>

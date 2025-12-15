@@ -436,7 +436,7 @@
   const permissionLoading = ref(false);
   const currentRole = ref<RoleModel | null>(null);
   const allPermissions = ref<
-    Array<{ value: string; label: string; code: string }>
+    Array<{ key: string; value: string; label: string; code: string }>
   >([]);
   const selectedPermissionIds = ref<string[]>([]);
   const permissionSearchText = ref('');
@@ -615,6 +615,7 @@
       // 加载所有权限
       const permissions = await getAllActivePermissions();
       allPermissions.value = permissions.map((p) => ({
+        key: p.id,
         value: p.id,
         label: p.name,
         code: p.code,

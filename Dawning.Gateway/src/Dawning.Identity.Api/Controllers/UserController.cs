@@ -1,5 +1,6 @@
 using Dapper;
 using Dawning.Identity.Api.Helpers;
+using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Authentication;
@@ -62,7 +63,7 @@ namespace Dawning.Identity.Api.Controllers
                 if (string.IsNullOrEmpty(userId))
                 {
                     _logger.LogWarning("User ID not found in token claims");
-                    return Unauthorized(new { message = "Invalid token: user ID not found" });
+                    return Unauthorized(ApiResponse.Error(40100, "Invalid token: user ID not found"));
                 }
 
                 // 获取用户信息
@@ -70,7 +71,7 @@ namespace Dawning.Identity.Api.Controllers
                 if (user == null)
                 {
                     _logger.LogWarning("User not found: {UserId}", userId);
-                    return NotFound(new { message = "User not found" });
+                    return NotFound(ApiResponse.Error(40400, "User not found"));
                 }
 
                 // 转换为响应 DTO
@@ -87,12 +88,12 @@ namespace Dawning.Identity.Api.Controllers
                 };
 
                 _logger.LogInformation("User info retrieved successfully for user: {UserId}", userId);
-                return Ok(userInfo);
+                return Ok(ApiResponse<object>.Success(userInfo));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user info");
-                return StatusCode(500, new { message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -126,26 +127,16 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("User list retrieved: page {Page}, total {Total}", page, result.TotalCount);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Success",
-                    data = new
-                    {
-                        list = result.Items,
-                        pagination = new
-                        {
-                            current = result.PageIndex,
-                            pageSize = result.PageSize,
-                            total = result.TotalCount
-                        }
-                    }
-                });
+                return Ok(ApiResponse<object>.SuccessPaged(
+                    result.Items,
+                    result.PageIndex,
+                    result.PageSize,
+                    result.TotalCount));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user list");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -179,23 +170,18 @@ namespace Dawning.Identity.Api.Controllers
                 _logger.LogInformation("User list by cursor retrieved: pageSize {PageSize}, hasNextPage {HasNextPage}, cursor {Cursor}", 
                     pageSize, result.HasNextPage, cursor);
 
-                return Ok(new
+                return Ok(ApiResponse<object>.Success(new
                 {
-                    code = 20000,
-                    message = "Success",
-                    data = new
-                    {
-                        items = result.Items,
-                        pageSize = result.PageSize,
-                        hasNextPage = result.HasNextPage,
-                        nextCursor = result.NextCursor
-                    }
-                });
+                    items = result.Items,
+                    pageSize = result.PageSize,
+                    hasNextPage = result.HasNextPage,
+                    nextCursor = result.NextCursor
+                }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user list by cursor");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -212,15 +198,15 @@ namespace Dawning.Identity.Api.Controllers
                 var user = await _userService.GetByIdAsync(id);
                 if (user == null)
                 {
-                    return NotFound(new { code = 404, message = "User not found" });
+                    return NotFound(ApiResponse.Error(40400, "User not found"));
                 }
 
-                return Ok(new { code = 20000, message = "Success", data = user });
+                return Ok(ApiResponse<object>.Success(user));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user by ID: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -254,17 +240,17 @@ namespace Dawning.Identity.Api.Controllers
                 return CreatedAtAction(
                     nameof(GetUserById),
                     new { id = user.Id },
-                    new { code = 20000, message = "User created successfully", data = user });
+                    ApiResponse<object>.Success(user, "User created successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to create user: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating user");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -301,17 +287,17 @@ namespace Dawning.Identity.Api.Controllers
                     oldValues: oldValues,
                     newValues: new { user.Username, user.Email, user.Role, user.IsActive });
 
-                return Ok(new { code = 20000, message = "User updated successfully", data = user });
+                return Ok(ApiResponse<object>.Success(user, "User updated successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to update user: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating user: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -345,17 +331,17 @@ namespace Dawning.Identity.Api.Controllers
                     description: $"Deleted user: {userInfo?.Username}",
                     oldValues: userInfo);
 
-                return Ok(new { code = 20000, message = "User deleted successfully" });
+                return Ok(ApiResponse.Success("User deleted successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to delete user: {Message}", ex.Message);
-                return NotFound(new { code = 404, message = ex.Message });
+                return NotFound(ApiResponse.Error(40400, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting user: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -380,17 +366,17 @@ namespace Dawning.Identity.Api.Controllers
                     entityId: dto.UserId,
                     description: "User changed their password");
 
-                return Ok(new { code = 20000, message = "Password changed successfully" });
+                return Ok(ApiResponse.Success("Password changed successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to change password: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error changing password");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -420,17 +406,17 @@ namespace Dawning.Identity.Api.Controllers
                     entityId: id,
                     description: $"Admin reset password for user: {user?.Username}");
 
-                return Ok(new { code = 20000, message = "Password reset successfully" });
+                return Ok(ApiResponse.Success("Password reset successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to reset password: {Message}", ex.Message);
-                return NotFound(new { code = 404, message = ex.Message });
+                return NotFound(ApiResponse.Error(40400, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error resetting password for user: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -444,12 +430,12 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 var exists = await _userService.UsernameExistsAsync(username, excludeUserId);
-                return Ok(new { code = 20000, data = new { exists } });
+                return Ok(ApiResponse<object>.Success(new { exists }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking username");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -463,12 +449,12 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 var exists = await _userService.EmailExistsAsync(email, excludeUserId);
-                return Ok(new { code = 20000, data = new { exists } });
+                return Ok(ApiResponse<object>.Success(new { exists }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking email");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -488,7 +474,7 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
 #if !DEBUG
-                return BadRequest(new { code = 400, message = "This endpoint is only available in development mode" });
+                return BadRequest(ApiResponse.Error(40000, "This endpoint is only available in development mode"));
 #endif
                 _logger.LogWarning("DEV MODE: Force resetting all users and creating new admin");
 
@@ -516,22 +502,12 @@ namespace Dawning.Identity.Api.Controllers
                 
                 _logger.LogInformation("Admin account reset successfully: {Username}", admin.Username);
 
-                return Ok(new 
-                { 
-                    code = 20000, 
-                    data = admin,
-                    message = "Admin account reset successfully. Username: admin, Password: admin"
-                });
+                return Ok(ApiResponse<object>.Success(admin, "Admin account reset successfully. Username: admin, Password: admin"));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error resetting admin account");
-                return StatusCode(500, new 
-                { 
-                    code = 500, 
-                    message = "Failed to reset admin account",
-                    error = ex.Message 
-                });
+                return StatusCode(500, ApiResponse.Error(50000, $"Failed to reset admin account: {ex.Message}"));
             }
         }
 
@@ -561,12 +537,7 @@ namespace Dawning.Identity.Api.Controllers
                 if (existingUsers.TotalCount > 0)
                 {
                     _logger.LogWarning("Admin initialization failed: System already has users");
-                    return Conflict(new 
-                    { 
-                        code = 409, 
-                        message = "System already initialized. Admin account cannot be created again.",
-                        error = "ALREADY_INITIALIZED"
-                    });
+                    return Conflict(ApiResponse.Error(40900, "System already initialized. Admin account cannot be created again."));
                 }
 
                 // 创建初始管理员账号
@@ -584,22 +555,12 @@ namespace Dawning.Identity.Api.Controllers
                 
                 _logger.LogInformation("Admin account initialized successfully: {Username}", admin.Username);
 
-                return Ok(new 
-                { 
-                    code = 20000, 
-                    data = admin,
-                    message = "Admin account initialized successfully. Please change the default password immediately."
-                });
+                return Ok(ApiResponse<object>.Success(admin, "Admin account initialized successfully. Please change the default password immediately."));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error initializing admin account");
-                return StatusCode(500, new 
-                { 
-                    code = 500, 
-                    message = "Failed to initialize admin account",
-                    error = ex.Message 
-                });
+                return StatusCode(500, ApiResponse.Error(50000, $"Failed to initialize admin account: {ex.Message}"));
             }
         }
 
@@ -614,12 +575,12 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 var roles = await _userService.GetUserRolesAsync(id);
-                return Ok(new { code = 20000, message = "Success", data = roles });
+                return Ok(ApiResponse<object>.Success(roles));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving roles for user: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -636,15 +597,15 @@ namespace Dawning.Identity.Api.Controllers
                 var user = await _userService.GetUserWithRolesAsync(id);
                 if (user == null)
                 {
-                    return NotFound(new { code = 404, message = "User not found" });
+                    return NotFound(ApiResponse.Error(40400, "User not found"));
                 }
 
-                return Ok(new { code = 20000, message = "Success", data = user });
+                return Ok(ApiResponse<object>.Success(user));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving user with roles: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -664,17 +625,17 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("Roles assigned to user: {UserId}", id);
 
-                return Ok(new { code = 20000, message = "Roles assigned successfully" });
+                return Ok(ApiResponse.Success("Roles assigned successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to assign roles: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error assigning roles to user: {UserId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -692,12 +653,12 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("Role removed from user: {UserId}, Role: {RoleId}", userId, roleId);
 
-                return Ok(new { code = 20000, message = "Role removed successfully" });
+                return Ok(ApiResponse.Success("Role removed successfully"));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error removing role from user: {UserId}, Role: {RoleId}", userId, roleId);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 

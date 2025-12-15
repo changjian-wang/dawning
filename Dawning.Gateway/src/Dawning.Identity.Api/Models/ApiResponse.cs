@@ -1,4 +1,6 @@
-﻿namespace Dawning.Identity.Api.Models
+﻿using System.Collections.Generic;
+
+namespace Dawning.Identity.Api.Models
 {
     /// <summary>
     /// 统一API响应格式
@@ -31,6 +33,28 @@
                 Code = 20000,
                 Message = message,
                 Data = data
+            };
+        }
+
+        /// <summary>
+        /// 成功响应（带分页）- 返回包含分页信息的数据结构
+        /// </summary>
+        public static ApiResponse<object> SuccessPaged<TItem>(IEnumerable<TItem> items, int current, int pageSize, long total, string message = "Success")
+        {
+            return new ApiResponse<object>
+            {
+                Code = 20000,
+                Message = message,
+                Data = new
+                {
+                    list = items,
+                    pagination = new
+                    {
+                        current,
+                        pageSize,
+                        total
+                    }
+                }
             };
         }
 

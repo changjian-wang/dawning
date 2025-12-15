@@ -2,6 +2,7 @@ using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
 using Dawning.Identity.Api.Helpers;
+using Dawning.Identity.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,15 +44,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var role = await _roleService.GetAsync(id);
                 if (role == null)
                 {
-                    return NotFound(new { code = 404, message = "Role not found" });
+                    return NotFound(ApiResponse.Error(40400, "Role not found"));
                 }
 
-                return Ok(new { code = 20000, message = "Success", data = role });
+                return Ok(ApiResponse<object>.Success(role));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving role by ID: {RoleId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -68,15 +69,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var role = await _roleService.GetByNameAsync(name);
                 if (role == null)
                 {
-                    return NotFound(new { code = 404, message = "Role not found" });
+                    return NotFound(ApiResponse.Error(40400, "Role not found"));
                 }
 
-                return Ok(new { code = 20000, message = "Success", data = role });
+                return Ok(ApiResponse<object>.Success(role));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving role by name: {RoleName}", name);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -105,26 +106,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 var result = await _roleService.GetPagedListAsync(model, page, pageSize);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Success",
-                    data = new
-                    {
-                        list = result.Items,
-                        pagination = new
-                        {
-                            total = result.TotalCount,
-                            current = result.PageIndex,
-                            pageSize = result.PageSize
-                        }
-                    }
-                });
+                return Ok(ApiResponse<object>.SuccessPaged(
+                    result.Items,
+                    result.PageIndex,
+                    result.PageSize,
+                    result.TotalCount));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving role list");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -138,12 +129,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var roles = await _roleService.GetAllAsync();
-                return Ok(new { code = 20000, message = "Success", data = roles });
+                return Ok(ApiResponse<object>.Success(roles));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving all roles");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -174,17 +165,17 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 return CreatedAtAction(
                     nameof(GetById),
                     new { id = role.Id },
-                    new { code = 20000, message = "Role created successfully", data = role });
+                    ApiResponse<object>.Success(role, "Role created successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to create role: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating role");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -217,17 +208,17 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     oldValues: oldRole != null ? new { oldRole.Name, oldRole.Description, Permissions = oldRole.Permissions } : null,
                     newValues: new { role.Name, role.Description, Permissions = role.Permissions });
 
-                return Ok(new { code = 20000, message = "Role updated successfully", data = role });
+                return Ok(ApiResponse<object>.Success(role, "Role updated successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to update role: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating role: {RoleId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -258,17 +249,17 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     description: $"Deleted role: {role?.Name}",
                     oldValues: role != null ? new { role.Name, role.Description, Permissions = role.Permissions } : null);
 
-                return Ok(new { code = 20000, message = "Role deleted successfully" });
+                return Ok(ApiResponse.Success("Role deleted successfully"));
             }
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Failed to delete role: {Message}", ex.Message);
-                return BadRequest(new { code = 400, message = ex.Message });
+                return BadRequest(ApiResponse.Error(40000, ex.Message));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting role: {RoleId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -282,12 +273,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var exists = await _roleService.NameExistsAsync(name, excludeRoleId);
-                return Ok(new { code = 20000, data = new { exists } });
+                return Ok(ApiResponse<object>.Success(new { exists }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking role name");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 

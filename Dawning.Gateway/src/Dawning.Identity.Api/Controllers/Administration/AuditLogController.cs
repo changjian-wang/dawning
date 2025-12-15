@@ -1,6 +1,7 @@
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
+using Dawning.Identity.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,15 +40,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var auditLog = await _auditLogService.GetAsync(id);
                 if (auditLog == null)
                 {
-                    return NotFound(new { code = 404, message = "Audit log not found" });
+                    return NotFound(ApiResponse.Error(40400, "Audit log not found"));
                 }
 
-                return Ok(new { code = 20000, message = "Success", data = auditLog });
+                return Ok(ApiResponse<object>.Success(auditLog));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving audit log by ID: {AuditLogId}", id);
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -82,7 +83,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     }
                     else
                     {
-                        return BadRequest(new { code = 400, message = $"Invalid startDate format: {startDate}" });
+                        return BadRequest(ApiResponse.Error(40000, $"Invalid startDate format: {startDate}"));
                     }
                 }
 
@@ -94,7 +95,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     }
                     else
                     {
-                        return BadRequest(new { code = 400, message = $"Invalid endDate format: {endDate}" });
+                        return BadRequest(ApiResponse.Error(40000, $"Invalid endDate format: {endDate}"));
                     }
                 }
 
@@ -121,26 +122,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 _logger.LogInformation("Audit log list retrieved: page {Page}, total {Total}", page, result.TotalCount);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Success",
-                    data = new
-                    {
-                        list = result.Items,
-                        pagination = new
-                        {
-                            current = result.PageIndex,
-                            pageSize = result.PageSize,
-                            total = result.TotalCount
-                        }
-                    }
-                });
+                return Ok(ApiResponse<object>.SuccessPaged(
+                    result.Items,
+                    result.PageIndex,
+                    result.PageSize,
+                    result.TotalCount));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving audit log list: {Message}", ex.Message);
-                return StatusCode(500, new { code = 500, message = $"Internal server error: {ex.Message}" });
+                return StatusCode(500, ApiResponse.Error(50000, $"Internal server error: {ex.Message}"));
             }
         }
 
@@ -156,12 +147,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var auditLog = await _auditLogService.CreateAsync(dto);
                 return CreatedAtAction(nameof(GetById), new { id = auditLog.Id }, 
-                    new { code = 20000, message = "Success", data = auditLog });
+                    ApiResponse<object>.Success(auditLog));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating audit log");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
 
@@ -178,17 +169,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var cutoffDate = DateTime.UtcNow.AddDays(-daysToKeep);
                 var deletedCount = await _auditLogService.DeleteOlderThanAsync(cutoffDate);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Success",
-                    data = new { deletedCount, cutoffDate, daysToKeep }
-                });
+                return Ok(ApiResponse<object>.Success(new { deletedCount, cutoffDate, daysToKeep }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error cleaning up old audit logs");
-                return StatusCode(500, new { code = 500, message = "Internal server error" });
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
             }
         }
     }
