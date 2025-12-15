@@ -332,7 +332,7 @@
     <a-modal
       v-model:visible="roleModalVisible"
       :title="`分配角色 - ${currentUser?.username}`"
-      width="700px"
+      width="900px"
       :mask-closable="false"
       @cancel="handleRoleCancel"
       @before-ok="handleRoleBeforeOk"
@@ -901,7 +901,8 @@
 
   .transfer-panel {
     padding: 8px;
-    max-height: 400px;
+    min-height: 350px;
+    max-height: 450px;
     overflow-y: auto;
 
     .transfer-item {
