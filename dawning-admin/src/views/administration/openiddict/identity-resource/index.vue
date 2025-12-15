@@ -1,108 +1,304 @@
 <template>
-  <div class="identity-resource">
-    <div class="container">
-      <Breadcrumb :items="['menu.form', 'menu.administration.ids.client']" />
-      <a-card class="general-card">
-        <template #title>
-          {{ $t('page.title.search.box') }}
-        </template>
-        <a-row :gutter="12">
-          <a-col :span="6">
-            <a-form-item label="名称">
-              <a-input placeholder="请输入..."></a-input>
+  <div class="container">
+    <Breadcrumb :items="['认证授权', '身份资源管理']" />
+    <a-card class="general-card" title="身份资源管理">
+      <!-- 搜索区 -->
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="24">
+          <a-form :model="searchForm" layout="inline">
+            <a-form-item field="name" label="名称">
+              <a-input
+                v-model="searchForm.name"
+                placeholder="请输入资源名称"
+                allow-clear
+                style="width: 180px"
+              />
             </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="类型">
-              <a-select placeholder="请选择...">
-                <a-option>String</a-option>
-                <a-option>Int</a-option>
-                <a-option>DateTime</a-option>
-                <a-option>Boolean</a-option>
-                <a-option>Enum</a-option>
+            <a-form-item field="displayName" label="显示名">
+              <a-input
+                v-model="searchForm.displayName"
+                placeholder="请输入显示名"
+                allow-clear
+                style="width: 180px"
+              />
+            </a-form-item>
+            <a-form-item field="enabled" label="启用">
+              <a-select
+                v-model="searchForm.enabled"
+                placeholder="请选择"
+                allow-clear
+                style="width: 100px"
+              >
+                <a-option :value="true">是</a-option>
+                <a-option :value="false">否</a-option>
               </a-select>
             </a-form-item>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" @click="handleSearch">
+                  <template #icon><icon-search /></template>
+                  查询
+                </a-button>
+                <a-button @click="handleReset">
+                  <template #icon><icon-refresh /></template>
+                  重置
+                </a-button>
+              </a-space>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
+
+      <!-- 操作按钮 -->
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="24">
+          <a-button type="primary" @click="handleCreate">
+            <template #icon><icon-plus /></template>
+            新增
+          </a-button>
+        </a-col>
+      </a-row>
+
+      <!-- 数据表格 -->
+      <a-table
+        :columns="columns"
+        :data="data"
+        :loading="loading"
+        :pagination="{
+          total,
+          current: pageIndex,
+          pageSize,
+          showTotal: true,
+          showPageSize: true,
+        }"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
+        :bordered="false"
+      >
+        <template #enabled="{ record }">
+          <a-tag :color="record.enabled ? 'green' : 'gray'">
+            {{ record.enabled ? '是' : '否' }}
+          </a-tag>
+        </template>
+        <template #required="{ record }">
+          <a-tag :color="record.required ? 'orange' : 'gray'">
+            {{ record.required ? '是' : '否' }}
+          </a-tag>
+        </template>
+        <template #userClaims="{ record }">
+          <a-space wrap>
+            <a-tag
+              v-for="claim in (record.userClaims || []).slice(0, 3)"
+              :key="claim"
+              color="purple"
+            >
+              {{ claim }}
+            </a-tag>
+            <a-tag v-if="(record.userClaims || []).length > 3" color="gray">
+              +{{ record.userClaims.length - 3 }}
+            </a-tag>
+          </a-space>
+        </template>
+        <template #optional="{ record }">
+          <a-space>
+            <a-button type="text" size="small" @click="handleEdit(record)">
+              编辑
+            </a-button>
+            <a-popconfirm content="确定删除该资源吗？" @ok="handleDelete(record)">
+              <a-button type="text" size="small" status="danger">
+                删除
+              </a-button>
+            </a-popconfirm>
+          </a-space>
+        </template>
+      </a-table>
+    </a-card>
+
+    <!-- 新增/编辑对话框 -->
+    <a-modal
+      v-model:visible="modalVisible"
+      :title="modalTitle"
+      :width="600"
+      @cancel="handleModalCancel"
+      @before-ok="handleModalOk"
+    >
+      <a-form :model="formData" ref="formRef" layout="vertical">
+        <a-form-item field="name" label="名称" required>
+          <a-input v-model="formData.name" placeholder="请输入名称" :disabled="isEdit" />
+        </a-form-item>
+        <a-form-item field="displayName" label="显示名" required>
+          <a-input v-model="formData.displayName" placeholder="请输入显示名" />
+        </a-form-item>
+        <a-form-item field="description" label="描述">
+          <a-textarea v-model="formData.description" placeholder="请输入描述" :max-length="500" />
+        </a-form-item>
+        <a-row :gutter="16">
+          <a-col :span="8">
+            <a-form-item field="enabled" label="启用">
+              <a-switch v-model="formData.enabled" />
+            </a-form-item>
           </a-col>
-          <a-col :flex="30" style="text-align: right">
-            <a-space direction="horizontal" :size="18">
-              <a-button type="primary" @click="() => {}">
-                <template #icon>
-                  <icon-search />
-                </template>
-                {{ '查询' }}
-              </a-button>
-              <a-button @click="() => {}">
-                <template #icon>
-                  <icon-refresh />
-                </template>
-                {{ '重置' }}
-              </a-button>
-              <a-button
-                type="primary"
-                class="add"
-                @click="
-                  () => {
-                    $router.push('identity-resource/add');
-                  }
-                "
-              >
-                <template #icon>
-                  <icon-plus />
-                </template>
-              </a-button>
-            </a-space>
+          <a-col :span="8">
+            <a-form-item field="required" label="必须同意">
+              <a-switch v-model="formData.required" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="8">
+            <a-form-item field="emphasize" label="强调">
+              <a-switch v-model="formData.emphasize" />
+            </a-form-item>
           </a-col>
         </a-row>
-        <a-divider style="margin-top: 0"></a-divider>
-        <a-table :columns="columns" :data="data" :bordered="false">
-          <template #optional="{ record }">
-            <a-space>
-              <a-button type="primary" @click="() => {}">
-                <template #icon>
-                  <icon-edit />
-                </template>
-              </a-button>
-              <a-button
-                @click="
-                  $modal.info({
-                    title: 'Name',
-                    content: `${record.clientId} ${record.clientName} `,
-                  })
-                "
-              >
-                <template #icon>
-                  <icon-eye />
-                </template>
-              </a-button>
-            </a-space>
-          </template>
-        </a-table>
-      </a-card>
-    </div>
+        <a-form-item field="showInDiscoveryDocument" label="显示在发现文档">
+          <a-switch v-model="formData.showInDiscoveryDocument" />
+        </a-form-item>
+        <a-form-item field="userClaims" label="声明类型">
+          <a-input-tag v-model="formData.userClaims" placeholder="输入后按回车添加" allow-clear />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
+import { Message } from '@arco-design/web-vue';
+import { identityResourceApi, IIdentityResource, IIdentityResourceModel } from '@/api/openiddict/identity-resource-api';
 
-  const formData = ref<any>({});
-  const formRef = ref<any>();
+// 搜索表单
+const searchForm = reactive<IIdentityResourceModel>({});
+const loading = ref(false);
+const data = ref<IIdentityResource[]>([]);
+const total = ref(0);
+const pageIndex = ref(1);
+const pageSize = ref(10);
 
-  const columns = [
-    {
-      title: '身份资源Id',
-      dataIndex: 'id',
-    },
-    {
-      title: '身份资源名称',
-      dataIndex: 'identityResourceName',
-    },
-    {
-      title: '操作',
-      slotName: 'optional',
-    },
-  ];
-  const data = ref([]);
+// 弹窗
+const modalVisible = ref(false);
+const modalTitle = ref('新增身份资源');
+const isEdit = ref(false);
+const formRef = ref<any>(null);
+const formData = reactive<Partial<IIdentityResource>>({
+  name: '',
+  displayName: '',
+  description: '',
+  enabled: true,
+  required: false,
+  emphasize: false,
+  showInDiscoveryDocument: true,
+  userClaims: [],
+});
+
+const columns = [
+  { title: 'ID', dataIndex: 'id', width: 180 },
+  { title: '名称', dataIndex: 'name' },
+  { title: '显示名', dataIndex: 'displayName' },
+  { title: '启用', slotName: 'enabled', width: 80 },
+  { title: '必须同意', slotName: 'required', width: 90 },
+  { title: '声明', slotName: 'userClaims', width: 200 },
+  { title: '操作', slotName: 'optional', width: 140 },
+];
+
+// 加载数据
+async function loadData() {
+  loading.value = true;
+  try {
+    const res = await identityResourceApi.getPagedList(searchForm, pageIndex.value, pageSize.value);
+    data.value = res.items;
+    total.value = res.totalCount;
+  } finally {
+    loading.value = false;
+  }
+}
+
+function handleSearch() {
+  pageIndex.value = 1;
+  loadData();
+}
+
+function handleReset() {
+  Object.keys(searchForm).forEach(k => (searchForm as any)[k] = undefined);
+  pageIndex.value = 1;
+  loadData();
+}
+
+function handlePageChange(page: number) {
+  pageIndex.value = page;
+  loadData();
+}
+
+function handlePageSizeChange(size: number) {
+  pageSize.value = size;
+  pageIndex.value = 1;
+  loadData();
+}
+
+function resetForm() {
+  formData.name = '';
+  formData.displayName = '';
+  formData.description = '';
+  formData.enabled = true;
+  formData.required = false;
+  formData.emphasize = false;
+  formData.showInDiscoveryDocument = true;
+  formData.userClaims = [];
+}
+
+function handleCreate() {
+  resetForm();
+  isEdit.value = false;
+  modalTitle.value = '新增身份资源';
+  modalVisible.value = true;
+}
+
+function handleEdit(record: IIdentityResource) {
+  isEdit.value = true;
+  modalTitle.value = '编辑身份资源';
+  formData.id = record.id;
+  formData.name = record.name;
+  formData.displayName = record.displayName;
+  formData.description = record.description;
+  formData.enabled = record.enabled;
+  formData.required = record.required;
+  formData.emphasize = record.emphasize;
+  formData.showInDiscoveryDocument = record.showInDiscoveryDocument;
+  formData.userClaims = record.userClaims || [];
+  modalVisible.value = true;
+}
+
+function handleModalCancel() {
+  modalVisible.value = false;
+}
+
+async function handleModalOk(done: (close: boolean) => void) {
+  if (!formData.name || !formData.displayName) {
+    Message.warning('请填写必填项');
+    done(false);
+    return;
+  }
+  try {
+    if (isEdit.value && formData.id) {
+      await identityResourceApi.update(formData.id, formData);
+      Message.success('更新成功');
+    } else {
+      await identityResourceApi.create(formData);
+      Message.success('新增成功');
+    }
+    loadData();
+    done(true);
+  } catch (e: any) {
+    Message.error(e?.message || '操作失败');
+    done(false);
+  }
+}
+
+async function handleDelete(record: IIdentityResource) {
+  await identityResourceApi.remove(record.id);
+  Message.success('删除成功');
+  loadData();
+}
+
+onMounted(loadData);
 </script>
 
 <style scoped lang="less"></style>
