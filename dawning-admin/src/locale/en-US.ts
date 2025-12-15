@@ -1,5 +1,6 @@
 import localeMessageBox from '@/components/message-box/locale/en-US';
 import localeLogin from '@/views/login/locale/en-US';
+import localeUserCenter from '@/views/user/locale/en-US';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 
@@ -62,4 +63,5 @@ export default {
   ...localeMessageBox,
   ...localeLogin,
   ...localeWorkplace,
+  ...localeUserCenter,
 };

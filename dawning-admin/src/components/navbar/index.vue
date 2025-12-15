@@ -264,9 +264,16 @@
     });
     triggerBtn.value.dispatchEvent(event);
   };
+  const canSwitchRoles = computed(() => {
+    return userStore.roles && userStore.roles.length > 1;
+  });
   const switchRoles = async () => {
+    if (!canSwitchRoles.value) {
+      Message.info('当前用户只有一个角色，无法切换');
+      return;
+    }
     const res = await userStore.switchRoles();
-    Message.success(res as string);
+    Message.success(`已切换到角色: ${res}`);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 </script>

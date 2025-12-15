@@ -9,7 +9,7 @@ import {
   clearToken,
 } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
-import { UserState } from './types';
+import { UserState, RoleType } from './types';
 import useAppStore from '../app';
 
 export interface LoginData {
@@ -68,9 +68,20 @@ const useUserStore = defineStore('user', {
   },
 
   actions: {
+    // 在用户拥有的多个角色之间切换
     switchRoles() {
       return new Promise((resolve) => {
-        this.role = this.role === 'user' ? 'admin' : 'user';
+        if (this.roles.length <= 1) {
+          // 只有一个角色，无法切换
+          resolve(this.role);
+          return;
+        }
+        // 找到当前角色在数组中的索引，切换到下一个
+        const currentIndex = this.roles.indexOf(this.role);
+        const nextIndex = (currentIndex + 1) % this.roles.length;
+        this.role = this.roles[nextIndex] as RoleType;
+        // 切换角色后重新获取权限
+        this.fetchPermissions();
         resolve(this.role);
       });
     },
@@ -134,7 +145,7 @@ const useUserStore = defineStore('user', {
           } else if (userInfo.role) {
             roles = [userInfo.role];
           }
-          const primaryRole = roles[0] || 'user';
+          const primaryRole = (roles[0] || 'user') as RoleType;
 
           this.setInfo({
             name: userInfo.name || userInfo.sub,
