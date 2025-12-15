@@ -3,6 +3,7 @@ import 'vue-router';
 declare module 'vue-router' {
   interface RouteMeta {
     roles?: string[]; // Controls roles that have access to the page
+    permissions?: string[]; // Controls permissions that have access to the page (any of the listed permissions)
     requiresAuth: boolean; // Whether login is required to access the current page (every route must declare)
     icon?: string; // The icon show in the side menu
     locale?: string; // The locale name show in side menu and breadcrumb

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { logout as userLogout, getUserInfo } from '@/api/user';
 import { loginWithPassword, parseJwtToken } from '@/api/auth';
+import { getUserPermissions } from '@/api/administration/permission';
 import {
   setToken,
   setRefreshToken,
@@ -35,11 +36,35 @@ const useUserStore = defineStore('user', {
     accountId: undefined,
     certification: undefined,
     role: '',
+    roles: [],
+    permissions: [],
   }),
 
   getters: {
     userInfo(state: UserState): UserState {
       return { ...state };
+    },
+    // 检查是否拥有指定权限
+    hasPermission: (state) => (permission: string) => {
+      // 超级管理员拥有所有权限
+      if (state.role === 'super_admin' || state.roles.includes('super_admin')) {
+        return true;
+      }
+      return state.permissions.includes(permission);
+    },
+    // 检查是否拥有任意一个权限
+    hasAnyPermission: (state) => (permissions: string[]) => {
+      if (state.role === 'super_admin' || state.roles.includes('super_admin')) {
+        return true;
+      }
+      return permissions.some((p) => state.permissions.includes(p));
+    },
+    // 检查是否拥有所有权限
+    hasAllPermissions: (state) => (permissions: string[]) => {
+      if (state.role === 'super_admin' || state.roles.includes('super_admin')) {
+        return true;
+      }
+      return permissions.every((p) => state.permissions.includes(p));
     },
   },
 
@@ -66,6 +91,18 @@ const useUserStore = defineStore('user', {
       this.setInfo(res.data);
     },
 
+    // Fetch user permissions
+    async fetchPermissions() {
+      if (!this.accountId) return;
+      try {
+        const permissions = await getUserPermissions(this.accountId);
+        this.permissions = permissions;
+      } catch (error) {
+        console.error('Failed to fetch user permissions:', error);
+        this.permissions = [];
+      }
+    },
+
     // Login with OpenIddict OAuth 2.0
     async login(loginForm: LoginData) {
       try {
@@ -88,12 +125,24 @@ const useUserStore = defineStore('user', {
         // 从 ID Token 或 Access Token 中解析用户信息
         const userInfo = parseJwtToken(id_token || access_token);
         if (userInfo) {
+          // 处理角色（可能是单个字符串或数组）
+          const roles = Array.isArray(userInfo.role)
+            ? userInfo.role
+            : userInfo.role
+              ? [userInfo.role]
+              : [];
+          const primaryRole = roles[0] || 'user';
+
           this.setInfo({
             name: userInfo.name || userInfo.sub,
             email: userInfo.email,
-            role: userInfo.role || 'admin',
+            role: primaryRole,
+            roles,
             accountId: userInfo.sub,
           });
+
+          // 登录后获取用户权限
+          await this.fetchPermissions();
         }
       } catch (err) {
         clearToken();
