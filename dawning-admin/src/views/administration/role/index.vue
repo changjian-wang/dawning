@@ -210,10 +210,10 @@
               :show-search="false"
               @change="handlePermissionChange"
             >
-              <template #source="{ filteredData }">
+              <template #source="{ data: sourceData }">
                 <div class="permission-list">
                   <div
-                    v-for="item in filteredData"
+                    v-for="item in sourceData"
                     :key="item.value"
                     class="permission-item"
                     @click="togglePermission(item.value)"
@@ -228,10 +228,10 @@
                   </div>
                 </div>
               </template>
-              <template #target="{ filteredData }">
+              <template #target="{ data: targetData }">
                 <div class="permission-list">
                   <div
-                    v-for="item in filteredData"
+                    v-for="item in targetData"
                     :key="item.value"
                     class="permission-item"
                     @click="togglePermission(item.value)"
