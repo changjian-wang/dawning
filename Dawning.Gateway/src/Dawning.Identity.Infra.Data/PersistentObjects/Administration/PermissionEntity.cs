@@ -62,7 +62,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
     [Table("role_permissions")]
     public class RolePermissionEntity
     {
-        [Key]
+        [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
