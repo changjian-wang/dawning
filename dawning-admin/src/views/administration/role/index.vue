@@ -205,21 +205,21 @@
             />
             <a-transfer
               :data="allPermissions"
-              :target-keys="selectedPermissionIds"
+              v-model="selectedPermissionIds"
               :title="['可分配权限', '已分配权限']"
               :show-search="false"
               @change="handlePermissionChange"
             >
-              <template #source="{ data: sourceData }">
+              <template #source="{ data: sourceData, selectedKeys, onSelect }">
                 <div class="permission-list">
                   <div
                     v-for="item in sourceData"
                     :key="item.value"
                     class="permission-item"
-                    @click="togglePermission(item.value)"
+                    @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter(k => k !== item.value) : [...selectedKeys, item.value]])"
                   >
                     <a-checkbox
-                      :model-value="selectedPermissionIds.includes(item.value)"
+                      :model-value="selectedKeys.includes(item.value)"
                     />
                     <div class="permission-info">
                       <div class="permission-name">{{ item.label }}</div>
@@ -228,16 +228,16 @@
                   </div>
                 </div>
               </template>
-              <template #target="{ data: targetData }">
+              <template #target="{ data: targetData, selectedKeys, onSelect }">
                 <div class="permission-list">
                   <div
                     v-for="item in targetData"
                     :key="item.value"
                     class="permission-item"
-                    @click="togglePermission(item.value)"
+                    @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter(k => k !== item.value) : [...selectedKeys, item.value]])"
                   >
                     <a-checkbox
-                      :model-value="selectedPermissionIds.includes(item.value)"
+                      :model-value="selectedKeys.includes(item.value)"
                     />
                     <div class="permission-info">
                       <div class="permission-name">{{ item.label }}</div>
