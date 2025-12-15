@@ -71,12 +71,29 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed } from 'vue';
+  import { computed, onMounted } from 'vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/store';
+  import { user as userApi } from '@/api/administration/user';
 
   const userStore = useUserStore();
   const router = useRouter();
+
+  // 页面加载时从后端获取最新用户信息
+  onMounted(async () => {
+    if (userStore.accountId) {
+      try {
+        const userInfo = await userApi.api.get(userStore.accountId);
+        userStore.setInfo({
+          name: userInfo.username,
+          email: userInfo.email,
+          phone: userInfo.phoneNumber,
+        });
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+      }
+    }
+  });
 
   const userInitial = computed(() => {
     const name = userStore.name || 'U';
