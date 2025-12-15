@@ -124,26 +124,6 @@
   const router = useRouter();
   const userStore = useUserStore();
 
-  // 页面加载时从后端获取最新用户信息
-  onMounted(async () => {
-    if (userStore.accountId) {
-      try {
-        const userInfo = await userApi.api.get(userStore.accountId);
-        // 更新 store 和表单
-        userStore.setInfo({
-          name: userInfo.username,
-          email: userInfo.email,
-          phone: userInfo.phoneNumber,
-        });
-        profileForm.username = userInfo.username || '';
-        profileForm.email = userInfo.email || '';
-        profileForm.phone = userInfo.phoneNumber || '';
-      } catch (error) {
-        console.error('Failed to fetch user info:', error);
-      }
-    }
-  });
-
   // 密码表单
   const passwordFormRef = ref();
   const passwordLoading = ref(false);
@@ -249,6 +229,26 @@
   const goBack = () => {
     router.push({ name: 'Info' });
   };
+
+  // 页面加载时从后端获取最新用户信息
+  onMounted(async () => {
+    if (userStore.accountId) {
+      try {
+        const userInfo = await userApi.api.get(userStore.accountId);
+        // 更新 store 和表单
+        userStore.setInfo({
+          name: userInfo.username,
+          email: userInfo.email,
+          phone: userInfo.phoneNumber,
+        });
+        profileForm.username = userInfo.username || '';
+        profileForm.email = userInfo.email || '';
+        profileForm.phone = userInfo.phoneNumber || '';
+      } catch (error) {
+        console.error('Failed to fetch user info:', error);
+      }
+    }
+  });
 </script>
 
 <style scoped lang="less">
