@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dawning.Identity.Api.Models;
+using Dawning.Identity.Api.Security;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
@@ -29,6 +30,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// 获取单个权限
         /// </summary>
         [HttpGet("{id}")]
+        [RequirePermission("permission.read")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
             var permission = await _permissionService.GetAsync(id);
@@ -89,6 +91,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// 获取所有权限
         /// </summary>
         [HttpGet("all")]
+        [RequirePermission("permission.read")]
         public async Task<IActionResult> GetAllAsync()
         {
             var permissions = await _permissionService.GetAllAsync();
@@ -119,6 +122,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// 创建权限
         /// </summary>
         [HttpPost]
+        [RequirePermission("permission.create")]
         public async Task<IActionResult> CreateAsync([FromBody] CreatePermissionDto dto)
         {
             try
@@ -137,6 +141,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// 更新权限
         /// </summary>
         [HttpPut("{id}")]
+        [RequirePermission("permission.update")]
         public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdatePermissionDto dto)
         {
             if (id != dto.Id)
@@ -160,6 +165,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// 删除权限
         /// </summary>
         [HttpDelete("{id}")]
+        [RequirePermission("permission.delete")]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {
             try
@@ -177,6 +183,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// 为角色分配权限
         /// </summary>
         [HttpPost("role/{roleId}/assign")]
+        [RequirePermission("role.permission.assign")]
         public async Task<IActionResult> AssignPermissionsToRoleAsync(
             Guid roleId,
             [FromBody] List<Guid> permissionIds

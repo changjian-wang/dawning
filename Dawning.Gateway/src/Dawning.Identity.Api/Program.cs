@@ -93,6 +93,9 @@ namespace Dawning.Identity.Api
             // ===== Swagger =====
             builder.Services.AddSwaggerConfiguration();
 
+            // ===== Permission Authorization =====
+            builder.Services.AddPermissionAuthorization();
+
             // ===== Health Checks =====
             builder.Services.AddHealthChecks();
 
