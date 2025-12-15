@@ -18,6 +18,7 @@ export default {
   'auditLog.form.dateRange.placeholder': ['开始日期', '结束日期'],
   'auditLog.form.search': '查询',
   'auditLog.form.reset': '重置',
+  'auditLog.form.export': '导出',
 
   // 操作类型
   'auditLog.action.Create': '创建',

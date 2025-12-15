@@ -74,6 +74,20 @@
                   <template #icon><icon-plus /></template>
                   新增
                 </a-button>
+                <a-dropdown>
+                  <a-button>
+                    <template #icon><icon-download /></template>
+                    导出
+                  </a-button>
+                  <template #content>
+                    <a-doption @click="handleExport('csv')">
+                      <icon-file /> 导出 CSV
+                    </a-doption>
+                    <a-doption @click="handleExport('xlsx')">
+                      <icon-file /> 导出 Excel
+                    </a-doption>
+                  </template>
+                </a-dropdown>
               </a-space>
             </a-col>
           </a-row>
@@ -406,6 +420,12 @@
   } from '@/api/administration/user';
   import { getAllActiveRoles, type RoleModel } from '@/api/administration/role';
   import { FieldRule, PaginationProps, Message } from '@arco-design/web-vue';
+  import {
+    exportData,
+    formatDateTime as exportFormatDateTime,
+    formatBoolean,
+    type ExportColumn,
+  } from '@/utils/export';
 
   const loading = ref(false);
   const modalVisible = ref(false);
@@ -646,6 +666,48 @@
     model.isActive = undefined;
     pagination.current = 1;
     fetchData();
+  };
+
+  // 导出用户数据
+  const handleExport = async (format: 'csv' | 'xlsx') => {
+    try {
+      Message.loading({ content: '正在导出...', id: 'export' });
+
+      // 获取所有数据（或当前筛选条件下的数据）
+      const result = await user.api.getPagedList(model, 1, 10000); // 获取最多10000条
+      const exportColumns: ExportColumn[] = [
+        { field: 'username', title: '用户名' },
+        { field: 'email', title: '邮箱' },
+        { field: 'phoneNumber', title: '手机号' },
+        { field: 'displayName', title: '显示名称' },
+        {
+          field: 'isActive',
+          title: '状态',
+          formatter: (value) => (value ? '启用' : '禁用'),
+        },
+        {
+          field: 'createdAt',
+          title: '创建时间',
+          formatter: (value) => exportFormatDateTime(value),
+        },
+        {
+          field: 'lastLoginAt',
+          title: '最后登录',
+          formatter: (value) => exportFormatDateTime(value),
+        },
+      ];
+
+      exportData({
+        filename: `用户列表_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}`,
+        columns: exportColumns,
+        data: result.items,
+        format,
+      });
+
+      Message.success({ content: '导出成功', id: 'export' });
+    } catch (error: any) {
+      Message.error({ content: error?.message || '导出失败', id: 'export' });
+    }
   };
 
   const handleDelete = (record: IUser) => {

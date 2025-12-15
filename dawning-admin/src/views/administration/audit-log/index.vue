@@ -118,6 +118,20 @@
                       <template #icon><icon-refresh /></template>
                       {{ $t('auditLog.form.reset') }}
                     </a-button>
+                    <a-dropdown>
+                      <a-button>
+                        <template #icon><icon-download /></template>
+                        {{ $t('auditLog.form.export') }}
+                      </a-button>
+                      <template #content>
+                        <a-doption @click="handleExport('csv')">
+                          <icon-file /> 导出 CSV
+                        </a-doption>
+                        <a-doption @click="handleExport('xlsx')">
+                          <icon-file /> 导出 Excel
+                        </a-doption>
+                      </template>
+                    </a-dropdown>
                   </a-space>
                 </a-form-item>
               </a-col>
@@ -310,6 +324,11 @@ import {
   type AuditLogQueryParams,
 } from '@/api/audit-log';
 import dayjs from 'dayjs';
+import {
+  exportData,
+  formatDateTime as exportFormatDateTime,
+  type ExportColumn,
+} from '@/utils/export';
 
 const { t } = useI18n();
 
@@ -454,6 +473,63 @@ const handleReset = () => {
   searchForm.dateRange = undefined;
   pagination.current = 1;
   fetchData();
+};
+
+// 导出审计日志
+const handleExport = async (format: 'csv' | 'xlsx') => {
+  try {
+    Message.loading({ content: '正在导出...', id: 'export' });
+
+    // 构建查询参数
+    const params: AuditLogQueryParams = {
+      ...searchForm,
+      page: 1,
+      pageSize: 10000, // 获取最多10000条
+    };
+
+    if (searchForm.dateRange?.length === 2) {
+      params.startDate = searchForm.dateRange[0];
+      params.endDate = searchForm.dateRange[1];
+    }
+
+    const result = await getAuditLogs(params);
+
+    const exportColumns: ExportColumn[] = [
+      { field: 'username', title: t('auditLog.detail.username') },
+      {
+        field: 'action',
+        title: t('auditLog.detail.action'),
+        formatter: (value) => t(`auditLog.action.${value}`),
+      },
+      {
+        field: 'entityType',
+        title: t('auditLog.detail.entityType'),
+        formatter: (value) => (value ? t(`auditLog.entityType.${value}`) : '-'),
+      },
+      { field: 'entityId', title: t('auditLog.detail.entityId') },
+      { field: 'description', title: t('auditLog.detail.description') },
+      { field: 'ipAddress', title: t('auditLog.detail.ipAddress') },
+      { field: 'requestPath', title: t('auditLog.detail.requestPath') },
+      { field: 'requestMethod', title: t('auditLog.detail.requestMethod') },
+      { field: 'statusCode', title: t('auditLog.detail.statusCode') },
+      {
+        field: 'createdAt',
+        title: t('auditLog.detail.createdAt'),
+        formatter: (value) => exportFormatDateTime(value),
+      },
+    ];
+
+    exportData({
+      filename: `审计日志_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}`,
+      columns: exportColumns,
+      data: result.items,
+      format,
+    });
+
+    Message.success({ content: '导出成功', id: 'export' });
+  } catch (error: any) {
+    Message.error({ content: error?.message || '导出失败', id: 'export' });
+  }
 };
 
 // 分页变化

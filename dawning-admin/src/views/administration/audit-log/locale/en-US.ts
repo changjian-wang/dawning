@@ -18,6 +18,7 @@ export default {
   'auditLog.form.dateRange.placeholder': ['Start Date', 'End Date'],
   'auditLog.form.search': 'Search',
   'auditLog.form.reset': 'Reset',
+  'auditLog.form.export': 'Export',
 
   // Action types
   'auditLog.action.Create': 'Create',
