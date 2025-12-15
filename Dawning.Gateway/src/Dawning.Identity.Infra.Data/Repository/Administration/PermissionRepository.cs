@@ -100,14 +100,21 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
         public async Task<IEnumerable<Permission>> GetByRoleIdAsync(Guid roleId)
         {
-            var query = @"
-                SELECT p.* FROM permissions p
-                INNER JOIN role_permissions rp ON p.id = rp.permission_id
-                WHERE rp.role_id = @RoleId AND p.is_active = true
-                ORDER BY p.display_order, p.code";
+            // 先获取角色的权限关联
+            var rolePermissions = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.RoleId == roleId)
+                .ToListAsync();
 
-            var entities = await _context.Connection
-                .QueryAsync<PermissionEntity>(query, new { RoleId = roleId }, _context.Transaction);
+            if (!rolePermissions.Any()) return new List<Permission>();
+
+            var permissionIds = rolePermissions.Select(rp => rp.PermissionId).ToList();
+
+            // 获取权限详情
+            var entities = await _context.Connection.Builder<PermissionEntity>(_context.Transaction)
+                .Where(p => permissionIds.Contains(p.Id) && p.IsActive == true)
+                .OrderBy(p => p.DisplayOrder)
+                .ThenBy(p => p.Code)
+                .ToListAsync();
 
             return entities.ToDomains() ?? new List<Permission>();
         }
@@ -168,43 +175,52 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
         public async Task<IEnumerable<RolePermission>> GetByRoleIdAsync(Guid roleId)
         {
-            var query = "SELECT * FROM role_permissions WHERE role_id = @RoleId";
-            var entities = await _context.Connection
-                .QueryAsync<RolePermissionEntity>(query, new { RoleId = roleId }, _context.Transaction);
+            var entities = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.RoleId == roleId)
+                .ToListAsync();
 
             return entities.Select(e => e.ToDomain());
         }
 
         public async Task<IEnumerable<RolePermission>> GetByPermissionIdAsync(Guid permissionId)
         {
-            var query = "SELECT * FROM role_permissions WHERE permission_id = @PermissionId";
-            var entities = await _context.Connection
-                .QueryAsync<RolePermissionEntity>(query, new { PermissionId = permissionId }, _context.Transaction);
+            var entities = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.PermissionId == permissionId)
+                .ToListAsync();
 
             return entities.Select(e => e.ToDomain());
         }
 
         public async Task<bool> AddRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds, Guid? operatorId = null)
         {
+            var permissionIdList = permissionIds.ToList();
+            if (!permissionIdList.Any()) return true;
+
             var now = DateTime.UtcNow;
-            var rolePermissions = permissionIds.Select(permissionId => new
+
+            // 获取已存在的权限关联
+            var existingEntities = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.RoleId == roleId)
+                .ToListAsync();
+            var existingPermissionIds = existingEntities.Select(e => e.PermissionId).ToHashSet();
+
+            // 只插入不存在的关联
+            var newPermissionIds = permissionIdList.Where(id => !existingPermissionIds.Contains(id)).ToList();
+
+            foreach (var permissionId in newPermissionIds)
             {
-                Id = Guid.NewGuid(),
-                RoleId = roleId,
-                PermissionId = permissionId,
-                CreatedAt = now,
-                CreatedBy = operatorId
-            }).ToList();
+                var entity = new RolePermissionEntity
+                {
+                    Id = Guid.NewGuid(),
+                    RoleId = roleId,
+                    PermissionId = permissionId,
+                    CreatedAt = now,
+                    CreatedBy = operatorId
+                };
+                await _context.Connection.InsertAsync(entity, _context.Transaction);
+            }
 
-            // MySQL 语法: INSERT IGNORE 忽略重复项
-            var query = @"
-                INSERT IGNORE INTO role_permissions (id, role_id, permission_id, created_at, created_by)
-                VALUES (@Id, @RoleId, @PermissionId, @CreatedAt, @CreatedBy)";
-
-            var result = await _context.Connection
-                .ExecuteAsync(query, rolePermissions, _context.Transaction);
-
-            return result > 0;
+            return true;
         }
 
         public async Task<bool> RemoveRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds)
@@ -212,33 +228,48 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             var permissionIdList = permissionIds.ToList();
             if (!permissionIdList.Any()) return true;
 
-            var query = "DELETE FROM role_permissions WHERE role_id = @RoleId AND permission_id IN @PermissionIds";
-            var result = await _context.Connection
-                .ExecuteAsync(query, new { RoleId = roleId, PermissionIds = permissionIdList }, _context.Transaction);
+            // 查找需要删除的实体
+            var entitiesToDelete = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.RoleId == roleId && permissionIdList.Contains(rp.PermissionId))
+                .ToListAsync();
 
-            return result > 0;
+            foreach (var entity in entitiesToDelete)
+            {
+                await _context.Connection.DeleteAsync(entity, _context.Transaction);
+            }
+
+            return true;
         }
 
         public async Task<bool> RemoveAllRolePermissionsAsync(Guid roleId)
         {
-            var query = "DELETE FROM role_permissions WHERE role_id = @RoleId";
-            var result = await _context.Connection
-                .ExecuteAsync(query, new { RoleId = roleId }, _context.Transaction);
+            var entities = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.RoleId == roleId)
+                .ToListAsync();
 
-            return result > 0;
+            foreach (var entity in entities)
+            {
+                await _context.Connection.DeleteAsync(entity, _context.Transaction);
+            }
+
+            return true;
         }
 
         public async Task<bool> HasPermissionAsync(Guid roleId, string permissionCode)
         {
-            var query = @"
-                SELECT COUNT(1) FROM role_permissions rp
-                INNER JOIN permissions p ON rp.permission_id = p.id
-                WHERE rp.role_id = @RoleId AND p.code = @PermissionCode";
+            // 先获取权限
+            var permission = await _context.Connection.Builder<PermissionEntity>(_context.Transaction)
+                .Where(p => p.Code == permissionCode)
+                .FirstOrDefaultAsync();
 
-            var count = await _context.Connection
-                .ExecuteScalarAsync<int>(query, new { RoleId = roleId, PermissionCode = permissionCode }, _context.Transaction);
+            if (permission == null) return false;
 
-            return count > 0;
+            // 检查角色是否有该权限
+            var rolePermission = await _context.Connection.Builder<RolePermissionEntity>(_context.Transaction)
+                .Where(rp => rp.RoleId == roleId && rp.PermissionId == permission.Id)
+                .FirstOrDefaultAsync();
+
+            return rolePermission != null;
         }
     }
 }
