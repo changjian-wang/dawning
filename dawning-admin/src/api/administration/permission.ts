@@ -87,16 +87,16 @@ export async function getPermissionList(params: PermissionQueryParams): Promise<
  * 获取所有启用的权限
  */
 export async function getAllActivePermissions(): Promise<PermissionModel[]> {
-  const response = await axios.get<{ data: PermissionModel[] }>('/api/permission/all');
-  return response.data.data;
+  const response = await axios.get<PermissionModel[]>('/api/permission/all');
+  return response.data;
 }
 
 /**
  * 获取分组的权限（按资源分组）
  */
 export async function getGroupedPermissions(): Promise<PermissionGroup[]> {
-  const response = await axios.get<{ data: PermissionGroup[] }>('/api/permission/grouped');
-  return response.data.data;
+  const response = await axios.get<PermissionGroup[]>('/api/permission/grouped');
+  return response.data;
 }
 
 /**
@@ -119,8 +119,8 @@ export async function getPermissionByCode(code: string): Promise<PermissionModel
  * 获取角色的权限列表
  */
 export async function getRolePermissions(roleId: string): Promise<PermissionModel[]> {
-  const response = await axios.get<{ data: PermissionModel[] }>(`/api/permission/role/${roleId}`);
-  return response.data.data;
+  const response = await axios.get<PermissionModel[]>(`/api/permission/role/${roleId}`);
+  return response.data;
 }
 
 /**
