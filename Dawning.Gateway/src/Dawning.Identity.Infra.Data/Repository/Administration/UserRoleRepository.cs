@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
@@ -29,20 +28,25 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<IEnumerable<Role>> GetUserRolesAsync(Guid userId)
         {
-            const string sql = @"
-                SELECT r.* 
-                FROM roles r
-                INNER JOIN user_roles ur ON r.id = ur.role_id
-                WHERE ur.user_id = @UserId 
-                  AND r.deleted_at IS NULL
-                ORDER BY r.name";
+            // Step 1: 获取用户的角色ID列表
+            var userRoles = await _context.Connection.Builder<UserRoleEntity>(_context.Transaction)
+                .Where(ur => ur.UserId == userId)
+                .ToListAsync();
 
-            var entities = await _context.Connection.QueryAsync<RoleEntity>(
-                sql,
-                new { UserId = userId },
-                _context.Transaction);
+            if (!userRoles.Any())
+            {
+                return Enumerable.Empty<Role>();
+            }
 
-            return entities.ToModels();
+            var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
+
+            // Step 2: 获取角色详情
+            var roles = await _context.Connection.Builder<RoleEntity>(_context.Transaction)
+                .Where(r => roleIds.Contains(r.Id) && r.DeletedAt == null)
+                .OrderBy(r => r.Name)
+                .ToListAsync();
+
+            return roles.ToModels();
         }
 
         /// <summary>
@@ -50,19 +54,25 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<IEnumerable<User>> GetRoleUsersAsync(Guid roleId)
         {
-            const string sql = @"
-                SELECT u.* 
-                FROM users u
-                INNER JOIN user_roles ur ON u.id = ur.user_id
-                WHERE ur.role_id = @RoleId
-                ORDER BY u.username";
+            // Step 1: 获取拥有该角色的用户ID列表
+            var userRoles = await _context.Connection.Builder<UserRoleEntity>(_context.Transaction)
+                .Where(ur => ur.RoleId == roleId)
+                .ToListAsync();
 
-            var entities = await _context.Connection.QueryAsync<UserEntity>(
-                sql,
-                new { RoleId = roleId },
-                _context.Transaction);
+            if (!userRoles.Any())
+            {
+                return Enumerable.Empty<User>();
+            }
 
-            return entities.ToModels();
+            var userIds = userRoles.Select(ur => ur.UserId).ToList();
+
+            // Step 2: 获取用户详情
+            var users = await _context.Connection.Builder<UserEntity>(_context.Transaction)
+                .Where(u => userIds.Contains(u.Id))
+                .OrderBy(u => u.Username)
+                .ToListAsync();
+
+            return users.ToModels();
         }
 
         /// <summary>
@@ -122,16 +132,18 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<bool> RemoveRoleAsync(Guid userId, Guid roleId)
         {
-            const string sql = @"
-                DELETE FROM user_roles 
-                WHERE user_id = @UserId AND role_id = @RoleId";
+            // 查找要删除的记录
+            var entity = await _context.Connection.Builder<UserRoleEntity>(_context.Transaction)
+                .Where(ur => ur.UserId == userId && ur.RoleId == roleId)
+                .FirstOrDefaultAsync();
 
-            var affected = await _context.Connection.ExecuteAsync(
-                sql,
-                new { UserId = userId, RoleId = roleId },
-                _context.Transaction);
+            if (entity == null)
+            {
+                return false;
+            }
 
-            return affected > 0;
+            var result = await _context.Connection.DeleteAsync(entity, _context.Transaction);
+            return result;
         }
 
         /// <summary>
@@ -139,12 +151,16 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<bool> RemoveAllRolesAsync(Guid userId)
         {
-            const string sql = "DELETE FROM user_roles WHERE user_id = @UserId";
+            // 查找用户的所有角色关联
+            var entities = await _context.Connection.Builder<UserRoleEntity>(_context.Transaction)
+                .Where(ur => ur.UserId == userId)
+                .ToListAsync();
 
-            await _context.Connection.ExecuteAsync(
-                sql,
-                new { UserId = userId },
-                _context.Transaction);
+            // 逐个删除
+            foreach (var entity in entities)
+            {
+                await _context.Connection.DeleteAsync(entity, _context.Transaction);
+            }
 
             return true;
         }
@@ -154,17 +170,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<bool> HasRoleAsync(Guid userId, Guid roleId)
         {
-            const string sql = @"
-                SELECT COUNT(1) 
-                FROM user_roles 
-                WHERE user_id = @UserId AND role_id = @RoleId";
+            var entity = await _context.Connection.Builder<UserRoleEntity>(_context.Transaction)
+                .Where(ur => ur.UserId == userId && ur.RoleId == roleId)
+                .FirstOrDefaultAsync();
 
-            var count = await _context.Connection.ExecuteScalarAsync<int>(
-                sql,
-                new { UserId = userId, RoleId = roleId },
-                _context.Transaction);
-
-            return count > 0;
+            return entity != null;
         }
 
         /// <summary>
@@ -172,20 +182,24 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<bool> HasRoleByNameAsync(Guid userId, string roleName)
         {
-            const string sql = @"
-                SELECT COUNT(1) 
-                FROM user_roles ur
-                INNER JOIN roles r ON ur.role_id = r.id
-                WHERE ur.user_id = @UserId 
-                  AND r.name = @RoleName
-                  AND r.deleted_at IS NULL";
+            // Step 1: 获取用户的角色ID列表
+            var userRoles = await _context.Connection.Builder<UserRoleEntity>(_context.Transaction)
+                .Where(ur => ur.UserId == userId)
+                .ToListAsync();
 
-            var count = await _context.Connection.ExecuteScalarAsync<int>(
-                sql,
-                new { UserId = userId, RoleName = roleName },
-                _context.Transaction);
+            if (!userRoles.Any())
+            {
+                return false;
+            }
 
-            return count > 0;
+            var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
+
+            // Step 2: 检查是否有匹配的角色
+            var role = await _context.Connection.Builder<RoleEntity>(_context.Transaction)
+                .Where(r => roleIds.Contains(r.Id) && r.Name == roleName && r.DeletedAt == null)
+                .FirstOrDefaultAsync();
+
+            return role != null;
         }
     }
 }
