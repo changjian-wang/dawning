@@ -1,5 +1,5 @@
 import { App, ComponentPublicInstance } from 'vue';
-import axios from 'axios';
+import axios from '@/api/interceptor';
 
 export default function handleError(Vue: App, baseUrl: string) {
   if (!baseUrl) {

@@ -77,8 +77,13 @@ export interface PermissionGroup {
 /**
  * 获取权限列表（分页）
  */
-export async function getPermissionList(params: PermissionQueryParams): Promise<IPagedData<PermissionModel>> {
-  const response = await axios.get<IPagedData<PermissionModel>>('/api/permission', { params });
+export async function getPermissionList(
+  params: PermissionQueryParams
+): Promise<IPagedData<PermissionModel>> {
+  const response = await axios.get<IPagedData<PermissionModel>>(
+    '/api/permission',
+    { params }
+  );
   // ApiResponse 包装的数据，拦截器解包后直接是 IPagedData 格式
   return response.data;
 }
@@ -95,7 +100,9 @@ export async function getAllActivePermissions(): Promise<PermissionModel[]> {
  * 获取分组的权限（按资源分组）
  */
 export async function getGroupedPermissions(): Promise<PermissionGroup[]> {
-  const response = await axios.get<PermissionGroup[]>('/api/permission/grouped');
+  const response = await axios.get<PermissionGroup[]>(
+    '/api/permission/grouped'
+  );
   return response.data;
 }
 
@@ -110,16 +117,24 @@ export async function getPermissionById(id: string): Promise<PermissionModel> {
 /**
  * 根据代码获取权限
  */
-export async function getPermissionByCode(code: string): Promise<PermissionModel> {
-  const response = await axios.get<PermissionModel>(`/api/permission/code/${code}`);
+export async function getPermissionByCode(
+  code: string
+): Promise<PermissionModel> {
+  const response = await axios.get<PermissionModel>(
+    `/api/permission/code/${code}`
+  );
   return response.data;
 }
 
 /**
  * 获取角色的权限列表
  */
-export async function getRolePermissions(roleId: string): Promise<PermissionModel[]> {
-  const response = await axios.get<PermissionModel[]>(`/api/permission/role/${roleId}`);
+export async function getRolePermissions(
+  roleId: string
+): Promise<PermissionModel[]> {
+  const response = await axios.get<PermissionModel[]>(
+    `/api/permission/role/${roleId}`
+  );
   return response.data;
 }
 
@@ -127,22 +142,31 @@ export async function getRolePermissions(roleId: string): Promise<PermissionMode
  * 获取用户的所有权限代码（聚合所有角色的权限）
  */
 export async function getUserPermissions(userId: string): Promise<string[]> {
-  const response = await axios.get<string[]>(`/api/permission/user/${userId}/codes`);
+  const response = await axios.get<string[]>(
+    `/api/permission/user/${userId}/codes`
+  );
   return response.data;
 }
 
 /**
  * 检查角色是否拥有指定权限
  */
-export async function checkRolePermission(roleId: string, permissionCode: string): Promise<boolean> {
-  const response = await axios.get<boolean>(`/api/permission/role/${roleId}/has/${permissionCode}`);
+export async function checkRolePermission(
+  roleId: string,
+  permissionCode: string
+): Promise<boolean> {
+  const response = await axios.get<boolean>(
+    `/api/permission/role/${roleId}/has/${permissionCode}`
+  );
   return response.data;
 }
 
 /**
  * 创建权限
  */
-export async function createPermission(data: CreatePermissionDto): Promise<PermissionModel> {
+export async function createPermission(
+  data: CreatePermissionDto
+): Promise<PermissionModel> {
   const response = await axios.post<PermissionModel>('/api/permission', data);
   return response.data;
 }
@@ -150,7 +174,10 @@ export async function createPermission(data: CreatePermissionDto): Promise<Permi
 /**
  * 更新权限
  */
-export async function updatePermission(id: string, data: UpdatePermissionDto): Promise<boolean> {
+export async function updatePermission(
+  id: string,
+  data: UpdatePermissionDto
+): Promise<boolean> {
   const response = await axios.put<boolean>(`/api/permission/${id}`, data);
   return response.data;
 }
@@ -166,7 +193,10 @@ export async function deletePermission(id: string): Promise<boolean> {
 /**
  * 为角色分配权限
  */
-export async function assignPermissionsToRole(roleId: string, permissionIds: string[]): Promise<boolean> {
+export async function assignPermissionsToRole(
+  roleId: string,
+  permissionIds: string[]
+): Promise<boolean> {
   const response = await axios.post<boolean>(
     `/api/permission/role/${roleId}/assign`,
     permissionIds
@@ -177,7 +207,10 @@ export async function assignPermissionsToRole(roleId: string, permissionIds: str
 /**
  * 移除角色的权限
  */
-export async function removePermissionsFromRole(roleId: string, permissionIds: string[]): Promise<boolean> {
+export async function removePermissionsFromRole(
+  roleId: string,
+  permissionIds: string[]
+): Promise<boolean> {
   const response = await axios.delete<boolean>(
     `/api/permission/role/${roleId}/remove`,
     { data: permissionIds }

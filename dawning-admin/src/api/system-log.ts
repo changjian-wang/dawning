@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/api/interceptor';
 import type { IPagedData } from './paged-data';
 
 export interface SystemLog {

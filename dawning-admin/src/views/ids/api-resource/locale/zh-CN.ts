@@ -16,8 +16,7 @@ export default {
   'ids.apiResource.enabled.placeholder': '请选择是否启用',
   'ids.apiResource.enabled.help': '是否启用该 API 资源',
   'ids.apiResource.showInDiscoveryDocument': '在发现文档中显示',
-  'ids.apiResource.showInDiscoveryDocument.help':
-    '是否在发现文档中显示该资源',
+  'ids.apiResource.showInDiscoveryDocument.help': '是否在发现文档中显示该资源',
   'ids.apiResource.scopes': '作用域',
   'ids.apiResource.scopes.placeholder': '请输入作用域名称',
   'ids.apiResource.scopes.add': '添加作用域',

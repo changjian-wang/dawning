@@ -5,7 +5,7 @@ export default {
   'permission.button.edit': 'Edit Permission',
   'permission.button.delete': 'Delete Permission',
   'permission.button.viewGrouped': 'View by Resource',
-  
+
   'permission.columns.code': 'Permission Code',
   'permission.columns.name': 'Permission Name',
   'permission.columns.resource': 'Resource Type',

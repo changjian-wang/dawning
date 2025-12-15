@@ -44,8 +44,13 @@ export interface RoleQueryParams {
 /**
  * 获取角色列表（分页）
  */
-export async function getRoleList(params: RoleQueryParams): Promise<IPagedData<RoleModel>> {
-  const response = await axios.get<{ list: RoleModel[]; pagination: any }>('/api/role', { params });
+export async function getRoleList(
+  params: RoleQueryParams
+): Promise<IPagedData<RoleModel>> {
+  const response = await axios.get<{ list: RoleModel[]; pagination: any }>(
+    '/api/role',
+    { params }
+  );
   // 响应拦截器返回 {code, message, data: {list, pagination}}
   const { list, pagination } = response.data;
   return {
@@ -83,7 +88,10 @@ export async function getRoleByName(name: string): Promise<RoleModel> {
 /**
  * 检查角色名称是否存在
  */
-export async function checkRoleName(name: string, excludeId?: string): Promise<boolean> {
+export async function checkRoleName(
+  name: string,
+  excludeId?: string
+): Promise<boolean> {
   const response = await axios.get<boolean>('/api/role/check-name', {
     params: { name, excludeId },
   });
@@ -101,7 +109,10 @@ export async function createRole(data: CreateRoleDto): Promise<RoleModel> {
 /**
  * 更新角色
  */
-export async function updateRole(id: string, data: UpdateRoleDto): Promise<RoleModel> {
+export async function updateRole(
+  id: string,
+  data: UpdateRoleDto
+): Promise<RoleModel> {
   const response = await axios.put<RoleModel>(`/api/role/${id}`, data);
   return response.data;
 }

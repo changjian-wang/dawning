@@ -1,10 +1,10 @@
 export default {
   'menu.administration.auditLog': 'Audit Log',
-  
+
   'auditLog.title': 'Audit Log',
   'auditLog.list.title': 'Audit Log List',
   'auditLog.detail.title': 'Log Detail',
-  
+
   // Search form
   'auditLog.form.username': 'Username',
   'auditLog.form.username.placeholder': 'Please enter username',
@@ -18,7 +18,7 @@ export default {
   'auditLog.form.dateRange.placeholder': ['Start Date', 'End Date'],
   'auditLog.form.search': 'Search',
   'auditLog.form.reset': 'Reset',
-  
+
   // Action types
   'auditLog.action.Create': 'Create',
   'auditLog.action.Update': 'Update',
@@ -27,7 +27,7 @@ export default {
   'auditLog.action.ResetPassword': 'Reset Password',
   'auditLog.action.Login': 'Login',
   'auditLog.action.Logout': 'Logout',
-  
+
   // Entity types
   'auditLog.entityType.User': 'User',
   'auditLog.entityType.Role': 'Role',
@@ -35,7 +35,7 @@ export default {
   'auditLog.entityType.Scope': 'Scope',
   'auditLog.entityType.ClaimType': 'Claim Type',
   'auditLog.entityType.SystemMetadata': 'System Metadata',
-  
+
   // Table columns
   'auditLog.columns.username': 'Username',
   'auditLog.columns.action': 'Action',
@@ -46,11 +46,11 @@ export default {
   'auditLog.columns.statusCode': 'Status Code',
   'auditLog.columns.createdAt': 'Created At',
   'auditLog.columns.operations': 'Operations',
-  
+
   // Action buttons
   'auditLog.button.view': 'View Details',
   'auditLog.button.cleanup': 'Cleanup Old Logs',
-  
+
   // Detail dialog
   'auditLog.detail.basicInfo': 'Basic Information',
   'auditLog.detail.requestInfo': 'Request Information',
@@ -70,7 +70,7 @@ export default {
   'auditLog.detail.oldValues': 'Old Values',
   'auditLog.detail.newValues': 'New Values',
   'auditLog.detail.noChanges': 'No changes recorded',
-  
+
   // Cleanup dialog
   'auditLog.cleanup.title': 'Cleanup Old Logs',
   'auditLog.cleanup.message': 'How many days of logs do you want to keep?',
@@ -80,7 +80,7 @@ export default {
   'auditLog.cleanup.cancel': 'Cancel',
   'auditLog.cleanup.success': 'Cleanup successful',
   'auditLog.cleanup.error': 'Cleanup failed',
-  
+
   // Messages
   'auditLog.message.noData': 'No audit logs',
   'auditLog.message.error': 'Failed to load, please try again later',

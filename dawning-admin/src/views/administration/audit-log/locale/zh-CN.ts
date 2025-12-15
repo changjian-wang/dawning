@@ -1,10 +1,10 @@
 export default {
   'menu.administration.auditLog': '审计日志',
-  
+
   'auditLog.title': '审计日志',
   'auditLog.list.title': '审计日志列表',
   'auditLog.detail.title': '日志详情',
-  
+
   // 搜索表单
   'auditLog.form.username': '操作用户',
   'auditLog.form.username.placeholder': '请输入用户名',
@@ -18,7 +18,7 @@ export default {
   'auditLog.form.dateRange.placeholder': ['开始日期', '结束日期'],
   'auditLog.form.search': '查询',
   'auditLog.form.reset': '重置',
-  
+
   // 操作类型
   'auditLog.action.Create': '创建',
   'auditLog.action.Update': '更新',
@@ -27,7 +27,7 @@ export default {
   'auditLog.action.ResetPassword': '重置密码',
   'auditLog.action.Login': '登录',
   'auditLog.action.Logout': '登出',
-  
+
   // 实体类型
   'auditLog.entityType.User': '用户',
   'auditLog.entityType.Role': '角色',
@@ -35,7 +35,7 @@ export default {
   'auditLog.entityType.Scope': '作用域',
   'auditLog.entityType.ClaimType': '声明类型',
   'auditLog.entityType.SystemMetadata': '系统元数据',
-  
+
   // 表格列
   'auditLog.columns.username': '操作用户',
   'auditLog.columns.action': '操作',
@@ -46,11 +46,11 @@ export default {
   'auditLog.columns.statusCode': '状态码',
   'auditLog.columns.createdAt': '操作时间',
   'auditLog.columns.operations': '操作',
-  
+
   // 操作按钮
   'auditLog.button.view': '查看详情',
   'auditLog.button.cleanup': '清理旧日志',
-  
+
   // 详情对话框
   'auditLog.detail.basicInfo': '基本信息',
   'auditLog.detail.requestInfo': '请求信息',
@@ -70,7 +70,7 @@ export default {
   'auditLog.detail.oldValues': '变更前',
   'auditLog.detail.newValues': '变更后',
   'auditLog.detail.noChanges': '无变更记录',
-  
+
   // 清理对话框
   'auditLog.cleanup.title': '清理旧日志',
   'auditLog.cleanup.message': '确定要清理多少天之前的审计日志？',
@@ -80,7 +80,7 @@ export default {
   'auditLog.cleanup.cancel': '取消',
   'auditLog.cleanup.success': '清理成功',
   'auditLog.cleanup.error': '清理失败',
-  
+
   // 提示信息
   'auditLog.message.noData': '暂无审计日志',
   'auditLog.message.error': '加载失败，请稍后重试',

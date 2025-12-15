@@ -20,7 +20,8 @@ export default {
   'role.form.description.placeholder': 'Please enter role description',
   'role.form.isActive': 'Active',
   'role.form.permissions': 'Permissions',
-  'role.form.permissions.placeholder': 'Enter permission (format: resource:action:scope)',
+  'role.form.permissions.placeholder':
+    'Enter permission (format: resource:action:scope)',
   'role.form.permissions.add': 'Add Permission',
   'role.form.status.placeholder': 'Please select status',
   'role.status.active': 'Active',
@@ -34,5 +35,6 @@ export default {
   'role.message.createFailed': 'Create failed',
   'role.message.updateSuccess': 'Updated successfully',
   'role.message.updateFailed': 'Update failed',
-  'role.message.systemRoleCannotModify': 'System roles cannot be modified or deleted',
+  'role.message.systemRoleCannotModify':
+    'System roles cannot be modified or deleted',
 };

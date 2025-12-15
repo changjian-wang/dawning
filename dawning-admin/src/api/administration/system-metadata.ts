@@ -48,7 +48,11 @@ export const metadata = {
       return response.data;
     },
 
-    async getPagedList(model: any, page: number, size: number): Promise<IPagedData<ISystemMetadata>> {
+    async getPagedList(
+      model: any,
+      page: number,
+      size: number
+    ): Promise<IPagedData<ISystemMetadata>> {
       const response = await axios.post<IPagedData<ISystemMetadata>>(
         `/api/system-metadata/get-paged-list?page=${page}&size=${size}`,
         model

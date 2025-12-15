@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { logout as userLogout, getUserInfo } from '@/api/user';
 import { loginWithPassword, parseJwtToken } from '@/api/auth';
-import { getUserPermissions } from '@/api/administration/permission';
 import {
   setToken,
   setRefreshToken,
@@ -95,10 +94,13 @@ const useUserStore = defineStore('user', {
     async fetchPermissions() {
       if (!this.accountId) return;
       try {
+        // Dynamic import to avoid circular dependency
+        const { getUserPermissions } = await import(
+          '@/api/administration/permission'
+        );
         const permissions = await getUserPermissions(this.accountId);
         this.permissions = permissions;
-      } catch (error) {
-        console.error('Failed to fetch user permissions:', error);
+      } catch {
         this.permissions = [];
       }
     },
@@ -126,11 +128,12 @@ const useUserStore = defineStore('user', {
         const userInfo = parseJwtToken(id_token || access_token);
         if (userInfo) {
           // 处理角色（可能是单个字符串或数组）
-          const roles = Array.isArray(userInfo.role)
-            ? userInfo.role
-            : userInfo.role
-              ? [userInfo.role]
-              : [];
+          let roles: string[] = [];
+          if (Array.isArray(userInfo.role)) {
+            roles = userInfo.role;
+          } else if (userInfo.role) {
+            roles = [userInfo.role];
+          }
           const primaryRole = roles[0] || 'user';
 
           this.setInfo({

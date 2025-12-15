@@ -111,7 +111,10 @@ export const scope = {
    * 更新作用域
    */
   async update(dto: IUpdateScopeDto): Promise<number> {
-    const response = await axios.put<number>(`/api/openiddict/scope/${dto.id}`, dto);
+    const response = await axios.put<number>(
+      `/api/openiddict/scope/${dto.id}`,
+      dto
+    );
     return response.data;
   },
 

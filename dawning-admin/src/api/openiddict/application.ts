@@ -176,7 +176,9 @@ export const application = {
    * 获取应用程序详情
    */
   async get(id: string): Promise<IApplication> {
-    const response = await axios.get<IApplication>(`/api/openiddict/application/${id}`);
+    const response = await axios.get<IApplication>(
+      `/api/openiddict/application/${id}`
+    );
     return response.data;
   },
 
@@ -209,7 +211,9 @@ export const application = {
    * 获取所有应用程序
    */
   async getAll(): Promise<IApplication[]> {
-    const response = await axios.get<IApplication[]>('/api/openiddict/application');
+    const response = await axios.get<IApplication[]>(
+      '/api/openiddict/application'
+    );
     return response.data;
   },
 
@@ -247,7 +251,9 @@ export const application = {
    * 删除应用程序
    */
   async delete(id: string): Promise<boolean> {
-    const response = await axios.delete<boolean>(`/api/openiddict/application/${id}`);
+    const response = await axios.delete<boolean>(
+      `/api/openiddict/application/${id}`
+    );
     return response.data;
   },
 

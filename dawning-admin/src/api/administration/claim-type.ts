@@ -81,12 +81,18 @@ export const claimType = {
     },
 
     async create(model: IClaimType): Promise<number> {
-      const response = await axios.post<number>('/api/claim-type/insert', model);
+      const response = await axios.post<number>(
+        '/api/claim-type/insert',
+        model
+      );
       return response.data;
     },
 
     async update(model: IClaimType): Promise<boolean> {
-      const response = await axios.put<boolean>('/api/claim-type/update', model);
+      const response = await axios.put<boolean>(
+        '/api/claim-type/update',
+        model
+      );
       return response.data;
     },
 

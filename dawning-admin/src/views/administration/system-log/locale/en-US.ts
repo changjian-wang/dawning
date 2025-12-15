@@ -21,7 +21,7 @@ export default {
   'systemLog.selectDate': 'Please select date',
   'systemLog.cleanupWarning':
     'This operation will permanently delete all logs before the specified date and cannot be undone. Please proceed with caution!',
-  
+
   // Common translations
   'common.all': 'All',
   'common.search': 'Search',

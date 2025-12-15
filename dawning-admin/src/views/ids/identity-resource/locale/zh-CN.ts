@@ -19,7 +19,8 @@ export default {
   'ids.identityResource.showInDiscoveryDocument': '显示在发现文档',
   'ids.identityResource.showInDiscoveryDocument.help': '在发现文档中显示',
   'ids.identityResource.userClaims': '用户声明',
-  'ids.identityResource.userClaims.placeholder': '请输入声明类型（如：sub, name, email）',
+  'ids.identityResource.userClaims.placeholder':
+    '请输入声明类型（如：sub, name, email）',
   'ids.identityResource.userClaims.add': '添加声明',
   'ids.identityResource.properties': '自定义属性',
   'ids.identityResource.properties.key': '属性键',

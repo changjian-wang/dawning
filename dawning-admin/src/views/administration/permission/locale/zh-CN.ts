@@ -5,7 +5,7 @@ export default {
   'permission.button.edit': '编辑权限',
   'permission.button.delete': '删除权限',
   'permission.button.viewGrouped': '按资源查看',
-  
+
   'permission.columns.code': '权限代码',
   'permission.columns.name': '权限名称',
   'permission.columns.resource': '资源类型',

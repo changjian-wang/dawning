@@ -15,11 +15,14 @@ export default {
   'ids.identityResource.required.placeholder': 'Please select required',
   'ids.identityResource.required.help': 'User must consent to this resource',
   'ids.identityResource.emphasize': 'Emphasize',
-  'ids.identityResource.emphasize.help': 'Emphasize this resource on consent screen',
+  'ids.identityResource.emphasize.help':
+    'Emphasize this resource on consent screen',
   'ids.identityResource.showInDiscoveryDocument': 'Show In Discovery',
-  'ids.identityResource.showInDiscoveryDocument.help': 'Show in discovery document',
+  'ids.identityResource.showInDiscoveryDocument.help':
+    'Show in discovery document',
   'ids.identityResource.userClaims': 'User Claims',
-  'ids.identityResource.userClaims.placeholder': 'Enter claim type (e.g., sub, name, email)',
+  'ids.identityResource.userClaims.placeholder':
+    'Enter claim type (e.g., sub, name, email)',
   'ids.identityResource.userClaims.add': 'Add Claim',
   'ids.identityResource.properties': 'Custom Properties',
   'ids.identityResource.properties.key': 'Property Key',

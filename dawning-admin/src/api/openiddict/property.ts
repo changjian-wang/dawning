@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/api/interceptor';
 
 export interface IProperty {
   id: string;

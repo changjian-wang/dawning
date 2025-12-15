@@ -20,7 +20,8 @@ export default {
   'role.form.description.placeholder': '请输入角色描述',
   'role.form.isActive': '启用',
   'role.form.permissions': '权限列表',
-  'role.form.permissions.placeholder': '请输入权限（格式：resource:action:scope）',
+  'role.form.permissions.placeholder':
+    '请输入权限（格式：resource:action:scope）',
   'role.form.permissions.add': '添加权限',
   'role.form.status.placeholder': '请选择状态',
   'role.status.active': '启用',

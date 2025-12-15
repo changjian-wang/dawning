@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/api/interceptor';
 import type { IPagedData } from './paged-data';
 
 // 审计日志接口定义
@@ -38,7 +38,10 @@ export interface AuditLogQueryParams {
 export async function getAuditLogs(
   params: AuditLogQueryParams
 ): Promise<IPagedData<AuditLog>> {
-  const response = await axios.get<{ list: AuditLog[]; pagination: any }>('/api/audit-log', { params });
+  const response = await axios.get<{ list: AuditLog[]; pagination: any }>(
+    '/api/audit-log',
+    { params }
+  );
   // 拦截器返回 { code, message, data }，response.data 包含 { list, pagination }
   const { list, pagination } = response.data;
   return {
