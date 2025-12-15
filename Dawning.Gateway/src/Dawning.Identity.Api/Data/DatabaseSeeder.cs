@@ -235,13 +235,13 @@ namespace Dawning.Identity.Api.Data
                     "Users already exist in system, skipping default user creation"
                 );
                 _logger.LogInformation(
-                    "To initialize admin account, please call POST /api/user/initialize-admin"
+                    "To initialize super admin account, please call POST /api/user/initialize-admin"
                 );
                 return;
             }
 
             _logger.LogInformation(
-                "No users found in system. Use POST /api/user/initialize-admin to create admin account"
+                "No users found in system. Use POST /api/user/initialize-admin to create super admin account"
             );
         }
     }

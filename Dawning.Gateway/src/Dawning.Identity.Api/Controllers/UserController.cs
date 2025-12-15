@@ -591,12 +591,12 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 初始化管理员账号（只能调用一次）
+        /// 初始化超级管理员账号（只能调用一次）
         /// </summary>
         /// <remarks>
-        /// 该接口用于系统首次部署时创建初始管理员账号。
+        /// 该接口用于系统首次部署时创建初始超级管理员账号。
         /// 如果系统中已存在任何用户，该接口将返回错误。
-        /// 默认账号密码：admin/admin
+        /// 默认账号密码：admin/admin，角色：super_admin（超级管理员）
         /// </remarks>
         [HttpPost("initialize-admin")]
         [AllowAnonymous]
@@ -624,13 +624,13 @@ namespace Dawning.Identity.Api.Controllers
                     );
                 }
 
-                // 创建初始管理员账号
+                // 创建初始超级管理员账号
                 var createUserDto = new CreateUserDto
                 {
                     Username = "admin",
                     Password = "admin",
                     Email = "admin@dawning.com",
-                    DisplayName = "Administrator",
+                    DisplayName = "超级管理员",
                     Role = "super_admin",
                     IsActive = true,
                 };
