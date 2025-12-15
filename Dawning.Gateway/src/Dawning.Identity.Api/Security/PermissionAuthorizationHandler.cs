@@ -1,5 +1,6 @@
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Microsoft.AspNetCore.Authorization;
+using OpenIddict.Abstractions;
 using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Security
@@ -37,7 +38,17 @@ namespace Dawning.Identity.Api.Security
             }
 
             // 检查是否是超级管理员（超级管理员拥有所有权限）
-            if (context.User.IsInRole("super_admin"))
+            // 注意：OpenIddict 使用 "role" claim type，需要直接检查 claims
+            var roles = context.User.Claims
+                .Where(c =>
+                    c.Type == OpenIddictConstants.Claims.Role
+                    || c.Type == ClaimTypes.Role
+                    || c.Type == "role"
+                )
+                .Select(c => c.Value)
+                .ToList();
+
+            if (roles.Contains("super_admin"))
             {
                 _logger.LogDebug(
                     "Permission {Permission} granted to super_admin user {UserId}",
@@ -47,6 +58,12 @@ namespace Dawning.Identity.Api.Security
                 context.Succeed(requirement);
                 return;
             }
+
+            _logger.LogDebug(
+                "User {UserId} roles from token: [{Roles}]",
+                userId,
+                string.Join(", ", roles)
+            );
 
             // 使用 scope 获取仓储服务
             using var scope = _serviceProvider.CreateScope();

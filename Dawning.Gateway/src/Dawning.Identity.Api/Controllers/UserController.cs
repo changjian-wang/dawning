@@ -24,6 +24,7 @@ namespace Dawning.Identity.Api.Controllers
     {
         private readonly IUserAuthenticationService _userAuthenticationService;
         private readonly IUserService _userService;
+        private readonly IRoleService _roleService;
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserController> _logger;
@@ -32,6 +33,7 @@ namespace Dawning.Identity.Api.Controllers
         public UserController(
             IUserAuthenticationService userAuthenticationService,
             IUserService userService,
+            IRoleService roleService,
             IUserRepository userRepository,
             IConfiguration configuration,
             ILogger<UserController> logger,
@@ -40,6 +42,7 @@ namespace Dawning.Identity.Api.Controllers
         {
             _userAuthenticationService = userAuthenticationService;
             _userService = userService;
+            _roleService = roleService;
             _userRepository = userRepository;
             _configuration = configuration;
             _logger = logger;
@@ -628,11 +631,32 @@ namespace Dawning.Identity.Api.Controllers
                     Password = "admin",
                     Email = "admin@dawning.com",
                     DisplayName = "Administrator",
-                    Role = "admin",
+                    Role = "super_admin",
                     IsActive = true,
                 };
 
                 var admin = await _userService.CreateAsync(createUserDto, null);
+
+                // 查找并分配 super_admin 角色
+                var superAdminRole = await _roleService.GetByNameAsync("super_admin");
+                if (superAdminRole?.Id != null)
+                {
+                    await _userService.AssignRolesAsync(
+                        admin.Id,
+                        new List<Guid> { superAdminRole.Id.Value },
+                        null
+                    );
+                    _logger.LogInformation(
+                        "super_admin role assigned to admin user: {UserId}",
+                        admin.Id
+                    );
+                }
+                else
+                {
+                    _logger.LogWarning(
+                        "super_admin role not found, admin user created without role assignment"
+                    );
+                }
 
                 _logger.LogInformation(
                     "Admin account initialized successfully: {Username}",
@@ -652,6 +676,75 @@ namespace Dawning.Identity.Api.Controllers
                 return StatusCode(
                     500,
                     ApiResponse.Error(50000, $"Failed to initialize admin account: {ex.Message}")
+                );
+            }
+        }
+
+        /// <summary>
+        /// 修复 admin 用户的角色分配（临时接口）
+        /// </summary>
+        /// <remarks>
+        /// 给 admin 用户分配 super_admin 角色。
+        /// 这是一个一次性修复接口，用于修复早期创建的 admin 用户没有角色分配的问题。
+        /// </remarks>
+        [HttpPost("fix-admin-roles")]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> FixAdminRoles()
+        {
+            try
+            {
+                // 查找 admin 用户
+                var admin = await _userService.GetByUsernameAsync("admin");
+                if (admin == null)
+                {
+                    return NotFound(ApiResponse.Error(40400, "Admin user not found"));
+                }
+
+                // 查找 super_admin 角色
+                var superAdminRole = await _roleService.GetByNameAsync("super_admin");
+                if (superAdminRole?.Id == null)
+                {
+                    return NotFound(ApiResponse.Error(40400, "super_admin role not found"));
+                }
+
+                // 检查是否已分配
+                var existingRoles = await _userService.GetUserRolesAsync(admin.Id);
+                if (existingRoles.Any(r => r.Name == "super_admin"))
+                {
+                    return Ok(
+                        ApiResponse<object>.Success(
+                            new { adminId = admin.Id, message = "Admin already has super_admin role" }
+                        )
+                    );
+                }
+
+                // 分配角色
+                await _userService.AssignRolesAsync(
+                    admin.Id,
+                    new List<Guid> { superAdminRole.Id.Value },
+                    null
+                );
+
+                _logger.LogInformation(
+                    "super_admin role assigned to existing admin user: {UserId}",
+                    admin.Id
+                );
+
+                return Ok(
+                    ApiResponse<object>.Success(
+                        new { adminId = admin.Id, roleId = superAdminRole.Id },
+                        "super_admin role assigned to admin user successfully"
+                    )
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fixing admin roles");
+                return StatusCode(
+                    500,
+                    ApiResponse.Error(50000, $"Failed to fix admin roles: {ex.Message}")
                 );
             }
         }
