@@ -196,10 +196,10 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 CreatedBy = operatorId
             }).ToList();
 
+            // MySQL 语法: INSERT IGNORE 忽略重复项
             var query = @"
-                INSERT INTO role_permissions (id, role_id, permission_id, created_at, created_by)
-                VALUES (@Id, @RoleId, @PermissionId, @CreatedAt, @CreatedBy)
-                ON CONFLICT (role_id, permission_id) DO NOTHING";
+                INSERT IGNORE INTO role_permissions (id, role_id, permission_id, created_at, created_by)
+                VALUES (@Id, @RoleId, @PermissionId, @CreatedAt, @CreatedBy)";
 
             var result = await _context.Connection
                 .ExecuteAsync(query, rolePermissions, _context.Transaction);
@@ -209,9 +209,12 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
         public async Task<bool> RemoveRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds)
         {
-            var query = "DELETE FROM role_permissions WHERE role_id = @RoleId AND permission_id = ANY(@PermissionIds)";
+            var permissionIdList = permissionIds.ToList();
+            if (!permissionIdList.Any()) return true;
+
+            var query = "DELETE FROM role_permissions WHERE role_id = @RoleId AND permission_id IN @PermissionIds";
             var result = await _context.Connection
-                .ExecuteAsync(query, new { RoleId = roleId, PermissionIds = permissionIds.ToArray() }, _context.Transaction);
+                .ExecuteAsync(query, new { RoleId = roleId, PermissionIds = permissionIdList }, _context.Transaction);
 
             return result > 0;
         }
