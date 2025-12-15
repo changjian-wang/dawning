@@ -1,3 +1,5 @@
+import axios from '@/api/interceptor';
+import { IPagedData } from '@/api/paged-data';
 import { IApiResourceClaim } from './api-resource-claim';
 import { IApiResourceProperty } from './api-resource-property';
 import { IApiResourceScope } from './api-resource-scope';
@@ -16,6 +18,13 @@ export interface IApiResource {
   claims: IApiResourceClaim[];
   properties: IApiResourceProperty[];
   nonEditable: boolean;
+}
+
+// 查询模型
+export interface IApiResourceModel {
+  name?: string;
+  displayName?: string;
+  enabled?: boolean;
 }
 
 /**
@@ -68,3 +77,39 @@ export class ApiResource implements IApiResource {
     this.nonEditable = nonEditable;
   }
 }
+
+export const apiResourceApi = {
+  // 获取分页列表
+  async getPagedList(model: IApiResourceModel, page: number, pageSize: number): Promise<IPagedData<IApiResource>> {
+    const response = await axios.post('/api/openiddict/api-resource/paged', model, {
+      params: { page, pageSize },
+    });
+    const { items, totalCount, pageIndex, pageSize: size } = response.data.data;
+    return { items, totalCount, pageIndex, pageSize: size };
+  },
+
+  // 获取详情
+  async get(id: string): Promise<IApiResource> {
+    const response = await axios.get(`/api/openiddict/api-resource/${id}`);
+    return response.data.data;
+  },
+
+  // 创建
+  async create(model: Partial<IApiResource>): Promise<number> {
+    const response = await axios.post('/api/openiddict/api-resource', model);
+    return response.data.data;
+  },
+
+  // 更新
+  async update(id: string, model: Partial<IApiResource>): Promise<boolean> {
+    const response = await axios.put(`/api/openiddict/api-resource/${id}`, model);
+    return response.data.data;
+  },
+
+  // 删除
+  async remove(id: string): Promise<boolean> {
+    const response = await axios.delete(`/api/openiddict/api-resource/${id}`);
+    return response.data.data;
+  },
+};
+
