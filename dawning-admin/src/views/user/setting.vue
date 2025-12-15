@@ -73,9 +73,9 @@
             >
               <a-form-item :label="$t('userSettings.username')">
                 <a-input
-                  v-model="profileForm.name"
-                  disabled
+                  v-model="profileForm.username"
                   :placeholder="$t('userSettings.usernamePlaceholder')"
+                  disabled
                 />
               </a-form-item>
               <a-form-item :label="$t('userSettings.email')">
@@ -158,6 +158,14 @@
     ],
   }));
 
+
+  const resetPasswordForm = () => {
+    passwordForm.oldPassword = '';
+    passwordForm.newPassword = '';
+    passwordForm.confirmPassword = '';
+    passwordFormRef.value?.clearValidate();
+  };
+
   const handleChangePassword = async ({
     errors,
   }: {
@@ -181,18 +189,11 @@
     }
   };
 
-  const resetPasswordForm = () => {
-    passwordForm.oldPassword = '';
-    passwordForm.newPassword = '';
-    passwordForm.confirmPassword = '';
-    passwordFormRef.value?.clearValidate();
-  };
-
   // 个人信息表单
   const profileFormRef = ref();
   const profileLoading = ref(false);
   const profileForm = reactive({
-    name: userStore.name || '',
+    username: userStore.name || '',
     email: userStore.email || '',
     phone: userStore.phone || '',
   });
@@ -208,7 +209,8 @@
     try {
       // TODO: 实现更新用户信息的 API
       await userApi.api.update({
-        id: userStore.accountId!,
+        id: userStore.accountId || '',
+        username: profileForm.username,
         email: profileForm.email,
         phoneNumber: profileForm.phone,
       });

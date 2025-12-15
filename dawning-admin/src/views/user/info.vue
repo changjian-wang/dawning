@@ -18,36 +18,40 @@
           </a-tag>
         </div>
 
-        <!-- 信息区域 -->
+        <!-- 信息区域（卡片分组式） -->
         <div class="info-section">
-          <a-descriptions
-            :column="1"
-            :label-style="{ width: '120px' }"
-            bordered
-          >
-            <a-descriptions-item :label="$t('userCenter.accountId')">
-              {{ userStore.accountId || '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item :label="$t('userCenter.username')">
-              {{ userStore.name || '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item :label="$t('userCenter.email')">
-              {{ userStore.email || '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item :label="$t('userCenter.role')">
-              <a-space>
-                <a-tag v-for="role in userRoles" :key="role" :color="getRoleColor(role)">
-                  {{ getRoleLabel(role) }}
-                </a-tag>
-              </a-space>
-            </a-descriptions-item>
-            <a-descriptions-item :label="$t('userCenter.phone')">
-              {{ userStore.phone || '-' }}
-            </a-descriptions-item>
-            <a-descriptions-item :label="$t('userCenter.registrationDate')">
-              {{ userStore.registrationDate || '-' }}
-            </a-descriptions-item>
-          </a-descriptions>
+          <div class="info-group">
+            <div class="info-item">
+              <span class="info-label">{{ $t('userCenter.accountId') }}</span>
+              <span class="info-value">{{ userStore.accountId || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">{{ $t('userCenter.username') }}</span>
+              <span class="info-value">{{ userStore.name || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">{{ $t('userCenter.email') }}</span>
+              <span class="info-value">{{ userStore.email || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">{{ $t('userCenter.role') }}</span>
+              <span class="info-value">
+                <a-space>
+                  <a-tag v-for="role in userRoles" :key="role" :color="getRoleColor(role)">
+                    {{ getRoleLabel(role) }}
+                  </a-tag>
+                </a-space>
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">{{ $t('userCenter.phone') }}</span>
+              <span class="info-value">{{ userStore.phone || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">{{ $t('userCenter.registrationDate') }}</span>
+              <span class="info-value">{{ userStore.registrationDate || '-' }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -151,6 +155,38 @@
   .info-section {
     flex: 1;
     max-width: 600px;
+    display: flex;
+    align-items: center;
+  }
+
+  .info-group {
+    width: 100%;
+    background: var(--color-fill-2);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+    padding: 32px 32px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 16px;
+  }
+  .info-label {
+    color: var(--color-text-3);
+    min-width: 90px;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+  .info-value {
+    color: var(--color-text-1);
+    font-weight: 400;
+    flex: 1;
+    word-break: break-all;
   }
 
   .action-section {
