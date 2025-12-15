@@ -9,6 +9,7 @@ import localeRole from '@/views/administration/role/locale/zh-CN';
 import localePermission from '@/views/administration/permission/locale/zh-CN';
 import localeApplication from '@/views/administration/openiddict/application/locale/zh-CN';
 import localeScope from '@/views/administration/openiddict/scope/locale/zh-CN';
+import localeOpenIddict from '@/views/administration/openiddict/locale/zh-CN';
 import localeClaimType from '@/views/administration/claim-type/locale/zh-CN';
 import localeIdsScope from '@/views/ids/scope/locale/zh-CN';
 import localeIdsIdentityResource from '@/views/ids/identity-resource/locale/zh-CN';
@@ -58,6 +59,7 @@ export default {
   ...localeIdsScope,
   ...localeIdsIdentityResource,
   ...localeIdsApiResource,
+  ...localeOpenIddict,
 
   ...localeSettings,
   ...localeMessageBox,

@@ -129,6 +129,42 @@ const ADMINISTRATION: AppRouteRecordRaw = {
         icon: 'icon-file',
       },
     },
+    {
+      path: 'api-resource',
+      name: 'ApiResource',
+      component: () =>
+        import('@/views/administration/openiddict/api-resource/index.vue'),
+      meta: {
+        locale: 'menu.administration.apiResource',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-apps',
+      },
+    },
+    {
+      path: 'identity-resource',
+      name: 'IdentityResource',
+      component: () =>
+        import('@/views/administration/openiddict/identity-resource/index.vue'),
+      meta: {
+        locale: 'menu.administration.identityResource',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-idcard',
+      },
+    },
+    {
+      path: 'authorization',
+      name: 'Authorization',
+      component: () =>
+        import('@/views/administration/openiddict/authorization/index.vue'),
+      meta: {
+        locale: 'menu.administration.authorization',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-safe',
+      },
+    },
   ],
 };
 
