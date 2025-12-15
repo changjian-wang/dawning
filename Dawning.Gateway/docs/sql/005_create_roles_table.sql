@@ -28,14 +28,16 @@ INSERT INTO `roles` (`id`, `name`, `display_name`, `description`, `is_system`, `
 (UUID(), 'super_admin', '超级管理员', '系统最高权限角色，拥有所有权限', 1, 1, 
  JSON_ARRAY('*:*:*'), NOW()),
  
-(UUID(), 'admin', '系统管理员', '系统管理员角色，可以管理用户、角色、应用等', 1, 1, 
+(UUID(), 'admin', '系统管理员', '系统管理员角色，可以管理用户、角色、权限、应用等', 1, 1, 
  JSON_ARRAY(
    'user:*:*',
-   'role:read:*',
+   'role:*:*',
+   'permission:*:*',
    'application:*:*',
    'scope:*:*',
    'claim-type:*:*',
-   'system-metadata:*:*'
+   'system-metadata:*:*',
+   'audit-log:read:*'
  ), NOW()),
  
 (UUID(), 'user_manager', '用户管理员', '负责用户账号管理', 1, 1, 
