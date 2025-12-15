@@ -332,71 +332,64 @@
     <a-modal
       v-model:visible="roleModalVisible"
       :title="`分配角色 - ${currentUser?.username}`"
-      width="750px"
+      width="800px"
       :mask-closable="false"
       @cancel="handleRoleCancel"
       @before-ok="handleRoleBeforeOk"
     >
       <a-spin :loading="roleLoading" style="width: 100%">
-        <a-transfer
-          :data="allRoles"
-          :target-keys="selectedRoleIds"
-          :title="['可分配角色', '已分配角色']"
-          show-search
-          :filter-option="filterRoleOption"
-          @change="handleRoleChange"
-        >
-          <template #source="{ selectedKeys, onSelect }">
-            <div class="transfer-panel">
-              <div
-                v-for="role in availableRoles"
-                :key="role.value"
-                class="transfer-item"
-                :class="{ selected: selectedKeys.includes(role.value) }"
-                @click="
-                  () => onSelect(role.value, !selectedKeys.includes(role.value))
-                "
-              >
-                <a-checkbox
-                  :model-value="selectedKeys.includes(role.value)"
-                  @click.stop="
-                    () =>
-                      onSelect(role.value, !selectedKeys.includes(role.value))
-                  "
-                />
-                <div class="role-info">
-                  <div class="role-name">{{ role.label }}</div>
-                  <div class="role-code">{{ role.name }}</div>
+        <div class="role-assignment">
+          <a-input-search
+            v-model="roleSearchText"
+            placeholder="搜索角色..."
+            allow-clear
+            style="margin-bottom: 16px"
+          />
+          <a-transfer
+            :data="allRoles"
+            v-model="selectedRoleIds"
+            :title="['可分配角色', '已分配角色']"
+            :show-search="false"
+            @change="handleRoleChange"
+          >
+            <template #source="{ data: sourceData, selectedKeys, onSelect }">
+              <div class="role-list">
+                <div
+                  v-for="item in sourceData"
+                  :key="item.value"
+                  class="role-item"
+                  @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter((k: string) => k !== item.value) : [...selectedKeys, item.value]])"
+                >
+                  <a-checkbox
+                    :model-value="selectedKeys.includes(item.value)"
+                  />
+                  <div class="role-info">
+                    <div class="role-name">{{ item.label }}</div>
+                    <div class="role-code">{{ item.name }}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </template>
-          <template #target="{ selectedKeys, onSelect }">
-            <div class="transfer-panel">
-              <div
-                v-for="role in assignedRoles"
-                :key="role.value"
-                class="transfer-item"
-                :class="{ selected: selectedKeys.includes(role.value) }"
-                @click="
-                  () => onSelect(role.value, !selectedKeys.includes(role.value))
-                "
-              >
-                <a-checkbox
-                  :model-value="selectedKeys.includes(role.value)"
-                  @click.stop="
-                    () =>
-                      onSelect(role.value, !selectedKeys.includes(role.value))
-                  "
-                />
-                <div class="role-info">
-                  <div class="role-name">{{ role.label }}</div>
-                  <div class="role-code">{{ role.name }}</div>
+            </template>
+            <template #target="{ data: targetData, selectedKeys, onSelect }">
+              <div class="role-list">
+                <div
+                  v-for="item in targetData"
+                  :key="item.value"
+                  class="role-item"
+                  @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter((k: string) => k !== item.value) : [...selectedKeys, item.value]])"
+                >
+                  <a-checkbox
+                    :model-value="selectedKeys.includes(item.value)"
+                  />
+                  <div class="role-info">
+                    <div class="role-name">{{ item.label }}</div>
+                    <div class="role-code">{{ item.name }}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </template>
-        </a-transfer>
+            </template>
+          </a-transfer>
+        </div>
       </a-spin>
     </a-modal>
   </div>
@@ -427,11 +420,25 @@
 
   // 角色分配相关状态
   const roleLoading = ref(false);
-  const allRoles = ref<Array<{ value: string; label: string; name: string }>>(
-    []
-  );
+  const roleSearchText = ref('');
+  const allRolesRaw = ref<
+    Array<{ value: string; label: string; name: string }>
+  >([]);
   const selectedRoleIds = ref<string[]>([]);
   const initialRoleIds = ref<string[]>([]);
+
+  // 过滤后的角色列表
+  const allRoles = computed(() => {
+    if (!roleSearchText.value) {
+      return allRolesRaw.value;
+    }
+    const keyword = roleSearchText.value.toLowerCase();
+    return allRolesRaw.value.filter(
+      (role) =>
+        role.label.toLowerCase().includes(keyword) ||
+        role.name.toLowerCase().includes(keyword)
+    );
+  });
 
   const columns = reactive([
     {
@@ -693,29 +700,17 @@
     }
   };
 
-  // 角色分配相关计算属性
-  const availableRoles = computed(() => {
-    return allRoles.value.filter(
-      (role) => !selectedRoleIds.value.includes(role.value)
-    );
-  });
-
-  const assignedRoles = computed(() => {
-    return allRoles.value.filter((role) =>
-      selectedRoleIds.value.includes(role.value)
-    );
-  });
-
   // 角色分配相关处理函数
   const handleAssignRoles = async (record: IUser) => {
     currentUser.value = record;
     roleLoading.value = true;
     roleModalVisible.value = true;
+    roleSearchText.value = ''; // 重置搜索
 
     try {
       // 加载所有活动角色
       const roles = await getAllActiveRoles();
-      allRoles.value = roles.map((role) => ({
+      allRolesRaw.value = roles.map((role) => ({
         value: role.id!,
         label: role.displayName,
         name: role.name,
@@ -737,13 +732,6 @@
 
   const handleRoleChange = (newTargetKeys: string[]) => {
     selectedRoleIds.value = newTargetKeys;
-  };
-
-  const filterRoleOption = (inputValue: string, option: any) => {
-    return (
-      option.label.toLowerCase().includes(inputValue.toLowerCase()) ||
-      option.name.toLowerCase().includes(inputValue.toLowerCase())
-    );
   };
 
   const handleRoleBeforeOk = async () => {
@@ -773,7 +761,8 @@
   const handleRoleCancel = () => {
     selectedRoleIds.value = [];
     initialRoleIds.value = [];
-    allRoles.value = [];
+    allRolesRaw.value = [];
+    roleSearchText.value = '';
     currentUser.value = null;
   };
 </script>
@@ -899,45 +888,52 @@
     }
   }
 
-  .transfer-panel {
-    padding: 8px;
-    min-height: 450px;
-    max-height: 550px;
-    overflow-y: auto;
-
-    .transfer-item {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      margin-bottom: 4px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:hover {
-        background-color: var(--color-fill-2);
+  // 角色分配样式
+  .role-assignment {
+    :deep(.arco-transfer) {
+      .arco-transfer-view {
+        width: calc(50% - 25px);
+        height: 400px;
       }
+    }
 
-      &.selected {
-        background-color: var(--color-primary-light-1);
-      }
+    .role-list {
+      padding: 8px;
+      max-height: 360px;
+      overflow-y: auto;
 
-      .role-info {
-        flex: 1;
-        margin-left: 8px;
+      .role-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 8px;
+        margin-bottom: 4px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
 
-        .role-name {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--color-text-1);
-          line-height: 1.5;
+        &:hover {
+          background-color: var(--color-fill-2);
         }
 
-        .role-code {
-          font-size: 12px;
-          color: var(--color-text-3);
-          font-family: 'Consolas', 'Monaco', monospace;
+        .arco-checkbox {
+          margin-right: 8px;
           margin-top: 2px;
+        }
+
+        .role-info {
+          flex: 1;
+
+          .role-name {
+            font-size: 14px;
+            color: var(--color-text-1);
+            margin-bottom: 2px;
+          }
+
+          .role-code {
+            font-size: 12px;
+            color: var(--color-text-3);
+            font-family: 'Courier New', monospace;
+          }
         }
       }
     }
