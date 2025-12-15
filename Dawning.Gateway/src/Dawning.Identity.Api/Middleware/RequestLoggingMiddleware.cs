@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace Dawning.Identity.Api.Middleware
@@ -17,7 +17,10 @@ namespace Dawning.Identity.Api.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<RequestLoggingMiddleware> _logger;
 
-        public RequestLoggingMiddleware(RequestDelegate next, ILogger<RequestLoggingMiddleware> logger)
+        public RequestLoggingMiddleware(
+            RequestDelegate next,
+            ILogger<RequestLoggingMiddleware> logger
+        )
         {
             _next = next;
             _logger = logger;
@@ -27,7 +30,7 @@ namespace Dawning.Identity.Api.Middleware
         {
             var stopwatch = Stopwatch.StartNew();
             var requestId = Guid.NewGuid().ToString("N");
-            
+
             // 记录请求信息
             var requestInfo = await FormatRequest(context.Request, requestId);
             _logger.LogInformation(requestInfo);
@@ -50,8 +53,9 @@ namespace Dawning.Identity.Api.Middleware
                 stopwatch.Stop();
 
                 // 记录响应基本信息（不读取响应体）
-                var responseInfo = $"[Response {requestId}] Status: {context.Response.StatusCode}, Time: {stopwatch.ElapsedMilliseconds}ms";
-                
+                var responseInfo =
+                    $"[Response {requestId}] Status: {context.Response.StatusCode}, Time: {stopwatch.ElapsedMilliseconds}ms";
+
                 if (stopwatch.ElapsedMilliseconds > 3000)
                 {
                     _logger.LogWarning($"Slow request detected: {responseInfo}");
@@ -64,7 +68,10 @@ namespace Dawning.Identity.Api.Middleware
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                _logger.LogError(ex, $"Request {requestId} failed after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}");
+                _logger.LogError(
+                    ex,
+                    $"Request {requestId} failed after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}"
+                );
                 throw;
             }
         }
@@ -95,7 +102,11 @@ namespace Dawning.Identity.Api.Middleware
             return builder.ToString();
         }
 
-        private async Task<string> FormatResponse(HttpResponse response, string requestId, long elapsedMs)
+        private async Task<string> FormatResponse(
+            HttpResponse response,
+            string requestId,
+            long elapsedMs
+        )
         {
             var builder = new StringBuilder();
             builder.AppendLine($"[Response {requestId}]");
@@ -110,7 +121,10 @@ namespace Dawning.Identity.Api.Middleware
         private bool IsSensitiveHeader(string headerName)
         {
             var sensitiveHeaders = new[] { "Authorization", "Cookie", "Set-Cookie", "X-API-Key" };
-            return Array.Exists(sensitiveHeaders, h => h.Equals(headerName, StringComparison.OrdinalIgnoreCase));
+            return Array.Exists(
+                sensitiveHeaders,
+                h => h.Equals(headerName, StringComparison.OrdinalIgnoreCase)
+            );
         }
     }
 }

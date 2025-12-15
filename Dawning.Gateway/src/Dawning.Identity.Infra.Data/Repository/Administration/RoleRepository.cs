@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Models;
@@ -6,10 +10,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Administration;
 using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using Dawning.Shared.Dapper.Contrib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.Administration
@@ -40,7 +40,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<Role?> GetByNameAsync(string name)
         {
-            var result = await _context.Connection.Builder<RoleEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<RoleEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(name), r => r.Name == name)
                 .AsListAsync();
 
@@ -50,14 +51,24 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <summary>
         /// 获取分页角色列表
         /// </summary>
-        public async Task<PagedData<Role>> GetPagedListAsync(RoleModel model, int page, int itemsPerPage)
+        public async Task<PagedData<Role>> GetPagedListAsync(
+            RoleModel model,
+            int page,
+            int itemsPerPage
+        )
         {
             var builder = _context.Connection.Builder<RoleEntity>(_context.Transaction);
 
             // 应用过滤条件
             builder = builder
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Name), r => r.Name!.Contains(model.Name ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), r => r.DisplayName!.Contains(model.DisplayName ?? ""))
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Name),
+                    r => r.Name!.Contains(model.Name ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.DisplayName),
+                    r => r.DisplayName!.Contains(model.DisplayName ?? "")
+                )
                 .WhereIf(model.IsActive.HasValue, r => r.IsActive == model.IsActive!.Value)
                 .WhereIf(model.IsSystem.HasValue, r => r.IsSystem == model.IsSystem!.Value);
 
@@ -71,7 +82,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
         }
 
@@ -80,7 +91,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<IEnumerable<Role>> GetAllAsync()
         {
-            var entities = await _context.Connection.Builder<RoleEntity>(_context.Transaction)
+            var entities = await _context
+                .Connection.Builder<RoleEntity>(_context.Transaction)
                 .Where(r => r.DeletedAt == null)
                 .OrderBy(r => r.Name)
                 .AsListAsync();
@@ -117,8 +129,12 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Role model)
         {
-            var entity = await _context.Connection.GetAsync<RoleEntity>(model.Id, _context.Transaction);
-            if (entity == null) return false;
+            var entity = await _context.Connection.GetAsync<RoleEntity>(
+                model.Id,
+                _context.Transaction
+            );
+            if (entity == null)
+                return false;
 
             entity.DeletedAt = DateTime.UtcNow;
             entity.UpdatedAt = DateTime.UtcNow;
@@ -133,7 +149,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<bool> NameExistsAsync(string name, Guid? excludeRoleId = null)
         {
-            var builder = _context.Connection.Builder<RoleEntity>(_context.Transaction)
+            var builder = _context
+                .Connection.Builder<RoleEntity>(_context.Transaction)
                 .Where(r => r.Name == name)
                 .Where(r => r.DeletedAt == null);
 

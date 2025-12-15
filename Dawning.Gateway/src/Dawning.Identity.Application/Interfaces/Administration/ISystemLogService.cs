@@ -18,7 +18,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         /// <param name="exception">异常对象</param>
         /// <param name="httpContext">HTTP上下文</param>
         /// <param name="statusCode">HTTP状态码</param>
-        Task LogErrorAsync(Exception exception, HttpContext? httpContext = null, int? statusCode = null);
+        Task LogErrorAsync(
+            Exception exception,
+            HttpContext? httpContext = null,
+            int? statusCode = null
+        );
 
         /// <summary>
         /// 记录警告日志
@@ -52,7 +56,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         /// <param name="queryModel">查询模型</param>
         /// <param name="page">页码</param>
         /// <param name="itemsPerPage">每页条数</param>
-        Task<PagedData<SystemLogDto>> GetPagedListAsync(SystemLogQueryModel queryModel, int page, int itemsPerPage);
+        Task<PagedData<SystemLogDto>> GetPagedListAsync(
+            SystemLogQueryModel queryModel,
+            int page,
+            int itemsPerPage
+        );
 
         /// <summary>
         /// 删除指定日期之前的日志

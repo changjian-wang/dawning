@@ -1,7 +1,4 @@
 ﻿namespace Dawning.Shared.Authentication
 {
-    public class Class1
-    {
-
-    }
+    public class Class1 { }
 }

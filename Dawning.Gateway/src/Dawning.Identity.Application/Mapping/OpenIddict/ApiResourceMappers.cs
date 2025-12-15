@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using System.Collections.Generic;
 
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
@@ -14,8 +14,9 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
 
         static ApiResourceMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<ApiResourceProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg =>
+                cfg.AddProfile<ApiResourceProfile>()
+            ).CreateMapper();
         }
 
         public static ApiResourceDto? ToDto(this ApiResource model)
@@ -43,7 +44,10 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
         {
             CreateMap<ApiResource, ApiResourceDto>();
             CreateMap<ApiResourceDto, ApiResource>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? System.Guid.NewGuid()));
+                .ForMember(
+                    dest => dest.Id,
+                    opt => opt.MapFrom(src => src.Id ?? System.Guid.NewGuid())
+                );
         }
     }
 }

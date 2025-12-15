@@ -1,6 +1,6 @@
-using Dawning.Identity.Domain.Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using Dawning.Identity.Domain.Core.Interfaces;
 
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {

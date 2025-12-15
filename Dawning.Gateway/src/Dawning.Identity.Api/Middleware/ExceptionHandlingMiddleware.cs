@@ -1,11 +1,11 @@
-using Dawning.Identity.Application.Interfaces.Administration;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dawning.Identity.Application.Interfaces.Administration;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Dawning.Identity.Api.Middleware
 {
@@ -18,7 +18,10 @@ namespace Dawning.Identity.Api.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(
+            RequestDelegate next,
+            ILogger<ExceptionHandlingMiddleware> logger
+        )
         {
             _next = next;
             _logger = logger;
@@ -32,11 +35,13 @@ namespace Dawning.Identity.Api.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, 
+                _logger.LogError(
+                    ex,
                     "Unhandled exception occurred. Path: {Path}, Method: {Method}, User: {User}",
-                    context.Request.Path, 
+                    context.Request.Path,
                     context.Request.Method,
-                    context.User?.Identity?.Name ?? "Anonymous");
+                    context.User?.Identity?.Name ?? "Anonymous"
+                );
 
                 // 记录异常到数据库
                 await LogExceptionToDatabaseAsync(context, ex);
@@ -63,7 +68,7 @@ namespace Dawning.Identity.Api.Middleware
                         ArgumentException => (int)HttpStatusCode.BadRequest,
                         UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
                         InvalidOperationException => (int)HttpStatusCode.Conflict,
-                        _ => (int)HttpStatusCode.InternalServerError
+                        _ => (int)HttpStatusCode.InternalServerError,
                     };
 
                     await systemLogService.LogErrorAsync(exception, context, statusCode);
@@ -86,13 +91,13 @@ namespace Dawning.Identity.Api.Middleware
             }
 
             context.Response.ContentType = "application/json";
-            
+
             var response = new ErrorResponse
             {
                 Success = false,
                 Message = "An internal server error occurred.",
                 ErrorDetails = exception.Message,
-                Timestamp = DateTime.UtcNow
+                Timestamp = DateTime.UtcNow,
             };
 
             // 根据异常类型设置不同的状态码
@@ -128,10 +133,10 @@ namespace Dawning.Identity.Api.Middleware
                     break;
             }
 
-            var jsonResponse = JsonSerializer.Serialize(response, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            var jsonResponse = JsonSerializer.Serialize(
+                response,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
+            );
 
             await context.Response.WriteAsync(jsonResponse);
         }

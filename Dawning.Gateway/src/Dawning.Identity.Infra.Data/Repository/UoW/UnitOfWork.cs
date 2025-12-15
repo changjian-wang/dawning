@@ -1,11 +1,11 @@
-﻿using Dawning.Identity.Domain.Interfaces.Administration;
+﻿using System;
+using System.Threading.Tasks;
+using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Repository.Administration;
 using Dawning.Identity.Infra.Data.Repository.OpenIddict;
-using System;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Infra.Data.Repository.UoW
 {
@@ -96,7 +96,8 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+                return;
 
             if (disposing)
             {
@@ -107,4 +108,3 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         }
     }
 }
-

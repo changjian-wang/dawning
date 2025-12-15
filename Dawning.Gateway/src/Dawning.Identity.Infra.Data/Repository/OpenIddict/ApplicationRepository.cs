@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using System;
+using Dapper;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models;
@@ -7,7 +8,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.OpenIddict;
 using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 using Dawning.Shared.Dapper.Contrib;
-using System;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
@@ -29,7 +29,10 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Application> GetAsync(Guid id)
         {
-            ApplicationEntity entity = await _context.Connection.GetAsync<ApplicationEntity>(id, _context.Transaction);
+            ApplicationEntity entity = await _context.Connection.GetAsync<ApplicationEntity>(
+                id,
+                _context.Transaction
+            );
             return entity?.ToModel() ?? new Application();
         }
 
@@ -38,7 +41,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Application?> GetByClientIdAsync(string clientId)
         {
-            var result = await _context.Connection.Builder<ApplicationEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<ApplicationEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(clientId), a => a.ClientId == clientId)
                 .AsListAsync();
 
@@ -48,11 +52,22 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// <summary>
         /// 获取分页列表
         /// </summary>
-        public async Task<PagedData<Application>> GetPagedListAsync(ApplicationModel model, int page, int itemsPerPage)
+        public async Task<PagedData<Application>> GetPagedListAsync(
+            ApplicationModel model,
+            int page,
+            int itemsPerPage
+        )
         {
-            PagedResult<ApplicationEntity> result = await _context.Connection.Builder<ApplicationEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.ClientId), a => a.ClientId!.Contains(model.ClientId ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), a => a.DisplayName!.Contains(model.DisplayName ?? ""))
+            PagedResult<ApplicationEntity> result = await _context
+                .Connection.Builder<ApplicationEntity>(_context.Transaction)
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.ClientId),
+                    a => a.ClientId!.Contains(model.ClientId ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.DisplayName),
+                    a => a.DisplayName!.Contains(model.DisplayName ?? "")
+                )
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Type), a => a.Type == model.Type)
                 .AsPagedListAsync(page, itemsPerPage);
 
@@ -61,7 +76,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
 
             return pagedData;
@@ -72,7 +87,9 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<IEnumerable<Application>> GetAllAsync()
         {
-            var list = await _context.Connection.GetAllAsync<ApplicationEntity>(_context.Transaction);
+            var list = await _context.Connection.GetAllAsync<ApplicationEntity>(
+                _context.Transaction
+            );
             return list?.ToModels() ?? new List<Application>();
         }
 
@@ -120,4 +137,3 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
     }
 }
-

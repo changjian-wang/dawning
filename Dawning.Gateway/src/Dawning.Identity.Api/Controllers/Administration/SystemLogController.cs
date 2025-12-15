@@ -1,10 +1,10 @@
+using System;
+using System.Threading.Tasks;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Api.Controllers.Administration
 {
@@ -21,7 +21,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
         public SystemLogController(
             ISystemLogService systemLogService,
-            ILogger<SystemLogController> logger)
+            ILogger<SystemLogController> logger
+        )
         {
             _systemLogService = systemLogService;
             _logger = logger;
@@ -51,7 +52,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20
+        )
         {
             try
             {
@@ -64,27 +66,32 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     IpAddress = ipAddress,
                     RequestPath = requestPath,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
                 };
 
                 var result = await _systemLogService.GetPagedListAsync(queryModel, page, pageSize);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Success",
-                    data = result
-                });
+                return Ok(
+                    new
+                    {
+                        code = 20000,
+                        message = "Success",
+                        data = result,
+                    }
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting paged system logs");
-                return StatusCode(500, new
-                {
-                    code = 50000,
-                    message = "Failed to retrieve system logs",
-                    error = ex.Message
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        code = 50000,
+                        message = "Failed to retrieve system logs",
+                        error = ex.Message,
+                    }
+                );
             }
         }
 
@@ -98,32 +105,33 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var log = await _systemLogService.GetAsync(id);
-                
+
                 if (log == null)
                 {
-                    return NotFound(new
-                    {
-                        code = 40400,
-                        message = "System log not found"
-                    });
+                    return NotFound(new { code = 40400, message = "System log not found" });
                 }
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Success",
-                    data = log
-                });
+                return Ok(
+                    new
+                    {
+                        code = 20000,
+                        message = "Success",
+                        data = log,
+                    }
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting system log {Id}", id);
-                return StatusCode(500, new
-                {
-                    code = 50000,
-                    message = "Failed to retrieve system log",
-                    error = ex.Message
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        code = 50000,
+                        message = "Failed to retrieve system log",
+                        error = ex.Message,
+                    }
+                );
             }
         }
 
@@ -139,22 +147,31 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var count = await _systemLogService.DeleteOlderThanAsync(beforeDate);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = $"Successfully deleted {count} log entries",
-                    data = new { deletedCount = count }
-                });
+                return Ok(
+                    new
+                    {
+                        code = 20000,
+                        message = $"Successfully deleted {count} log entries",
+                        data = new { deletedCount = count },
+                    }
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error cleaning up system logs before {BeforeDate}", beforeDate);
-                return StatusCode(500, new
-                {
-                    code = 50000,
-                    message = "Failed to cleanup system logs",
-                    error = ex.Message
-                });
+                _logger.LogError(
+                    ex,
+                    "Error cleaning up system logs before {BeforeDate}",
+                    beforeDate
+                );
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        code = 50000,
+                        message = "Failed to cleanup system logs",
+                        error = ex.Message,
+                    }
+                );
             }
         }
 
@@ -169,22 +186,27 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var log = await _systemLogService.CreateAsync(dto);
 
-                return Ok(new
-                {
-                    code = 20000,
-                    message = "Log created successfully",
-                    data = log
-                });
+                return Ok(
+                    new
+                    {
+                        code = 20000,
+                        message = "Log created successfully",
+                        data = log,
+                    }
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating test log");
-                return StatusCode(500, new
-                {
-                    code = 50000,
-                    message = "Failed to create log",
-                    error = ex.Message
-                });
+                return StatusCode(
+                    500,
+                    new
+                    {
+                        code = 50000,
+                        message = "Failed to create log",
+                        error = ex.Message,
+                    }
+                );
             }
         }
     }

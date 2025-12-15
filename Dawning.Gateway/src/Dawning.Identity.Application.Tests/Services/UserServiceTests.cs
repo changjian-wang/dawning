@@ -25,11 +25,12 @@ public class UserServiceTests
         _userRepositoryMock = new Mock<IUserRepository>();
         _uowMock = new Mock<IUnitOfWork>();
         _mapperMock = new Mock<IMapper>();
-        
+
         _userService = new UserService(
             _userRepositoryMock.Object,
             _uowMock.Object,
-            _mapperMock.Object);
+            _mapperMock.Object
+        );
     }
 
     [Fact]
@@ -44,9 +45,9 @@ public class UserServiceTests
             Email = "test@test.com",
             DisplayName = "Test User",
             Role = "user",
-            IsActive = true
+            IsActive = true,
         };
-        
+
         var userDto = new UserDto
         {
             Id = userId,
@@ -54,16 +55,12 @@ public class UserServiceTests
             Email = "test@test.com",
             DisplayName = "Test User",
             Role = "user",
-            IsActive = true
+            IsActive = true,
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync(user);
-        
-        _mapperMock
-            .Setup(x => x.Map<UserDto>(user))
-            .Returns(userDto);
+        _userRepositoryMock.Setup(x => x.GetAsync(userId)).ReturnsAsync(user);
+
+        _mapperMock.Setup(x => x.Map<UserDto>(user)).Returns(userDto);
 
         // Act
         var result = await _userService.GetByIdAsync(userId);
@@ -80,9 +77,7 @@ public class UserServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        _userRepositoryMock
-            .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync((User?)null);
+        _userRepositoryMock.Setup(x => x.GetAsync(userId)).ReturnsAsync((User?)null);
 
         // Act
         var result = await _userService.GetByIdAsync(userId);
@@ -100,23 +95,19 @@ public class UserServiceTests
         {
             Id = Guid.NewGuid(),
             Username = username,
-            Email = "test@test.com"
+            Email = "test@test.com",
         };
-        
+
         var userDto = new UserDto
         {
             Id = user.Id,
             Username = username,
-            Email = "test@test.com"
+            Email = "test@test.com",
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetByUsernameAsync(username))
-            .ReturnsAsync(user);
-        
-        _mapperMock
-            .Setup(x => x.Map<UserDto>(user))
-            .Returns(userDto);
+        _userRepositoryMock.Setup(x => x.GetByUsernameAsync(username)).ReturnsAsync(user);
+
+        _mapperMock.Setup(x => x.Map<UserDto>(user)).Returns(userDto);
 
         // Act
         var result = await _userService.GetByUsernameAsync(username);
@@ -137,7 +128,7 @@ public class UserServiceTests
             Email = "new@test.com",
             DisplayName = "New User",
             Role = "user",
-            IsActive = true
+            IsActive = true,
         };
 
         var userId = Guid.NewGuid();
@@ -148,7 +139,7 @@ public class UserServiceTests
             Email = createDto.Email,
             DisplayName = createDto.DisplayName,
             Role = createDto.Role,
-            IsActive = true
+            IsActive = true,
         };
 
         _userRepositoryMock
@@ -159,13 +150,9 @@ public class UserServiceTests
             .Setup(x => x.EmailExistsAsync(createDto.Email!, null))
             .ReturnsAsync(false);
 
-        _userRepositoryMock
-            .Setup(x => x.InsertAsync(It.IsAny<User>()))
-            .ReturnsAsync(1);
+        _userRepositoryMock.Setup(x => x.InsertAsync(It.IsAny<User>())).ReturnsAsync(1);
 
-        _mapperMock
-            .Setup(x => x.Map<UserDto>(It.IsAny<User>()))
-            .Returns(userDto);
+        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>())).Returns(userDto);
 
         // Act
         var result = await _userService.CreateAsync(createDto, null);
@@ -188,7 +175,7 @@ public class UserServiceTests
             Email = "updated@test.com",
             DisplayName = "Updated User",
             Role = "admin",
-            IsActive = false
+            IsActive = false,
         };
 
         var existingUser = new User
@@ -198,7 +185,7 @@ public class UserServiceTests
             Email = "old@test.com",
             DisplayName = "Old User",
             Role = "user",
-            IsActive = true
+            IsActive = true,
         };
 
         var updatedUserDto = new UserDto
@@ -208,24 +195,18 @@ public class UserServiceTests
             Email = updateDto.Email,
             DisplayName = updateDto.DisplayName,
             Role = updateDto.Role,
-            IsActive = false
+            IsActive = false,
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync(existingUser);
+        _userRepositoryMock.Setup(x => x.GetAsync(userId)).ReturnsAsync(existingUser);
 
         _userRepositoryMock
             .Setup(x => x.EmailExistsAsync(updateDto.Email!, userId))
             .ReturnsAsync(false);
 
-        _userRepositoryMock
-            .Setup(x => x.UpdateAsync(It.IsAny<User>()))
-            .ReturnsAsync(true);
+        _userRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(true);
 
-        _mapperMock
-            .Setup(x => x.Map<UserDto>(It.IsAny<User>()))
-            .Returns(updatedUserDto);
+        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>())).Returns(updatedUserDto);
 
         // Act
         var result = await _userService.UpdateAsync(updateDto, null);
@@ -248,16 +229,12 @@ public class UserServiceTests
         {
             Id = userId,
             Username = "testuser",
-            Email = "test@test.com"
+            Email = "test@test.com",
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync(user);
+        _userRepositoryMock.Setup(x => x.GetAsync(userId)).ReturnsAsync(user);
 
-        _userRepositoryMock
-            .Setup(x => x.DeleteAsync(It.IsAny<User>()))
-            .ReturnsAsync(true);
+        _userRepositoryMock.Setup(x => x.DeleteAsync(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
         await _userService.DeleteAsync(userId);
@@ -273,8 +250,18 @@ public class UserServiceTests
         var model = new UserModel { Username = "test" };
         var users = new List<User>
         {
-            new() { Id = Guid.NewGuid(), Username = "testuser1", Email = "test1@test.com" },
-            new() { Id = Guid.NewGuid(), Username = "testuser2", Email = "test2@test.com" }
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Username = "testuser1",
+                Email = "test1@test.com",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Username = "testuser2",
+                Email = "test2@test.com",
+            },
         };
 
         var pagedData = new PagedData<User>
@@ -282,26 +269,30 @@ public class UserServiceTests
             PageIndex = 1,
             PageSize = 10,
             TotalCount = 2,
-            Items = users
+            Items = users,
         };
 
         var userDtos = new List<UserDto>
         {
-            new() { Id = users[0].Id, Username = "testuser1", Email = "test1@test.com" },
-            new() { Id = users[1].Id, Username = "testuser2", Email = "test2@test.com" }
+            new()
+            {
+                Id = users[0].Id,
+                Username = "testuser1",
+                Email = "test1@test.com",
+            },
+            new()
+            {
+                Id = users[1].Id,
+                Username = "testuser2",
+                Email = "test2@test.com",
+            },
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetPagedListAsync(model, 1, 10))
-            .ReturnsAsync(pagedData);
+        _userRepositoryMock.Setup(x => x.GetPagedListAsync(model, 1, 10)).ReturnsAsync(pagedData);
 
-        _mapperMock
-            .Setup(x => x.Map<UserDto>(users[0]))
-            .Returns(userDtos[0]);
-        
-        _mapperMock
-            .Setup(x => x.Map<UserDto>(users[1]))
-            .Returns(userDtos[1]);
+        _mapperMock.Setup(x => x.Map<UserDto>(users[0])).Returns(userDtos[0]);
+
+        _mapperMock.Setup(x => x.Map<UserDto>(users[1])).Returns(userDtos[1]);
 
         // Act
         var result = await _userService.GetPagedListAsync(model, 1, 10);
@@ -325,23 +316,21 @@ public class UserServiceTests
             Id = userId,
             Username = "testuser",
             Email = "test@test.com",
-            PasswordHash = "oldHash"
+            PasswordHash = "oldHash",
         };
 
-        _userRepositoryMock
-            .Setup(x => x.GetAsync(userId))
-            .ReturnsAsync(user);
+        _userRepositoryMock.Setup(x => x.GetAsync(userId)).ReturnsAsync(user);
 
-        _userRepositoryMock
-            .Setup(x => x.UpdateAsync(It.IsAny<User>()))
-            .ReturnsAsync(true);
+        _userRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(true);
 
         // Act
         await _userService.ResetPasswordAsync(userId, newPassword);
 
         // Assert
         _userRepositoryMock.Verify(x => x.GetAsync(userId), Times.Once);
-        _userRepositoryMock.Verify(x => x.UpdateAsync(It.Is<User>(u => 
-            u.Id == userId && u.PasswordHash != "oldHash")), Times.Once);
+        _userRepositoryMock.Verify(
+            x => x.UpdateAsync(It.Is<User>(u => u.Id == userId && u.PasswordHash != "oldHash")),
+            Times.Once
+        );
     }
 }

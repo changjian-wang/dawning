@@ -1,12 +1,12 @@
+using System;
+using System.Threading.Tasks;
+using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Models.Administration;
-using Dawning.Identity.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Api.Controllers.Administration
 {
@@ -21,7 +21,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
         private readonly IAuditLogService _auditLogService;
         private readonly ILogger<AuditLogController> _logger;
 
-        public AuditLogController(IAuditLogService auditLogService, ILogger<AuditLogController> logger)
+        public AuditLogController(
+            IAuditLogService auditLogService,
+            ILogger<AuditLogController> logger
+        )
         {
             _auditLogService = auditLogService;
             _logger = logger;
@@ -67,7 +70,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
             [FromQuery] string? startDate,
             [FromQuery] string? endDate,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             try
             {
@@ -83,7 +87,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     }
                     else
                     {
-                        return BadRequest(ApiResponse.Error(40000, $"Invalid startDate format: {startDate}"));
+                        return BadRequest(
+                            ApiResponse.Error(40000, $"Invalid startDate format: {startDate}")
+                        );
                     }
                 }
 
@@ -95,16 +101,27 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     }
                     else
                     {
-                        return BadRequest(ApiResponse.Error(40000, $"Invalid endDate format: {endDate}"));
+                        return BadRequest(
+                            ApiResponse.Error(40000, $"Invalid endDate format: {endDate}")
+                        );
                     }
                 }
 
                 _logger.LogInformation(
-                    "GetList called with parameters: userId={UserId}, username={Username}, action={Action}, " +
-                    "entityType={EntityType}, entityId={EntityId}, ipAddress={IpAddress}, " +
-                    "startDate={StartDate}, endDate={EndDate}, page={Page}, pageSize={PageSize}",
-                    userId, username, action, entityType, entityId, ipAddress, 
-                    parsedStartDate, parsedEndDate, page, pageSize);
+                    "GetList called with parameters: userId={UserId}, username={Username}, action={Action}, "
+                        + "entityType={EntityType}, entityId={EntityId}, ipAddress={IpAddress}, "
+                        + "startDate={StartDate}, endDate={EndDate}, page={Page}, pageSize={PageSize}",
+                    userId,
+                    username,
+                    action,
+                    entityType,
+                    entityId,
+                    ipAddress,
+                    parsedStartDate,
+                    parsedEndDate,
+                    page,
+                    pageSize
+                );
 
                 var model = new AuditLogModel
                 {
@@ -115,23 +132,33 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     EntityId = entityId,
                     IpAddress = ipAddress,
                     StartDate = parsedStartDate,
-                    EndDate = parsedEndDate
+                    EndDate = parsedEndDate,
                 };
 
                 var result = await _auditLogService.GetPagedListAsync(model, page, pageSize);
 
-                _logger.LogInformation("Audit log list retrieved: page {Page}, total {Total}", page, result.TotalCount);
+                _logger.LogInformation(
+                    "Audit log list retrieved: page {Page}, total {Total}",
+                    page,
+                    result.TotalCount
+                );
 
-                return Ok(ApiResponse<object>.SuccessPaged(
-                    result.Items,
-                    result.PageIndex,
-                    result.PageSize,
-                    result.TotalCount));
+                return Ok(
+                    ApiResponse<object>.SuccessPaged(
+                        result.Items,
+                        result.PageIndex,
+                        result.PageSize,
+                        result.TotalCount
+                    )
+                );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving audit log list: {Message}", ex.Message);
-                return StatusCode(500, ApiResponse.Error(50000, $"Internal server error: {ex.Message}"));
+                return StatusCode(
+                    500,
+                    ApiResponse.Error(50000, $"Internal server error: {ex.Message}")
+                );
             }
         }
 
@@ -146,8 +173,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 var auditLog = await _auditLogService.CreateAsync(dto);
-                return CreatedAtAction(nameof(GetById), new { id = auditLog.Id }, 
-                    ApiResponse<object>.Success(auditLog));
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new { id = auditLog.Id },
+                    ApiResponse<object>.Success(auditLog)
+                );
             }
             catch (Exception ex)
             {
@@ -169,7 +199,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var cutoffDate = DateTime.UtcNow.AddDays(-daysToKeep);
                 var deletedCount = await _auditLogService.DeleteOlderThanAsync(cutoffDate);
 
-                return Ok(ApiResponse<object>.Success(new { deletedCount, cutoffDate, daysToKeep }));
+                return Ok(
+                    ApiResponse<object>.Success(
+                        new
+                        {
+                            deletedCount,
+                            cutoffDate,
+                            daysToKeep,
+                        }
+                    )
+                );
             }
             catch (Exception ex)
             {

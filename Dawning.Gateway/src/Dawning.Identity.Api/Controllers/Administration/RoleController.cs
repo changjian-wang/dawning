@@ -1,14 +1,14 @@
-using Dawning.Identity.Application.Dtos.Administration;
-using Dawning.Identity.Application.Interfaces.Administration;
-using Dawning.Identity.Domain.Models.Administration;
-using Dawning.Identity.Api.Helpers;
-using Dawning.Identity.Api.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Dawning.Identity.Api.Helpers;
+using Dawning.Identity.Api.Models;
+using Dawning.Identity.Application.Dtos.Administration;
+using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Domain.Models.Administration;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dawning.Identity.Api.Controllers.Administration
 {
@@ -24,7 +24,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
         private readonly ILogger<RoleController> _logger;
         private readonly AuditLogHelper _auditLogHelper;
 
-        public RoleController(IRoleService roleService, ILogger<RoleController> logger, AuditLogHelper auditLogHelper)
+        public RoleController(
+            IRoleService roleService,
+            ILogger<RoleController> logger,
+            AuditLogHelper auditLogHelper
+        )
         {
             _roleService = roleService;
             _logger = logger;
@@ -92,7 +96,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
             [FromQuery] bool? isActive,
             [FromQuery] bool? isSystem,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             try
             {
@@ -101,16 +106,19 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     Name = name,
                     DisplayName = displayName,
                     IsActive = isActive,
-                    IsSystem = isSystem
+                    IsSystem = isSystem,
                 };
 
                 var result = await _roleService.GetPagedListAsync(model, page, pageSize);
 
-                return Ok(ApiResponse<object>.SuccessPaged(
-                    result.Items,
-                    result.PageIndex,
-                    result.PageSize,
-                    result.TotalCount));
+                return Ok(
+                    ApiResponse<object>.SuccessPaged(
+                        result.Items,
+                        result.PageIndex,
+                        result.PageSize,
+                        result.TotalCount
+                    )
+                );
             }
             catch (Exception ex)
             {
@@ -159,13 +167,20 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     entityType: "Role",
                     entityId: role.Id,
                     description: $"Created role: {role.Name}",
-                    newValues: new { role.Name, role.Description, Permissions = role.Permissions },
-                    statusCode: 201);
+                    newValues: new
+                    {
+                        role.Name,
+                        role.Description,
+                        Permissions = role.Permissions,
+                    },
+                    statusCode: 201
+                );
 
                 return CreatedAtAction(
                     nameof(GetById),
                     new { id = role.Id },
-                    ApiResponse<object>.Success(role, "Role created successfully"));
+                    ApiResponse<object>.Success(role, "Role created successfully")
+                );
             }
             catch (InvalidOperationException ex)
             {
@@ -205,8 +220,21 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     entityType: "Role",
                     entityId: id,
                     description: $"Updated role: {role.Name}",
-                    oldValues: oldRole != null ? new { oldRole.Name, oldRole.Description, Permissions = oldRole.Permissions } : null,
-                    newValues: new { role.Name, role.Description, Permissions = role.Permissions });
+                    oldValues: oldRole != null
+                        ? new
+                        {
+                            oldRole.Name,
+                            oldRole.Description,
+                            Permissions = oldRole.Permissions,
+                        }
+                        : null,
+                    newValues: new
+                    {
+                        role.Name,
+                        role.Description,
+                        Permissions = role.Permissions,
+                    }
+                );
 
                 return Ok(ApiResponse<object>.Success(role, "Role updated successfully"));
             }
@@ -247,7 +275,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     entityType: "Role",
                     entityId: id,
                     description: $"Deleted role: {role?.Name}",
-                    oldValues: role != null ? new { role.Name, role.Description, Permissions = role.Permissions } : null);
+                    oldValues: role != null
+                        ? new
+                        {
+                            role.Name,
+                            role.Description,
+                            Permissions = role.Permissions,
+                        }
+                        : null
+                );
 
                 return Ok(ApiResponse.Success("Role deleted successfully"));
             }
@@ -268,7 +304,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// </summary>
         [HttpGet("check-name")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> CheckName([FromQuery] string name, [FromQuery] Guid? excludeRoleId)
+        public async Task<IActionResult> CheckName(
+            [FromQuery] string name,
+            [FromQuery] Guid? excludeRoleId
+        )
         {
             try
             {
@@ -287,7 +326,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// </summary>
         private Guid? GetCurrentUserId()
         {
-            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
+            var userIdStr =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst("sub")?.Value;
             return Guid.TryParse(userIdStr, out var userId) ? userId : null;
         }
     }

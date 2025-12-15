@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
@@ -7,10 +11,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.OpenIddict;
 using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 using Dawning.Shared.Dapper.Contrib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
@@ -32,16 +32,22 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<ApiResource?> GetAsync(Guid id)
         {
-            var entity = await _context.Connection.GetAsync<ApiResourceEntity>(id, _context.Transaction);
-            if (entity == null) return null;
+            var entity = await _context.Connection.GetAsync<ApiResourceEntity>(
+                id,
+                _context.Transaction
+            );
+            if (entity == null)
+                return null;
 
             // Load scopes
-            var scopes = await _context.Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
+            var scopes = await _context
+                .Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
                 .Where(s => s.ApiResourceId == id)
                 .AsListAsync();
 
             // Load claims
-            var claims = await _context.Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
+            var claims = await _context
+                .Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
                 .Where(c => c.ApiResourceId == id)
                 .AsListAsync();
 
@@ -53,20 +59,24 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<ApiResource?> GetByNameAsync(string name)
         {
-            var result = await _context.Connection.Builder<ApiResourceEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<ApiResourceEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(name), r => r.Name == name)
                 .AsListAsync();
 
             var entity = result.FirstOrDefault();
-            if (entity == null) return null;
+            if (entity == null)
+                return null;
 
             // Load scopes
-            var scopes = await _context.Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
+            var scopes = await _context
+                .Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
                 .Where(s => s.ApiResourceId == entity.Id)
                 .AsListAsync();
 
             // Load claims
-            var claims = await _context.Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
+            var claims = await _context
+                .Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
                 .Where(c => c.ApiResourceId == entity.Id)
                 .AsListAsync();
 
@@ -76,11 +86,22 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// <summary>
         /// 获取分页列表
         /// </summary>
-        public async Task<PagedData<ApiResource>> GetPagedListAsync(ApiResourceModel model, int page, int itemsPerPage)
+        public async Task<PagedData<ApiResource>> GetPagedListAsync(
+            ApiResourceModel model,
+            int page,
+            int itemsPerPage
+        )
         {
-            var result = await _context.Connection.Builder<ApiResourceEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Name), r => r.Name!.Contains(model.Name ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), r => r.DisplayName!.Contains(model.DisplayName ?? ""))
+            var result = await _context
+                .Connection.Builder<ApiResourceEntity>(_context.Transaction)
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Name),
+                    r => r.Name!.Contains(model.Name ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.DisplayName),
+                    r => r.DisplayName!.Contains(model.DisplayName ?? "")
+                )
                 .WhereIf(model.Enabled.HasValue, r => r.Enabled == model.Enabled!.Value)
                 .AsPagedListAsync(page, itemsPerPage);
 
@@ -88,12 +109,14 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
             foreach (var entity in result.Values)
             {
                 // Load scopes
-                var scopes = await _context.Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
+                var scopes = await _context
+                    .Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
                     .Where(s => s.ApiResourceId == entity.Id)
                     .AsListAsync();
 
                 // Load claims
-                var claims = await _context.Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
+                var claims = await _context
+                    .Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
                     .Where(c => c.ApiResourceId == entity.Id)
                     .AsListAsync();
 
@@ -105,7 +128,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = resources
+                Items = resources,
             };
         }
 
@@ -114,18 +137,22 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<IEnumerable<ApiResource>> GetAllAsync()
         {
-            var entities = await _context.Connection.GetAllAsync<ApiResourceEntity>(_context.Transaction);
+            var entities = await _context.Connection.GetAllAsync<ApiResourceEntity>(
+                _context.Transaction
+            );
             var resources = new List<ApiResource>();
 
             foreach (var entity in entities ?? Enumerable.Empty<ApiResourceEntity>())
             {
                 // Load scopes
-                var scopes = await _context.Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
+                var scopes = await _context
+                    .Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
                     .Where(s => s.ApiResourceId == entity.Id)
                     .AsListAsync();
 
                 // Load claims
-                var claims = await _context.Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
+                var claims = await _context
+                    .Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
                     .Where(c => c.ApiResourceId == entity.Id)
                     .AsListAsync();
 
@@ -140,22 +167,29 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<IEnumerable<ApiResource>> GetByNamesAsync(IEnumerable<string> names)
         {
-            if (names == null || !names.Any()) return Enumerable.Empty<ApiResource>();
+            if (names == null || !names.Any())
+                return Enumerable.Empty<ApiResource>();
 
             var nameList = names.ToList();
             var sql = $"SELECT * FROM api_resources WHERE name IN @Names";
-            var entities = await _context.Connection.QueryAsync<ApiResourceEntity>(sql, new { Names = nameList }, _context.Transaction);
+            var entities = await _context.Connection.QueryAsync<ApiResourceEntity>(
+                sql,
+                new { Names = nameList },
+                _context.Transaction
+            );
 
             var resources = new List<ApiResource>();
             foreach (var entity in entities)
             {
                 // Load scopes
-                var scopes = await _context.Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
+                var scopes = await _context
+                    .Connection.Builder<ApiResourceScopeEntity>(_context.Transaction)
                     .Where(s => s.ApiResourceId == entity.Id)
                     .AsListAsync();
 
                 // Load claims
-                var claims = await _context.Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
+                var claims = await _context
+                    .Connection.Builder<ApiResourceClaimEntity>(_context.Transaction)
                     .Where(c => c.ApiResourceId == entity.Id)
                     .AsListAsync();
 
@@ -183,7 +217,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                         Id = Guid.NewGuid(),
                         ApiResourceId = entity.Id,
                         Scope = scope,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
                     };
                     await _context.Connection.InsertAsync(scopeEntity, _context.Transaction);
                 }
@@ -199,7 +233,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                         Id = Guid.NewGuid(),
                         ApiResourceId = entity.Id,
                         Type = claim,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
                     };
                     await _context.Connection.InsertAsync(claimEntity, _context.Transaction);
                 }
@@ -221,12 +255,14 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
             await _context.Connection.ExecuteAsync(
                 "DELETE FROM api_resource_scopes WHERE api_resource_id = @Id",
                 new { Id = entity.Id },
-                _context.Transaction);
+                _context.Transaction
+            );
 
             await _context.Connection.ExecuteAsync(
                 "DELETE FROM api_resource_claims WHERE api_resource_id = @Id",
                 new { Id = entity.Id },
-                _context.Transaction);
+                _context.Transaction
+            );
 
             // Insert new scopes
             if (model.Scopes != null && model.Scopes.Any())
@@ -238,7 +274,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                         Id = Guid.NewGuid(),
                         ApiResourceId = entity.Id,
                         Scope = scope,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
                     };
                     await _context.Connection.InsertAsync(scopeEntity, _context.Transaction);
                 }
@@ -254,7 +290,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                         Id = Guid.NewGuid(),
                         ApiResourceId = entity.Id,
                         Type = claim,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
                     };
                     await _context.Connection.InsertAsync(claimEntity, _context.Transaction);
                 }
@@ -269,7 +305,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         public async ValueTask<bool> DeleteAsync(ApiResource model)
         {
             var entity = model.ToEntity();
-            
+
             // Delete scopes and claims (handled by foreign key cascade)
             return await _context.Connection.DeleteAsync(entity, _context.Transaction);
         }

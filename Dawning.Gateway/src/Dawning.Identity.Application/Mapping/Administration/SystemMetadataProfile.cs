@@ -16,7 +16,8 @@ namespace Dawning.Identity.Application.Mapping.Administration
     {
         public static SystemMetadataDto? ToDto(this SystemMetadata? model)
         {
-            if (model == null) return null;
+            if (model == null)
+                return null;
 
             return new SystemMetadataDto
             {
@@ -28,13 +29,18 @@ namespace Dawning.Identity.Application.Mapping.Administration
                 NonEditable = model.NonEditable,
                 Timestamp = model.Timestamp,
                 Created = model.Created,
-                Updated = model.Updated
+                Updated = model.Updated,
             };
         }
 
-        public static IEnumerable<SystemMetadataDto>? ToDtos(this IEnumerable<SystemMetadata>? models)
+        public static IEnumerable<SystemMetadataDto>? ToDtos(
+            this IEnumerable<SystemMetadata>? models
+        )
         {
-            return models?.Select(m => m.ToDto()).Where(dto => dto != null).Cast<SystemMetadataDto>();
+            return models
+                ?.Select(m => m.ToDto())
+                .Where(dto => dto != null)
+                .Cast<SystemMetadataDto>();
         }
 
         public static SystemMetadata ToEntity(this SystemMetadataDto dto)
@@ -46,7 +52,7 @@ namespace Dawning.Identity.Application.Mapping.Administration
                 Key = dto.Key,
                 Value = dto.Value,
                 Description = dto.Description,
-                NonEditable = dto.NonEditable
+                NonEditable = dto.NonEditable,
             };
         }
     }

@@ -1,5 +1,5 @@
-using Dawning.Identity.Domain.Core.Interfaces;
 using System;
+using Dawning.Identity.Domain.Core.Interfaces;
 
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {

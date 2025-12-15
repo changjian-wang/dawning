@@ -11,9 +11,9 @@ namespace Dawning.Shared.Dapper.Contrib
     public static partial class SqlMapperExtensions
     {
         /// <summary>
-        /// Returns a single entity by a single id from table "Ts" asynchronously using Task. T must be of interface type. 
+        /// Returns a single entity by a single id from table "Ts" asynchronously using Task. T must be of interface type.
         /// Id must be marked with [Key] attribute.
-        /// Created entity is tracked/intercepted for changes and used by the Update() extension. 
+        /// Created entity is tracked/intercepted for changes and used by the Update() extension.
         /// </summary>
         /// <typeparam name="T">Interface type to create and populate</typeparam>
         /// <param name="connection">Open SqlConnection</param>
@@ -21,7 +21,13 @@ namespace Dawning.Shared.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Entity of T</returns>
-        public static async Task<T> GetAsync<T>(this IDbConnection connection, dynamic id, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class, new()
+        public static async Task<T> GetAsync<T>(
+            this IDbConnection connection,
+            dynamic id,
+            IDbTransaction? transaction = null,
+            int? commandTimeout = null
+        )
+            where T : class, new()
         {
             var type = typeof(T);
             if (!GetQueries.TryGetValue(type.TypeHandle, out string? sql))
@@ -37,22 +43,34 @@ namespace Dawning.Shared.Dapper.Contrib
             var dynParams = new DynamicParameters();
             dynParams.Add("@id", id);
 
-            var obj = (await connection.QueryAsync(sql, dynParams, transaction, commandTimeout: commandTimeout)).FirstOrDefault();
+            var obj = (
+                await connection.QueryAsync(
+                    sql,
+                    dynParams,
+                    transaction,
+                    commandTimeout: commandTimeout
+                )
+            ).FirstOrDefault();
             return GetImpl<T>(obj, type);
         }
 
         /// <summary>
-        /// Returns a list of entities from table "Ts".  
+        /// Returns a list of entities from table "Ts".
         /// Id of T must be marked with [Key] attribute.
         /// Entities created from interfaces are tracked/intercepted for changes and used by the Update() extension
-        /// for optimal performance. 
+        /// for optimal performance.
         /// </summary>
         /// <typeparam name="T">Interface or type to create and populate</typeparam>
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>Entity of T</returns>
-        public static async Task<IEnumerable<T>> GetAllAsync<T>(this IDbConnection connection, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class, new()
+        public static async Task<IEnumerable<T>> GetAllAsync<T>(
+            this IDbConnection connection,
+            IDbTransaction? transaction = null,
+            int? commandTimeout = null
+        )
+            where T : class, new()
         {
             var type = typeof(T);
             var cacheType = typeof(List<T>);
@@ -66,14 +84,16 @@ namespace Dawning.Shared.Dapper.Contrib
                 GetQueries[cacheType.TypeHandle] = sql;
             }
 
-            var result = await connection.QueryAsync(sql, transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+            var result = await connection
+                .QueryAsync(sql, transaction: transaction, commandTimeout: commandTimeout)
+                .ConfigureAwait(false);
             // return GetAllAsyncImpl<T>(result, type);
             return GetListImpl<T>(result, type);
         }
 
-        private static IEnumerable<T> GetAllAsyncImpl<T>(dynamic result, Type type) where T : class, new()
+        private static IEnumerable<T> GetAllAsyncImpl<T>(dynamic result, Type type)
+            where T : class, new()
         {
-
             var list = new List<T>();
             foreach (IDictionary<string, object> res in result)
             {
@@ -81,18 +101,27 @@ namespace Dawning.Shared.Dapper.Contrib
                 foreach (var property in TypePropertiesCache(type))
                 {
                     var val = res[property.Name];
-                    if (val == null) continue;
-                    if (property.PropertyType.IsGenericType && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    if (val == null)
+                        continue;
+                    if (
+                        property.PropertyType.IsGenericType
+                        && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>)
+                    )
                     {
                         var genericType = Nullable.GetUnderlyingType(property.PropertyType);
-                        if (genericType != null) property.SetValue(obj, Convert.ChangeType(val, genericType), null);
+                        if (genericType != null)
+                            property.SetValue(obj, Convert.ChangeType(val, genericType), null);
                     }
                     else
                     {
-                        property.SetValue(obj, Convert.ChangeType(val, property.PropertyType), null);
+                        property.SetValue(
+                            obj,
+                            Convert.ChangeType(val, property.PropertyType),
+                            null
+                        );
                     }
                 }
-                ((IProxy)obj).IsDirty = false;   //reset change tracking and return
+                ((IProxy)obj).IsDirty = false; //reset change tracking and return
                 list.Add(obj);
             }
             return list;
@@ -108,8 +137,14 @@ namespace Dawning.Shared.Dapper.Contrib
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <param name="sqlAdapter">The specific ISqlAdapter to use, auto-detected based on connection if null</param>
         /// <returns>Identity of inserted entity</returns>
-        public static Task<int> InsertAsync<T>(this IDbConnection connection, T entityToInsert, IDbTransaction? transaction = null,
-            int? commandTimeout = null, ISqlAdapter sqlAdapter = null) where T : class
+        public static Task<int> InsertAsync<T>(
+            this IDbConnection connection,
+            T entityToInsert,
+            IDbTransaction? transaction = null,
+            int? commandTimeout = null,
+            ISqlAdapter sqlAdapter = null
+        )
+            where T : class
         {
             var type = typeof(T);
             sqlAdapter ??= GetFormatter(connection);
@@ -124,8 +159,10 @@ namespace Dawning.Shared.Dapper.Contrib
             {
                 var typeInfo = type.GetTypeInfo();
                 bool implementsGenericIEnumerableOrIsGenericIEnumerable =
-                    typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
-                    typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                    typeInfo.ImplementedInterfaces.Any(ti =>
+                        ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                    )
+                    || typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
                 if (implementsGenericIEnumerableOrIsGenericIEnumerable)
                 {
@@ -139,12 +176,15 @@ namespace Dawning.Shared.Dapper.Contrib
             var allProperties = TypePropertiesCache(type);
             var keyProperties = KeyPropertiesCache(type).ToList();
             var computedProperties = ComputedPropertiesCache(type);
-            var allPropertiesExceptKeyAndComputed = allProperties.Except(keyProperties.Union(computedProperties)).ToList();
+            var allPropertiesExceptKeyAndComputed = allProperties
+                .Except(keyProperties.Union(computedProperties))
+                .ToList();
 
             for (var i = 0; i < allPropertiesExceptKeyAndComputed.Count; i++)
             {
                 var property = allPropertiesExceptKeyAndComputed[i];
-                string columnName = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                string columnName =
+                    property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
                 sqlAdapter.AppendColumnName(sbColumnList, columnName);
                 if (i < allPropertiesExceptKeyAndComputed.Count - 1)
                     sbColumnList.Append(", ");
@@ -159,10 +199,18 @@ namespace Dawning.Shared.Dapper.Contrib
                     sbParameterList.Append(", ");
             }
 
-            if (!isList)    //single entity
+            if (!isList) //single entity
             {
-                return sqlAdapter.InsertAsync(connection, transaction, commandTimeout, name, sbColumnList.ToString(),
-                    sbParameterList.ToString(), keyProperties, entityToInsert);
+                return sqlAdapter.InsertAsync(
+                    connection,
+                    transaction,
+                    commandTimeout,
+                    name,
+                    sbColumnList.ToString(),
+                    sbParameterList.ToString(),
+                    keyProperties,
+                    entityToInsert
+                );
             }
 
             //insert list of entities
@@ -179,7 +227,13 @@ namespace Dawning.Shared.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if updated, false if not found or not modified (tracked entities)</returns>
-        public static async Task<bool> UpdateAsync<T>(this IDbConnection connection, T entityToUpdate, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
+        public static async Task<bool> UpdateAsync<T>(
+            this IDbConnection connection,
+            T entityToUpdate,
+            IDbTransaction? transaction = null,
+            int? commandTimeout = null
+        )
+            where T : class
         {
             if ((entityToUpdate is IProxy proxy) && !proxy.IsDirty)
             {
@@ -196,8 +250,10 @@ namespace Dawning.Shared.Dapper.Contrib
             {
                 var typeInfo = type.GetTypeInfo();
                 bool implementsGenericIEnumerableOrIsGenericIEnumerable =
-                    typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
-                    typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                    typeInfo.ImplementedInterfaces.Any(ti =>
+                        ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                    )
+                    || typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
                 if (implementsGenericIEnumerableOrIsGenericIEnumerable)
                 {
@@ -208,7 +264,9 @@ namespace Dawning.Shared.Dapper.Contrib
             var keyProperties = KeyPropertiesCache(type).ToList();
             var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
             if (keyProperties.Count == 0 && explicitKeyProperties.Count == 0)
-                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
+                throw new ArgumentException(
+                    "Entity must have at least one [Key] or [ExplicitKey] property"
+                );
 
             var name = GetTableName(type);
 
@@ -219,7 +277,9 @@ namespace Dawning.Shared.Dapper.Contrib
             keyProperties.AddRange(explicitKeyProperties);
             var computedProperties = ComputedPropertiesCache(type);
             var ignoreUpdateProperties = IgnoreUpdatePropertiesCache(type);
-            var nonIdProps = allProperties.Except(keyProperties.Union(computedProperties).Union(ignoreUpdateProperties)).ToList();
+            var nonIdProps = allProperties
+                .Except(keyProperties.Union(computedProperties).Union(ignoreUpdateProperties))
+                .ToList();
 
             var adapter = GetFormatter(connection);
 
@@ -238,7 +298,14 @@ namespace Dawning.Shared.Dapper.Contrib
                 if (i < keyProperties.Count - 1)
                     sb.Append(" and ");
             }
-            var updated = await connection.ExecuteAsync(sb.ToString(), entityToUpdate, commandTimeout: commandTimeout, transaction: transaction).ConfigureAwait(false);
+            var updated = await connection
+                .ExecuteAsync(
+                    sb.ToString(),
+                    entityToUpdate,
+                    commandTimeout: commandTimeout,
+                    transaction: transaction
+                )
+                .ConfigureAwait(false);
             return updated > 0;
         }
 
@@ -251,7 +318,13 @@ namespace Dawning.Shared.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if not found</returns>
-        public static async Task<bool> DeleteAsync<T>(this IDbConnection connection, T entityToDelete, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
+        public static async Task<bool> DeleteAsync<T>(
+            this IDbConnection connection,
+            T entityToDelete,
+            IDbTransaction? transaction = null,
+            int? commandTimeout = null
+        )
+            where T : class
         {
             if (entityToDelete == null)
                 throw new ArgumentException("Cannot Delete null Object", nameof(entityToDelete));
@@ -266,8 +339,10 @@ namespace Dawning.Shared.Dapper.Contrib
             {
                 var typeInfo = type.GetTypeInfo();
                 bool implementsGenericIEnumerableOrIsGenericIEnumerable =
-                    typeInfo.ImplementedInterfaces.Any(ti => ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ||
-                    typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
+                    typeInfo.ImplementedInterfaces.Any(ti =>
+                        ti.IsGenericType && ti.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                    )
+                    || typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
                 if (implementsGenericIEnumerableOrIsGenericIEnumerable)
                 {
@@ -278,7 +353,9 @@ namespace Dawning.Shared.Dapper.Contrib
             var keyProperties = KeyPropertiesCache(type);
             var explicitKeyProperties = ExplicitKeyPropertiesCache(type);
             if (keyProperties.Count == 0 && explicitKeyProperties.Count == 0)
-                throw new ArgumentException("Entity must have at least one [Key] or [ExplicitKey] property");
+                throw new ArgumentException(
+                    "Entity must have at least one [Key] or [ExplicitKey] property"
+                );
 
             var name = GetTableName(type);
             var allKeyProperties = keyProperties.Concat(explicitKeyProperties).ToList();
@@ -295,7 +372,9 @@ namespace Dawning.Shared.Dapper.Contrib
                 if (i < allKeyProperties.Count - 1)
                     sb.Append(" AND ");
             }
-            var deleted = await connection.ExecuteAsync(sb.ToString(), entityToDelete, transaction, commandTimeout).ConfigureAwait(false);
+            var deleted = await connection
+                .ExecuteAsync(sb.ToString(), entityToDelete, transaction, commandTimeout)
+                .ConfigureAwait(false);
             return deleted > 0;
         }
 
@@ -307,19 +386,27 @@ namespace Dawning.Shared.Dapper.Contrib
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <returns>true if deleted, false if none found</returns>
-        public static async Task<bool> DeleteAllAsync<T>(this IDbConnection connection, IDbTransaction? transaction = null, int? commandTimeout = null) where T : class
+        public static async Task<bool> DeleteAllAsync<T>(
+            this IDbConnection connection,
+            IDbTransaction? transaction = null,
+            int? commandTimeout = null
+        )
+            where T : class
         {
             var type = typeof(T);
             var statement = "DELETE FROM " + GetTableName(type);
-            var deleted = await connection.ExecuteAsync(statement, null, transaction, commandTimeout).ConfigureAwait(false);
+            var deleted = await connection
+                .ExecuteAsync(statement, null, transaction, commandTimeout)
+                .ConfigureAwait(false);
             return deleted > 0;
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
-        public partial class QueryBuilder<TEntity> where TEntity : class, new()
+        public partial class QueryBuilder<TEntity>
+            where TEntity : class, new()
         {
             /// <summary>
             /// Maximum allowed page number to prevent performance issues and malicious requests
@@ -331,10 +418,16 @@ namespace Dawning.Shared.Dapper.Contrib
                 return await AsPagedListAsync(page, itemsPerPage, PagedOptions.Default);
             }
 
-            public async Task<PagedResult<TEntity>> AsPagedListAsync(int page, int itemsPerPage, PagedOptions options)
+            public async Task<PagedResult<TEntity>> AsPagedListAsync(
+                int page,
+                int itemsPerPage,
+                PagedOptions options
+            )
             {
-                if (page < 1) page = 1;
-                if (itemsPerPage < 1) itemsPerPage = options.DefaultPageSize;
+                if (page < 1)
+                    page = 1;
+                if (itemsPerPage < 1)
+                    itemsPerPage = options.DefaultPageSize;
 
                 var maxPage = options?.MaxPageNumber ?? MaxPageNumber;
 
@@ -342,8 +435,9 @@ namespace Dawning.Shared.Dapper.Contrib
                 if (page > maxPage)
                 {
                     throw new InvalidOperationException(
-                        $"Page number {page} exceeds maximum allowed {maxPage}. " +
-                        "Consider using filters to narrow down results or contact support for large dataset access.");
+                        $"Page number {page} exceeds maximum allowed {maxPage}. "
+                            + "Consider using filters to narrow down results or contact support for large dataset access."
+                    );
                 }
 
                 var type = typeof(TEntity);
@@ -359,14 +453,20 @@ namespace Dawning.Shared.Dapper.Contrib
                     {
                         var condition = _conditions[i];
                         conditionsList.Add(condition);
-                        
+
                         // Add AND between conditions if next item is not AND/OR/(/)
                         if (i < _conditions.Count - 1)
                         {
                             var nextCondition = _conditions[i + 1];
-                            if (nextCondition != "AND" && nextCondition != "OR" && 
-                                nextCondition != "(" && nextCondition != ")" &&
-                                condition != "AND" && condition != "OR" && condition != "(")
+                            if (
+                                nextCondition != "AND"
+                                && nextCondition != "OR"
+                                && nextCondition != "("
+                                && nextCondition != ")"
+                                && condition != "AND"
+                                && condition != "OR"
+                                && condition != "("
+                            )
                             {
                                 conditionsList.Add("AND");
                             }
@@ -384,12 +484,18 @@ namespace Dawning.Shared.Dapper.Contrib
                 if (string.IsNullOrEmpty(_orderBy))
                 {
                     throw new InvalidOperationException(
-                        "A sorting column must be specified for pagination.");
+                        "A sorting column must be specified for pagination."
+                    );
                 }
 
                 // ✅ Execute COUNT first, then data query (MySQL doesn't support MARS - Multiple Active Result Sets)
                 var countSql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
-                var count = await _connection.ExecuteScalarAsync(countSql, parameters, _transaction, _commandTimeout);
+                var count = await _connection.ExecuteScalarAsync(
+                    countSql,
+                    parameters,
+                    _transaction,
+                    _commandTimeout
+                );
                 long totalCount = count != null ? Convert.ToInt64(count) : 0;
 
                 var list = await sqlAdapter.RetrieveCurrentPaginatedDataAsync(
@@ -401,14 +507,15 @@ namespace Dawning.Shared.Dapper.Contrib
                     page,
                     itemsPerPage,
                     whereClause,
-                    parameters);
+                    parameters
+                );
 
                 return new PagedResult<TEntity>
                 {
                     Values = GetListImpl<TEntity>(list, type),
                     ItemsPerPage = itemsPerPage,
                     Page = page,
-                    TotalItems = totalCount
+                    TotalItems = totalCount,
                 };
             }
 
@@ -420,23 +527,39 @@ namespace Dawning.Shared.Dapper.Contrib
             /// <param name="lastCursorValue">Last cursor value from previous page (null for first page)</param>
             /// <param name="ascending">Sort direction (true for ASC, false for DESC, default is DESC)</param>
             /// <returns>CursorPagedResult with data and cursor info</returns>
-            public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(int itemsPerPage, object? lastCursorValue = null, bool ascending = false)
+            public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(
+                int itemsPerPage,
+                object? lastCursorValue = null,
+                bool ascending = false
+            )
             {
-                return await AsPagedListByCursorAsync(itemsPerPage, lastCursorValue, ascending, PagedOptions.Default);
+                return await AsPagedListByCursorAsync(
+                    itemsPerPage,
+                    lastCursorValue,
+                    ascending,
+                    PagedOptions.Default
+                );
             }
 
             /// <summary>
             /// Cursor-based pagination for large datasets with custom options.
             /// </summary>
-            public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(int itemsPerPage, object? lastCursorValue, bool ascending, PagedOptions options)
+            public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(
+                int itemsPerPage,
+                object? lastCursorValue,
+                bool ascending,
+                PagedOptions options
+            )
             {
-                if (itemsPerPage < 1) itemsPerPage = options.DefaultPageSize;
+                if (itemsPerPage < 1)
+                    itemsPerPage = options.DefaultPageSize;
 
                 var maxPageSize = options?.MaxCursorPageSize ?? 1000;
                 if (itemsPerPage > maxPageSize)
                 {
                     throw new InvalidOperationException(
-                        $"Page size {itemsPerPage} exceeds maximum allowed {maxPageSize} for cursor pagination.");
+                        $"Page size {itemsPerPage} exceeds maximum allowed {maxPageSize} for cursor pagination."
+                    );
                 }
 
                 var type = typeof(TEntity);
@@ -445,7 +568,8 @@ namespace Dawning.Shared.Dapper.Contrib
                 if (string.IsNullOrEmpty(_orderBy))
                 {
                     throw new InvalidOperationException(
-                        "A cursor column must be specified for cursor-based pagination. Use OrderBy() or OrderByDescending().");
+                        "A cursor column must be specified for cursor-based pagination. Use OrderBy() or OrderByDescending()."
+                    );
                 }
 
                 // Build WHERE clause: join conditions with AND when multiple conditions exist
@@ -458,14 +582,20 @@ namespace Dawning.Shared.Dapper.Contrib
                     {
                         var condition = _conditions[i];
                         conditionsList.Add(condition);
-                        
+
                         // Add AND between conditions if next item is not AND/OR/(/)
                         if (i < _conditions.Count - 1)
                         {
                             var nextCondition = _conditions[i + 1];
-                            if (nextCondition != "AND" && nextCondition != "OR" && 
-                                nextCondition != "(" && nextCondition != ")" &&
-                                condition != "AND" && condition != "OR" && condition != "(")
+                            if (
+                                nextCondition != "AND"
+                                && nextCondition != "OR"
+                                && nextCondition != "("
+                                && nextCondition != ")"
+                                && condition != "AND"
+                                && condition != "OR"
+                                && condition != "("
+                            )
                             {
                                 conditionsList.Add("AND");
                             }
@@ -477,7 +607,7 @@ namespace Dawning.Shared.Dapper.Contrib
                 {
                     whereClause = "1=1";
                 }
-                
+
                 var parameters = ConvertToDynamicParameters();
 
                 // Fetch itemsPerPage + 1 to detect if there's a next page
@@ -491,7 +621,8 @@ namespace Dawning.Shared.Dapper.Contrib
                     lastCursorValue,
                     whereClause,
                     parameters,
-                    ascending);
+                    ascending
+                );
 
                 var entities = GetListImpl<TEntity>(list, type).ToList();
                 bool hasNextPage = entities.Count > itemsPerPage;
@@ -518,7 +649,7 @@ namespace Dawning.Shared.Dapper.Contrib
                     Values = entities,
                     ItemsPerPage = itemsPerPage,
                     HasNextPage = hasNextPage,
-                    NextCursor = nextCursor
+                    NextCursor = nextCursor,
                 };
             }
 
@@ -534,10 +665,16 @@ namespace Dawning.Shared.Dapper.Contrib
 
                 if (!string.IsNullOrEmpty(_orderBy))
                 {
-                    sql += $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
+                    sql +=
+                        $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
                 }
 
-                var list = await _connection.QueryAsync(sql, parameters, _transaction, commandTimeout: _commandTimeout);
+                var list = await _connection.QueryAsync(
+                    sql,
+                    parameters,
+                    _transaction,
+                    commandTimeout: _commandTimeout
+                );
                 IEnumerable<TEntity> entities = GetListImpl<TEntity>(list, type);
 
                 return entities;
@@ -567,7 +704,10 @@ namespace Dawning.Shared.Dapper.Contrib
                 string selectClause = "*";
                 if (_selectColumns.Count > 0)
                 {
-                    selectClause = string.Join(", ", _selectColumns.Select(c => sqlAdapter.ConvertColumnName(c)));
+                    selectClause = string.Join(
+                        ", ",
+                        _selectColumns.Select(c => sqlAdapter.ConvertColumnName(c))
+                    );
                 }
 
                 var sql = $"SELECT {selectClause} FROM {name} WHERE {whereClause}";
@@ -575,19 +715,26 @@ namespace Dawning.Shared.Dapper.Contrib
                 // Add ORDER BY if specified
                 if (_orderByList.Count > 0)
                 {
-                    var orderByParts = _orderByList.Select(o => 
-                        $"{sqlAdapter.ConvertColumnName(o.Column)} {(o.Descending ? "DESC" : "ASC")}");
+                    var orderByParts = _orderByList.Select(o =>
+                        $"{sqlAdapter.ConvertColumnName(o.Column)} {(o.Descending ? "DESC" : "ASC")}"
+                    );
                     sql += $" ORDER BY {string.Join(", ", orderByParts)}";
                 }
                 else if (!string.IsNullOrEmpty(_orderBy))
                 {
-                    sql += $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
+                    sql +=
+                        $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
                 }
 
                 // Limit to 1 result for efficiency
                 sql += " LIMIT 1";
 
-                var list = await _connection.QueryAsync(sql, parameters, _transaction, commandTimeout: _commandTimeout);
+                var list = await _connection.QueryAsync(
+                    sql,
+                    parameters,
+                    _transaction,
+                    commandTimeout: _commandTimeout
+                );
                 var entities = GetListImpl<TEntity>(list, type);
 
                 return entities.FirstOrDefault();
@@ -610,13 +757,32 @@ public partial interface ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert);
+    Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    );
 
     /// <summary>
     /// Retrieve the current paginated data based on the sorted column names.
     /// </summary>
     /// <returns></returns>
-    Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters);
+    Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    );
 
     /// <summary>
     /// Retrieve cursor-based paginated data (for large datasets, better performance than OFFSET)
@@ -632,7 +798,18 @@ public partial interface ISqlAdapter
     /// <param name="parameters">Parameters</param>
     /// <param name="ascending">Sort direction (true for ASC, false for DESC)</param>
     /// <returns>Paginated data</returns>
-    Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false);
+    Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    );
 }
 
 public partial class SqlServerAdapter
@@ -649,19 +826,33 @@ public partial class SqlServerAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public async Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    )
     {
-        var cmd = $"INSERT INTO {tableName} ({columnList}) values ({parameterList}); SELECT SCOPE_IDENTITY() id";
-        var multi = await connection.QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout).ConfigureAwait(false);
+        var cmd =
+            $"INSERT INTO {tableName} ({columnList}) values ({parameterList}); SELECT SCOPE_IDENTITY() id";
+        var multi = await connection
+            .QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout)
+            .ConfigureAwait(false);
 
         if (keyProperties.Any())
         {
             var first = await multi.ReadFirstOrDefaultAsync().ConfigureAwait(false);
-            if (first == null || first.id == null) return 0;
+            if (first == null || first.id == null)
+                return 0;
 
             var id = (int)first.id;
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
-            if (pi.Length == 0) return id;
+            if (pi.Length == 0)
+                return id;
 
             var idp = pi[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
@@ -687,35 +878,63 @@ public partial class SqlServerAdapter
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
+    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    )
     {
         // ✅ Simplified: Single query with standard OFFSET FETCH NEXT
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      OFFSET {(page - 1) * itemsPerPage} ROWS 
                      FETCH NEXT {itemsPerPage} ROWS ONLY";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 
-    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    )
     {
         var baseWhereClause = whereClause ?? "1=1";
-        var cursorCondition = lastCursorValue != null 
-            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
-            : "1=1";
-        
+        var cursorCondition =
+            lastCursorValue != null
+                ? (
+                    ascending
+                        ? $"{cursorColumnName} > @__cursor"
+                        : $"{cursorColumnName} < @__cursor"
+                )
+                : "1=1";
+
         if (lastCursorValue != null)
         {
             parameters.Add("__cursor", lastCursorValue);
         }
 
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {baseWhereClause} AND {cursorCondition}
                      ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
                      OFFSET 0 ROWS FETCH NEXT {itemsPerPage} ROWS ONLY";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
@@ -734,20 +953,41 @@ public partial class SqlCeServerAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public async Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    )
     {
         var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
-        var result = await connection.ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout).ConfigureAwait(false);
+        var result = await connection
+            .ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout)
+            .ConfigureAwait(false);
 
         if (keyProperties.Any() && result > 0)
         {
-            var r = (await connection.QueryAsync<dynamic>("SELECT @@IDENTITY id", transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false)).ToList();
+            var r = (
+                await connection
+                    .QueryAsync<dynamic>(
+                        "SELECT @@IDENTITY id",
+                        transaction: transaction,
+                        commandTimeout: commandTimeout
+                    )
+                    .ConfigureAwait(false)
+            ).ToList();
 
-            if (r[0] == null || r[0].id == null) return 0;
+            if (r[0] == null || r[0].id == null)
+                return 0;
             var id = (int)r[0].id;
 
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
-            if (pi.Length == 0) return id;
+            if (pi.Length == 0)
+                return id;
 
             var idp = pi[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
@@ -771,39 +1011,67 @@ public partial class SqlCeServerAdapter
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
+    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    )
     {
         // ✅ Simplified: Single query with ROW_NUMBER pagination
-        var sql = $@"SELECT * FROM (
+        var sql =
+            $@"SELECT * FROM (
                         SELECT *, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS RowNum
                         FROM {tableName}
                         WHERE {whereClause ?? "1=1"}
                      ) AS t
                      WHERE RowNum BETWEEN {(page - 1) * itemsPerPage + 1} AND {page * itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 
-    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    )
     {
         var baseWhereClause = whereClause ?? "1=1";
-        var cursorCondition = lastCursorValue != null 
-            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
-            : "1=1";
-        
+        var cursorCondition =
+            lastCursorValue != null
+                ? (
+                    ascending
+                        ? $"{cursorColumnName} > @__cursor"
+                        : $"{cursorColumnName} < @__cursor"
+                )
+                : "1=1";
+
         if (lastCursorValue != null)
         {
             parameters.Add("__cursor", lastCursorValue);
         }
 
         // SQL CE uses ROW_NUMBER() for pagination
-        var sql = $@"SELECT * FROM (
+        var sql =
+            $@"SELECT * FROM (
                         SELECT *, ROW_NUMBER() OVER (ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}) AS RowNum 
                         FROM {tableName}
                         WHERE {baseWhereClause} AND {cursorCondition}
                      ) AS t
                      WHERE RowNum BETWEEN 1 AND {itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
@@ -822,20 +1090,38 @@ public partial class MySqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName,
-        string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public async Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    )
     {
         var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
-        var result = await connection.ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout).ConfigureAwait(false);
+        var result = await connection
+            .ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout)
+            .ConfigureAwait(false);
 
         if (keyProperties.Any() && result > 0)
         {
-            var r = await connection.QueryAsync<dynamic>("SELECT LAST_INSERT_ID() id", transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+            var r = await connection
+                .QueryAsync<dynamic>(
+                    "SELECT LAST_INSERT_ID() id",
+                    transaction: transaction,
+                    commandTimeout: commandTimeout
+                )
+                .ConfigureAwait(false);
 
             var id = r.First().id;
-            if (id == null) return 0;
+            if (id == null)
+                return 0;
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
-            if (pi.Length == 0) return Convert.ToInt32(id);
+            if (pi.Length == 0)
+                return Convert.ToInt32(id);
 
             var idp = pi[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
@@ -859,34 +1145,62 @@ public partial class MySqlAdapter
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
+    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    )
     {
         // ✅ Simplified: Single query with standard LIMIT OFFSET
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 
-    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    )
     {
         var baseWhereClause = whereClause ?? "1=1";
-        var cursorCondition = lastCursorValue != null 
-            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
-            : "1=1";
-        
+        var cursorCondition =
+            lastCursorValue != null
+                ? (
+                    ascending
+                        ? $"{cursorColumnName} > @__cursor"
+                        : $"{cursorColumnName} < @__cursor"
+                )
+                : "1=1";
+
         if (lastCursorValue != null)
         {
             parameters.Add("__cursor", lastCursorValue);
         }
 
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {baseWhereClause} AND {cursorCondition}
                      ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
                      LIMIT {itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
@@ -905,7 +1219,16 @@ public partial class PostgresAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public async Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    )
     {
         var sb = new StringBuilder();
         sb.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", tableName, columnList, parameterList);
@@ -929,7 +1252,9 @@ public partial class PostgresAdapter
             }
         }
 
-        var results = await connection.QueryAsync(sb.ToString(), entityToInsert, transaction, commandTimeout).ConfigureAwait(false);
+        var results = await connection
+            .QueryAsync(sb.ToString(), entityToInsert, transaction, commandTimeout)
+            .ConfigureAwait(false);
 
         if (keyProperties.Any())
         {
@@ -961,34 +1286,62 @@ public partial class PostgresAdapter
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
+    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    )
     {
         // ✅ Simplified: Single query with standard LIMIT OFFSET
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 
-    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    )
     {
         var baseWhereClause = whereClause ?? "1=1";
-        var cursorCondition = lastCursorValue != null 
-            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
-            : "1=1";
-        
+        var cursorCondition =
+            lastCursorValue != null
+                ? (
+                    ascending
+                        ? $"{cursorColumnName} > @__cursor"
+                        : $"{cursorColumnName} < @__cursor"
+                )
+                : "1=1";
+
         if (lastCursorValue != null)
         {
             parameters.Add("__cursor", lastCursorValue);
         }
 
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {baseWhereClause} AND {cursorCondition}
                      ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
                      LIMIT {itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
@@ -1007,16 +1360,29 @@ public partial class SQLiteAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public async Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    )
     {
-        var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT last_insert_rowid() id";
-        var multi = await connection.QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout).ConfigureAwait(false);
+        var cmd =
+            $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT last_insert_rowid() id";
+        var multi = await connection
+            .QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout)
+            .ConfigureAwait(false);
 
         if (keyProperties.Any())
         {
             var id = (int)(await multi.ReadFirstAsync().ConfigureAwait(false)).id;
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
-            if (pi.Length == 0) return id;
+            if (pi.Length == 0)
+                return id;
 
             var idp = pi[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
@@ -1042,34 +1408,62 @@ public partial class SQLiteAdapter
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
+    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    )
     {
         // ✅ Simplified: Single query with standard LIMIT OFFSET
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 
-    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    )
     {
         var baseWhereClause = whereClause ?? "1=1";
-        var cursorCondition = lastCursorValue != null 
-            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
-            : "1=1";
-        
+        var cursorCondition =
+            lastCursorValue != null
+                ? (
+                    ascending
+                        ? $"{cursorColumnName} > @__cursor"
+                        : $"{cursorColumnName} < @__cursor"
+                )
+                : "1=1";
+
         if (lastCursorValue != null)
         {
             parameters.Add("__cursor", lastCursorValue);
         }
 
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {baseWhereClause} AND {cursorCondition}
                      ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
                      LIMIT {itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }
@@ -1088,20 +1482,39 @@ public partial class FbAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(IDbConnection connection, IDbTransaction transaction, int? commandTimeout, string tableName, string columnList, string parameterList, IEnumerable<PropertyInfo> keyProperties, object entityToInsert)
+    public async Task<int> InsertAsync(
+        IDbConnection connection,
+        IDbTransaction transaction,
+        int? commandTimeout,
+        string tableName,
+        string columnList,
+        string parameterList,
+        IEnumerable<PropertyInfo> keyProperties,
+        object entityToInsert
+    )
     {
         var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
-        var result = await connection.ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout).ConfigureAwait(false);
+        var result = await connection
+            .ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout)
+            .ConfigureAwait(false);
 
         if (keyProperties.Any())
         {
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             var keyName = propertyInfos[0].Name;
-            var r = await connection.QueryAsync($"SELECT FIRST 1 {keyName} ID FROM {tableName} ORDER BY {keyName} DESC", transaction: transaction, commandTimeout: commandTimeout).ConfigureAwait(false);
+            var r = await connection
+                .QueryAsync(
+                    $"SELECT FIRST 1 {keyName} ID FROM {tableName} ORDER BY {keyName} DESC",
+                    transaction: transaction,
+                    commandTimeout: commandTimeout
+                )
+                .ConfigureAwait(false);
 
             var id = r.First().ID;
-            if (id == null) return 0;
-            if (propertyInfos.Length == 0) return Convert.ToInt32(id);
+            if (id == null)
+                return 0;
+            if (propertyInfos.Length == 0)
+                return Convert.ToInt32(id);
 
             var idp = propertyInfos[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
@@ -1125,34 +1538,62 @@ public partial class FbAdapter
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string sortingColumnName, int page, int itemsPerPage, string? whereClause, DynamicParameters parameters)
+    public async Task<IEnumerable<dynamic>> RetrieveCurrentPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string sortingColumnName,
+        int page,
+        int itemsPerPage,
+        string? whereClause,
+        DynamicParameters parameters
+    )
     {
         // ✅ Simplified: Single query with Firebird ROWS syntax
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
                      ORDER BY {sortingColumnName} DESC 
                      ROWS {(page - 1) * itemsPerPage + 1} TO {page * itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 
-    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(IDbConnection connection, IDbTransaction? transaction, int? commandTimeout, string tableName, string cursorColumnName, int itemsPerPage, object? lastCursorValue, string? whereClause, DynamicParameters parameters, bool ascending = false)
+    public async Task<IEnumerable<dynamic>> RetrieveCursorPaginatedDataAsync(
+        IDbConnection connection,
+        IDbTransaction? transaction,
+        int? commandTimeout,
+        string tableName,
+        string cursorColumnName,
+        int itemsPerPage,
+        object? lastCursorValue,
+        string? whereClause,
+        DynamicParameters parameters,
+        bool ascending = false
+    )
     {
         var baseWhereClause = whereClause ?? "1=1";
-        var cursorCondition = lastCursorValue != null 
-            ? (ascending ? $"{cursorColumnName} > @__cursor" : $"{cursorColumnName} < @__cursor")
-            : "1=1";
-        
+        var cursorCondition =
+            lastCursorValue != null
+                ? (
+                    ascending
+                        ? $"{cursorColumnName} > @__cursor"
+                        : $"{cursorColumnName} < @__cursor"
+                )
+                : "1=1";
+
         if (lastCursorValue != null)
         {
             parameters.Add("__cursor", lastCursorValue);
         }
 
-        var sql = $@"SELECT * FROM {tableName} 
+        var sql =
+            $@"SELECT * FROM {tableName} 
                      WHERE {baseWhereClause} AND {cursorCondition}
                      ORDER BY {cursorColumnName} {(ascending ? "ASC" : "DESC")}
                      ROWS 1 TO {itemsPerPage}";
-        
+
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
     }
 }

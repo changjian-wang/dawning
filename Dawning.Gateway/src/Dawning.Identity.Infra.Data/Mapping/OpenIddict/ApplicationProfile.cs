@@ -11,27 +11,47 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         public ApplicationProfile()
         {
             CreateMap<ApplicationEntity, Application>(MemberList.Destination)
-            .ForMember(dest => dest.Permissions,
-                opt => opt.MapFrom(src => DeserializeList(src.PermissionsJson)))
-            .ForMember(dest => dest.RedirectUris,
-                opt => opt.MapFrom(src => DeserializeList(src.RedirectUrisJson)))
-            .ForMember(dest => dest.PostLogoutRedirectUris,
-                opt => opt.MapFrom(src => DeserializeList(src.PostLogoutRedirectUrisJson)))
-            .ForMember(dest => dest.Requirements,
-                opt => opt.MapFrom(src => DeserializeList(src.RequirementsJson)))
-            .ForMember(dest => dest.Properties,
-                opt => opt.MapFrom(src => DeserializeDictionary(src.PropertiesJson)))
-            .ReverseMap()
-            .ForMember(dest => dest.PermissionsJson,
-                opt => opt.MapFrom(src => SerializeList(src.Permissions)))
-            .ForMember(dest => dest.RedirectUrisJson,
-                opt => opt.MapFrom(src => SerializeList(src.RedirectUris)))
-            .ForMember(dest => dest.PostLogoutRedirectUrisJson,
-                opt => opt.MapFrom(src => SerializeList(src.PostLogoutRedirectUris)))
-            .ForMember(dest => dest.RequirementsJson,
-                opt => opt.MapFrom(src => SerializeList(src.Requirements)))
-            .ForMember(dest => dest.PropertiesJson,
-                opt => opt.MapFrom(src => SerializeDictionary(src.Properties)));
+                .ForMember(
+                    dest => dest.Permissions,
+                    opt => opt.MapFrom(src => DeserializeList(src.PermissionsJson))
+                )
+                .ForMember(
+                    dest => dest.RedirectUris,
+                    opt => opt.MapFrom(src => DeserializeList(src.RedirectUrisJson))
+                )
+                .ForMember(
+                    dest => dest.PostLogoutRedirectUris,
+                    opt => opt.MapFrom(src => DeserializeList(src.PostLogoutRedirectUrisJson))
+                )
+                .ForMember(
+                    dest => dest.Requirements,
+                    opt => opt.MapFrom(src => DeserializeList(src.RequirementsJson))
+                )
+                .ForMember(
+                    dest => dest.Properties,
+                    opt => opt.MapFrom(src => DeserializeDictionary(src.PropertiesJson))
+                )
+                .ReverseMap()
+                .ForMember(
+                    dest => dest.PermissionsJson,
+                    opt => opt.MapFrom(src => SerializeList(src.Permissions))
+                )
+                .ForMember(
+                    dest => dest.RedirectUrisJson,
+                    opt => opt.MapFrom(src => SerializeList(src.RedirectUris))
+                )
+                .ForMember(
+                    dest => dest.PostLogoutRedirectUrisJson,
+                    opt => opt.MapFrom(src => SerializeList(src.PostLogoutRedirectUris))
+                )
+                .ForMember(
+                    dest => dest.RequirementsJson,
+                    opt => opt.MapFrom(src => SerializeList(src.Requirements))
+                )
+                .ForMember(
+                    dest => dest.PropertiesJson,
+                    opt => opt.MapFrom(src => SerializeDictionary(src.Properties))
+                );
         }
 
         /// <summary>
@@ -94,4 +114,3 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         }
     }
 }
-

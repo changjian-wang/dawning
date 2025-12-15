@@ -25,16 +25,21 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<PagedData<SystemMetadataDto>> GetPagedListAsync(
             SystemMetadataModel model,
             int page,
-            int itemsPerPage)
+            int itemsPerPage
+        )
         {
-            var data = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, page, itemsPerPage);
+            var data = await _unitOfWork.SystemMetadata.GetPagedListAsync(
+                model,
+                page,
+                itemsPerPage
+            );
 
             return new PagedData<SystemMetadataDto>
             {
                 PageIndex = data.PageIndex,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = data.Items.ToDtos() ?? new List<SystemMetadataDto>()
+                Items = data.Items.ToDtos() ?? new List<SystemMetadataDto>(),
             };
         }
 

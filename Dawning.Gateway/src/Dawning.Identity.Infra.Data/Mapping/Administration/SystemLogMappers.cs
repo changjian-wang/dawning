@@ -1,7 +1,7 @@
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using System.Collections.Generic;
 using System.Linq;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
@@ -31,7 +31,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 RequestMethod = entity.RequestMethod,
                 StatusCode = entity.StatusCode,
                 CreatedAt = entity.CreatedAt,
-                Timestamp = entity.Timestamp
+                Timestamp = entity.Timestamp,
             };
         }
 
@@ -56,7 +56,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 RequestMethod = model.RequestMethod,
                 StatusCode = model.StatusCode,
                 CreatedAt = model.CreatedAt,
-                Timestamp = model.Timestamp
+                Timestamp = model.Timestamp,
             };
         }
 

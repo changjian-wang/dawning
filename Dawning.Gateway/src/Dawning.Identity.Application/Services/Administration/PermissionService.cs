@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
@@ -5,10 +9,6 @@ using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Services.Administration
 {
@@ -33,16 +33,20 @@ namespace Dawning.Identity.Application.Services.Administration
             return permission?.ToDto();
         }
 
-        public async Task<PagedData<PermissionDto>> GetPagedListAsync(PermissionModel model, int page, int pageSize)
+        public async Task<PagedData<PermissionDto>> GetPagedListAsync(
+            PermissionModel model,
+            int page,
+            int pageSize
+        )
         {
             var pagedData = await _unitOfWork.Permission.GetPagedListAsync(model, page, pageSize);
-            
+
             return new PagedData<PermissionDto>
             {
                 Items = pagedData.Items.Select(p => p.ToDto()).ToList(),
                 TotalCount = pagedData.TotalCount,
                 PageIndex = pagedData.PageIndex,
-                PageSize = pagedData.PageSize
+                PageSize = pagedData.PageSize,
             };
         }
 
@@ -61,14 +65,14 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<IEnumerable<PermissionGroupDto>> GetGroupedPermissionsAsync()
         {
             var permissions = await _unitOfWork.Permission.GetAllAsync();
-            
+
             var grouped = permissions
                 .GroupBy(p => p.Resource)
                 .Select(g => new PermissionGroupDto
                 {
                     Resource = g.Key,
                     ResourceName = g.Key,
-                    Permissions = g.Select(p => p.ToDto()).OrderBy(p => p.DisplayOrder).ToList()
+                    Permissions = g.Select(p => p.ToDto()).OrderBy(p => p.DisplayOrder).ToList(),
                 })
                 .OrderBy(g => g.Resource)
                 .ToList();
@@ -76,7 +80,10 @@ namespace Dawning.Identity.Application.Services.Administration
             return grouped;
         }
 
-        public async Task<PermissionDto> CreateAsync(CreatePermissionDto dto, Guid? operatorId = null)
+        public async Task<PermissionDto> CreateAsync(
+            CreatePermissionDto dto,
+            Guid? operatorId = null
+        )
         {
             // 验证代码唯一性
             var exists = await _unitOfWork.Permission.CodeExistsAsync(dto.Code);
@@ -98,29 +105,31 @@ namespace Dawning.Identity.Application.Services.Administration
                 IsActive = dto.IsActive,
                 DisplayOrder = dto.DisplayOrder,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = operatorId
+                CreatedBy = operatorId,
             };
 
             _unitOfWork.BeginTransaction();
             try
             {
                 await _unitOfWork.Permission.InsertAsync(permission);
-                
+
                 // 记录审计日志
-                await _unitOfWork.AuditLog.InsertAsync(new Domain.Aggregates.Administration.AuditLog
-                {
-                    Id = Guid.NewGuid(),
-                    Action = "Create",
-                    EntityType = "Permission",
-                    EntityId = permission.Id,
-                    Description = $"创建权限: {permission.Name} ({permission.Code})",
-                    IpAddress = null,
-                    UserAgent = null,
-                    StatusCode = 200,
-                    UserId = operatorId,
-                    Username = null,
-                    CreatedAt = DateTime.UtcNow
-                });
+                await _unitOfWork.AuditLog.InsertAsync(
+                    new Domain.Aggregates.Administration.AuditLog
+                    {
+                        Id = Guid.NewGuid(),
+                        Action = "Create",
+                        EntityType = "Permission",
+                        EntityId = permission.Id,
+                        Description = $"创建权限: {permission.Name} ({permission.Code})",
+                        IpAddress = null,
+                        UserAgent = null,
+                        StatusCode = 200,
+                        UserId = operatorId,
+                        Username = null,
+                        CreatedAt = DateTime.UtcNow,
+                    }
+                );
 
                 _unitOfWork.Commit();
                 return permission.ToDto();
@@ -132,7 +141,10 @@ namespace Dawning.Identity.Application.Services.Administration
             }
         }
 
-        public async Task<PermissionDto> UpdateAsync(UpdatePermissionDto dto, Guid? operatorId = null)
+        public async Task<PermissionDto> UpdateAsync(
+            UpdatePermissionDto dto,
+            Guid? operatorId = null
+        )
         {
             var permission = await _unitOfWork.Permission.GetAsync(dto.Id);
             if (permission == null)
@@ -159,22 +171,25 @@ namespace Dawning.Identity.Application.Services.Administration
             try
             {
                 await _unitOfWork.Permission.UpdateAsync(permission);
-                
+
                 // 记录审计日志
-                await _unitOfWork.AuditLog.InsertAsync(new Domain.Aggregates.Administration.AuditLog
-                {
-                    Id = Guid.NewGuid(),
-                    Action = "Update",
-                    EntityType = "Permission",
-                    EntityId = permission.Id,
-                    Description = $"更新权限: {oldValues} -> {permission.Name}|{permission.Description}",
-                    IpAddress = null,
-                    UserAgent = null,
-                    StatusCode = 200,
-                    UserId = operatorId,
-                    Username = null,
-                    CreatedAt = DateTime.UtcNow
-                });
+                await _unitOfWork.AuditLog.InsertAsync(
+                    new Domain.Aggregates.Administration.AuditLog
+                    {
+                        Id = Guid.NewGuid(),
+                        Action = "Update",
+                        EntityType = "Permission",
+                        EntityId = permission.Id,
+                        Description =
+                            $"更新权限: {oldValues} -> {permission.Name}|{permission.Description}",
+                        IpAddress = null,
+                        UserAgent = null,
+                        StatusCode = 200,
+                        UserId = operatorId,
+                        Username = null,
+                        CreatedAt = DateTime.UtcNow,
+                    }
+                );
 
                 _unitOfWork.Commit();
                 return permission.ToDto();
@@ -204,29 +219,33 @@ namespace Dawning.Identity.Application.Services.Administration
             var rolePermissions = await _unitOfWork.RolePermission.GetByPermissionIdAsync(id);
             if (rolePermissions.Any())
             {
-                throw new InvalidOperationException($"权限 '{permission.Name}' 正在被 {rolePermissions.Count()} 个角色使用,无法删除");
+                throw new InvalidOperationException(
+                    $"权限 '{permission.Name}' 正在被 {rolePermissions.Count()} 个角色使用,无法删除"
+                );
             }
 
             _unitOfWork.BeginTransaction();
             try
             {
                 await _unitOfWork.Permission.DeleteAsync(permission);
-                
+
                 // 记录审计日志
-                await _unitOfWork.AuditLog.InsertAsync(new Domain.Aggregates.Administration.AuditLog
-                {
-                    Id = Guid.NewGuid(),
-                    Action = "Delete",
-                    EntityType = "Permission",
-                    EntityId = id,
-                    Description = $"删除权限: {permission.Name} ({permission.Code})",
-                    IpAddress = null,
-                    UserAgent = null,
-                    StatusCode = 200,
-                    UserId = null,
-                    Username = null,
-                    CreatedAt = DateTime.UtcNow
-                });
+                await _unitOfWork.AuditLog.InsertAsync(
+                    new Domain.Aggregates.Administration.AuditLog
+                    {
+                        Id = Guid.NewGuid(),
+                        Action = "Delete",
+                        EntityType = "Permission",
+                        EntityId = id,
+                        Description = $"删除权限: {permission.Name} ({permission.Code})",
+                        IpAddress = null,
+                        UserAgent = null,
+                        StatusCode = 200,
+                        UserId = null,
+                        Username = null,
+                        CreatedAt = DateTime.UtcNow,
+                    }
+                );
 
                 _unitOfWork.Commit();
                 return true;
@@ -238,7 +257,11 @@ namespace Dawning.Identity.Application.Services.Administration
             }
         }
 
-        public async Task<bool> AssignPermissionsToRoleAsync(Guid roleId, IEnumerable<Guid> permissionIds, Guid? operatorId = null)
+        public async Task<bool> AssignPermissionsToRoleAsync(
+            Guid roleId,
+            IEnumerable<Guid> permissionIds,
+            Guid? operatorId = null
+        )
         {
             var role = await _unitOfWork.Role.GetAsync(roleId);
             if (role == null)
@@ -252,29 +275,37 @@ namespace Dawning.Identity.Application.Services.Administration
 
             if (missingIds.Any())
             {
-                throw new InvalidOperationException($"权限 ID {string.Join(", ", missingIds)} 不存在");
+                throw new InvalidOperationException(
+                    $"权限 ID {string.Join(", ", missingIds)} 不存在"
+                );
             }
 
             _unitOfWork.BeginTransaction();
             try
             {
-                await _unitOfWork.RolePermission.AddRolePermissionsAsync(roleId, permissionIds, operatorId);
-                
+                await _unitOfWork.RolePermission.AddRolePermissionsAsync(
+                    roleId,
+                    permissionIds,
+                    operatorId
+                );
+
                 // 记录审计日志
-                await _unitOfWork.AuditLog.InsertAsync(new Domain.Aggregates.Administration.AuditLog
-                {
-                    Id = Guid.NewGuid(),
-                    Action = "AssignPermissions",
-                    EntityType = "Role",
-                    EntityId = roleId,
-                    Description = $"为角色 '{role.Name}' 分配 {permissionIds.Count()} 个权限",
-                    IpAddress = null,
-                    UserAgent = null,
-                    StatusCode = 200,
-                    UserId = operatorId,
-                    Username = null,
-                    CreatedAt = DateTime.UtcNow
-                });
+                await _unitOfWork.AuditLog.InsertAsync(
+                    new Domain.Aggregates.Administration.AuditLog
+                    {
+                        Id = Guid.NewGuid(),
+                        Action = "AssignPermissions",
+                        EntityType = "Role",
+                        EntityId = roleId,
+                        Description = $"为角色 '{role.Name}' 分配 {permissionIds.Count()} 个权限",
+                        IpAddress = null,
+                        UserAgent = null,
+                        StatusCode = 200,
+                        UserId = operatorId,
+                        Username = null,
+                        CreatedAt = DateTime.UtcNow,
+                    }
+                );
 
                 _unitOfWork.Commit();
                 return true;
@@ -286,7 +317,10 @@ namespace Dawning.Identity.Application.Services.Administration
             }
         }
 
-        public async Task<bool> RemovePermissionsFromRoleAsync(Guid roleId, IEnumerable<Guid> permissionIds)
+        public async Task<bool> RemovePermissionsFromRoleAsync(
+            Guid roleId,
+            IEnumerable<Guid> permissionIds
+        )
         {
             var role = await _unitOfWork.Role.GetAsync(roleId);
             if (role == null)
@@ -298,22 +332,24 @@ namespace Dawning.Identity.Application.Services.Administration
             try
             {
                 await _unitOfWork.RolePermission.RemoveRolePermissionsAsync(roleId, permissionIds);
-                
+
                 // 记录审计日志
-                await _unitOfWork.AuditLog.InsertAsync(new Domain.Aggregates.Administration.AuditLog
-                {
-                    Id = Guid.NewGuid(),
-                    Action = "RemovePermissions",
-                    EntityType = "Role",
-                    EntityId = roleId,
-                    Description = $"从角色 '{role.Name}' 移除 {permissionIds.Count()} 个权限",
-                    IpAddress = null,
-                    UserAgent = null,
-                    StatusCode = 200,
-                    UserId = null,
-                    Username = null,
-                    CreatedAt = DateTime.UtcNow
-                });
+                await _unitOfWork.AuditLog.InsertAsync(
+                    new Domain.Aggregates.Administration.AuditLog
+                    {
+                        Id = Guid.NewGuid(),
+                        Action = "RemovePermissions",
+                        EntityType = "Role",
+                        EntityId = roleId,
+                        Description = $"从角色 '{role.Name}' 移除 {permissionIds.Count()} 个权限",
+                        IpAddress = null,
+                        UserAgent = null,
+                        StatusCode = 200,
+                        UserId = null,
+                        Username = null,
+                        CreatedAt = DateTime.UtcNow,
+                    }
+                );
 
                 _unitOfWork.Commit();
                 return true;
@@ -334,7 +370,7 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             // 获取用户的所有角色
             var userRoles = await _unitOfWork.UserRole.GetUserRolesAsync(userId);
-            
+
             if (!userRoles.Any())
             {
                 return new List<string>();
@@ -349,11 +385,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 去重并返回权限代码
-            return allPermissions
-                .Where(p => p.IsActive)
-                .Select(p => p.Code)
-                .Distinct()
-                .ToList();
+            return allPermissions.Where(p => p.IsActive).Select(p => p.Code).Distinct().ToList();
         }
     }
 
@@ -375,7 +407,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 IsActive = permission.IsActive,
                 DisplayOrder = permission.DisplayOrder,
                 CreatedAt = permission.CreatedAt,
-                UpdatedAt = permission.UpdatedAt
+                UpdatedAt = permission.UpdatedAt,
             };
         }
     }

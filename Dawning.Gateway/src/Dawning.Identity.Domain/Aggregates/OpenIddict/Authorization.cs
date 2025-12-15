@@ -46,4 +46,3 @@ namespace Dawning.Identity.Domain.Aggregates.OpenIddict
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
-

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Models;
@@ -6,10 +10,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Administration;
 using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using Dawning.Shared.Dapper.Contrib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.Administration
@@ -40,7 +40,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<UserEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(username), u => u.Username == username)
                 .AsListAsync();
 
@@ -52,7 +53,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<User?> GetByEmailAsync(string email)
         {
-            var result = await _context.Connection.Builder<UserEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<UserEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(email), u => u.Email == email)
                 .AsListAsync();
 
@@ -62,15 +64,28 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <summary>
         /// 获取分页用户列表
         /// </summary>
-        public async Task<PagedData<User>> GetPagedListAsync(UserModel model, int page, int itemsPerPage)
+        public async Task<PagedData<User>> GetPagedListAsync(
+            UserModel model,
+            int page,
+            int itemsPerPage
+        )
         {
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
 
             // 应用过滤条件
             builder = builder
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Username), u => u.Username!.Contains(model.Username ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Email), u => u.Email!.Contains(model.Email ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), u => u.DisplayName!.Contains(model.DisplayName ?? ""))
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Username),
+                    u => u.Username!.Contains(model.Username ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Email),
+                    u => u.Email!.Contains(model.Email ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.DisplayName),
+                    u => u.DisplayName!.Contains(model.DisplayName ?? "")
+                )
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Role), u => u.Role == model.Role)
                 .WhereIf(model.IsActive.HasValue, u => u.IsActive == model.IsActive!.Value);
 
@@ -84,22 +99,35 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
         }
 
         /// <summary>
         /// 获取用户列表（Cursor 分页）
         /// </summary>
-        public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(UserModel model, long? cursor, int pageSize)
+        public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(
+            UserModel model,
+            long? cursor,
+            int pageSize
+        )
         {
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
 
             // 应用过滤条件
             builder = builder
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Username), u => u.Username!.Contains(model.Username ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Email), u => u.Email!.Contains(model.Email ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), u => u.DisplayName!.Contains(model.DisplayName ?? ""))
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Username),
+                    u => u.Username!.Contains(model.Username ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Email),
+                    u => u.Email!.Contains(model.Email ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.DisplayName),
+                    u => u.DisplayName!.Contains(model.DisplayName ?? "")
+                )
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Role), u => u.Role == model.Role)
                 .WhereIf(model.IsActive.HasValue, u => u.IsActive == model.IsActive!.Value);
 
@@ -110,21 +138,19 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             }
 
             // 按 Timestamp 降序排序，获取指定数量 + 1（用于判断是否有下一页）
-            var items = builder
-                .OrderByDescending(u => u.Timestamp)
-                .Take(pageSize + 1)
-                .AsList();
+            var items = builder.OrderByDescending(u => u.Timestamp).Take(pageSize + 1).AsList();
 
             var hasNextPage = items.Count() > pageSize;
             var resultItems = items.Take(pageSize).ToModels().ToList();
-            var nextCursor = hasNextPage && resultItems.Any() ? resultItems.Last().Timestamp : (long?)null;
+            var nextCursor =
+                hasNextPage && resultItems.Any() ? resultItems.Last().Timestamp : (long?)null;
 
             return new CursorPagedData<User>
             {
                 PageSize = pageSize,
                 HasNextPage = hasNextPage,
                 NextCursor = nextCursor,
-                Items = resultItems
+                Items = resultItems,
             };
         }
 
@@ -190,7 +216,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             }
 
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
-            
+
             if (excludeUserId.HasValue)
             {
                 var excludeId = excludeUserId.Value;
@@ -216,7 +242,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             }
 
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
-            
+
             if (excludeUserId.HasValue)
             {
                 var excludeId = excludeUserId.Value;

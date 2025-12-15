@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using Dapper;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.Administration;
@@ -7,8 +9,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Administration;
 using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using Dawning.Shared.Dapper.Contrib;
-using System;
-using System.Threading.Tasks;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.Administration
@@ -30,25 +30,44 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// </summary>
         public async Task<SystemLog?> GetAsync(Guid id)
         {
-            var entity = await _context.Connection.GetAsync<SystemLogEntity>(id, _context.Transaction);
+            var entity = await _context.Connection.GetAsync<SystemLogEntity>(
+                id,
+                _context.Transaction
+            );
             return entity?.ToModel();
         }
 
         /// <summary>
         /// 获取分页系统日志列表
         /// </summary>
-        public async Task<PagedData<SystemLog>> GetPagedListAsync(SystemLogQueryModel model, int page, int itemsPerPage)
+        public async Task<PagedData<SystemLog>> GetPagedListAsync(
+            SystemLogQueryModel model,
+            int page,
+            int itemsPerPage
+        )
         {
             var builder = _context.Connection.Builder<SystemLogEntity>(_context.Transaction);
 
             // 应用过滤条件
             builder = builder
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Level), l => l.Level == model.Level)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Keyword), l => l.Message.Contains(model.Keyword ?? ""))
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Keyword),
+                    l => l.Message.Contains(model.Keyword ?? "")
+                )
                 .WhereIf(model.UserId.HasValue, l => l.UserId == model.UserId!.Value)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Username), l => l.Username!.Contains(model.Username ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.IpAddress), l => l.IpAddress == model.IpAddress)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.RequestPath), l => l.RequestPath!.Contains(model.RequestPath ?? ""))
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Username),
+                    l => l.Username!.Contains(model.Username ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.IpAddress),
+                    l => l.IpAddress == model.IpAddress
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.RequestPath),
+                    l => l.RequestPath!.Contains(model.RequestPath ?? "")
+                )
                 .WhereIf(model.StartDate.HasValue, l => l.CreatedAt >= model.StartDate!.Value)
                 .WhereIf(model.EndDate.HasValue, l => l.CreatedAt <= model.EndDate!.Value);
 
@@ -62,7 +81,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
         }
 
@@ -85,7 +104,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         public async Task<int> DeleteOlderThanAsync(DateTime date)
         {
             const string sql = "DELETE FROM system_logs WHERE created_at < @Date";
-            var result = await _context.Connection.ExecuteAsync(sql, new { Date = date }, _context.Transaction);
+            var result = await _context.Connection.ExecuteAsync(
+                sql,
+                new { Date = date },
+                _context.Transaction
+            );
             return result;
         }
     }

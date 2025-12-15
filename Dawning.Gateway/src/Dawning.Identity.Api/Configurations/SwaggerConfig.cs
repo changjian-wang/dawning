@@ -1,5 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
-using System.Reflection;
+﻿using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 namespace Dawning.Identity.Api.Configurations
 {
@@ -13,21 +13,25 @@ namespace Dawning.Identity.Api.Configurations
 
         public static void AddSwaggerConfiguration(this IServiceCollection services)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
 
             services.AddSwaggerGen(options =>
             {
-                options.SwaggerDoc(Name, new OpenApiInfo
-                {
-                    Title = Title,
-                    Version = Name,
-                    Description = "Dawning Identity 身份认证 API",
-                    Contact = new OpenApiContact
+                options.SwaggerDoc(
+                    Name,
+                    new OpenApiInfo
                     {
-                        Name = "Dawning Team",
-                        Email = "support@dawning.com"
+                        Title = Title,
+                        Version = Name,
+                        Description = "Dawning Identity 身份认证 API",
+                        Contact = new OpenApiContact
+                        {
+                            Name = "Dawning Team",
+                            Email = "support@dawning.com",
+                        },
                     }
-                });
+                );
 
                 // 添加 XML 注释
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -39,35 +43,42 @@ namespace Dawning.Identity.Api.Configurations
                 }
 
                 // 添加 JWT Bearer 认证
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
-
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+                options.AddSecurityDefinition(
+                    "Bearer",
+                    new OpenApiSecurityScheme
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        Array.Empty<string>()
+                        Description =
+                            "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
                     }
-                });
+                );
+
+                options.AddSecurityRequirement(
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer",
+                                },
+                            },
+                            Array.Empty<string>()
+                        },
+                    }
+                );
             });
         }
 
         public static void UseSwaggerSetup(this IApplicationBuilder app)
         {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+            if (app == null)
+                throw new ArgumentNullException(nameof(app));
 
             app.UseSwagger();
             app.UseSwaggerUI(options =>

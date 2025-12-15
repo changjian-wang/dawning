@@ -25,7 +25,8 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<PagedData<ClaimTypeDto>> GetPagedListAsync(
             ClaimTypeModel model,
             int page,
-            int itemsPerPage)
+            int itemsPerPage
+        )
         {
             var data = await _unitOfWork.ClaimType.GetPagedListAsync(model, page, itemsPerPage);
 
@@ -34,7 +35,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = data.PageIndex,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = data.Items.ToDtos() ?? new List<ClaimTypeDto>()
+                Items = data.Items.ToDtos() ?? new List<ClaimTypeDto>(),
             };
         }
 

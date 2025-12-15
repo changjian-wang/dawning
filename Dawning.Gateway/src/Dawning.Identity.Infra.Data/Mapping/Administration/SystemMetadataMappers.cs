@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
@@ -29,8 +29,9 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
         /// </summary>
         static SystemMetadataMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<SystemMetadataProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg =>
+                cfg.AddProfile<SystemMetadataProfile>()
+            ).CreateMapper();
         }
 
         /// <summary>
@@ -49,7 +50,9 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
         /// </summary>
         /// <param name="entities">The collection of SystemMetadataEntity objects to convert.</param>
         /// <returns>An IEnumerable of SystemMetadata representing the converted entities.</returns>
-        public static IEnumerable<SystemMetadata> ToModels(this IEnumerable<SystemMetadataEntity> entities)
+        public static IEnumerable<SystemMetadata> ToModels(
+            this IEnumerable<SystemMetadataEntity> entities
+        )
         {
             return Mapper.Map<IEnumerable<SystemMetadata>>(entities);
         }

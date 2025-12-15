@@ -32,14 +32,20 @@ namespace Dawning.Identity.Api.Models
             {
                 Code = 20000,
                 Message = message,
-                Data = data
+                Data = data,
             };
         }
 
         /// <summary>
         /// 成功响应（带分页）- 返回包含分页信息的数据结构
         /// </summary>
-        public static ApiResponse<object> SuccessPaged<TItem>(IEnumerable<TItem> items, int current, int pageSize, long total, string message = "Success")
+        public static ApiResponse<object> SuccessPaged<TItem>(
+            IEnumerable<TItem> items,
+            int current,
+            int pageSize,
+            long total,
+            string message = "Success"
+        )
         {
             return new ApiResponse<object>
             {
@@ -52,9 +58,9 @@ namespace Dawning.Identity.Api.Models
                     {
                         current,
                         pageSize,
-                        total
-                    }
-                }
+                        total,
+                    },
+                },
             };
         }
 
@@ -67,7 +73,7 @@ namespace Dawning.Identity.Api.Models
             {
                 Code = code,
                 Message = message,
-                Data = data
+                Data = data,
             };
         }
     }
@@ -88,7 +94,7 @@ namespace Dawning.Identity.Api.Models
             {
                 Code = 20000,
                 Message = message,
-                Data = null
+                Data = null,
             };
         }
 
@@ -104,7 +110,7 @@ namespace Dawning.Identity.Api.Models
             {
                 Code = code,
                 Message = message,
-                Data = null
+                Data = null,
             };
         }
     }

@@ -1,11 +1,11 @@
-﻿using AutoMapper;
-using Dawning.Identity.Application.Dtos.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Application.Dtos.OpenIddict;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
 
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
@@ -15,8 +15,7 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
 
         static TokenMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<TokenProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<TokenProfile>()).CreateMapper();
         }
 
         public static TokenDto? ToDto(this Token model)

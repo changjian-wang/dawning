@@ -50,4 +50,3 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
-

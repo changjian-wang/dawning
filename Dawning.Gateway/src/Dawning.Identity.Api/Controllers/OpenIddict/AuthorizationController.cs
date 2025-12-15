@@ -48,7 +48,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         {
             if (string.IsNullOrWhiteSpace(subject))
             {
-                return Ok(ApiResponse<IEnumerable<AuthorizationDto>>.Error(40001, "Invalid subject"));
+                return Ok(
+                    ApiResponse<IEnumerable<AuthorizationDto>>.Error(40001, "Invalid subject")
+                );
             }
 
             var result = await _service.GetBySubjectAsync(subject);
@@ -63,7 +65,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         {
             if (applicationId == Guid.Empty)
             {
-                return Ok(ApiResponse<IEnumerable<AuthorizationDto>>.Error(40001, "Invalid application ID"));
+                return Ok(
+                    ApiResponse<IEnumerable<AuthorizationDto>>.Error(
+                        40001,
+                        "Invalid application ID"
+                    )
+                );
             }
 
             var result = await _service.GetByApplicationIdAsync(applicationId);
@@ -77,7 +84,8 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] AuthorizationModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             if (page < 1 || pageSize < 1)
             {
@@ -106,7 +114,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         {
             if (authorizationDto == null || string.IsNullOrWhiteSpace(authorizationDto.Subject))
             {
-                return Ok(ApiResponse<int>.Error(40002, "Invalid authorization data or missing subject"));
+                return Ok(
+                    ApiResponse<int>.Error(40002, "Invalid authorization data or missing subject")
+                );
             }
 
             var result = await _service.InsertAsync(authorizationDto);
@@ -121,7 +131,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         {
             if (authorizationDto?.Id == null)
             {
-                return Ok(ApiResponse<bool>.Error(40003, "Invalid authorization data or missing ID"));
+                return Ok(
+                    ApiResponse<bool>.Error(40003, "Invalid authorization data or missing ID")
+                );
             }
 
             var result = await _service.UpdateAsync(authorizationDto);

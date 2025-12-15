@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Interfaces.Administration
 {
@@ -31,7 +31,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         /// <summary>
         /// 获取用户列表（Cursor 分页）
         /// </summary>
-        Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(UserModel model, long? cursor, int pageSize);
+        Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(
+            UserModel model,
+            long? cursor,
+            int pageSize
+        );
 
         /// <summary>
         /// 创建用户
@@ -96,7 +100,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         /// <summary>
         /// 为用户分配角色
         /// </summary>
-        Task<bool> AssignRolesAsync(Guid userId, IEnumerable<Guid> roleIds, Guid? operatorId = null);
+        Task<bool> AssignRolesAsync(
+            Guid userId,
+            IEnumerable<Guid> roleIds,
+            Guid? operatorId = null
+        );
 
         /// <summary>
         /// 移除用户的角色

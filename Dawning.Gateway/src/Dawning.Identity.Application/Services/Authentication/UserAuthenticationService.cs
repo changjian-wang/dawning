@@ -20,7 +20,10 @@ namespace Dawning.Identity.Application.Services.Authentication
         /// <summary>
         /// 验证用户凭据
         /// </summary>
-        public async Task<UserAuthenticationDto?> ValidateCredentialsAsync(string username, string password)
+        public async Task<UserAuthenticationDto?> ValidateCredentialsAsync(
+            string username,
+            string password
+        )
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -28,7 +31,10 @@ namespace Dawning.Identity.Application.Services.Authentication
             }
 
             // 使用ValidateCredentialsAndUpdateLoginAsync方法，它会同时验证密码和更新登录时间
-            var user = await _userService.ValidateCredentialsAndUpdateLoginAsync(username, password);
+            var user = await _userService.ValidateCredentialsAndUpdateLoginAsync(
+                username,
+                password
+            );
             if (user == null)
             {
                 return null;
@@ -45,7 +51,7 @@ namespace Dawning.Identity.Application.Services.Authentication
                 Username = user.Username,
                 Email = user.Email,
                 Roles = roleNames,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
             };
         }
 
@@ -75,7 +81,7 @@ namespace Dawning.Identity.Application.Services.Authentication
                 Username = user.Username,
                 Email = user.Email,
                 Roles = roleNames,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
             };
         }
 
@@ -92,7 +98,7 @@ namespace Dawning.Identity.Application.Services.Authentication
             var model = new Domain.Models.Administration.UserModel
             {
                 Username = username,
-                IsActive = true
+                IsActive = true,
             };
             var users = await _userService.GetPagedListAsync(model, 1, 10);
 
@@ -112,7 +118,7 @@ namespace Dawning.Identity.Application.Services.Authentication
                 Username = user.Username,
                 Email = user.Email,
                 Roles = roleNames,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
             };
         }
     }

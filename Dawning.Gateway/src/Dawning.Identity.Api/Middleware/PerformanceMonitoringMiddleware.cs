@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Dawning.Identity.Api.Middleware
 {
@@ -17,7 +17,10 @@ namespace Dawning.Identity.Api.Middleware
         private const int SlowRequestThresholdMs = 3000; // 3秒
         private const int VerySlowRequestThresholdMs = 10000; // 10秒
 
-        public PerformanceMonitoringMiddleware(RequestDelegate next, ILogger<PerformanceMonitoringMiddleware> logger)
+        public PerformanceMonitoringMiddleware(
+            RequestDelegate next,
+            ILogger<PerformanceMonitoringMiddleware> logger
+        )
         {
             _next = next;
             _logger = logger;
@@ -43,19 +46,31 @@ namespace Dawning.Identity.Api.Middleware
                 {
                     _logger.LogError(
                         "Very slow request detected: {Method} {Path} took {ElapsedMs}ms (Status: {StatusCode})",
-                        method, path, elapsedMs, context.Response.StatusCode);
+                        method,
+                        path,
+                        elapsedMs,
+                        context.Response.StatusCode
+                    );
                 }
                 else if (elapsedMs > SlowRequestThresholdMs)
                 {
                     _logger.LogWarning(
                         "Slow request detected: {Method} {Path} took {ElapsedMs}ms (Status: {StatusCode})",
-                        method, path, elapsedMs, context.Response.StatusCode);
+                        method,
+                        path,
+                        elapsedMs,
+                        context.Response.StatusCode
+                    );
                 }
                 else
                 {
                     _logger.LogDebug(
                         "Request completed: {Method} {Path} took {ElapsedMs}ms (Status: {StatusCode})",
-                        method, path, elapsedMs, context.Response.StatusCode);
+                        method,
+                        path,
+                        elapsedMs,
+                        context.Response.StatusCode
+                    );
                 }
 
                 // 只在响应未开始时添加性能头
@@ -84,8 +99,10 @@ namespace Dawning.Identity.Api.Middleware
             _totalResponseTime += responseTimeMs;
             AverageResponseTime = (double)_totalResponseTime / TotalRequests;
 
-            if (isError) TotalErrors++;
-            if (isSlow) SlowRequests++;
+            if (isError)
+                TotalErrors++;
+            if (isSlow)
+                SlowRequests++;
         }
 
         public static void Reset()

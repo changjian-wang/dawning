@@ -20,7 +20,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
         _client = factory.CreateClient();
         _jsonOptions = new JsonSerializerOptions
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         };
     }
 
@@ -32,10 +32,10 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<DevResetAdminResponse>(content, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result!.Code.Should().Be(0);
         result.Data.Should().NotBeNull();
@@ -54,10 +54,10 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<PagedResponse>(content, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result!.Code.Should().Be(0);
         result.Data.Should().NotBeNull();
@@ -69,7 +69,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
     {
         // Arrange
         await _client.PostAsync("/api/user/dev-reset-admin", null);
-        
+
         var createDto = new CreateUserDto
         {
             Username = $"testuser_{Guid.NewGuid():N}",
@@ -77,7 +77,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
             Email = $"test_{Guid.NewGuid():N}@test.com",
             DisplayName = "Test User",
             Role = "user",
-            IsActive = true
+            IsActive = true,
         };
 
         // Act
@@ -85,10 +85,10 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<CreateUserResponse>(content, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result!.Code.Should().Be(0);
         result.Data.Should().NotBeNull();
@@ -101,7 +101,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
     {
         // Arrange - 创建用户
         await _client.PostAsync("/api/user/dev-reset-admin", null);
-        
+
         var listResponse = await _client.GetAsync("/api/user?page=1&itemsPerPage=1");
         var listContent = await listResponse.Content.ReadAsStringAsync();
         var listResult = JsonSerializer.Deserialize<PagedResponse>(listContent, _jsonOptions);
@@ -112,10 +112,10 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<GetUserResponse>(content, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result!.Code.Should().Be(0);
         result.Data.Should().NotBeNull();
@@ -127,7 +127,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
     {
         // Arrange - 创建用户
         await _client.PostAsync("/api/user/dev-reset-admin", null);
-        
+
         var listResponse = await _client.GetAsync("/api/user?page=1&itemsPerPage=1");
         var listContent = await listResponse.Content.ReadAsStringAsync();
         var listResult = JsonSerializer.Deserialize<PagedResponse>(listContent, _jsonOptions);
@@ -138,7 +138,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
             DisplayName = "Updated Name",
             Email = user.Email,
             Role = user.Role,
-            IsActive = user.IsActive
+            IsActive = user.IsActive,
         };
 
         // Act
@@ -146,10 +146,10 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<UpdateUserResponse>(content, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result!.Code.Should().Be(0);
         result.Data.Should().NotBeNull();
@@ -161,7 +161,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
     {
         // Arrange - 创建用户
         await _client.PostAsync("/api/user/dev-reset-admin", null);
-        
+
         var listResponse = await _client.GetAsync("/api/user?page=1&itemsPerPage=1");
         var listContent = await listResponse.Content.ReadAsStringAsync();
         var listResult = JsonSerializer.Deserialize<PagedResponse>(listContent, _jsonOptions);
@@ -170,14 +170,17 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
         var resetDto = new { newPassword = "NewPass@123" };
 
         // Act
-        var response = await _client.PostAsJsonAsync($"/api/user/{userId}/reset-password", resetDto);
+        var response = await _client.PostAsJsonAsync(
+            $"/api/user/{userId}/reset-password",
+            resetDto
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var content = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<ResetPasswordResponse>(content, _jsonOptions);
-        
+
         result.Should().NotBeNull();
         result!.Code.Should().Be(0);
         result.Message.Should().Contain("success");
@@ -188,7 +191,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
     {
         // Arrange - 创建一个测试用户
         await _client.PostAsync("/api/user/dev-reset-admin", null);
-        
+
         var createDto = new CreateUserDto
         {
             Username = $"deletetest_{Guid.NewGuid():N}",
@@ -196,12 +199,15 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
             Email = $"delete_{Guid.NewGuid():N}@test.com",
             DisplayName = "Delete Test",
             Role = "user",
-            IsActive = true
+            IsActive = true,
         };
-        
+
         var createResponse = await _client.PostAsJsonAsync("/api/user", createDto);
         var createContent = await createResponse.Content.ReadAsStringAsync();
-        var createResult = JsonSerializer.Deserialize<CreateUserResponse>(createContent, _jsonOptions);
+        var createResult = JsonSerializer.Deserialize<CreateUserResponse>(
+            createContent,
+            _jsonOptions
+        );
         var userId = createResult!.Data!.Id;
 
         // Act
@@ -209,7 +215,7 @@ public class UserControllerTests : IClassFixture<TestWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         // 验证用户已被删除
         var getResponse = await _client.GetAsync($"/api/user/{userId}");
         getResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);

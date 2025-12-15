@@ -1,7 +1,7 @@
+using System.Text.Json;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
-using System.Text.Json;
 
 namespace Dawning.Identity.Application.Mapping.Administration
 {
@@ -14,17 +14,25 @@ namespace Dawning.Identity.Application.Mapping.Administration
         {
             // AuditLog -> AuditLogDto
             CreateMap<AuditLog, AuditLogDto>()
-                .ForMember(dest => dest.OldValues, opt => opt.MapFrom(src =>
-                    DeserializeJson(src.OldValues)))
-                .ForMember(dest => dest.NewValues, opt => opt.MapFrom(src =>
-                    DeserializeJson(src.NewValues)));
+                .ForMember(
+                    dest => dest.OldValues,
+                    opt => opt.MapFrom(src => DeserializeJson(src.OldValues))
+                )
+                .ForMember(
+                    dest => dest.NewValues,
+                    opt => opt.MapFrom(src => DeserializeJson(src.NewValues))
+                );
 
             // CreateAuditLogDto -> AuditLog
             CreateMap<CreateAuditLogDto, AuditLog>()
-                .ForMember(dest => dest.OldValues, opt => opt.MapFrom(src =>
-                    SerializeJson(src.OldValues)))
-                .ForMember(dest => dest.NewValues, opt => opt.MapFrom(src =>
-                    SerializeJson(src.NewValues)));
+                .ForMember(
+                    dest => dest.OldValues,
+                    opt => opt.MapFrom(src => SerializeJson(src.OldValues))
+                )
+                .ForMember(
+                    dest => dest.NewValues,
+                    opt => opt.MapFrom(src => SerializeJson(src.NewValues))
+                );
         }
 
         private static object? DeserializeJson(string? json)

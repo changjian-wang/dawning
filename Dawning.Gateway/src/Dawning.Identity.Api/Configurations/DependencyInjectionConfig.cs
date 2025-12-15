@@ -6,7 +6,8 @@ namespace Dawning.Identity.Api.Configurations
     {
         public static void AddDependencyInjectionConfiguration(this IServiceCollection services)
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
 
             NativeInjectorBootStrapper.AddApplicationServices(services);
         }

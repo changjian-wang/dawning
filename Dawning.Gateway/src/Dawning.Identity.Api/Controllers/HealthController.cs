@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.UoW;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Dawning.Identity.Api.Controllers
 {
@@ -31,12 +31,14 @@ namespace Dawning.Identity.Api.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new
-            {
-                status = "Healthy",
-                timestamp = DateTime.UtcNow,
-                uptime = (DateTime.UtcNow - _startTime).ToString(@"dd\.hh\:mm\:ss")
-            });
+            return Ok(
+                new
+                {
+                    status = "Healthy",
+                    timestamp = DateTime.UtcNow,
+                    uptime = (DateTime.UtcNow - _startTime).ToString(@"dd\.hh\:mm\:ss"),
+                }
+            );
         }
 
         /// <summary>
@@ -58,23 +60,27 @@ namespace Dawning.Identity.Api.Controllers
                 {
                     api = apiCheck,
                     database = dbCheck,
-                    memory = memCheck
-                }
+                    memory = memCheck,
+                },
             };
 
-            var hasFailures = apiCheck.status != "Healthy" ||
-                             dbCheck.status != "Healthy" ||
-                             memCheck.status != "Healthy";
+            var hasFailures =
+                apiCheck.status != "Healthy"
+                || dbCheck.status != "Healthy"
+                || memCheck.status != "Healthy";
 
             if (hasFailures)
             {
-                return StatusCode(503, new
-                {
-                    status = "Unhealthy",
-                    timestamp = healthStatus.timestamp,
-                    uptime = healthStatus.uptime,
-                    checks = healthStatus.checks
-                });
+                return StatusCode(
+                    503,
+                    new
+                    {
+                        status = "Unhealthy",
+                        timestamp = healthStatus.timestamp,
+                        uptime = healthStatus.uptime,
+                        checks = healthStatus.checks,
+                    }
+                );
             }
 
             return Ok(healthStatus);
@@ -92,7 +98,10 @@ namespace Dawning.Identity.Api.Controllers
                 var dbCheck = await CheckDatabaseHealth();
                 if (dbCheck.status != "Healthy")
                 {
-                    return StatusCode(503, new { status = "NotReady", reason = "Database unavailable" });
+                    return StatusCode(
+                        503,
+                        new { status = "NotReady", reason = "Database unavailable" }
+                    );
                 }
 
                 return Ok(new { status = "Ready" });
@@ -121,53 +130,44 @@ namespace Dawning.Identity.Api.Controllers
         {
             var process = Process.GetCurrentProcess();
 
-            return Ok(new
-            {
-                timestamp = DateTime.UtcNow,
-                uptime = (DateTime.UtcNow - _startTime).ToString(@"dd\.hh\:mm\:ss"),
-                memory = new
+            return Ok(
+                new
                 {
-                    workingSet = FormatBytes(process.WorkingSet64),
-                    privateMemory = FormatBytes(process.PrivateMemorySize64),
-                    virtualMemory = FormatBytes(process.VirtualMemorySize64),
-                    gcMemory = FormatBytes(GC.GetTotalMemory(false))
-                },
-                cpu = new
-                {
-                    totalProcessorTime = process.TotalProcessorTime.ToString(@"hh\:mm\:ss"),
-                    userProcessorTime = process.UserProcessorTime.ToString(@"hh\:mm\:ss")
-                },
-                threads = new
-                {
-                    count = process.Threads.Count
-                },
-                gc = new
-                {
-                    gen0Collections = GC.CollectionCount(0),
-                    gen1Collections = GC.CollectionCount(1),
-                    gen2Collections = GC.CollectionCount(2)
+                    timestamp = DateTime.UtcNow,
+                    uptime = (DateTime.UtcNow - _startTime).ToString(@"dd\.hh\:mm\:ss"),
+                    memory = new
+                    {
+                        workingSet = FormatBytes(process.WorkingSet64),
+                        privateMemory = FormatBytes(process.PrivateMemorySize64),
+                        virtualMemory = FormatBytes(process.VirtualMemorySize64),
+                        gcMemory = FormatBytes(GC.GetTotalMemory(false)),
+                    },
+                    cpu = new
+                    {
+                        totalProcessorTime = process.TotalProcessorTime.ToString(@"hh\:mm\:ss"),
+                        userProcessorTime = process.UserProcessorTime.ToString(@"hh\:mm\:ss"),
+                    },
+                    threads = new { count = process.Threads.Count },
+                    gc = new
+                    {
+                        gen0Collections = GC.CollectionCount(0),
+                        gen1Collections = GC.CollectionCount(1),
+                        gen2Collections = GC.CollectionCount(2),
+                    },
                 }
-            });
+            );
         }
 
         private async Task<dynamic> CheckApiHealth()
         {
             try
             {
-                return new
-                {
-                    status = "Healthy",
-                    responseTime = "0ms"
-                };
+                return new { status = "Healthy", responseTime = "0ms" };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "API health check failed");
-                return new
-                {
-                    status = "Unhealthy",
-                    error = ex.Message
-                };
+                return new { status = "Unhealthy", error = ex.Message };
             }
         }
 
@@ -183,7 +183,7 @@ namespace Dawning.Identity.Api.Controllers
                 return new
                 {
                     status = "Healthy",
-                    responseTime = $"{stopwatch.ElapsedMilliseconds}ms"
+                    responseTime = $"{stopwatch.ElapsedMilliseconds}ms",
                 };
             }
             catch (Exception ex)
@@ -194,7 +194,7 @@ namespace Dawning.Identity.Api.Controllers
                 {
                     status = "Unhealthy",
                     error = ex.Message,
-                    responseTime = $"{stopwatch.ElapsedMilliseconds}ms"
+                    responseTime = $"{stopwatch.ElapsedMilliseconds}ms",
                 };
             }
         }
@@ -211,17 +211,13 @@ namespace Dawning.Identity.Api.Controllers
                 {
                     status = workingSetMb < threshold ? "Healthy" : "Warning",
                     workingSet = FormatBytes(process.WorkingSet64),
-                    threshold = $"{threshold}MB"
+                    threshold = $"{threshold}MB",
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Memory health check failed");
-                return new
-                {
-                    status = "Unhealthy",
-                    error = ex.Message
-                };
+                return new { status = "Unhealthy", error = ex.Message };
             }
         }
 

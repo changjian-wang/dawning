@@ -1,7 +1,7 @@
-﻿using Dawning.Identity.Domain.Interfaces.UoW;
+﻿using System.Reflection;
+using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Repository.UoW;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Dawning.Identity.Infra.CrossCutting.IoC
 {
@@ -35,7 +35,8 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         /// </summary>
         private static void RegisterServices(IServiceCollection services, Assembly assembly)
         {
-            var serviceTypes = assembly.GetExportedTypes()
+            var serviceTypes = assembly
+                .GetExportedTypes()
                 .Where(t => !t.IsAbstract && IsServiceOrRepository(t));
 
             foreach (var type in serviceTypes)

@@ -1,7 +1,7 @@
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using System.Collections.Generic;
 using System.Linq;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
@@ -25,7 +25,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 CreatedBy = entity.CreatedBy,
                 UpdatedAt = entity.UpdatedAt,
                 UpdatedBy = entity.UpdatedBy,
-                Timestamp = entity.Timestamp
+                Timestamp = entity.Timestamp,
             };
         }
 
@@ -47,7 +47,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 CreatedBy = model.CreatedBy,
                 UpdatedAt = model.UpdatedAt,
                 UpdatedBy = model.UpdatedBy,
-                Timestamp = model.Timestamp
+                Timestamp = model.Timestamp,
             };
         }
 
@@ -64,7 +64,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 RoleId = entity.RoleId,
                 PermissionId = entity.PermissionId,
                 CreatedAt = entity.CreatedAt,
-                CreatedBy = entity.CreatedBy
+                CreatedBy = entity.CreatedBy,
             };
         }
 
@@ -76,7 +76,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 RoleId = model.RoleId,
                 PermissionId = model.PermissionId,
                 CreatedAt = model.CreatedAt,
-                CreatedBy = model.CreatedBy
+                CreatedBy = model.CreatedBy,
             };
         }
     }

@@ -1,8 +1,8 @@
+using System;
+using System.Threading.Tasks;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
@@ -19,7 +19,11 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         /// <summary>
         /// 获取分页审计日志列表
         /// </summary>
-        Task<PagedData<AuditLog>> GetPagedListAsync(AuditLogModel model, int page, int itemsPerPage);
+        Task<PagedData<AuditLog>> GetPagedListAsync(
+            AuditLogModel model,
+            int page,
+            int itemsPerPage
+        );
 
         /// <summary>
         /// 异步插入审计日志

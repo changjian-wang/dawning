@@ -14,8 +14,9 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 
         static ApplicationMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<ApplicationProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg =>
+                cfg.AddProfile<ApplicationProfile>()
+            ).CreateMapper();
         }
 
         public static Application ToModel(this ApplicationEntity entity)
@@ -23,7 +24,9 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
             return Mapper.Map<Application>(entity);
         }
 
-        public static IEnumerable<Application> ToModels(this IEnumerable<ApplicationEntity> entities)
+        public static IEnumerable<Application> ToModels(
+            this IEnumerable<ApplicationEntity> entities
+        )
         {
             return Mapper.Map<IEnumerable<Application>>(entities);
         }
@@ -34,4 +37,3 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         }
     }
 }
-

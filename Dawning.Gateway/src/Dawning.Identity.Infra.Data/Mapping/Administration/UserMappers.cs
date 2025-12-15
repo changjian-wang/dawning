@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
@@ -15,8 +15,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
 
         static UserMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<UserProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<UserProfile>()).CreateMapper();
         }
 
         /// <summary>

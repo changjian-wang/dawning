@@ -20,7 +20,8 @@ namespace Dawning.Identity.Api.Data
             IApplicationService applicationService,
             IScopeService scopeService,
             Dawning.Identity.Application.Interfaces.Administration.IUserService userService,
-            ILogger<DatabaseSeeder> logger)
+            ILogger<DatabaseSeeder> logger
+        )
         {
             _applicationService = applicationService;
             _scopeService = scopeService;
@@ -54,11 +55,36 @@ namespace Dawning.Identity.Api.Data
         {
             var scopes = new[]
             {
-                new { Name = Scopes.OpenId, DisplayName = "OpenID", Description = "OpenID Connect scope" },
-                new { Name = Scopes.Profile, DisplayName = "Profile", Description = "User profile information" },
-                new { Name = Scopes.Email, DisplayName = "Email", Description = "User email address" },
-                new { Name = Scopes.Roles, DisplayName = "Roles", Description = "User roles" },
-                new { Name = "api", DisplayName = "API", Description = "API access scope" }
+                new
+                {
+                    Name = Scopes.OpenId,
+                    DisplayName = "OpenID",
+                    Description = "OpenID Connect scope",
+                },
+                new
+                {
+                    Name = Scopes.Profile,
+                    DisplayName = "Profile",
+                    Description = "User profile information",
+                },
+                new
+                {
+                    Name = Scopes.Email,
+                    DisplayName = "Email",
+                    Description = "User email address",
+                },
+                new
+                {
+                    Name = Scopes.Roles,
+                    DisplayName = "Roles",
+                    Description = "User roles",
+                },
+                new
+                {
+                    Name = "api",
+                    DisplayName = "API",
+                    Description = "API access scope",
+                },
             };
 
             foreach (var scope in scopes)
@@ -72,10 +98,13 @@ namespace Dawning.Identity.Api.Data
                         Name = scope.Name,
                         DisplayName = scope.DisplayName,
                         Description = scope.Description,
-                        Resources = scope.Name == "api" ? new List<string> { "api-resource" } : new List<string>(),
+                        Resources =
+                            scope.Name == "api"
+                                ? new List<string> { "api-resource" }
+                                : new List<string>(),
                         Properties = new Dictionary<string, string>(),
                         Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
                     };
 
                     await _scopeService.InsertAsync(newScope);
@@ -113,35 +142,33 @@ namespace Dawning.Identity.Api.Data
                         Permissions.GrantTypes.Password,
                         Permissions.GrantTypes.RefreshToken,
                         Permissions.GrantTypes.AuthorizationCode,
-                        
                         // 端点
                         Permissions.Endpoints.Token,
                         Permissions.Endpoints.Authorization,
                         Permissions.Endpoints.Logout,
-                        
                         // 作用域
                         Permissions.Prefixes.Scope + Scopes.OpenId,
                         Permissions.Prefixes.Scope + Scopes.Profile,
                         Permissions.Prefixes.Scope + Scopes.Email,
                         Permissions.Prefixes.Scope + Scopes.Roles,
-                        Permissions.Prefixes.Scope + "api"
+                        Permissions.Prefixes.Scope + "api",
                     },
                     RedirectUris = new List<string>
                     {
                         "http://localhost:5173/callback",
                         "http://localhost:5173/silent-renew",
                         "https://localhost:5173/callback",
-                        "https://localhost:5173/silent-renew"
+                        "https://localhost:5173/silent-renew",
                     },
                     PostLogoutRedirectUris = new List<string>
                     {
                         "http://localhost:5173/login",
-                        "https://localhost:5173/login"
+                        "https://localhost:5173/login",
                     },
                     Requirements = new List<string>(),
                     Properties = new Dictionary<string, string>(),
                     Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 await _applicationService.InsertAsync(adminApp);
@@ -170,20 +197,18 @@ namespace Dawning.Identity.Api.Data
                     {
                         // 授权类型
                         Permissions.GrantTypes.ClientCredentials,
-                        
                         // 端点
                         Permissions.Endpoints.Token,
                         Permissions.Endpoints.Introspection,
-                        
                         // 作用域
-                        Permissions.Prefixes.Scope + "api"
+                        Permissions.Prefixes.Scope + "api",
                     },
                     RedirectUris = new List<string>(),
                     PostLogoutRedirectUris = new List<string>(),
                     Requirements = new List<string>(),
                     Properties = new Dictionary<string, string>(),
                     Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 await _applicationService.InsertAsync(apiApp);
@@ -206,12 +231,18 @@ namespace Dawning.Identity.Api.Data
             var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);
             if (existingUsers.TotalCount > 0)
             {
-                _logger.LogInformation("Users already exist in system, skipping default user creation");
-                _logger.LogInformation("To initialize admin account, please call POST /api/user/initialize-admin");
+                _logger.LogInformation(
+                    "Users already exist in system, skipping default user creation"
+                );
+                _logger.LogInformation(
+                    "To initialize admin account, please call POST /api/user/initialize-admin"
+                );
                 return;
             }
 
-            _logger.LogInformation("No users found in system. Use POST /api/user/initialize-admin to create admin account");
+            _logger.LogInformation(
+                "No users found in system. Use POST /api/user/initialize-admin to create admin account"
+            );
         }
     }
 }

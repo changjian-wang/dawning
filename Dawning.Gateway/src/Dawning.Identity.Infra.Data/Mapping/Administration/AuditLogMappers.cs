@@ -1,7 +1,7 @@
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using System.Collections.Generic;
 using System.Linq;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
@@ -32,7 +32,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 OldValues = entity.OldValues,
                 NewValues = entity.NewValues,
                 CreatedAt = entity.CreatedAt,
-                Timestamp = entity.Timestamp
+                Timestamp = entity.Timestamp,
             };
         }
 
@@ -58,7 +58,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 OldValues = model.OldValues,
                 NewValues = model.NewValues,
                 CreatedAt = model.CreatedAt,
-                Timestamp = model.Timestamp
+                Timestamp = model.Timestamp,
             };
         }
 

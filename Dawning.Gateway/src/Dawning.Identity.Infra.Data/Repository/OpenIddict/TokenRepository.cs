@@ -1,4 +1,9 @@
-﻿using Dapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Dapper;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models;
@@ -7,11 +12,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.OpenIddict;
 using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 using Dawning.Shared.Dapper.Contrib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
@@ -33,7 +33,10 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Token> GetAsync(Guid id)
         {
-            TokenEntity entity = await _context.Connection.GetAsync<TokenEntity>(id, _context.Transaction);
+            TokenEntity entity = await _context.Connection.GetAsync<TokenEntity>(
+                id,
+                _context.Transaction
+            );
             return entity?.ToModel() ?? new Token();
         }
 
@@ -42,7 +45,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Token?> GetByReferenceIdAsync(string referenceId)
         {
-            var result = await _context.Connection.Builder<TokenEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(referenceId), t => t.ReferenceId == referenceId)
                 .AsListAsync();
 
@@ -54,7 +58,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<IEnumerable<Token>> GetBySubjectAsync(string subject)
         {
-            var result = await _context.Connection.Builder<TokenEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(subject), t => t.Subject == subject)
                 .AsListAsync();
 
@@ -66,7 +71,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<IEnumerable<Token>> GetByApplicationIdAsync(Guid applicationId)
         {
-            var result = await _context.Connection.Builder<TokenEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
                 .WhereIf(applicationId != Guid.Empty, t => t.ApplicationId == applicationId)
                 .AsListAsync();
 
@@ -78,7 +84,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<IEnumerable<Token>> GetByAuthorizationIdAsync(Guid authorizationId)
         {
-            var result = await _context.Connection.Builder<TokenEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
                 .WhereIf(authorizationId != Guid.Empty, t => t.AuthorizationId == authorizationId)
                 .AsListAsync();
 
@@ -88,12 +95,23 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// <summary>
         /// 获取分页列表
         /// </summary>
-        public async Task<PagedData<Token>> GetPagedListAsync(TokenModel model, int page, int itemsPerPage)
+        public async Task<PagedData<Token>> GetPagedListAsync(
+            TokenModel model,
+            int page,
+            int itemsPerPage
+        )
         {
-            PagedResult<TokenEntity> result = await _context.Connection.Builder<TokenEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Subject), t => t.Subject!.Contains(model.Subject ?? ""))
+            PagedResult<TokenEntity> result = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Subject),
+                    t => t.Subject!.Contains(model.Subject ?? "")
+                )
                 .WhereIf(model.ApplicationId.HasValue, t => t.ApplicationId == model.ApplicationId)
-                .WhereIf(model.AuthorizationId.HasValue, t => t.AuthorizationId == model.AuthorizationId)
+                .WhereIf(
+                    model.AuthorizationId.HasValue,
+                    t => t.AuthorizationId == model.AuthorizationId
+                )
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Type), t => t.Type == model.Type)
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Status), t => t.Status == model.Status)
                 .AsPagedListAsync(page, itemsPerPage);
@@ -103,7 +121,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
 
             return pagedData;
@@ -165,7 +183,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<int> PruneExpiredTokensAsync()
         {
-            var expiredTokens = await _context.Connection.Builder<TokenEntity>(_context.Transaction)
+            var expiredTokens = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
                 .WhereIf(true, t => t.ExpiresAt != null && t.ExpiresAt < DateTime.UtcNow)
                 .WhereIf(true, t => t.Status != "valid")
                 .AsListAsync();

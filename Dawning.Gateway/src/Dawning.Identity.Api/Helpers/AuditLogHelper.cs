@@ -1,10 +1,10 @@
-using Dawning.Identity.Application.Dtos.Administration;
-using Dawning.Identity.Application.Interfaces.Administration;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dawning.Identity.Application.Dtos.Administration;
+using Dawning.Identity.Application.Interfaces.Administration;
+using Microsoft.AspNetCore.Http;
 
 namespace Dawning.Identity.Api.Helpers
 {
@@ -16,7 +16,10 @@ namespace Dawning.Identity.Api.Helpers
         private readonly IAuditLogService _auditLogService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuditLogHelper(IAuditLogService auditLogService, IHttpContextAccessor httpContextAccessor)
+        public AuditLogHelper(
+            IAuditLogService auditLogService,
+            IHttpContextAccessor httpContextAccessor
+        )
         {
             _auditLogService = auditLogService;
             _httpContextAccessor = httpContextAccessor;
@@ -32,12 +35,14 @@ namespace Dawning.Identity.Api.Helpers
             string? description = null,
             object? oldValues = null,
             object? newValues = null,
-            int? statusCode = null)
+            int? statusCode = null
+        )
         {
             try
             {
                 var httpContext = _httpContextAccessor.HttpContext;
-                if (httpContext == null) return;
+                if (httpContext == null)
+                    return;
 
                 var user = httpContext.User;
                 var userId = GetUserId(user);
@@ -57,7 +62,7 @@ namespace Dawning.Identity.Api.Helpers
                     RequestMethod = httpContext.Request.Method,
                     StatusCode = statusCode ?? httpContext.Response.StatusCode,
                     OldValues = oldValues,
-                    NewValues = newValues
+                    NewValues = newValues,
                 };
 
                 await _auditLogService.CreateAsync(dto);
@@ -87,9 +92,9 @@ namespace Dawning.Identity.Api.Helpers
         /// </summary>
         private static string? GetUsername(ClaimsPrincipal user)
         {
-            return user.FindFirst(ClaimTypes.Name)?.Value ?? 
-                   user.FindFirst("preferred_username")?.Value ??
-                   user.Identity?.Name;
+            return user.FindFirst(ClaimTypes.Name)?.Value
+                ?? user.FindFirst("preferred_username")?.Value
+                ?? user.Identity?.Name;
         }
 
         /// <summary>

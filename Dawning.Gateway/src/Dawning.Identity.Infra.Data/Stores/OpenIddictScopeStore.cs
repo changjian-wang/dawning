@@ -1,11 +1,11 @@
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using Dawning.Identity.Domain.Interfaces.UoW;
-using OpenIddict.Abstractions;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using Dawning.Identity.Domain.Interfaces.UoW;
+using OpenIddict.Abstractions;
 
 namespace Dawning.Identity.Infra.Data.Stores
 {
@@ -27,7 +27,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return all.Count();
         }
 
-        public ValueTask<long> CountAsync<TResult>(Func<IQueryable<Scope>, IQueryable<TResult>> query, CancellationToken cancellationToken)
+        public ValueTask<long> CountAsync<TResult>(
+            Func<IQueryable<Scope>, IQueryable<TResult>> query,
+            CancellationToken cancellationToken
+        )
         {
             return CountAsync(cancellationToken);
         }
@@ -53,7 +56,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             await _unitOfWork.Scope.DeleteAsync(scope);
         }
 
-        public async ValueTask<Scope?> FindByIdAsync(string identifier, CancellationToken cancellationToken)
+        public async ValueTask<Scope?> FindByIdAsync(
+            string identifier,
+            CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrEmpty(identifier))
                 return null;
@@ -65,7 +71,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return scope.Id == Guid.Empty ? null : scope;
         }
 
-        public async ValueTask<Scope?> FindByNameAsync(string name, CancellationToken cancellationToken)
+        public async ValueTask<Scope?> FindByNameAsync(
+            string name,
+            CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrEmpty(name))
                 return null;
@@ -73,7 +82,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return await _unitOfWork.Scope.GetByNameAsync(name);
         }
 
-        public async IAsyncEnumerable<Scope> FindByNamesAsync(ImmutableArray<string> names, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Scope> FindByNamesAsync(
+            ImmutableArray<string> names,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             if (names.IsDefaultOrEmpty)
                 yield break;
@@ -87,7 +99,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async IAsyncEnumerable<Scope> FindByResourceAsync(string resource, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Scope> FindByResourceAsync(
+            string resource,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrEmpty(resource))
                 yield break;
@@ -101,7 +116,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public ValueTask<string?> GetDescriptionAsync(Scope scope, CancellationToken cancellationToken)
+        public ValueTask<string?> GetDescriptionAsync(
+            Scope scope,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -109,7 +127,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(scope.Description);
         }
 
-        public ValueTask<ImmutableDictionary<CultureInfo, string>> GetDescriptionsAsync(Scope scope, CancellationToken cancellationToken)
+        public ValueTask<ImmutableDictionary<CultureInfo, string>> GetDescriptionsAsync(
+            Scope scope,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -123,7 +144,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<ImmutableDictionary<CultureInfo, string>>(dict.ToImmutable());
         }
 
-        public ValueTask<string?> GetDisplayNameAsync(Scope scope, CancellationToken cancellationToken)
+        public ValueTask<string?> GetDisplayNameAsync(
+            Scope scope,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -131,7 +155,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(scope.DisplayName);
         }
 
-        public ValueTask<ImmutableDictionary<CultureInfo, string>> GetDisplayNamesAsync(Scope scope, CancellationToken cancellationToken)
+        public ValueTask<ImmutableDictionary<CultureInfo, string>> GetDisplayNamesAsync(
+            Scope scope,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -161,7 +188,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(scope.Name);
         }
 
-        public ValueTask<ImmutableDictionary<string, JsonElement>> GetPropertiesAsync(Scope scope, CancellationToken cancellationToken)
+        public ValueTask<ImmutableDictionary<string, JsonElement>> GetPropertiesAsync(
+            Scope scope,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -178,25 +208,31 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<ImmutableDictionary<string, JsonElement>>(builder.ToImmutable());
         }
 
-        public ValueTask<ImmutableArray<string>> GetResourcesAsync(Scope scope, CancellationToken cancellationToken)
+        public ValueTask<ImmutableArray<string>> GetResourcesAsync(
+            Scope scope,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
 
             return new ValueTask<ImmutableArray<string>>(
-                scope.Resources?.ToImmutableArray() ?? ImmutableArray<string>.Empty);
+                scope.Resources?.ToImmutableArray() ?? ImmutableArray<string>.Empty
+            );
         }
 
         public ValueTask<Scope> InstantiateAsync(CancellationToken cancellationToken)
         {
-            return new ValueTask<Scope>(new Scope
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow
-            });
+            return new ValueTask<Scope>(
+                new Scope { Id = Guid.NewGuid(), CreatedAt = DateTime.UtcNow }
+            );
         }
 
-        public async IAsyncEnumerable<Scope> ListAsync(int? count, int? offset, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Scope> ListAsync(
+            int? count,
+            int? offset,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             var all = await _unitOfWork.Scope.GetAllAsync();
             var query = all.AsEnumerable();
@@ -213,13 +249,21 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async IAsyncEnumerable<TResult> ListAsync<TState, TResult>(Func<IQueryable<Scope>, TState, IQueryable<TResult>> query, TState state, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<TResult> ListAsync<TState, TResult>(
+            Func<IQueryable<Scope>, TState, IQueryable<TResult>> query,
+            TState state,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             await Task.CompletedTask;
             yield break;
         }
 
-        public ValueTask SetDescriptionAsync(Scope scope, string? description, CancellationToken cancellationToken)
+        public ValueTask SetDescriptionAsync(
+            Scope scope,
+            string? description,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -228,7 +272,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetDescriptionsAsync(Scope scope, ImmutableDictionary<CultureInfo, string> descriptions, CancellationToken cancellationToken)
+        public ValueTask SetDescriptionsAsync(
+            Scope scope,
+            ImmutableDictionary<CultureInfo, string> descriptions,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -241,7 +289,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetDisplayNameAsync(Scope scope, string? name, CancellationToken cancellationToken)
+        public ValueTask SetDisplayNameAsync(
+            Scope scope,
+            string? name,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -250,7 +302,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetDisplayNamesAsync(Scope scope, ImmutableDictionary<CultureInfo, string> names, CancellationToken cancellationToken)
+        public ValueTask SetDisplayNamesAsync(
+            Scope scope,
+            ImmutableDictionary<CultureInfo, string> names,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -263,7 +319,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetNameAsync(Scope scope, string? name, CancellationToken cancellationToken)
+        public ValueTask SetNameAsync(
+            Scope scope,
+            string? name,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -272,19 +332,28 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetPropertiesAsync(Scope scope, ImmutableDictionary<string, JsonElement> properties, CancellationToken cancellationToken)
+        public ValueTask SetPropertiesAsync(
+            Scope scope,
+            ImmutableDictionary<string, JsonElement> properties,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
 
             scope.Properties = properties.ToDictionary(
                 p => p.Key,
-                p => p.Value.GetString() ?? string.Empty);
+                p => p.Value.GetString() ?? string.Empty
+            );
 
             return default;
         }
 
-        public ValueTask SetResourcesAsync(Scope scope, ImmutableArray<string> resources, CancellationToken cancellationToken)
+        public ValueTask SetResourcesAsync(
+            Scope scope,
+            ImmutableArray<string> resources,
+            CancellationToken cancellationToken
+        )
         {
             if (scope == null)
                 throw new ArgumentNullException(nameof(scope));
@@ -307,7 +376,8 @@ namespace Dawning.Identity.Infra.Data.Stores
         public ValueTask<TResult?> GetAsync<TState, TResult>(
             Func<IQueryable<Scope>, TState, IQueryable<TResult>> query,
             TState state,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             // Dapper 不支持 IQueryable
             return new ValueTask<TResult?>(default(TResult));

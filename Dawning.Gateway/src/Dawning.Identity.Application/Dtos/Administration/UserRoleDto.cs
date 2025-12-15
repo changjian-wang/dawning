@@ -1,6 +1,6 @@
-using Dawning.Identity.Application.Dtos.User;
 using System;
 using System.Collections.Generic;
+using Dawning.Identity.Application.Dtos.User;
 
 namespace Dawning.Identity.Application.Dtos.Administration
 {

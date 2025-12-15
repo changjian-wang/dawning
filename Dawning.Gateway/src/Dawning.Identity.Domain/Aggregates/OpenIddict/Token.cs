@@ -45,34 +45,36 @@ namespace Dawning.Identity.Domain.Aggregates.OpenIddict
         /// </summary>
         public string? ReferenceId { get; set; }
 
-    /// <summary>
-    /// 过期时间
-    /// </summary>
-    public DateTime? ExpiresAt { get; set; }
+        /// <summary>
+        /// 过期时间
+        /// </summary>
+        public DateTime? ExpiresAt { get; set; }
 
-    /// <summary>
-    /// 过期时间（OpenIddict 命名）
-    /// </summary>
-    public DateTime? ExpirationDate 
-    { 
-        get => ExpiresAt; 
-        set => ExpiresAt = value; 
-    }
+        /// <summary>
+        /// 过期时间（OpenIddict 命名）
+        /// </summary>
+        public DateTime? ExpirationDate
+        {
+            get => ExpiresAt;
+            set => ExpiresAt = value;
+        }
 
-    /// <summary>
-    /// 使用时间（令牌被使用的时间）
-    /// </summary>
-    public DateTime? RedemptionDate { get; set; }
+        /// <summary>
+        /// 使用时间（令牌被使用的时间）
+        /// </summary>
+        public DateTime? RedemptionDate { get; set; }
 
-    /// <summary>
-    /// 扩展属性
-    /// </summary>
-    public Dictionary<string, string> Properties { get; set; } = new();
+        /// <summary>
+        /// 扩展属性
+        /// </summary>
+        public Dictionary<string, string> Properties { get; set; } = new();
 
-    /// <summary>
-    /// 创建时间
-    /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;        /// <summary>
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
         /// 业务方法：检查令牌是否过期
         /// </summary>
         public bool IsExpired()
@@ -81,4 +83,3 @@ namespace Dawning.Identity.Domain.Aggregates.OpenIddict
         }
     }
 }
-

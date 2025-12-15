@@ -1,4 +1,10 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.OpenIddict;
@@ -7,12 +13,6 @@ using Dawning.Identity.Domain.Core.Security;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.OpenIddict;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
@@ -36,7 +36,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         private bool IsValidUri(string uri)
         {
             return Uri.TryCreate(uri, UriKind.Absolute, out var uriResult)
-                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                && (
+                    uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps
+                );
         }
 
         /// <summary>
@@ -61,7 +63,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         /// <summary>
         /// 记录审计日志
         /// </summary>
-        private async Task LogAuditAsync(Guid userId, string action, string entityType, Guid entityId, string description)
+        private async Task LogAuditAsync(
+            Guid userId,
+            string action,
+            string entityType,
+            Guid entityId,
+            string description
+        )
         {
             var auditLog = new AuditLog
             {
@@ -72,7 +80,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 EntityId = entityId,
                 Description = description,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             await _unitOfWork.AuditLog.InsertAsync(auditLog);
@@ -80,32 +88,34 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async Task<ApplicationDto> GetAsync(Guid id)
         {
-            Domain.Aggregates.OpenIddict.Application model = await _unitOfWork.Application.GetAsync(id);
+            Domain.Aggregates.OpenIddict.Application model = await _unitOfWork.Application.GetAsync(
+                id
+            );
             return model?.ToDto() ?? new ApplicationDto();
         }
 
         public async Task<ApplicationDto?> GetByClientIdAsync(string clientId)
         {
-            Domain.Aggregates.OpenIddict.Application? model = await _unitOfWork.Application.GetByClientIdAsync(clientId);
+            Domain.Aggregates.OpenIddict.Application? model =
+                await _unitOfWork.Application.GetByClientIdAsync(clientId);
             return model?.ToDto();
         }
 
         public async Task<PagedData<ApplicationDto>> GetPagedListAsync(
             ApplicationModel model,
             int page,
-            int itemsPerPage)
+            int itemsPerPage
+        )
         {
-            PagedData<Domain.Aggregates.OpenIddict.Application> data = await _unitOfWork.Application.GetPagedListAsync(
-                model,
-                page,
-                itemsPerPage);
+            PagedData<Domain.Aggregates.OpenIddict.Application> data =
+                await _unitOfWork.Application.GetPagedListAsync(model, page, itemsPerPage);
 
             PagedData<ApplicationDto> pageResult = new PagedData<ApplicationDto>
             {
                 PageIndex = data.PageIndex,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = data.Items.ToDtos() ?? new List<ApplicationDto>()
+                Items = data.Items.ToDtos() ?? new List<ApplicationDto>(),
             };
 
             return pageResult;
@@ -147,8 +157,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new ArgumentException("Type must be 'confidential' or 'public'");
             }
 
-            Domain.Aggregates.OpenIddict.Application model = _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
-            
+            Domain.Aggregates.OpenIddict.Application model =
+                _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
+
             // 如果是confidential类型且有ClientSecret,使用PBKDF2哈希
             if (!string.IsNullOrEmpty(dto.ClientSecret) && dto.Type == "confidential")
             {
@@ -192,7 +203,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 var duplicateCheck = await _unitOfWork.Application.GetByClientIdAsync(dto.ClientId);
                 if (duplicateCheck != null)
                 {
-                    throw new InvalidOperationException($"ClientId '{dto.ClientId}' already exists");
+                    throw new InvalidOperationException(
+                        $"ClientId '{dto.ClientId}' already exists"
+                    );
                 }
             }
 
@@ -200,8 +213,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             ValidateRedirectUris(dto.RedirectUris, "RedirectUri");
             ValidateRedirectUris(dto.PostLogoutRedirectUris, "PostLogoutRedirectUri");
 
-            Domain.Aggregates.OpenIddict.Application model = _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
-            
+            Domain.Aggregates.OpenIddict.Application model =
+                _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
+
             // 如果提供了新密钥,使用PBKDF2哈希
             if (!string.IsNullOrEmpty(dto.ClientSecret) && dto.Type == "confidential")
             {
@@ -242,8 +256,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new InvalidOperationException($"Application with ID '{dto.Id}' not found");
             }
 
-            Domain.Aggregates.OpenIddict.Application model = dto?.ToModel() ?? new Domain.Aggregates.OpenIddict.Application();
-            
+            Domain.Aggregates.OpenIddict.Application model =
+                dto?.ToModel() ?? new Domain.Aggregates.OpenIddict.Application();
+
             var result = await _unitOfWork.Application.DeleteAsync(model);
 
             // 记录审计日志

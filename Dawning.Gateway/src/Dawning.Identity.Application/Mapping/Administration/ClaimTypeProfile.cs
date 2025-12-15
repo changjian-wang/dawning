@@ -16,7 +16,8 @@ namespace Dawning.Identity.Application.Mapping.Administration
     {
         public static ClaimTypeDto? ToDto(this ClaimType? model)
         {
-            if (model == null) return null;
+            if (model == null)
+                return null;
 
             return new ClaimTypeDto
             {
@@ -27,7 +28,7 @@ namespace Dawning.Identity.Application.Mapping.Administration
                 Description = model.Description ?? string.Empty,
                 Required = model.Required,
                 NonEditable = model.NonEditable,
-                Timestamp = model.Timestamp
+                Timestamp = model.Timestamp,
             };
         }
 
@@ -46,7 +47,7 @@ namespace Dawning.Identity.Application.Mapping.Administration
                 Type = dto.Type,
                 Description = dto.Description,
                 Required = dto.Required,
-                NonEditable = dto.NonEditable
+                NonEditable = dto.NonEditable,
             };
         }
     }

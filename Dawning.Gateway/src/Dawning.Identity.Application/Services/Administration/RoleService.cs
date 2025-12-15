@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
@@ -5,10 +9,6 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Services.Administration
 {
@@ -47,7 +47,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 获取分页角色列表
         /// </summary>
-        public async Task<PagedData<RoleDto>> GetPagedListAsync(RoleModel model, int page, int itemsPerPage)
+        public async Task<PagedData<RoleDto>> GetPagedListAsync(
+            RoleModel model,
+            int page,
+            int itemsPerPage
+        )
         {
             var pagedData = await _uow.Role.GetPagedListAsync(model, page, itemsPerPage);
 
@@ -56,7 +60,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,
                 TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(r => _mapper.Map<RoleDto>(r))
+                Items = pagedData.Items.Select(r => _mapper.Map<RoleDto>(r)),
             };
         }
 
@@ -109,9 +113,12 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 更新字段
-            if (dto.DisplayName != null) role.DisplayName = dto.DisplayName;
-            if (dto.Description != null) role.Description = dto.Description;
-            if (dto.IsActive.HasValue) role.IsActive = dto.IsActive.Value;
+            if (dto.DisplayName != null)
+                role.DisplayName = dto.DisplayName;
+            if (dto.Description != null)
+                role.Description = dto.Description;
+            if (dto.IsActive.HasValue)
+                role.IsActive = dto.IsActive.Value;
             if (dto.Permissions != null)
             {
                 role.Permissions = dto.Permissions.Any()

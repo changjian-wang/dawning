@@ -1,18 +1,18 @@
-using AutoMapper;
-using Dawning.Identity.Application.Dtos.Administration;
-using Dawning.Identity.Application.Dtos.User;
-using Dawning.Identity.Application.Interfaces.Administration;
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Domain.Interfaces.Administration;
-using Dawning.Identity.Domain.Interfaces.UoW;
-using Dawning.Identity.Domain.Models;
-using Dawning.Identity.Domain.Models.Administration;
-using Dawning.Identity.Domain.Core.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Application.Dtos.Administration;
+using Dawning.Identity.Application.Dtos.User;
+using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Domain.Core.Security;
+using Dawning.Identity.Domain.Interfaces.Administration;
+using Dawning.Identity.Domain.Interfaces.UoW;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.Administration;
 
 namespace Dawning.Identity.Application.Services.Administration
 {
@@ -25,10 +25,7 @@ namespace Dawning.Identity.Application.Services.Administration
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public UserService(
-            IUserRepository userRepository,
-            IUnitOfWork uow,
-            IMapper mapper)
+        public UserService(IUserRepository userRepository, IUnitOfWork uow, IMapper mapper)
         {
             _userRepository = userRepository;
             _uow = uow;
@@ -56,7 +53,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 获取分页用户列表
         /// </summary>
-        public async Task<PagedData<UserDto>> GetPagedListAsync(UserModel model, int page, int itemsPerPage)
+        public async Task<PagedData<UserDto>> GetPagedListAsync(
+            UserModel model,
+            int page,
+            int itemsPerPage
+        )
         {
             var pagedData = await _userRepository.GetPagedListAsync(model, page, itemsPerPage);
 
@@ -65,23 +66,31 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,
                 TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u))
+                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u)),
             };
         }
 
         /// <summary>
         /// 获取用户列表（Cursor 分页）
         /// </summary>
-        public async Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(UserModel model, long? cursor, int pageSize)
+        public async Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(
+            UserModel model,
+            long? cursor,
+            int pageSize
+        )
         {
-            var pagedData = await _userRepository.GetPagedListByCursorAsync(model, cursor, pageSize);
+            var pagedData = await _userRepository.GetPagedListByCursorAsync(
+                model,
+                cursor,
+                pageSize
+            );
 
             return new CursorPagedData<UserDto>
             {
                 PageSize = pagedData.PageSize,
                 HasNextPage = pagedData.HasNextPage,
                 NextCursor = pagedData.NextCursor,
-                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u)).ToList()
+                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u)).ToList(),
             };
         }
 
@@ -97,7 +106,10 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 验证邮箱是否已存在
-            if (!string.IsNullOrWhiteSpace(dto.Email) && await _userRepository.EmailExistsAsync(dto.Email))
+            if (
+                !string.IsNullOrWhiteSpace(dto.Email)
+                && await _userRepository.EmailExistsAsync(dto.Email)
+            )
             {
                 throw new InvalidOperationException($"Email '{dto.Email}' already exists.");
             }
@@ -123,7 +135,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 IsActive = dto.IsActive,
                 Remark = dto.Remark,
                 CreatedAt = DateTime.UtcNow,
-                CreatedBy = operatorId
+                CreatedBy = operatorId,
             };
 
             await _userRepository.InsertAsync(user);
@@ -152,13 +164,20 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 更新字段
-            if (dto.Email != null) user.Email = dto.Email;
-            if (dto.PhoneNumber != null) user.PhoneNumber = dto.PhoneNumber;
-            if (dto.DisplayName != null) user.DisplayName = dto.DisplayName;
-            if (dto.Avatar != null) user.Avatar = dto.Avatar;
-            if (dto.Role != null) user.Role = dto.Role;
-            if (dto.IsActive.HasValue) user.IsActive = dto.IsActive.Value;
-            if (dto.Remark != null) user.Remark = dto.Remark;
+            if (dto.Email != null)
+                user.Email = dto.Email;
+            if (dto.PhoneNumber != null)
+                user.PhoneNumber = dto.PhoneNumber;
+            if (dto.DisplayName != null)
+                user.DisplayName = dto.DisplayName;
+            if (dto.Avatar != null)
+                user.Avatar = dto.Avatar;
+            if (dto.Role != null)
+                user.Role = dto.Role;
+            if (dto.IsActive.HasValue)
+                user.IsActive = dto.IsActive.Value;
+            if (dto.Remark != null)
+                user.Remark = dto.Remark;
 
             user.UpdatedAt = DateTime.UtcNow;
             user.UpdatedBy = operatorId;
@@ -290,7 +309,9 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         /// <param name="password">待验证的密码</param>
         /// <returns>验证结果和错误消息</returns>
-        private static (bool IsValid, string ErrorMessage) ValidatePasswordComplexity(string password)
+        private static (bool IsValid, string ErrorMessage) ValidatePasswordComplexity(
+            string password
+        )
         {
             if (string.IsNullOrWhiteSpace(password))
             {
@@ -383,7 +404,10 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 验证用户凭据并更新登录时间
         /// </summary>
-        public async Task<UserDto?> ValidateCredentialsAndUpdateLoginAsync(string username, string password)
+        public async Task<UserDto?> ValidateCredentialsAndUpdateLoginAsync(
+            string username,
+            string password
+        )
         {
             var user = await ValidatePasswordAsync(username, password);
             if (user != null)
@@ -417,7 +441,8 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<UserWithRolesDto?> GetUserWithRolesAsync(Guid userId)
         {
             var user = await GetByIdAsync(userId);
-            if (user == null) return null;
+            if (user == null)
+                return null;
 
             var roles = await GetUserRolesAsync(userId);
 
@@ -430,7 +455,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 为用户分配角色
         /// </summary>
-        public async Task<bool> AssignRolesAsync(Guid userId, IEnumerable<Guid> roleIds, Guid? operatorId = null)
+        public async Task<bool> AssignRolesAsync(
+            Guid userId,
+            IEnumerable<Guid> roleIds,
+            Guid? operatorId = null
+        )
         {
             var user = await _userRepository.GetAsync(userId);
             if (user == null)

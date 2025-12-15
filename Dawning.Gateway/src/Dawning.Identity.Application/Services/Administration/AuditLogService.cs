@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
@@ -5,9 +8,6 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Services.Administration
 {
@@ -37,7 +37,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 获取分页审计日志列表
         /// </summary>
-        public async Task<PagedData<AuditLogDto>> GetPagedListAsync(AuditLogModel model, int page, int itemsPerPage)
+        public async Task<PagedData<AuditLogDto>> GetPagedListAsync(
+            AuditLogModel model,
+            int page,
+            int itemsPerPage
+        )
         {
             var pagedData = await _uow.AuditLog.GetPagedListAsync(model, page, itemsPerPage);
 
@@ -46,7 +50,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,
                 TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(a => _mapper.Map<AuditLogDto>(a))
+                Items = pagedData.Items.Select(a => _mapper.Map<AuditLogDto>(a)),
             };
         }
 

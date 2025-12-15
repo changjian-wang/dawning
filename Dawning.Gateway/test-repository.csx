@@ -11,11 +11,7 @@ Console.WriteLine("测试GetPagedListAsync...");
 
 try
 {
-    var model = new UserModel
-    {
-        IsActive = true,
-        IncludeDeleted = false
-    };
+    var model = new UserModel { IsActive = true, IncludeDeleted = false };
 
     var result = await repository.GetPagedListAsync(model, 1, 10);
 

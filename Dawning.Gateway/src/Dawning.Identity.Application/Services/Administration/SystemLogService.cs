@@ -6,9 +6,9 @@ using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using Dawning.Identity.Domain.Interfaces.UoW;
 using Microsoft.AspNetCore.Http;
 
 namespace Dawning.Identity.Application.Services.Administration
@@ -30,7 +30,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 记录错误日志
         /// </summary>
-        public async Task LogErrorAsync(Exception exception, HttpContext? httpContext = null, int? statusCode = null)
+        public async Task LogErrorAsync(
+            Exception exception,
+            HttpContext? httpContext = null,
+            int? statusCode = null
+        )
         {
             var log = CreateLogFromException(exception, httpContext, statusCode, "Error");
             await _uow.SystemLog.InsertAsync(log);
@@ -81,18 +85,19 @@ namespace Dawning.Identity.Application.Services.Administration
         /// 分页获取系统日志列表
         /// </summary>
         public async Task<PagedData<SystemLogDto>> GetPagedListAsync(
-            SystemLogQueryModel queryModel, 
-            int page, 
-            int itemsPerPage)
+            SystemLogQueryModel queryModel,
+            int page,
+            int itemsPerPage
+        )
         {
             var pagedData = await _uow.SystemLog.GetPagedListAsync(queryModel, page, itemsPerPage);
-            
+
             return new PagedData<SystemLogDto>
             {
                 Items = _mapper.Map<SystemLogDto[]>(pagedData.Items),
                 TotalCount = pagedData.TotalCount,
                 PageIndex = pagedData.PageIndex,
-                PageSize = pagedData.PageSize
+                PageSize = pagedData.PageSize,
             };
         }
 
@@ -112,10 +117,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// 从异常创建日志对象
         /// </summary>
         private SystemLog CreateLogFromException(
-            Exception exception, 
-            HttpContext? httpContext, 
+            Exception exception,
+            HttpContext? httpContext,
             int? statusCode,
-            string level)
+            string level
+        )
         {
             var log = new SystemLog
             {
@@ -125,7 +131,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 Exception = exception.ToString(),
                 StackTrace = exception.StackTrace,
                 Source = exception.Source,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             if (httpContext != null)
@@ -140,16 +146,17 @@ namespace Dawning.Identity.Application.Services.Administration
         /// 从消息创建日志对象
         /// </summary>
         private SystemLog CreateLogFromMessage(
-            string message, 
-            HttpContext? httpContext, 
-            string level)
+            string message,
+            HttpContext? httpContext,
+            string level
+        )
         {
             var log = new SystemLog
             {
                 Id = Guid.NewGuid(),
                 Level = level,
                 Message = message,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             if (httpContext != null)
@@ -164,22 +171,25 @@ namespace Dawning.Identity.Application.Services.Administration
         /// 从HTTP上下文补充日志信息
         /// </summary>
         private void EnrichLogFromHttpContext(
-            SystemLog log, 
-            HttpContext httpContext, 
-            int? statusCode)
+            SystemLog log,
+            HttpContext httpContext,
+            int? statusCode
+        )
         {
             // 用户信息
             if (httpContext.User?.Identity?.IsAuthenticated == true)
             {
-                var userIdClaim = httpContext.User.Claims.FirstOrDefault(c => 
-                    c.Type == ClaimTypes.NameIdentifier || c.Type == "sub");
+                var userIdClaim = httpContext.User.Claims.FirstOrDefault(c =>
+                    c.Type == ClaimTypes.NameIdentifier || c.Type == "sub"
+                );
                 if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
                 {
                     log.UserId = userId;
                 }
 
-                var usernameClaim = httpContext.User.Claims.FirstOrDefault(c => 
-                    c.Type == ClaimTypes.Name || c.Type == "name");
+                var usernameClaim = httpContext.User.Claims.FirstOrDefault(c =>
+                    c.Type == ClaimTypes.Name || c.Type == "name"
+                );
                 log.Username = usernameClaim?.Value;
             }
 

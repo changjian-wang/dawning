@@ -68,4 +68,3 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
         public DateTime? UpdatedAt { get; set; }
     }
 }
-

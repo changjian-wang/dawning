@@ -1,7 +1,7 @@
-using Dawning.Identity.Domain.Aggregates.Administration;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dawning.Identity.Domain.Aggregates.Administration;
 
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
@@ -28,7 +28,11 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         /// <summary>
         /// 批量为用户分配角色
         /// </summary>
-        Task<bool> AssignRolesAsync(Guid userId, IEnumerable<Guid> roleIds, Guid? operatorId = null);
+        Task<bool> AssignRolesAsync(
+            Guid userId,
+            IEnumerable<Guid> roleIds,
+            Guid? operatorId = null
+        );
 
         /// <summary>
         /// 移除用户的角色

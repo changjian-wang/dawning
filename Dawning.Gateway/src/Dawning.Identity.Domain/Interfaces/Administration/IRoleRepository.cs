@@ -1,9 +1,9 @@
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Domain.Models;
-using Dawning.Identity.Domain.Models.Administration;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.Administration;
 
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {

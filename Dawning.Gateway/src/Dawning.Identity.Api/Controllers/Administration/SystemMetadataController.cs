@@ -43,7 +43,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] SystemMetadataModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             if (page < 1 || pageSize < 1)
             {

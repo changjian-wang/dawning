@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Interfaces.Authentication;
 using Microsoft.AspNetCore;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
-using System.Security.Claims;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Dawning.Identity.Api.Controllers
@@ -33,8 +33,11 @@ namespace Dawning.Identity.Api.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Exchange()
         {
-            var request = HttpContext.GetOpenIddictServerRequest() ??
-                throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+            var request =
+                HttpContext.GetOpenIddictServerRequest()
+                ?? throw new InvalidOperationException(
+                    "The OpenID Connect request cannot be retrieved."
+                );
 
             // 处理密码授权流程 (Resource Owner Password Credentials)
             if (request.IsPasswordGrantType())
@@ -71,8 +74,11 @@ namespace Dawning.Identity.Api.Controllers
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Authorize()
         {
-            var request = HttpContext.GetOpenIddictServerRequest() ??
-                throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+            var request =
+                HttpContext.GetOpenIddictServerRequest()
+                ?? throw new InvalidOperationException(
+                    "The OpenID Connect request cannot be retrieved."
+                );
 
             // 检查用户是否已认证
             var result = await HttpContext.AuthenticateAsync();
@@ -83,26 +89,47 @@ namespace Dawning.Identity.Api.Controllers
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                     properties: new AuthenticationProperties
                     {
-                        RedirectUri = Request.PathBase + Request.Path + QueryString.Create(
-                            Request.HasFormContentType ? Request.Form.ToList() : Request.Query.ToList())
-                    });
+                        RedirectUri =
+                            Request.PathBase
+                            + Request.Path
+                            + QueryString.Create(
+                                Request.HasFormContentType
+                                    ? Request.Form.ToList()
+                                    : Request.Query.ToList()
+                            ),
+                    }
+                );
             }
 
             // 创建用户身份声明
             var identity = new ClaimsIdentity(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
-                roleType: Claims.Role);
+                roleType: Claims.Role
+            );
 
             // 从认证结果中获取用户信息
-            identity.SetClaim(Claims.Subject, result.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty)
-                    .SetClaim(Claims.Name, result.Principal?.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty)
-                    .SetClaim(Claims.Email, result.Principal?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty);
+            identity
+                .SetClaim(
+                    Claims.Subject,
+                    result.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty
+                )
+                .SetClaim(
+                    Claims.Name,
+                    result.Principal?.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty
+                )
+                .SetClaim(
+                    Claims.Email,
+                    result.Principal?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty
+                );
 
             identity.SetDestinations(GetDestinations);
 
             // 返回授权响应
-            return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            return SignIn(
+                new ClaimsPrincipal(identity),
+                OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+            );
         }
 
         /// <summary>
@@ -114,23 +141,32 @@ namespace Dawning.Identity.Api.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> UserInfo()
         {
-            var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+            var claimsPrincipal = (
+                await HttpContext.AuthenticateAsync(
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+                )
+            ).Principal;
 
             if (claimsPrincipal == null)
             {
                 return Challenge(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                    properties: new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidToken,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The specified access token is invalid."
-                    }));
+                    properties: new AuthenticationProperties(
+                        new Dictionary<string, string?>
+                        {
+                            [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                                Errors.InvalidToken,
+                            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                                "The specified access token is invalid.",
+                        }
+                    )
+                );
             }
 
             var claims = new Dictionary<string, object>(StringComparer.Ordinal)
             {
                 // 必需声明
-                [Claims.Subject] = claimsPrincipal.GetClaim(Claims.Subject) ?? string.Empty
+                [Claims.Subject] = claimsPrincipal.GetClaim(Claims.Subject) ?? string.Empty,
             };
 
             // 可选声明
@@ -169,15 +205,20 @@ namespace Dawning.Identity.Api.Controllers
             // 验证用户凭据
             var user = await _userAuthenticationService.ValidateCredentialsAsync(
                 request.Username ?? string.Empty,
-                request.Password ?? string.Empty);
+                request.Password ?? string.Empty
+            );
 
             if (user == null)
             {
-                var properties = new AuthenticationProperties(new Dictionary<string, string?>
-                {
-                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The username/password couple is invalid."
-                });
+                var properties = new AuthenticationProperties(
+                    new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                            Errors.InvalidGrant,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The username/password couple is invalid.",
+                    }
+                );
 
                 return Forbid(properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
@@ -186,11 +227,13 @@ namespace Dawning.Identity.Api.Controllers
             var identity = new ClaimsIdentity(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
-                roleType: Claims.Role);
+                roleType: Claims.Role
+            );
 
-            identity.SetClaim(Claims.Subject, user.Id)
-                    .SetClaim(Claims.Name, user.Username)
-                    .SetClaim(Claims.Email, user.Email ?? string.Empty);
+            identity
+                .SetClaim(Claims.Subject, user.Id)
+                .SetClaim(Claims.Name, user.Username)
+                .SetClaim(Claims.Email, user.Email ?? string.Empty);
 
             // 添加所有用户角色作为 role claims
             foreach (var role in user.Roles)
@@ -202,7 +245,10 @@ namespace Dawning.Identity.Api.Controllers
             identity.SetScopes(request.GetScopes());
             identity.SetDestinations(GetDestinations);
 
-            return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            return SignIn(
+                new ClaimsPrincipal(identity),
+                OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+            );
         }
 
         /// <summary>
@@ -214,16 +260,23 @@ namespace Dawning.Identity.Api.Controllers
             var identity = new ClaimsIdentity(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
-                roleType: Claims.Role);
+                roleType: Claims.Role
+            );
 
-            identity.SetClaim(Claims.Subject, request.ClientId ?? string.Empty)
-                    .SetClaim(Claims.Name, request.ClientId ?? string.Empty);
+            identity
+                .SetClaim(Claims.Subject, request.ClientId ?? string.Empty)
+                .SetClaim(Claims.Name, request.ClientId ?? string.Empty);
 
             // 设置作用域
             identity.SetScopes(request.GetScopes());
             identity.SetDestinations(GetDestinations);
 
-            return Task.FromResult<IActionResult>(SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme));
+            return Task.FromResult<IActionResult>(
+                SignIn(
+                    new ClaimsPrincipal(identity),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+                )
+            );
         }
 
         /// <summary>
@@ -231,17 +284,26 @@ namespace Dawning.Identity.Api.Controllers
         /// </summary>
         private async Task<IActionResult> HandleAuthorizationCodeGrantAsync()
         {
-            var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+            var claimsPrincipal = (
+                await HttpContext.AuthenticateAsync(
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+                )
+            ).Principal;
 
             if (claimsPrincipal == null)
             {
                 return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                    properties: new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is no longer valid."
-                    }));
+                    properties: new AuthenticationProperties(
+                        new Dictionary<string, string?>
+                        {
+                            [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                                Errors.InvalidGrant,
+                            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                                "The token is no longer valid.",
+                        }
+                    )
+                );
             }
 
             return SignIn(claimsPrincipal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -252,17 +314,26 @@ namespace Dawning.Identity.Api.Controllers
         /// </summary>
         private async Task<IActionResult> HandleRefreshTokenGrantAsync()
         {
-            var claimsPrincipal = (await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)).Principal;
+            var claimsPrincipal = (
+                await HttpContext.AuthenticateAsync(
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+                )
+            ).Principal;
 
             if (claimsPrincipal == null)
             {
                 return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                    properties: new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The refresh token is no longer valid."
-                    }));
+                    properties: new AuthenticationProperties(
+                        new Dictionary<string, string?>
+                        {
+                            [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                                Errors.InvalidGrant,
+                            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                                "The refresh token is no longer valid.",
+                        }
+                    )
+                );
             }
 
             // 验证用户是否仍然存在
@@ -271,21 +342,31 @@ namespace Dawning.Identity.Api.Controllers
             {
                 return Forbid(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
-                    properties: new AuthenticationProperties(new Dictionary<string, string?>
-                    {
-                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user no longer exists."
-                    }));
+                    properties: new AuthenticationProperties(
+                        new Dictionary<string, string?>
+                        {
+                            [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                                Errors.InvalidGrant,
+                            [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                                "The user no longer exists.",
+                        }
+                    )
+                );
             }
 
-            var identity = new ClaimsIdentity(claimsPrincipal.Claims,
+            var identity = new ClaimsIdentity(
+                claimsPrincipal.Claims,
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
-                roleType: Claims.Role);
+                roleType: Claims.Role
+            );
 
             identity.SetDestinations(GetDestinations);
 
-            return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            return SignIn(
+                new ClaimsPrincipal(identity),
+                OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+            );
         }
 
         /// <summary>

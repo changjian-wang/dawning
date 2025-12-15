@@ -1,9 +1,9 @@
-﻿using Dawning.Shared.Dapper.Contrib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dawning.Shared.Dapper.Contrib;
 
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {
@@ -20,19 +20,19 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
         /// <summary>
         /// 类型：Client，IdentityResource，ApiResource，ApiScope，也可以存储上级key来形成上下级联动查询
         /// </summary>
-		[Column("name")]
+        [Column("name")]
         public string? Name { get; set; }
 
         /// <summary>
         /// 键
         /// </summary>
-		[Column("key")]
+        [Column("key")]
         public string? Key { get; set; }
 
         /// <summary>
         /// 值
         /// </summary>
-		[Column("value")]
+        [Column("value")]
         public string? Value { get; set; }
 
         /// <summary>

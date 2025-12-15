@@ -1,9 +1,9 @@
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
@@ -15,10 +15,13 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         /// <summary>
         /// Entity转Model
         /// </summary>
-        public static IdentityResource ToModel(this IdentityResourceEntity entity,
-            IEnumerable<IdentityResourceClaimEntity>? claims = null)
+        public static IdentityResource ToModel(
+            this IdentityResourceEntity entity,
+            IEnumerable<IdentityResourceClaimEntity>? claims = null
+        )
         {
-            if (entity == null) throw new ArgumentNullException(nameof(entity));
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
 
             return new IdentityResource
             {
@@ -33,7 +36,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
                 UserClaims = claims?.Select(c => c.Type).ToList() ?? new List<string>(),
                 Properties = ParseJsonObject(entity.Properties),
                 CreatedAt = entity.CreatedAt,
-                UpdatedAt = entity.UpdatedAt
+                UpdatedAt = entity.UpdatedAt,
             };
         }
 
@@ -42,7 +45,8 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         /// </summary>
         public static IdentityResourceEntity ToEntity(this IdentityResource model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
             return new IdentityResourceEntity
             {
@@ -57,24 +61,28 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
                 Properties = SerializeJsonObject(model.Properties),
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 CreatedAt = model.CreatedAt,
-                UpdatedAt = model.UpdatedAt
+                UpdatedAt = model.UpdatedAt,
             };
         }
 
         /// <summary>
         /// 批量Entity转Model
         /// </summary>
-        public static IEnumerable<IdentityResource> ToModels(this IEnumerable<IdentityResourceEntity> entities)
+        public static IEnumerable<IdentityResource> ToModels(
+            this IEnumerable<IdentityResourceEntity> entities
+        )
         {
             return entities?.Select(e => e.ToModel()) ?? Enumerable.Empty<IdentityResource>();
         }
 
         private static Dictionary<string, string> ParseJsonObject(string? json)
         {
-            if (string.IsNullOrWhiteSpace(json)) return new Dictionary<string, string>();
+            if (string.IsNullOrWhiteSpace(json))
+                return new Dictionary<string, string>();
             try
             {
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new Dictionary<string, string>();
+                return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                    ?? new Dictionary<string, string>();
             }
             catch
             {
@@ -84,7 +92,8 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 
         private static string? SerializeJsonObject(Dictionary<string, string>? dict)
         {
-            if (dict == null || !dict.Any()) return null;
+            if (dict == null || !dict.Any())
+                return null;
             return JsonSerializer.Serialize(dict);
         }
     }

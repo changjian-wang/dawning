@@ -1,7 +1,7 @@
+using System.Collections.Generic;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using System.Collections.Generic;
 
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
@@ -14,8 +14,9 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
 
         static IdentityResourceMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<IdentityResourceProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg =>
+                cfg.AddProfile<IdentityResourceProfile>()
+            ).CreateMapper();
         }
 
         public static IdentityResourceDto? ToDto(this IdentityResource model)
@@ -23,7 +24,9 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
             return model == null ? null : Mapper.Map<IdentityResourceDto>(model);
         }
 
-        public static IEnumerable<IdentityResourceDto>? ToDtos(this IEnumerable<IdentityResource> models)
+        public static IEnumerable<IdentityResourceDto>? ToDtos(
+            this IEnumerable<IdentityResource> models
+        )
         {
             return models == null ? null : Mapper.Map<IEnumerable<IdentityResourceDto>>(models);
         }
@@ -43,7 +46,10 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
         {
             CreateMap<IdentityResource, IdentityResourceDto>();
             CreateMap<IdentityResourceDto, IdentityResource>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id ?? System.Guid.NewGuid()));
+                .ForMember(
+                    dest => dest.Id,
+                    opt => opt.MapFrom(src => src.Id ?? System.Guid.NewGuid())
+                );
         }
     }
 }

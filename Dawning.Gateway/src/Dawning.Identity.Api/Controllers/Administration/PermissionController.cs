@@ -1,12 +1,12 @@
-using Dawning.Identity.Application.Dtos.Administration;
-using Dawning.Identity.Application.Interfaces.Administration;
-using Dawning.Identity.Domain.Models.Administration;
-using Dawning.Identity.Api.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dawning.Identity.Api.Models;
+using Dawning.Identity.Application.Dtos.Administration;
+using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Domain.Models.Administration;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dawning.Identity.Api.Controllers.Administration
 {
@@ -67,7 +67,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
             [FromQuery] string? category,
             [FromQuery] bool? isActive,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20
+        )
         {
             var model = new PermissionModel
             {
@@ -76,7 +77,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 Resource = resource,
                 Action = action,
                 Category = category,
-                IsActive = isActive
+                IsActive = isActive,
             };
 
             var result = await _permissionService.GetPagedListAsync(model, page, pageSize);
@@ -178,12 +179,17 @@ namespace Dawning.Identity.Api.Controllers.Administration
         [HttpPost("role/{roleId}/assign")]
         public async Task<IActionResult> AssignPermissionsToRoleAsync(
             Guid roleId,
-            [FromBody] List<Guid> permissionIds)
+            [FromBody] List<Guid> permissionIds
+        )
         {
             try
             {
                 var operatorId = GetOperatorId();
-                await _permissionService.AssignPermissionsToRoleAsync(roleId, permissionIds, operatorId);
+                await _permissionService.AssignPermissionsToRoleAsync(
+                    roleId,
+                    permissionIds,
+                    operatorId
+                );
                 return Ok(ApiResponse.Success("权限分配成功"));
             }
             catch (InvalidOperationException ex)
@@ -198,7 +204,8 @@ namespace Dawning.Identity.Api.Controllers.Administration
         [HttpDelete("role/{roleId}/remove")]
         public async Task<IActionResult> RemovePermissionsFromRoleAsync(
             Guid roleId,
-            [FromBody] List<Guid> permissionIds)
+            [FromBody] List<Guid> permissionIds
+        )
         {
             try
             {

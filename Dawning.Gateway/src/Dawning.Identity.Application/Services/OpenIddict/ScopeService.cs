@@ -1,17 +1,17 @@
-﻿using AutoMapper;
-using Dawning.Identity.Application.Dtos.OpenIddict;
-using Dawning.Identity.Application.Interfaces.OpenIddict;
-using Dawning.Identity.Application.Mapping.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using Dawning.Identity.Domain.Interfaces.UoW;
-using Dawning.Identity.Domain.Models;
-using Dawning.Identity.Domain.Models.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.Administration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Application.Dtos.OpenIddict;
+using Dawning.Identity.Application.Interfaces.OpenIddict;
+using Dawning.Identity.Application.Mapping.OpenIddict;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using Dawning.Identity.Domain.Interfaces.UoW;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.OpenIddict;
 
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
@@ -32,7 +32,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         /// <summary>
         /// Logs an audit entry for scope operations
         /// </summary>
-        private async Task LogAuditAsync(Guid userId, string action, string entityType, Guid entityId, string description)
+        private async Task LogAuditAsync(
+            Guid userId,
+            string action,
+            string entityType,
+            Guid entityId,
+            string description
+        )
         {
             var auditLog = new AuditLog
             {
@@ -42,7 +48,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 EntityType = entityType,
                 EntityId = entityId,
                 Description = description,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
             await _unitOfWork.AuditLog.InsertAsync(auditLog);
         }
@@ -62,19 +68,21 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         public async Task<PagedData<ScopeDto>> GetPagedListAsync(
             ScopeModel model,
             int page,
-            int itemsPerPage)
+            int itemsPerPage
+        )
         {
             PagedData<Scope> data = await _unitOfWork.Scope.GetPagedListAsync(
                 model,
                 page,
-                itemsPerPage);
+                itemsPerPage
+            );
 
             PagedData<ScopeDto> pageResult = new PagedData<ScopeDto>
             {
                 PageIndex = data.PageIndex,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = data.Items.ToDtos() ?? new List<ScopeDto>()
+                Items = data.Items.ToDtos() ?? new List<ScopeDto>(),
             };
 
             return pageResult;
@@ -133,7 +141,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                     "Create",
                     "Scope",
                     model.Id,
-                    $"Created scope: {model.Name}");
+                    $"Created scope: {model.Name}"
+                );
             }
 
             return result;
@@ -160,7 +169,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 var duplicateScope = await _unitOfWork.Scope.GetByNameAsync(dto.Name);
                 if (duplicateScope != null && duplicateScope.Id != dto.Id)
                 {
-                    throw new InvalidOperationException($"Another scope with name '{dto.Name}' already exists");
+                    throw new InvalidOperationException(
+                        $"Another scope with name '{dto.Name}' already exists"
+                    );
                 }
             }
 
@@ -183,7 +194,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                     "Update",
                     "Scope",
                     model.Id,
-                    $"Updated scope: {model.Name}");
+                    $"Updated scope: {model.Name}"
+                );
             }
 
             return result;
@@ -215,7 +227,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                     "Delete",
                     "Scope",
                     model.Id,
-                    $"Deleted scope: {existingScope.Name}");
+                    $"Deleted scope: {existingScope.Name}"
+                );
             }
 
             return result;

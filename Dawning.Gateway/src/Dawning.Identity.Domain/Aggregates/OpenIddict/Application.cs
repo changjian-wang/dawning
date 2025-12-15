@@ -97,4 +97,3 @@ namespace Dawning.Identity.Domain.Aggregates.OpenIddict
         }
     }
 }
-

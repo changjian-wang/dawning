@@ -8,7 +8,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
     {
         Task<ClaimTypeDto?> GetAsync(Guid id);
 
-        Task<PagedData<ClaimTypeDto>> GetPagedListAsync(ClaimTypeModel model, int page, int itemsPerPage);
+        Task<PagedData<ClaimTypeDto>> GetPagedListAsync(
+            ClaimTypeModel model,
+            int page,
+            int itemsPerPage
+        );
 
         Task<IEnumerable<ClaimTypeDto>?> GetAllAsync();
 

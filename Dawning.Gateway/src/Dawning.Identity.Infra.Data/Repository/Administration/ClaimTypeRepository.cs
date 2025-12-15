@@ -40,7 +40,10 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <returns>返回与给定ID匹配的ClaimType实体，如果没有找到则返回一个新的ClaimType实例。</returns>
         public async Task<ClaimType> GetAsync(Guid id)
         {
-            ClaimTypeEntity entity = await _context.Connection.GetAsync<ClaimTypeEntity>(id, _context.Transaction);
+            ClaimTypeEntity entity = await _context.Connection.GetAsync<ClaimTypeEntity>(
+                id,
+                _context.Transaction
+            );
             return entity.ToModel() ?? new ClaimType();
         }
 
@@ -51,10 +54,18 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <param name="page">要检索的结果页码。</param>
         /// <param name="itemsPerPage">每页显示的项数。</param>
         /// <returns>返回符合条件的ClaimType实体分页列表，如果没有找到匹配项则返回null。</returns>
-        public async Task<PagedData<ClaimType>> GetPagedListAsync(ClaimTypeModel model, int page, int itemsPerPage)
+        public async Task<PagedData<ClaimType>> GetPagedListAsync(
+            ClaimTypeModel model,
+            int page,
+            int itemsPerPage
+        )
         {
-            PagedResult<ClaimTypeEntity> result = await _context.Connection.Builder<ClaimTypeEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Name), s => s.Name!.Contains(model.Name ?? ""))
+            PagedResult<ClaimTypeEntity> result = await _context
+                .Connection.Builder<ClaimTypeEntity>(_context.Transaction)
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Name),
+                    s => s.Name!.Contains(model.Name ?? "")
+                )
                 .AsPagedListAsync(page, itemsPerPage);
 
             PagedData<ClaimType> pagedData = new PagedData<ClaimType>
@@ -62,7 +73,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
 
             return pagedData;
@@ -131,4 +142,3 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
     }
 }
-

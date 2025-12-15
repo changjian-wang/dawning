@@ -16,11 +16,13 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // ===== YARP =====
-builder.Services.AddReverseProxy()
+builder
+    .Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 // ===== 认证 =====
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.Authority = builder.Configuration["Identity:Authority"];
@@ -31,52 +33,65 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidateLifetime = true,
             ValidIssuer = builder.Configuration["Identity:Issuer"],
-            ClockSkew = TimeSpan.FromMinutes(5)
+            ClockSkew = TimeSpan.FromMinutes(5),
         };
     });
 
 // ===== 授权 =====
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("authenticated", policy =>
-        policy.RequireAuthenticatedUser());
+    options.AddPolicy("authenticated", policy => policy.RequireAuthenticatedUser());
 
-    options.AddPolicy("admin", policy =>
-        policy.RequireRole("admin"));
+    options.AddPolicy("admin", policy => policy.RequireRole("admin"));
 });
 
 // ===== 限流 =====
 builder.Services.AddRateLimiter(options =>
 {
-    // 
-    options.AddFixedWindowLimiter("FixedWindowPolicy", config =>
-    {
-        config.PermitLimit = 100;
-        config.Window = TimeSpan.FromMinutes(1);
-        config.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        config.QueueLimit = 50;
-    });
+    //
+    options.AddFixedWindowLimiter(
+        "FixedWindowPolicy",
+        config =>
+        {
+            config.PermitLimit = 100;
+            config.Window = TimeSpan.FromMinutes(1);
+            config.QueueProcessingOrder = System
+                .Threading
+                .RateLimiting
+                .QueueProcessingOrder
+                .OldestFirst;
+            config.QueueLimit = 50;
+        }
+    );
 
-    // 
-    options.AddSlidingWindowLimiter("SlidingWindowPolicy", config =>
-    {
-        config.PermitLimit = 100;
-        config.Window = TimeSpan.FromMinutes(1);
-        config.SegmentsPerWindow = 6;
-        config.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
-        config.QueueLimit = 50;
-    });
+    //
+    options.AddSlidingWindowLimiter(
+        "SlidingWindowPolicy",
+        config =>
+        {
+            config.PermitLimit = 100;
+            config.Window = TimeSpan.FromMinutes(1);
+            config.SegmentsPerWindow = 6;
+            config.QueueProcessingOrder = System
+                .Threading
+                .RateLimiting
+                .QueueProcessingOrder
+                .OldestFirst;
+            config.QueueLimit = 50;
+        }
+    );
 });
 
 // ===== CORS =====
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
+    options.AddPolicy(
+        "AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+        }
+    );
 });
 
 // ===== Redis =====
@@ -87,10 +102,13 @@ builder.Services.AddStackExchangeRedisCache(options =>
 });
 
 // ===== 健康检查 =====
-builder.Services.AddHealthChecks()
-    .AddUrlGroup(new Uri(builder.Configuration["Identity:Authority"] + "/health"),
+builder
+    .Services.AddHealthChecks()
+    .AddUrlGroup(
+        new Uri(builder.Configuration["Identity:Authority"] + "/health"),
         name: "identity-service",
-        timeout: TimeSpan.FromSeconds(5));
+        timeout: TimeSpan.FromSeconds(5)
+    );
 
 var app = builder.Build();
 

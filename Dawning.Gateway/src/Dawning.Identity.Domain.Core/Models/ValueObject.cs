@@ -1,11 +1,13 @@
 ﻿using System;
+
 namespace Dawning.Identity.Domain.Core.Models
 {
     /// <summary>
     /// ValueObject
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class ValueObject<T> where T : ValueObject<T>
+    public abstract class ValueObject<T>
+        where T : ValueObject<T>
     {
         public override bool Equals(object obj)
         {
@@ -39,4 +41,3 @@ namespace Dawning.Identity.Domain.Core.Models
         }
     }
 }
-

@@ -1,10 +1,10 @@
+using System.Security.Claims;
 using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Controllers.OpenIddict
 {
@@ -34,9 +34,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         /// </summary>
         private Guid GetOperatorId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
-                           ?? User.FindFirst("sub")
-                           ?? User.FindFirst("user_id");
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)
+                ?? User.FindFirst("sub")
+                ?? User.FindFirst("user_id");
 
             if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
             {
@@ -63,7 +64,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<ScopeDto>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<ScopeDto>.Error(50000, $"Internal server error: {ex.Message}")
+                );
             }
         }
 
@@ -89,7 +92,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<ScopeDto>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<ScopeDto>.Error(50000, $"Internal server error: {ex.Message}")
+                );
             }
         }
 
@@ -103,7 +108,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             {
                 if (names == null || !names.Any())
                 {
-                    return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(40001, "Invalid scope names"));
+                    return Ok(
+                        ApiResponse<IEnumerable<ScopeDto>>.Error(40001, "Invalid scope names")
+                    );
                 }
 
                 var result = await _service.GetByNamesAsync(names);
@@ -111,7 +118,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<IEnumerable<ScopeDto>>.Error(
+                        50000,
+                        $"Internal server error: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -122,7 +134,8 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] ScopeModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             try
             {
@@ -153,7 +166,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<IEnumerable<ScopeDto>>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<IEnumerable<ScopeDto>>.Error(
+                        50000,
+                        $"Internal server error: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -239,11 +257,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
                     return Ok(ApiResponse<bool>.Error(40005, "Invalid ID"));
                 }
 
-                var scopeDto = new ScopeDto
-                {
-                    Id = id,
-                    OperatorId = GetOperatorId()
-                };
+                var scopeDto = new ScopeDto { Id = id, OperatorId = GetOperatorId() };
 
                 var result = await _service.DeleteAsync(scopeDto);
                 return Ok(ApiResponse<bool>.Success(result, "Scope deleted successfully"));

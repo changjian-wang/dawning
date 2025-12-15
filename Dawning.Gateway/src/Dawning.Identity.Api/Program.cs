@@ -28,8 +28,8 @@ namespace Dawning.Identity.Api
             builder.Host.UseSerilog();
 
             // AppSettings
-            builder.Configuration
-                .SetBasePath(builder.Environment.ContentRootPath)
+            builder
+                .Configuration.SetBasePath(builder.Environment.ContentRootPath)
                 .AddJsonFile("appsettings.json", true, true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
                 .AddEnvironmentVariables();
@@ -42,8 +42,10 @@ namespace Dawning.Identity.Api
             builder.Services.AddOpenIddictConfiguration(builder.Configuration);
 
             // ===== User Authentication Service =====
-            builder.Services.AddScoped<Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService, 
-                Dawning.Identity.Application.Services.Authentication.UserAuthenticationService>();
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService,
+                Dawning.Identity.Application.Services.Authentication.UserAuthenticationService
+            >();
 
             // ===== Audit Log Helper =====
             builder.Services.AddHttpContextAccessor();
@@ -56,30 +58,36 @@ namespace Dawning.Identity.Api
             builder.Services.AddAutoMapperConfiguration();
 
             // ===== Controllers =====
-            builder.Services.AddControllers()
+            builder
+                .Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     // Configure JSON serialization options
-                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase; // use camelCase for JSON
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System
+                        .Text
+                        .Json
+                        .JsonNamingPolicy
+                        .CamelCase; // use camelCase for JSON
                     options.JsonSerializerOptions.WriteIndented = true; // format output
                 });
 
             // ===== Routing =====
             builder.Services.Configure<RouteOptions>(options =>
             {
-                options.LowercaseUrls = true;           // URL lowercase
-                options.LowercaseQueryStrings = false;   // Query strings not lowercase
+                options.LowercaseUrls = true; // URL lowercase
+                options.LowercaseQueryStrings = false; // Query strings not lowercase
             });
 
             // CORS
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
-                {
-                    policy.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
-                });
+                options.AddPolicy(
+                    "AllowAll",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    }
+                );
             });
 
             // ===== Swagger =====
@@ -114,11 +122,11 @@ namespace Dawning.Identity.Api
             app.UseMiddleware<Dawning.Identity.Api.Middleware.ExceptionHandlingMiddleware>();
             app.UseMiddleware<Dawning.Identity.Api.Middleware.RequestLoggingMiddleware>();
             app.UseMiddleware<Dawning.Identity.Api.Middleware.PerformanceMonitoringMiddleware>();
-            
+
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("AllowAll");
-            
+
             // 启用认证和授权
             app.UseAuthentication();
             app.UseAuthorization();
@@ -128,16 +136,20 @@ namespace Dawning.Identity.Api
             app.MapHealthChecks("/health");
 
             // Error handling endpoint
-            app.Map("/error", (HttpContext httpContext) =>
-            {
-                httpContext.Response.StatusCode = 500;
-                return Results.Problem("An unexpected error occurred.");
-            });
+            app.Map(
+                "/error",
+                (HttpContext httpContext) =>
+                {
+                    httpContext.Response.StatusCode = 500;
+                    return Results.Problem("An unexpected error occurred.");
+                }
+            );
 
             // ===== Database Seeding =====
             using (var scope = app.Services.CreateScope())
             {
-                var seeder = scope.ServiceProvider.GetRequiredService<Dawning.Identity.Api.Data.DatabaseSeeder>();
+                var seeder =
+                    scope.ServiceProvider.GetRequiredService<Dawning.Identity.Api.Data.DatabaseSeeder>();
                 try
                 {
                     await seeder.SeedAsync();

@@ -6,7 +6,8 @@ namespace Dawning.Identity.Domain.Models
     /// Cursor 分页数据
     /// </summary>
     /// <typeparam name="T">数据类型</typeparam>
-    public class CursorPagedData<T> where T : class, new()
+    public class CursorPagedData<T>
+        where T : class, new()
     {
         /// <summary>
         /// 每页数量

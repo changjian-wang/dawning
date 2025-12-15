@@ -88,8 +88,12 @@ namespace Dawning.Identity.Api.Configurations
             {
                 "file" => LoadFromFile(config),
                 "store" => LoadFromStore(config),
-                "azurekeyvault" => throw new NotImplementedException("Azure Key Vault integration not implemented yet"),
-                _ => throw new InvalidOperationException($"Unknown certificate type: {config.Type}")
+                "azurekeyvault" => throw new NotImplementedException(
+                    "Azure Key Vault integration not implemented yet"
+                ),
+                _ => throw new InvalidOperationException(
+                    $"Unknown certificate type: {config.Type}"
+                ),
             };
         }
 
@@ -144,7 +148,9 @@ namespace Dawning.Identity.Api.Configurations
             }
             else
             {
-                throw new InvalidOperationException("Either Thumbprint or SubjectName is required when Type=Store");
+                throw new InvalidOperationException(
+                    "Either Thumbprint or SubjectName is required when Type=Store"
+                );
             }
 
             if (certificates.Count == 0)

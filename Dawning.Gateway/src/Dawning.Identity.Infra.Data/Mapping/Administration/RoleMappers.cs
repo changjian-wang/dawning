@@ -1,7 +1,7 @@
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using System.Collections.Generic;
 using System.Linq;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 UpdatedAt = entity.UpdatedAt,
                 UpdatedBy = entity.UpdatedBy,
                 DeletedAt = entity.DeletedAt,
-                Timestamp = entity.Timestamp
+                Timestamp = entity.Timestamp,
             };
         }
 
@@ -52,7 +52,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 UpdatedAt = model.UpdatedAt,
                 UpdatedBy = model.UpdatedBy,
                 DeletedAt = model.DeletedAt,
-                Timestamp = model.Timestamp
+                Timestamp = model.Timestamp,
             };
         }
 

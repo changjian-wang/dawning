@@ -1,10 +1,10 @@
+using System.Security.Claims;
 using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Controllers.OpenIddict
 {
@@ -34,9 +34,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         /// </summary>
         private Guid GetOperatorId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                           ?? User.FindFirst("sub")?.Value
-                           ?? User.FindFirst("user_id")?.Value;
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? User.FindFirst("sub")?.Value
+                ?? User.FindFirst("user_id")?.Value;
 
             return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
         }
@@ -58,7 +59,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<ApplicationDto>.Error(50000, $"Error retrieving application: {ex.Message}"));
+                return Ok(
+                    ApiResponse<ApplicationDto>.Error(
+                        50000,
+                        $"Error retrieving application: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -84,7 +90,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<ApplicationDto>.Error(50000, $"Error retrieving application: {ex.Message}"));
+                return Ok(
+                    ApiResponse<ApplicationDto>.Error(
+                        50000,
+                        $"Error retrieving application: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -95,7 +106,8 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] ApplicationModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             try
             {
@@ -140,7 +152,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             {
                 if (applicationDto == null || string.IsNullOrWhiteSpace(applicationDto.ClientId))
                 {
-                    return Ok(ApiResponse<int>.Error(40002, "Invalid application data or missing client ID"));
+                    return Ok(
+                        ApiResponse<int>.Error(
+                            40002,
+                            "Invalid application data or missing client ID"
+                        )
+                    );
                 }
 
                 var result = await _service.InsertAsync(applicationDto);
@@ -156,7 +173,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<int>.Error(50000, $"Error creating application: {ex.Message}"));
+                return Ok(
+                    ApiResponse<int>.Error(50000, $"Error creating application: {ex.Message}")
+                );
             }
         }
 
@@ -164,13 +183,18 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         /// Updates an existing application.
         /// </summary>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] ApplicationDto applicationDto)
+        public async Task<IActionResult> UpdateAsync(
+            Guid id,
+            [FromBody] ApplicationDto applicationDto
+        )
         {
             try
             {
                 if (applicationDto?.Id == null || applicationDto.Id != id)
                 {
-                    return Ok(ApiResponse<bool>.Error(40003, "Invalid application data or ID mismatch"));
+                    return Ok(
+                        ApiResponse<bool>.Error(40003, "Invalid application data or ID mismatch")
+                    );
                 }
 
                 var result = await _service.UpdateAsync(applicationDto);
@@ -186,7 +210,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<bool>.Error(50000, $"Error updating application: {ex.Message}"));
+                return Ok(
+                    ApiResponse<bool>.Error(50000, $"Error updating application: {ex.Message}")
+                );
             }
         }
 
@@ -212,7 +238,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<bool>.Error(50000, $"Error deleting application: {ex.Message}"));
+                return Ok(
+                    ApiResponse<bool>.Error(50000, $"Error deleting application: {ex.Message}")
+                );
             }
         }
     }

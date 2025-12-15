@@ -1,16 +1,16 @@
-using AutoMapper;
-using Dawning.Identity.Application.Dtos.OpenIddict;
-using Dawning.Identity.Application.Interfaces.OpenIddict;
-using Dawning.Identity.Application.Mapping.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.Administration;
-using Dawning.Identity.Domain.Interfaces.UoW;
-using Dawning.Identity.Domain.Models;
-using Dawning.Identity.Domain.Models.OpenIddict;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Application.Dtos.OpenIddict;
+using Dawning.Identity.Application.Interfaces.OpenIddict;
+using Dawning.Identity.Application.Mapping.OpenIddict;
+using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using Dawning.Identity.Domain.Interfaces.UoW;
+using Dawning.Identity.Domain.Models;
+using Dawning.Identity.Domain.Models.OpenIddict;
 
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
@@ -31,7 +31,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         /// <summary>
         /// 记录审计日志
         /// </summary>
-        private async Task LogAuditAsync(Guid userId, string action, string entityType, Guid entityId, string description)
+        private async Task LogAuditAsync(
+            Guid userId,
+            string action,
+            string entityType,
+            Guid entityId,
+            string description
+        )
         {
             var auditLog = new AuditLog
             {
@@ -41,7 +47,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 EntityType = entityType,
                 EntityId = entityId,
                 Description = description,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
             await _unitOfWork.AuditLog.InsertAsync(auditLog);
         }
@@ -61,7 +67,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         public async Task<PagedData<ApiResourceDto>> GetPagedListAsync(
             ApiResourceModel model,
             int page,
-            int itemsPerPage)
+            int itemsPerPage
+        )
         {
             var data = await _unitOfWork.ApiResource.GetPagedListAsync(model, page, itemsPerPage);
 
@@ -70,7 +77,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 PageIndex = data.PageIndex,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = data.Items.ToDtos() ?? new List<ApiResourceDto>()
+                Items = data.Items.ToDtos() ?? new List<ApiResourceDto>(),
             };
         }
 
@@ -103,7 +110,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             var existingResource = await _unitOfWork.ApiResource.GetByNameAsync(dto.Name);
             if (existingResource != null)
             {
-                throw new InvalidOperationException($"API Resource with name '{dto.Name}' already exists");
+                throw new InvalidOperationException(
+                    $"API Resource with name '{dto.Name}' already exists"
+                );
             }
 
             // 映射并准备模型
@@ -132,7 +141,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                     "Create",
                     "ApiResource",
                     model.Id,
-                    $"Created API Resource: {model.Name}");
+                    $"Created API Resource: {model.Name}"
+                );
             }
 
             return result;
@@ -159,7 +169,9 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 var duplicateResource = await _unitOfWork.ApiResource.GetByNameAsync(dto.Name);
                 if (duplicateResource != null && duplicateResource.Id != dto.Id)
                 {
-                    throw new InvalidOperationException($"Another API Resource with name '{dto.Name}' already exists");
+                    throw new InvalidOperationException(
+                        $"Another API Resource with name '{dto.Name}' already exists"
+                    );
                 }
             }
 
@@ -187,7 +199,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                     "Update",
                     "ApiResource",
                     model.Id,
-                    $"Updated API Resource: {model.Name}");
+                    $"Updated API Resource: {model.Name}"
+                );
             }
 
             return result;
@@ -219,7 +232,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                     "Delete",
                     "ApiResource",
                     model.Id,
-                    $"Deleted API Resource: {existingResource.Name}");
+                    $"Deleted API Resource: {existingResource.Name}"
+                );
             }
 
             return result;

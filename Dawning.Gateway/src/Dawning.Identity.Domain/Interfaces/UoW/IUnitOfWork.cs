@@ -1,7 +1,7 @@
-﻿using Dawning.Identity.Domain.Interfaces.Administration;
-using Dawning.Identity.Domain.Interfaces.OpenIddict;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Dawning.Identity.Domain.Interfaces.Administration;
+using Dawning.Identity.Domain.Interfaces.OpenIddict;
 
 namespace Dawning.Identity.Domain.Interfaces.UoW
 {
@@ -32,4 +32,3 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         Task CommitAsync();
     }
 }
-

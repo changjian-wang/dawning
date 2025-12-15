@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Dawning.Identity.Domain.Models
 {
-    public class PagedData<T> where T : class, new()
+    public class PagedData<T>
+        where T : class, new()
     {
         /// <summary>
         /// 当前页码

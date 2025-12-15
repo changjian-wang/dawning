@@ -1,8 +1,8 @@
+using System;
+using System.Threading.Tasks;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
@@ -34,7 +34,11 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         /// <summary>
         /// 获取用户列表（Cursor 分页）
         /// </summary>
-        Task<CursorPagedData<User>> GetPagedListByCursorAsync(UserModel model, long? cursor, int pageSize);
+        Task<CursorPagedData<User>> GetPagedListByCursorAsync(
+            UserModel model,
+            long? cursor,
+            int pageSize
+        );
 
         /// <summary>
         /// 异步插入用户

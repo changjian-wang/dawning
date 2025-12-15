@@ -28,13 +28,7 @@ namespace Dawning.Identity.Domain.Core.Security
             }
 
             var salt = RandomNumberGenerator.GetBytes(SaltSize);
-            var hash = Rfc2898DeriveBytes.Pbkdf2(
-                password,
-                salt,
-                Iterations,
-                Algorithm,
-                KeySize
-            );
+            var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, Algorithm, KeySize);
 
             return string.Join(
                 Delimiter,

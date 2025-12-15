@@ -1,7 +1,8 @@
-﻿using Dawning.Identity.Domain.Aggregates.Administration;
+﻿using System;
+using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
+
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     public interface ISystemMetadataRepository
@@ -21,4 +22,3 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         ValueTask<bool> DeleteAsync(SystemMetadata model);
     }
 }
-

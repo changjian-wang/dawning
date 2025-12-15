@@ -28,7 +28,10 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Scope> GetAsync(Guid id)
         {
-            ScopeEntity entity = await _context.Connection.GetAsync<ScopeEntity>(id, _context.Transaction);
+            ScopeEntity entity = await _context.Connection.GetAsync<ScopeEntity>(
+                id,
+                _context.Transaction
+            );
             return entity?.ToModel() ?? new Scope();
         }
 
@@ -37,7 +40,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Scope?> GetByNameAsync(string name)
         {
-            var result = await _context.Connection.Builder<ScopeEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<ScopeEntity>(_context.Transaction)
                 .WhereIf(!string.IsNullOrWhiteSpace(name), s => s.Name == name)
                 .AsListAsync();
 
@@ -47,11 +51,22 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// <summary>
         /// 获取分页列表
         /// </summary>
-        public async Task<PagedData<Scope>> GetPagedListAsync(ScopeModel model, int page, int itemsPerPage)
+        public async Task<PagedData<Scope>> GetPagedListAsync(
+            ScopeModel model,
+            int page,
+            int itemsPerPage
+        )
         {
-            PagedResult<ScopeEntity> result = await _context.Connection.Builder<ScopeEntity>(_context.Transaction)
-                .WhereIf(!string.IsNullOrWhiteSpace(model.Name), s => s.Name!.Contains(model.Name ?? ""))
-                .WhereIf(!string.IsNullOrWhiteSpace(model.DisplayName), s => s.DisplayName!.Contains(model.DisplayName ?? ""))
+            PagedResult<ScopeEntity> result = await _context
+                .Connection.Builder<ScopeEntity>(_context.Transaction)
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.Name),
+                    s => s.Name!.Contains(model.Name ?? "")
+                )
+                .WhereIf(
+                    !string.IsNullOrWhiteSpace(model.DisplayName),
+                    s => s.DisplayName!.Contains(model.DisplayName ?? "")
+                )
                 .AsPagedListAsync(page, itemsPerPage);
 
             PagedData<Scope> pagedData = new PagedData<Scope>
@@ -59,7 +74,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                 PageIndex = page,
                 PageSize = itemsPerPage,
                 TotalCount = result.TotalItems,
-                Items = result.Values.ToModels()
+                Items = result.Values.ToModels(),
             };
 
             return pagedData;
@@ -83,7 +98,8 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
                 return Enumerable.Empty<Scope>();
 
             // 使用 QueryBuilder 支持的 IN 操作：集合.Contains(字段)
-            var result = await _context.Connection.Builder<ScopeEntity>(_context.Transaction)
+            var result = await _context
+                .Connection.Builder<ScopeEntity>(_context.Transaction)
                 .WhereIf(true, s => names.Contains(s.Name!))
                 .AsListAsync();
 

@@ -1,15 +1,20 @@
-﻿using Dawning.Identity.Domain.Aggregates.Administration;
+﻿using System;
+using System.Security.Claims;
+using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
-using System;
-using System.Security.Claims;
+
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     public interface IClaimTypeRepository
     {
         Task<ClaimType> GetAsync(Guid id);
 
-        Task<PagedData<ClaimType>> GetPagedListAsync(ClaimTypeModel model, int page, int itemsPerPage);
+        Task<PagedData<ClaimType>> GetPagedListAsync(
+            ClaimTypeModel model,
+            int page,
+            int itemsPerPage
+        );
 
         Task<IEnumerable<ClaimType>> GetAllAsync();
 
@@ -20,4 +25,3 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         ValueTask<bool> DeleteAsync(ClaimType model);
     }
 }
-

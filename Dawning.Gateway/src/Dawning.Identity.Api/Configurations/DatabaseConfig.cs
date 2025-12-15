@@ -7,15 +7,21 @@ namespace Dawning.Identity.Api.Configurations
     /// </summary>
     public static class DatabaseConfig
     {
-        public static void AddDatabaseConfiguration(this IServiceCollection services, IConfiguration configuration)
+        public static void AddDatabaseConfiguration(
+            this IServiceCollection services,
+            IConfiguration configuration
+        )
         {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
 
             string? connectionString = configuration.GetConnectionString("MySQL");
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                throw new ArgumentException("MySQL connection string cannot be empty! Please check appsettings.json");
+                throw new ArgumentException(
+                    "MySQL connection string cannot be empty! Please check appsettings.json"
+                );
             }
 
             // 注册 DbContext（Scoped 生命周期）

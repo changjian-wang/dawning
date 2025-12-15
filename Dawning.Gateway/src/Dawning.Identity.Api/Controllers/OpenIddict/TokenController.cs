@@ -82,7 +82,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         {
             if (applicationId == Guid.Empty)
             {
-                return Ok(ApiResponse<IEnumerable<TokenDto>>.Error(40001, "Invalid application ID"));
+                return Ok(
+                    ApiResponse<IEnumerable<TokenDto>>.Error(40001, "Invalid application ID")
+                );
             }
 
             var result = await _service.GetByApplicationIdAsync(applicationId);
@@ -97,7 +99,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         {
             if (authorizationId == Guid.Empty)
             {
-                return Ok(ApiResponse<IEnumerable<TokenDto>>.Error(40001, "Invalid authorization ID"));
+                return Ok(
+                    ApiResponse<IEnumerable<TokenDto>>.Error(40001, "Invalid authorization ID")
+                );
             }
 
             var result = await _service.GetByAuthorizationIdAsync(authorizationId);
@@ -111,7 +115,8 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] TokenModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             if (page < 1 || pageSize < 1)
             {
@@ -184,7 +189,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> PruneExpiredTokensAsync()
         {
             var result = await _service.PruneExpiredTokensAsync();
-            return Ok(ApiResponse<int>.Success(result, $"Successfully pruned {result} expired tokens"));
+            return Ok(
+                ApiResponse<int>.Success(result, $"Successfully pruned {result} expired tokens")
+            );
         }
     }
 }

@@ -1,4 +1,9 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.OpenIddict;
@@ -6,11 +11,6 @@ using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.OpenIddict;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
@@ -61,19 +61,21 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         public async Task<PagedData<TokenDto>> GetPagedListAsync(
             TokenModel model,
             int page,
-            int itemsPerPage)
+            int itemsPerPage
+        )
         {
             PagedData<Token> data = await _unitOfWork.Token.GetPagedListAsync(
                 model,
                 page,
-                itemsPerPage);
+                itemsPerPage
+            );
 
             PagedData<TokenDto> pageResult = new PagedData<TokenDto>
             {
                 PageIndex = data.PageIndex,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = data.Items.ToDtos() ?? new List<TokenDto>()
+                Items = data.Items.ToDtos() ?? new List<TokenDto>(),
             };
 
             return pageResult;

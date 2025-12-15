@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using Dawning.Identity.Application.Dtos.OpenIddict;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Application.Dtos.OpenIddict;
 
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
@@ -14,8 +14,9 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
 
         static ApplicationMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<ApplicationProfile>())
-                .CreateMapper();
+            Mapper = new MapperConfiguration(cfg =>
+                cfg.AddProfile<ApplicationProfile>()
+            ).CreateMapper();
         }
 
         public static ApplicationDto? ToDto(this Domain.Aggregates.OpenIddict.Application model)
@@ -23,7 +24,9 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
             return model == null ? null : Mapper.Map<ApplicationDto>(model);
         }
 
-        public static IEnumerable<ApplicationDto>? ToDtos(this IEnumerable<Domain.Aggregates.OpenIddict.Application> models)
+        public static IEnumerable<ApplicationDto>? ToDtos(
+            this IEnumerable<Domain.Aggregates.OpenIddict.Application> models
+        )
         {
             return models == null ? null : Mapper.Map<IEnumerable<ApplicationDto>>(models);
         }

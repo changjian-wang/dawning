@@ -1,4 +1,5 @@
-﻿using Dawning.Identity.Domain.Aggregates.Administration;
+﻿using System;
+using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
@@ -6,7 +7,6 @@ using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Administration;
 using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 using Dawning.Shared.Dapper.Contrib;
-using System;
 using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.Administration
@@ -126,4 +126,3 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
     }
 }
-

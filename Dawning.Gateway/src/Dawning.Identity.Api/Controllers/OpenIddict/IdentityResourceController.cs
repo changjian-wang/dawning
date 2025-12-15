@@ -1,14 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Models.OpenIddict;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Dawning.Identity.Api.Controllers.OpenIddict
 {
@@ -32,9 +32,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         /// </summary>
         private Guid GetOperatorId()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
-                           ?? User.FindFirst("sub")
-                           ?? User.FindFirst("user_id");
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)
+                ?? User.FindFirst("sub")
+                ?? User.FindFirst("user_id");
 
             if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
             {
@@ -55,13 +56,20 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
                 var result = await _service.GetAsync(id);
                 if (result == null || result.Id == null)
                 {
-                    return Ok(ApiResponse<IdentityResourceDto>.Error(40404, "Identity Resource not found"));
+                    return Ok(
+                        ApiResponse<IdentityResourceDto>.Error(40404, "Identity Resource not found")
+                    );
                 }
                 return Ok(ApiResponse<IdentityResourceDto>.Success(result));
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<IdentityResourceDto>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<IdentityResourceDto>.Error(
+                        50000,
+                        $"Internal server error: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -75,19 +83,28 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             {
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    return Ok(ApiResponse<IdentityResourceDto>.Error(40001, "Invalid resource name"));
+                    return Ok(
+                        ApiResponse<IdentityResourceDto>.Error(40001, "Invalid resource name")
+                    );
                 }
 
                 var result = await _service.GetByNameAsync(name);
                 if (result == null)
                 {
-                    return Ok(ApiResponse<IdentityResourceDto>.Error(40404, "Identity Resource not found"));
+                    return Ok(
+                        ApiResponse<IdentityResourceDto>.Error(40404, "Identity Resource not found")
+                    );
                 }
                 return Ok(ApiResponse<IdentityResourceDto>.Success(result));
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<IdentityResourceDto>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<IdentityResourceDto>.Error(
+                        50000,
+                        $"Internal server error: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -101,15 +118,29 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             {
                 if (names == null || !names.Any())
                 {
-                    return Ok(ApiResponse<IEnumerable<IdentityResourceDto>>.Error(40001, "Invalid resource names"));
+                    return Ok(
+                        ApiResponse<IEnumerable<IdentityResourceDto>>.Error(
+                            40001,
+                            "Invalid resource names"
+                        )
+                    );
                 }
 
                 var result = await _service.GetByNamesAsync(names);
-                return Ok(ApiResponse<IEnumerable<IdentityResourceDto>>.Success(result ?? Array.Empty<IdentityResourceDto>()));
+                return Ok(
+                    ApiResponse<IEnumerable<IdentityResourceDto>>.Success(
+                        result ?? Array.Empty<IdentityResourceDto>()
+                    )
+                );
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<IEnumerable<IdentityResourceDto>>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<IEnumerable<IdentityResourceDto>>.Error(
+                        50000,
+                        $"Internal server error: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -120,7 +151,8 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         public async Task<IActionResult> GetPagedListAsync(
             [FromBody] IdentityResourceModel model,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
+            [FromQuery] int pageSize = 10
+        )
         {
             try
             {
@@ -147,11 +179,20 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             try
             {
                 var result = await _service.GetAllAsync();
-                return Ok(ApiResponse<IEnumerable<IdentityResourceDto>>.Success(result ?? Array.Empty<IdentityResourceDto>()));
+                return Ok(
+                    ApiResponse<IEnumerable<IdentityResourceDto>>.Success(
+                        result ?? Array.Empty<IdentityResourceDto>()
+                    )
+                );
             }
             catch (Exception ex)
             {
-                return Ok(ApiResponse<IEnumerable<IdentityResourceDto>>.Error(50000, $"Internal server error: {ex.Message}"));
+                return Ok(
+                    ApiResponse<IEnumerable<IdentityResourceDto>>.Error(
+                        50000,
+                        $"Internal server error: {ex.Message}"
+                    )
+                );
             }
         }
 
@@ -165,14 +206,18 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
             {
                 if (dto == null || string.IsNullOrWhiteSpace(dto.Name))
                 {
-                    return Ok(ApiResponse<int>.Error(40002, "Invalid resource data or missing name"));
+                    return Ok(
+                        ApiResponse<int>.Error(40002, "Invalid resource data or missing name")
+                    );
                 }
 
                 // 设置操作者ID
                 dto.OperatorId = GetOperatorId();
 
                 var result = await _service.InsertAsync(dto);
-                return Ok(ApiResponse<int>.Success(result, "Identity Resource created successfully"));
+                return Ok(
+                    ApiResponse<int>.Success(result, "Identity Resource created successfully")
+                );
             }
             catch (ArgumentException ex)
             {
@@ -208,7 +253,9 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
                 dto.OperatorId = GetOperatorId();
 
                 var result = await _service.UpdateAsync(dto);
-                return Ok(ApiResponse<bool>.Success(result, "Identity Resource updated successfully"));
+                return Ok(
+                    ApiResponse<bool>.Success(result, "Identity Resource updated successfully")
+                );
             }
             catch (ArgumentException ex)
             {
@@ -237,14 +284,12 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
                     return Ok(ApiResponse<bool>.Error(40005, "Invalid ID"));
                 }
 
-                var dto = new IdentityResourceDto
-                {
-                    Id = id,
-                    OperatorId = GetOperatorId()
-                };
+                var dto = new IdentityResourceDto { Id = id, OperatorId = GetOperatorId() };
 
                 var result = await _service.DeleteAsync(dto);
-                return Ok(ApiResponse<bool>.Success(result, "Identity Resource deleted successfully"));
+                return Ok(
+                    ApiResponse<bool>.Success(result, "Identity Resource deleted successfully")
+                );
             }
             catch (ArgumentException ex)
             {

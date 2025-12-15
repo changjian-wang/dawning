@@ -1,10 +1,10 @@
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using Dawning.Identity.Domain.Interfaces.UoW;
-using OpenIddict.Abstractions;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using Dawning.Identity.Domain.Interfaces.UoW;
+using OpenIddict.Abstractions;
 
 namespace Dawning.Identity.Infra.Data.Stores
 {
@@ -26,12 +26,18 @@ namespace Dawning.Identity.Infra.Data.Stores
             return all.Count();
         }
 
-        public ValueTask<long> CountAsync<TResult>(Func<IQueryable<Authorization>, IQueryable<TResult>> query, CancellationToken cancellationToken)
+        public ValueTask<long> CountAsync<TResult>(
+            Func<IQueryable<Authorization>, IQueryable<TResult>> query,
+            CancellationToken cancellationToken
+        )
         {
             return CountAsync(cancellationToken);
         }
 
-        public async ValueTask CreateAsync(Authorization authorization, CancellationToken cancellationToken)
+        public async ValueTask CreateAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -44,7 +50,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             await _unitOfWork.Authorization.InsertAsync(authorization);
         }
 
-        public async ValueTask DeleteAsync(Authorization authorization, CancellationToken cancellationToken)
+        public async ValueTask DeleteAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -52,26 +61,16 @@ namespace Dawning.Identity.Infra.Data.Stores
             await _unitOfWork.Authorization.DeleteAsync(authorization);
         }
 
-        public async IAsyncEnumerable<Authorization> FindAsync(string subject, string client, [EnumeratorCancellation] CancellationToken cancellationToken)
-        {
-            var all = await _unitOfWork.Authorization.GetAllAsync();
-            var filtered = all.Where(a => 
-                a.Subject == subject && 
-                a.ApplicationId.ToString() == client);
-
-            foreach (var auth in filtered)
-            {
-                yield return auth;
-            }
-        }
-
-        public async IAsyncEnumerable<Authorization> FindAsync(string subject, string client, string status, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Authorization> FindAsync(
+            string subject,
+            string client,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             var all = await _unitOfWork.Authorization.GetAllAsync();
             var filtered = all.Where(a =>
-                a.Subject == subject &&
-                a.ApplicationId.ToString() == client &&
-                a.Status == status);
+                a.Subject == subject && a.ApplicationId.ToString() == client
+            );
 
             foreach (var auth in filtered)
             {
@@ -79,14 +78,17 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async IAsyncEnumerable<Authorization> FindAsync(string subject, string client, string status, string type, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Authorization> FindAsync(
+            string subject,
+            string client,
+            string status,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             var all = await _unitOfWork.Authorization.GetAllAsync();
             var filtered = all.Where(a =>
-                a.Subject == subject &&
-                a.ApplicationId.ToString() == client &&
-                a.Status == status &&
-                a.Type == type);
+                a.Subject == subject && a.ApplicationId.ToString() == client && a.Status == status
+            );
 
             foreach (var auth in filtered)
             {
@@ -94,15 +96,21 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async IAsyncEnumerable<Authorization> FindAsync(string subject, string client, string status, string type, ImmutableArray<string> scopes, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Authorization> FindAsync(
+            string subject,
+            string client,
+            string status,
+            string type,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             var all = await _unitOfWork.Authorization.GetAllAsync();
             var filtered = all.Where(a =>
-                a.Subject == subject &&
-                a.ApplicationId.ToString() == client &&
-                a.Status == status &&
-                a.Type == type &&
-                (a.Scopes != null && scopes.All(s => a.Scopes.Contains(s))));
+                a.Subject == subject
+                && a.ApplicationId.ToString() == client
+                && a.Status == status
+                && a.Type == type
+            );
 
             foreach (var auth in filtered)
             {
@@ -110,7 +118,34 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async IAsyncEnumerable<Authorization> FindByApplicationIdAsync(string identifier, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Authorization> FindAsync(
+            string subject,
+            string client,
+            string status,
+            string type,
+            ImmutableArray<string> scopes,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
+        {
+            var all = await _unitOfWork.Authorization.GetAllAsync();
+            var filtered = all.Where(a =>
+                a.Subject == subject
+                && a.ApplicationId.ToString() == client
+                && a.Status == status
+                && a.Type == type
+                && (a.Scopes != null && scopes.All(s => a.Scopes.Contains(s)))
+            );
+
+            foreach (var auth in filtered)
+            {
+                yield return auth;
+            }
+        }
+
+        public async IAsyncEnumerable<Authorization> FindByApplicationIdAsync(
+            string identifier,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             if (!Guid.TryParse(identifier, out var appId))
                 yield break;
@@ -124,7 +159,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async ValueTask<Authorization?> FindByIdAsync(string identifier, CancellationToken cancellationToken)
+        public async ValueTask<Authorization?> FindByIdAsync(
+            string identifier,
+            CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrEmpty(identifier))
                 return null;
@@ -136,7 +174,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return auth.Id == Guid.Empty ? null : auth;
         }
 
-        public async IAsyncEnumerable<Authorization> FindBySubjectAsync(string subject, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Authorization> FindBySubjectAsync(
+            string subject,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             if (string.IsNullOrEmpty(subject))
                 yield break;
@@ -150,7 +191,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public ValueTask<string?> GetApplicationIdAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<string?> GetApplicationIdAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -158,20 +202,32 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(authorization.ApplicationId?.ToString());
         }
 
-        public ValueTask<TResult?> GetAsync<TState, TResult>(Func<IQueryable<Authorization>, TState, IQueryable<TResult>> query, TState state, CancellationToken cancellationToken)
+        public ValueTask<TResult?> GetAsync<TState, TResult>(
+            Func<IQueryable<Authorization>, TState, IQueryable<TResult>> query,
+            TState state,
+            CancellationToken cancellationToken
+        )
         {
             return new ValueTask<TResult?>(default(TResult));
         }
 
-        public ValueTask<DateTimeOffset?> GetCreationDateAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<DateTimeOffset?> GetCreationDateAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
 
-            return new ValueTask<DateTimeOffset?>(new DateTimeOffset(authorization.CreatedAt, TimeSpan.Zero));
+            return new ValueTask<DateTimeOffset?>(
+                new DateTimeOffset(authorization.CreatedAt, TimeSpan.Zero)
+            );
         }
 
-        public ValueTask<string?> GetIdAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<string?> GetIdAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -179,7 +235,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(authorization.Id.ToString());
         }
 
-        public ValueTask<ImmutableDictionary<string, JsonElement>> GetPropertiesAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<ImmutableDictionary<string, JsonElement>> GetPropertiesAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -196,16 +255,23 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<ImmutableDictionary<string, JsonElement>>(builder.ToImmutable());
         }
 
-        public ValueTask<ImmutableArray<string>> GetScopesAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<ImmutableArray<string>> GetScopesAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
 
             return new ValueTask<ImmutableArray<string>>(
-                authorization.Scopes?.ToImmutableArray() ?? ImmutableArray<string>.Empty);
+                authorization.Scopes?.ToImmutableArray() ?? ImmutableArray<string>.Empty
+            );
         }
 
-        public ValueTask<string?> GetStatusAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<string?> GetStatusAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -213,7 +279,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(authorization.Status);
         }
 
-        public ValueTask<string?> GetSubjectAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<string?> GetSubjectAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -221,7 +290,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return new ValueTask<string?>(authorization.Subject);
         }
 
-        public ValueTask<string?> GetTypeAsync(Authorization authorization, CancellationToken cancellationToken)
+        public ValueTask<string?> GetTypeAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -231,14 +303,16 @@ namespace Dawning.Identity.Infra.Data.Stores
 
         public ValueTask<Authorization> InstantiateAsync(CancellationToken cancellationToken)
         {
-            return new ValueTask<Authorization>(new Authorization
-            {
-                Id = Guid.NewGuid(),
-                CreatedAt = DateTime.UtcNow
-            });
+            return new ValueTask<Authorization>(
+                new Authorization { Id = Guid.NewGuid(), CreatedAt = DateTime.UtcNow }
+            );
         }
 
-        public async IAsyncEnumerable<Authorization> ListAsync(int? count, int? offset, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<Authorization> ListAsync(
+            int? count,
+            int? offset,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             var all = await _unitOfWork.Authorization.GetAllAsync();
             var query = all.AsEnumerable();
@@ -255,13 +329,20 @@ namespace Dawning.Identity.Infra.Data.Stores
             }
         }
 
-        public async IAsyncEnumerable<TResult> ListAsync<TState, TResult>(Func<IQueryable<Authorization>, TState, IQueryable<TResult>> query, TState state, [EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<TResult> ListAsync<TState, TResult>(
+            Func<IQueryable<Authorization>, TState, IQueryable<TResult>> query,
+            TState state,
+            [EnumeratorCancellation] CancellationToken cancellationToken
+        )
         {
             await Task.CompletedTask;
             yield break;
         }
 
-        public async ValueTask<long> PruneAsync(DateTimeOffset threshold, CancellationToken cancellationToken)
+        public async ValueTask<long> PruneAsync(
+            DateTimeOffset threshold,
+            CancellationToken cancellationToken
+        )
         {
             var all = await _unitOfWork.Authorization.GetAllAsync();
             var toDelete = all.Where(a => a.CreatedAt < threshold.UtcDateTime).ToList();
@@ -274,16 +355,26 @@ namespace Dawning.Identity.Infra.Data.Stores
             return toDelete.Count;
         }
 
-        public ValueTask SetApplicationIdAsync(Authorization authorization, string? identifier, CancellationToken cancellationToken)
+        public ValueTask SetApplicationIdAsync(
+            Authorization authorization,
+            string? identifier,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
 
-            authorization.ApplicationId = string.IsNullOrEmpty(identifier) ? null : Guid.Parse(identifier);
+            authorization.ApplicationId = string.IsNullOrEmpty(identifier)
+                ? null
+                : Guid.Parse(identifier);
             return default;
         }
 
-        public ValueTask SetCreationDateAsync(Authorization authorization, DateTimeOffset? date, CancellationToken cancellationToken)
+        public ValueTask SetCreationDateAsync(
+            Authorization authorization,
+            DateTimeOffset? date,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -292,19 +383,28 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetPropertiesAsync(Authorization authorization, ImmutableDictionary<string, JsonElement> properties, CancellationToken cancellationToken)
+        public ValueTask SetPropertiesAsync(
+            Authorization authorization,
+            ImmutableDictionary<string, JsonElement> properties,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
 
             authorization.Properties = properties.ToDictionary(
                 p => p.Key,
-                p => p.Value.GetString() ?? string.Empty);
+                p => p.Value.GetString() ?? string.Empty
+            );
 
             return default;
         }
 
-        public ValueTask SetScopesAsync(Authorization authorization, ImmutableArray<string> scopes, CancellationToken cancellationToken)
+        public ValueTask SetScopesAsync(
+            Authorization authorization,
+            ImmutableArray<string> scopes,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -313,7 +413,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetStatusAsync(Authorization authorization, string? status, CancellationToken cancellationToken)
+        public ValueTask SetStatusAsync(
+            Authorization authorization,
+            string? status,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -322,7 +426,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetSubjectAsync(Authorization authorization, string? subject, CancellationToken cancellationToken)
+        public ValueTask SetSubjectAsync(
+            Authorization authorization,
+            string? subject,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -331,7 +439,11 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public ValueTask SetTypeAsync(Authorization authorization, string? type, CancellationToken cancellationToken)
+        public ValueTask SetTypeAsync(
+            Authorization authorization,
+            string? type,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));
@@ -340,7 +452,10 @@ namespace Dawning.Identity.Infra.Data.Stores
             return default;
         }
 
-        public async ValueTask UpdateAsync(Authorization authorization, CancellationToken cancellationToken)
+        public async ValueTask UpdateAsync(
+            Authorization authorization,
+            CancellationToken cancellationToken
+        )
         {
             if (authorization == null)
                 throw new ArgumentNullException(nameof(authorization));

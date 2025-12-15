@@ -8,7 +8,11 @@ namespace Dawning.Identity.Application.Interfaces.Administration
     {
         Task<SystemMetadataDto?> GetAsync(Guid id);
 
-        Task<PagedData<SystemMetadataDto>> GetPagedListAsync(SystemMetadataModel model, int page, int itemsPerPage);
+        Task<PagedData<SystemMetadataDto>> GetPagedListAsync(
+            SystemMetadataModel model,
+            int page,
+            int itemsPerPage
+        );
 
         Task<IEnumerable<SystemMetadataDto>?> GetAllAsync();
 

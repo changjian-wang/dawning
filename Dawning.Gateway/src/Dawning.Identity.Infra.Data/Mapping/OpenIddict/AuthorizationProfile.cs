@@ -1,12 +1,12 @@
-﻿using AutoMapper;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
-using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AutoMapper;
+using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
@@ -15,15 +15,23 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         public AuthorizationProfile()
         {
             CreateMap<AuthorizationEntity, Authorization>(MemberList.Destination)
-                .ForMember(dest => dest.Scopes,
-                    opt => opt.MapFrom(src => DeserializeList(src.ScopesJson)))
-                .ForMember(dest => dest.Properties,
-                    opt => opt.MapFrom(src => DeserializeDictionary(src.PropertiesJson)))
+                .ForMember(
+                    dest => dest.Scopes,
+                    opt => opt.MapFrom(src => DeserializeList(src.ScopesJson))
+                )
+                .ForMember(
+                    dest => dest.Properties,
+                    opt => opt.MapFrom(src => DeserializeDictionary(src.PropertiesJson))
+                )
                 .ReverseMap()
-                .ForMember(dest => dest.ScopesJson,
-                    opt => opt.MapFrom(src => SerializeList(src.Scopes)))
-                .ForMember(dest => dest.PropertiesJson,
-                    opt => opt.MapFrom(src => SerializeDictionary(src.Properties)));
+                .ForMember(
+                    dest => dest.ScopesJson,
+                    opt => opt.MapFrom(src => SerializeList(src.Scopes))
+                )
+                .ForMember(
+                    dest => dest.PropertiesJson,
+                    opt => opt.MapFrom(src => SerializeDictionary(src.Properties))
+                );
         }
 
         private static List<string> DeserializeList(string? json)
