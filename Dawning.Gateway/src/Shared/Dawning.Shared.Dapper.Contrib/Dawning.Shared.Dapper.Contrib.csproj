@@ -3,6 +3,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- 禁用 nullable 警告，因为这是从 Dapper.Contrib 改编的代码 -->
+    <NoWarn>$(NoWarn);CS8600;CS8602;CS8603;CS8604;CS8625</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
