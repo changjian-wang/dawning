@@ -213,6 +213,17 @@ const ADMINISTRATION: AppRouteRecordRaw = {
       },
     },
     {
+      path: 'alert',
+      name: 'AlertManagement',
+      component: () => import('@/views/administration/alert/index.vue'),
+      meta: {
+        locale: 'menu.administration.alertManagement',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-notification',
+      },
+    },
+    {
       path: 'system-config',
       name: 'SystemConfig',
       component: () => import('@/views/administration/system-config/index.vue'),
