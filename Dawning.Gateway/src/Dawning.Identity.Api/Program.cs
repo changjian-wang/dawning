@@ -105,6 +105,12 @@ namespace Dawning.Identity.Api
                 Dawning.Identity.Application.Services.Logging.RequestLoggingService
             >();
 
+            // ===== Backup Service =====
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Administration.IBackupService,
+                Dawning.Identity.Application.Services.Administration.BackupService
+            >();
+
             // ===== CSRF Protection =====
             builder.Services.AddCsrfProtection();
 
