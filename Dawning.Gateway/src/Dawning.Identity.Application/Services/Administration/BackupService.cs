@@ -1,6 +1,3 @@
-using System.Data;
-using System.Text;
-using Dapper;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
@@ -14,14 +11,19 @@ public class BackupService : IBackupService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ISystemConfigService _configService;
+    private readonly IDatabaseExportService _exportService;
     private readonly string _backupPath;
 
-    public BackupService(IUnitOfWork unitOfWork, ISystemConfigService configService)
+    public BackupService(
+        IUnitOfWork unitOfWork,
+        ISystemConfigService configService,
+        IDatabaseExportService exportService)
     {
         _unitOfWork = unitOfWork;
         _configService = configService;
+        _exportService = exportService;
         _backupPath = Path.Combine(AppContext.BaseDirectory, "Backups");
-        
+
         // 确保备份目录存在
         if (!Directory.Exists(_backupPath))
         {
@@ -44,19 +46,22 @@ public class BackupService : IBackupService
     {
         var startTime = DateTime.UtcNow;
         options ??= new BackupOptions();
-        
+
         try
         {
             var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
             var fileName = $"backup_{timestamp}.sql";
             var filePath = Path.Combine(_backupPath, fileName);
 
-            // 导出数据库到 SQL 文件
-            var sqlContent = await ExportToSqlAsync(options);
+            // 构建排除表集合
+            var excludeTables = BuildExcludeTableSet(options);
+
+            // 使用导出服务导出数据库
+            var sqlContent = await _exportService.ExportToSqlAsync(_unitOfWork.Connection, excludeTables);
             await File.WriteAllTextAsync(filePath, sqlContent);
 
             var fileInfo = new FileInfo(filePath);
-            
+
             var record = new BackupRecord
             {
                 Id = Guid.NewGuid(),
@@ -71,7 +76,7 @@ public class BackupService : IBackupService
             };
 
             await _unitOfWork.BackupRecord.CreateAsync(record);
-            
+
             return new BackupResult
             {
                 Success = true,
@@ -162,134 +167,44 @@ public class BackupService : IBackupService
     /// </summary>
     public async Task UpdateConfigurationAsync(BackupConfiguration config)
     {
-        await _configService.SetValueAsync("backup", "retention_days", config.RetentionDays.ToString(), "Backup retention days");
-        await _configService.SetValueAsync("backup", "auto_enabled", config.AutoBackupEnabled.ToString().ToLower(), "Auto backup enabled");
-        await _configService.SetValueAsync("backup", "auto_cron", config.AutoBackupCron, "Auto backup cron expression");
+        await _configService.SetValueAsync(
+            "backup",
+            "retention_days",
+            config.RetentionDays.ToString(),
+            "Backup retention days"
+        );
+        await _configService.SetValueAsync(
+            "backup",
+            "auto_enabled",
+            config.AutoBackupEnabled.ToString().ToLower(),
+            "Auto backup enabled"
+        );
+        await _configService.SetValueAsync(
+            "backup",
+            "auto_cron",
+            config.AutoBackupCron,
+            "Auto backup cron expression"
+        );
     }
 
     /// <summary>
-    /// 导出数据库到 SQL 格式
-    /// 注意：此方法需要直接访问数据库连接以获取表结构和数据
+    /// 构建排除表集合
     /// </summary>
-    private async Task<string> ExportToSqlAsync(BackupOptions options)
+    private static HashSet<string> BuildExcludeTableSet(BackupOptions options)
     {
-        var sb = new StringBuilder();
-        sb.AppendLine("-- Database Backup");
-        sb.AppendLine($"-- Generated at: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
-        sb.AppendLine($"-- Backup Type: {options.BackupType}");
-        sb.AppendLine();
+        var excludeTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        // 使用 UnitOfWork 的连接进行数据库架构导出
-        var connection = _unitOfWork.Connection;
-        await ExportDatabaseAsync(connection, sb, options);
-
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// 导出数据库
-    /// </summary>
-    private async Task ExportDatabaseAsync(IDbConnection connection, StringBuilder sb, BackupOptions options)
-    {
-        var wasOpen = connection.State == ConnectionState.Open;
-        if (!wasOpen)
+        if (!options.IncludeLogs)
         {
-            connection.Open();
+            excludeTables.Add("audit_logs");
+            excludeTables.Add("system_logs");
         }
 
-        try
+        if (!options.IncludeConfigs)
         {
-            // 获取所有表 - 使用 Dapper
-            var tables = (await connection.QueryAsync<string>("SHOW TABLES")).ToList();
-
-            // 过滤表
-            var excludeTables = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (!options.IncludeLogs)
-            {
-                excludeTables.Add("audit_logs");
-                excludeTables.Add("system_logs");
-            }
-            if (!options.IncludeConfigs)
-            {
-                excludeTables.Add("system_configs");
-            }
-
-            foreach (var table in tables.Where(t => !excludeTables.Contains(t)))
-            {
-                // 获取建表语句
-                var createTableResult = await connection.QueryFirstOrDefaultAsync<dynamic>($"SHOW CREATE TABLE `{table}`");
-                if (createTableResult != null)
-                {
-                    sb.AppendLine($"-- Table structure for `{table}`");
-                    sb.AppendLine($"DROP TABLE IF EXISTS `{table}`;");
-                    
-                    // 动态获取第二列（Create Table 语句）
-                    var dict = (IDictionary<string, object>)createTableResult;
-                    var createStatement = dict.Values.Skip(1).FirstOrDefault()?.ToString();
-                    if (!string.IsNullOrEmpty(createStatement))
-                    {
-                        sb.AppendLine(createStatement + ";");
-                    }
-                    sb.AppendLine();
-                }
-
-                // 导出数据
-                var rows = await connection.QueryAsync($"SELECT * FROM `{table}`");
-                var rowList = rows.ToList();
-                
-                if (rowList.Any())
-                {
-                    sb.AppendLine($"-- Data for `{table}`");
-                    
-                    foreach (var row in rowList)
-                    {
-                        var dict = (IDictionary<string, object>)row;
-                        var columns = string.Join(", ", dict.Keys.Select(k => $"`{k}`"));
-                        var values = string.Join(", ", dict.Values.Select(FormatSqlValue));
-                        sb.AppendLine($"INSERT INTO `{table}` ({columns}) VALUES ({values});");
-                    }
-                    sb.AppendLine();
-                }
-            }
+            excludeTables.Add("system_configs");
         }
-        finally
-        {
-            if (!wasOpen)
-            {
-                connection.Close();
-            }
-        }
-    }
 
-    /// <summary>
-    /// 格式化 SQL 值
-    /// </summary>
-    private static string FormatSqlValue(object? value)
-    {
-        if (value == null || value == DBNull.Value)
-            return "NULL";
-
-        return value switch
-        {
-            string s => $"'{EscapeSqlString(s)}'",
-            DateTime dt => $"'{dt:yyyy-MM-dd HH:mm:ss}'",
-            Guid g => $"'{g}'",
-            bool b => b ? "1" : "0",
-            byte[] bytes => $"0x{BitConverter.ToString(bytes).Replace("-", "")}",
-            _ => value.ToString() ?? "NULL"
-        };
-    }
-
-    /// <summary>
-    /// 转义 SQL 字符串
-    /// </summary>
-    private static string EscapeSqlString(string value)
-    {
-        return value
-            .Replace("\\", "\\\\")
-            .Replace("'", "\\'")
-            .Replace("\r", "\\r")
-            .Replace("\n", "\\n")
-            .Replace("\t", "\\t");
+        return excludeTables;
     }
 }

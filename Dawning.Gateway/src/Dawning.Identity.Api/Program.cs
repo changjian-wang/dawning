@@ -118,6 +118,10 @@ namespace Dawning.Identity.Api
 
             // ===== Backup Service =====
             builder.Services.AddScoped<
+                Dawning.Identity.Application.Services.Administration.IDatabaseExportService,
+                Dawning.Identity.Application.Services.Administration.DatabaseExportService
+            >();
+            builder.Services.AddScoped<
                 Dawning.Identity.Application.Interfaces.Administration.IBackupService,
                 Dawning.Identity.Application.Services.Administration.BackupService
             >();
