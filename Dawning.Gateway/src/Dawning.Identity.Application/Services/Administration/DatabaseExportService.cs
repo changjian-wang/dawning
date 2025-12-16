@@ -28,7 +28,10 @@ public class DatabaseExportService : IDatabaseExportService
     /// <summary>
     /// 导出数据库到 SQL 格式
     /// </summary>
-    public async Task<string> ExportToSqlAsync(IDbConnection connection, HashSet<string>? excludeTables = null)
+    public async Task<string> ExportToSqlAsync(
+        IDbConnection connection,
+        HashSet<string>? excludeTables = null
+    )
     {
         var sb = new StringBuilder();
         sb.AppendLine("-- Database Backup");
@@ -83,9 +86,11 @@ public class DatabaseExportService : IDatabaseExportService
                 // 不同数据库的列名可能不同，尝试常见的列名
                 var tableName = GetTableNameFromRow(row);
 
-                if (!string.IsNullOrEmpty(tableName) && 
-                    !excludeTables.Contains(tableName) &&
-                    !IsSystemTable(tableName))
+                if (
+                    !string.IsNullOrEmpty(tableName)
+                    && !excludeTables.Contains(tableName)
+                    && !IsSystemTable(tableName)
+                )
                 {
                     tables.Add(tableName);
                 }
@@ -129,7 +134,11 @@ public class DatabaseExportService : IDatabaseExportService
     /// <summary>
     /// 导出表数据（使用 Dapper，跨数据库兼容）
     /// </summary>
-    private async Task ExportTableDataAsync(IDbConnection connection, string tableName, StringBuilder sb)
+    private async Task ExportTableDataAsync(
+        IDbConnection connection,
+        string tableName,
+        StringBuilder sb
+    )
     {
         // 使用参数化的表名（注意：表名无法参数化，但这里的表名来自 GetSchema，是安全的）
         var quotedTable = QuoteIdentifier(tableName, connection);
@@ -143,7 +152,10 @@ public class DatabaseExportService : IDatabaseExportService
             foreach (var row in rowList)
             {
                 var dict = (IDictionary<string, object>)row;
-                var columns = string.Join(", ", dict.Keys.Select(k => QuoteIdentifier(k, connection)));
+                var columns = string.Join(
+                    ", ",
+                    dict.Keys.Select(k => QuoteIdentifier(k, connection))
+                );
                 var values = string.Join(", ", dict.Values.Select(FormatSqlValue));
                 sb.AppendLine($"INSERT INTO {quotedTable} ({columns}) VALUES ({values});");
             }
@@ -183,7 +195,7 @@ public class DatabaseExportService : IDatabaseExportService
             Guid g => $"'{g}'",
             bool b => b ? "1" : "0",
             byte[] bytes => $"0x{BitConverter.ToString(bytes).Replace("-", "")}",
-            _ => value.ToString() ?? "NULL"
+            _ => value.ToString() ?? "NULL",
         };
     }
 
@@ -192,8 +204,6 @@ public class DatabaseExportService : IDatabaseExportService
     /// </summary>
     private static string EscapeSqlString(string value)
     {
-        return value
-            .Replace("\\", "\\\\")
-            .Replace("'", "''"); // SQL 标准转义
+        return value.Replace("\\", "\\\\").Replace("'", "''"); // SQL 标准转义
     }
 }

@@ -17,7 +17,8 @@ public class BackupService : IBackupService
     public BackupService(
         IUnitOfWork unitOfWork,
         ISystemConfigService configService,
-        IDatabaseExportService exportService)
+        IDatabaseExportService exportService
+    )
     {
         _unitOfWork = unitOfWork;
         _configService = configService;
@@ -57,7 +58,10 @@ public class BackupService : IBackupService
             var excludeTables = BuildExcludeTableSet(options);
 
             // 使用导出服务导出数据库
-            var sqlContent = await _exportService.ExportToSqlAsync(_unitOfWork.Connection, excludeTables);
+            var sqlContent = await _exportService.ExportToSqlAsync(
+                _unitOfWork.Connection,
+                excludeTables
+            );
             await File.WriteAllTextAsync(filePath, sqlContent);
 
             var fileInfo = new FileInfo(filePath);
@@ -72,7 +76,7 @@ public class BackupService : IBackupService
                 BackupType = options.BackupType,
                 IsManual = options.IsManual,
                 Status = "success",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             await _unitOfWork.BackupRecord.CreateAsync(record);
@@ -81,7 +85,7 @@ public class BackupService : IBackupService
             {
                 Success = true,
                 Backup = record,
-                DurationSeconds = (DateTime.UtcNow - startTime).TotalSeconds
+                DurationSeconds = (DateTime.UtcNow - startTime).TotalSeconds,
             };
         }
         catch (Exception ex)
@@ -90,7 +94,7 @@ public class BackupService : IBackupService
             {
                 Success = false,
                 ErrorMessage = ex.Message,
-                DurationSeconds = (DateTime.UtcNow - startTime).TotalSeconds
+                DurationSeconds = (DateTime.UtcNow - startTime).TotalSeconds,
             };
         }
     }
@@ -158,7 +162,7 @@ public class BackupService : IBackupService
         {
             RetentionDays = int.TryParse(retentionDays, out var days) ? days : 30,
             AutoBackupEnabled = autoBackupEnabled?.ToLower() == "true",
-            AutoBackupCron = autoBackupCron ?? "0 2 * * *" // 默认每天凌晨2点
+            AutoBackupCron = autoBackupCron ?? "0 2 * * *", // 默认每天凌晨2点
         };
     }
 
