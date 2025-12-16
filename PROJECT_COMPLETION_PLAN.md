@@ -33,6 +33,42 @@
 - `src/views/administration/alert/locale/en-US.ts` - 英文国际化
 - 路由配置更新
 
+#### 3. 统一缓存服务 ✅
+**缓存接口**:
+- `ICacheService.cs` - 统一缓存服务接口
+  - Cache-Aside 模式：GetOrSetAsync
+  - 缓存穿透防护：GetOrSetWithNullProtectionAsync
+  - 缓存键生成器：CacheKeys 静态类
+  - 预设缓存策略：Short(1分钟)/Default(5分钟)/Medium(15分钟)/Long(1小时)
+
+**缓存实现**:
+- `DistributedCacheService.cs` - 基于 IDistributedCache 实现
+  - 支持 Redis 和内存缓存自动切换
+  - 防止缓存击穿的锁机制（SemaphoreSlim）
+  - JSON 序列化/反序列化
+
+**服务集成**:
+- `SystemConfigService.cs` - 配置读取添加 15 分钟缓存，写入自动失效缓存
+
+#### 4. API 响应缓存 ✅
+**缓存中间件**:
+- `ResponseCacheMiddleware.cs` - API 响应缓存中间件
+  - 只缓存 GET 请求的成功响应
+  - 支持按用户区分、按查询参数区分
+  - X-Cache 头标识缓存命中/未命中
+
+**缓存特性**:
+- `CacheResponseAttribute` - 标记需要缓存的端点
+- `NoCacheAttribute` - 禁用缓存
+- `InvalidateCacheAttribute` - 缓存失效标记
+
+**性能优化的端点**:
+- `/api/monitoring/statistics` - 缓存 60 秒
+- `/api/monitoring/performance` - 缓存 30 秒
+- `/api/monitoring/realtime` - 缓存 15 秒
+- `/api/monitoring/user-statistics` - 缓存 120 秒
+- `/api/monitoring/recent-active-users` - 缓存 60 秒
+
 ---
 
 ## 📋 2025-12-17 会话完成记录
@@ -450,15 +486,15 @@
   - ✅ 实现数据库迁移脚本（migrate-db.ps1）
   - 执行 V2_remove_soft_delete.sql 迁移（待用户执行）
 
-- [ ] **缓存策略**
+- [x] **缓存策略** ✅
   - ✅ 实现 Redis 缓存（Token黑名单已支持）
   - ✅ 实现分布式缓存（自动回退到内存缓存）
-  - 缓存失效策略（待完善）
+  - ✅ 缓存失效策略（ICacheService + 自动失效）
 
-- [ ] **性能优化**
-  - API 响应时间优化
+- [x] **性能优化** ✅
+  - ✅ API 响应缓存（ResponseCacheMiddleware）
   - ✅ 数据库查询优化（索引已添加）
-  - 前端资源优化（CDN、压缩）
+  - 前端资源优化（CDN、压缩）- 待完成
 
 - [x] **用户登录状态管理** ✅
   - ✅ 实现最后登录时间更新（UpdateLastLoginAsync）
