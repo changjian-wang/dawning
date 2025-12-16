@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1B6BAD2E-C431-4147-985A-567781A1A7DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Gateway.Api", "src\Dawning.Gateway.Api\Dawning.Gateway.Api.csproj", "{F313BA0E-57FD-4762-9546-A812664AB2D5}"
@@ -42,8 +40,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Identity.Infra.CrossCutting.Mapping", "src\Dawning.Identity.Infra.CrossCutting.Mapping\Dawning.Identity.Infra.CrossCutting.Mapping.csproj", "{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Shared.Utils", "src\Shared\Dawning.Shared.Utils\Dawning.Shared.Utils.csproj", "{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Identity.Api.Tests", "src\Dawning.Identity.Api.Tests\Dawning.Identity.Api.Tests.csproj", "{2A272F72-6C06-41AF-805E-27B6C644660A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dawning.Identity.Application.Tests", "src\Dawning.Identity.Application.Tests\Dawning.Identity.Application.Tests.csproj", "{2FBA0F7C-B020-48AF-B1C4-1E41DF9FF708}"
 EndProject
@@ -261,18 +257,6 @@ Global
 		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Release|x64.Build.0 = Release|Any CPU
 		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Release|x86.ActiveCfg = Release|Any CPU
 		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68}.Release|x86.Build.0 = Release|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Debug|x64.Build.0 = Debug|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Debug|x86.Build.0 = Debug|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Release|x64.ActiveCfg = Release|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Release|x64.Build.0 = Release|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Release|x86.ActiveCfg = Release|Any CPU
-		{2A272F72-6C06-41AF-805E-27B6C644660A}.Release|x86.Build.0 = Release|Any CPU
 		{2FBA0F7C-B020-48AF-B1C4-1E41DF9FF708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2FBA0F7C-B020-48AF-B1C4-1E41DF9FF708}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FBA0F7C-B020-48AF-B1C4-1E41DF9FF708}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -308,7 +292,6 @@ Global
 		{F0DCC629-8CD0-472B-B53B-681697089B44} = {1B6BAD2E-C431-4147-985A-567781A1A7DC}
 		{85CEE768-3ACC-48FE-9E02-F1C8E2DA7207} = {1B6BAD2E-C431-4147-985A-567781A1A7DC}
 		{F84ABED0-11BD-449C-ABEE-30C40C5DEC68} = {78363918-AEEE-4B17-92DA-24D66DDC96CF}
-		{2A272F72-6C06-41AF-805E-27B6C644660A} = {1B6BAD2E-C431-4147-985A-567781A1A7DC}
 		{2FBA0F7C-B020-48AF-B1C4-1E41DF9FF708} = {1B6BAD2E-C431-4147-985A-567781A1A7DC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
