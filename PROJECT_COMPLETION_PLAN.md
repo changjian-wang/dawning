@@ -344,31 +344,32 @@
 
 ---
 
-#### 2.3 数据完整性和性能 ⭐⭐
+#### 2.3 数据完整性和性能 ⭐⭐ ✅
 **优先级**: 🟡 中
+**完成日期**: 2025-12-16
 
 **任务列表**:
-- [ ] **数据库优化**
-  - 添加必要的索引
-  - 实现数据库迁移脚本（FluentMigrator 或 EF Migrations）
-  - 执行 V2_remove_soft_delete.sql 迁移
+- [x] **数据库优化** ✅
+  - ✅ 添加必要的索引（V7_add_performance_indexes.sql）
+  - ✅ 实现数据库迁移脚本（migrate-db.ps1）
+  - 执行 V2_remove_soft_delete.sql 迁移（待用户执行）
 
 - [ ] **缓存策略**
-  - 实现 Redis 缓存
-  - 实现分布式缓存
-  - 缓存失效策略
+  - ✅ 实现 Redis 缓存（Token黑名单已支持）
+  - ✅ 实现分布式缓存（自动回退到内存缓存）
+  - 缓存失效策略（待完善）
 
 - [ ] **性能优化**
   - API 响应时间优化
-  - 数据库查询优化
+  - ✅ 数据库查询优化（索引已添加）
   - 前端资源优化（CDN、压缩）
 
-- [ ] **用户登录状态管理**
-  - TODO: `UserService.cs:318` - 实现最后登录时间更新
-  - 解决 UnitOfWork 事务问题
-  - 实现在线用户统计
+- [x] **用户登录状态管理** ✅
+  - ✅ 实现最后登录时间更新（UpdateLastLoginAsync）
+  - ✅ 用户统计 API（GetUserStatisticsAsync）
+  - ✅ 实现在线用户统计（GetRecentActiveUsersAsync）
 
-**预计时间**: 5-7天
+**预计时间**: 5-7天 → 核心功能已完成
 
 ---
 
