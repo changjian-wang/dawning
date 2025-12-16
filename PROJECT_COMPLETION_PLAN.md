@@ -1,8 +1,37 @@
 # Dawning 网关管理系统 - 完成计划
 
 **制定日期**: 2025-12-08  
-**最后更新**: 2025-12-17  
+**最后更新**: 2025-12-18  
 **当前状态**: 核心功能已实现，安全加固已完成，生产化准备完毕
+
+---
+
+## 📋 2025-12-18 会话完成记录
+
+### 本次会话完成的功能
+
+#### 1. 告警服务重构 ✅
+**Repository 模式迁移**（后端禁止直接写 SQL）:
+- `AlertEntities.cs` - 数据库实体类（AlertRuleEntity、AlertHistoryEntity）
+- `AlertMappers.cs` - 实体/模型映射扩展方法
+- `AlertRuleRepository.cs` - 使用 Builder<T>() 模式重写
+- `AlertHistoryRepository.cs` - 使用 Builder<T>() 模式重写
+- `AlertService.cs` - 完全移除 SQL，使用 UnitOfWork 仓储
+
+**测试验证**:
+- 52 个单元测试全部通过
+- 0 编译警告、0 错误
+
+#### 2. 告警管理前端 ✅
+**新增文件**:
+- `src/api/alert.ts` - API 客户端（规则/历史 CRUD）
+- `src/views/administration/alert/index.vue` - 告警管理页面
+  - 统计卡片（总规则、启用规则、今日告警、未解决告警）
+  - 规则管理 Tab（CRUD、启用/禁用）
+  - 历史查看 Tab（筛选、确认、解决）
+- `src/views/administration/alert/locale/zh-CN.ts` - 中文国际化
+- `src/views/administration/alert/locale/en-US.ts` - 英文国际化
+- 路由配置更新
 
 ---
 
@@ -347,7 +376,7 @@
   - ✅ 实现请求日志记录（数据库存储）
   - ✅ 实现性能监控面板（MonitoringController）
   - ✅ 请求统计和分析（状态码分布、Top路径、响应时间）
-  - 告警规则配置（待实现）
+  - ✅ 告警规则配置（AlertService、AlertController、后台检查服务）
 
 **预计时间**: 7-10天 → 已完成核心功能
 
