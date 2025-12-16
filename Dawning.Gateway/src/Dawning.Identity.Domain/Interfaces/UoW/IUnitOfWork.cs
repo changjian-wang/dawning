@@ -25,6 +25,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         ISystemLogRepository SystemLog { get; }
         IPermissionRepository Permission { get; }
         IRolePermissionRepository RolePermission { get; }
+        IBackupRecordRepository BackupRecord { get; }
 
         // OpenIddict
         IApplicationRepository Application { get; }

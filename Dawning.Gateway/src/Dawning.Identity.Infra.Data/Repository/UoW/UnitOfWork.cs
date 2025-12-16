@@ -37,6 +37,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             SystemLog = new SystemLogRepository(_context);
             Permission = new PermissionRepository(_context);
             RolePermission = new RolePermissionRepository(_context);
+            BackupRecord = new BackupRecordRepository(_context);
 
             // OpenIddict
             Application = new ApplicationRepository(_context);
@@ -72,6 +73,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public ISystemLogRepository SystemLog { get; }
         public IPermissionRepository Permission { get; }
         public IRolePermissionRepository RolePermission { get; }
+        public IBackupRecordRepository BackupRecord { get; }
 
         // OpenIddict
         public IApplicationRepository Application { get; }
