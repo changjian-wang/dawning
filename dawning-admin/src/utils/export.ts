@@ -103,6 +103,20 @@ export function exportToCSV(options: ExportOptions): void {
 }
 
 /**
+ * HTML 转义
+ */
+function escapeHtml(str: string): string {
+  const htmlEntities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return str.replace(/[&<>"']/g, (char) => htmlEntities[char]);
+}
+
+/**
  * 导出为 Excel 文件（简单 HTML 表格格式，Excel 可直接打开）
  * 注意：这是一个简易实现，如需更复杂的 Excel 功能请使用 xlsx 库
  */
@@ -147,7 +161,9 @@ export function exportToExcel(options: ExportOptions): void {
       <table>
         <thead>
           <tr>
-            ${columns.map((col) => `<th>${escapeHtml(col.title)}</th>`).join('')}
+            ${columns
+              .map((col) => `<th>${escapeHtml(col.title)}</th>`)
+              .join('')}
           </tr>
         </thead>
         <tbody>
@@ -186,20 +202,6 @@ export function exportToExcel(options: ExportOptions): void {
 }
 
 /**
- * HTML 转义
- */
-function escapeHtml(str: string): string {
-  const htmlEntities: Record<string, string> = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  };
-  return str.replace(/[&<>"']/g, (char) => htmlEntities[char]);
-}
-
-/**
  * 通用导出函数
  */
 export function exportData(options: ExportOptions): void {
@@ -217,7 +219,9 @@ export function exportData(options: ExportOptions): void {
 /**
  * 格式化日期时间
  */
-export function formatDateTime(value: string | Date | null | undefined): string {
+export function formatDateTime(
+  value: string | Date | null | undefined
+): string {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';

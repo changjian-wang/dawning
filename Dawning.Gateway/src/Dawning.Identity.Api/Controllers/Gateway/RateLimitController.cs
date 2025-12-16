@@ -1,5 +1,5 @@
-using Dawning.Identity.Application.Dtos.Gateway;
 using Dawning.Identity.Api.Services;
+using Dawning.Identity.Application.Dtos.Gateway;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,7 +66,10 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         /// </summary>
         [HttpPut("policies/{id}")]
         [Authorize(Policy = "SystemAdmin")]
-        public async Task<IActionResult> UpdatePolicy(Guid id, [FromBody] UpdateRateLimitPolicyDto dto)
+        public async Task<IActionResult> UpdatePolicy(
+            Guid id,
+            [FromBody] UpdateRateLimitPolicyDto dto
+        )
         {
             dto.Id = id;
             var result = await _rateLimitService.UpdatePolicyAsync(dto);

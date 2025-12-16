@@ -35,17 +35,19 @@ namespace Dawning.Identity.Api.Middleware
             headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()";
 
             // Content-Security-Policy: 内容安全策略（仅用于 Swagger UI 等页面）
-            if (context.Request.Path.StartsWithSegments("/swagger") || 
-                context.Request.Path == "/" ||
-                context.Request.Path.StartsWithSegments("/index.html"))
+            if (
+                context.Request.Path.StartsWithSegments("/swagger")
+                || context.Request.Path == "/"
+                || context.Request.Path.StartsWithSegments("/index.html")
+            )
             {
-                headers["Content-Security-Policy"] = 
-                    "default-src 'self'; " +
-                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-                    "style-src 'self' 'unsafe-inline'; " +
-                    "img-src 'self' data: https:; " +
-                    "font-src 'self' data:; " +
-                    "connect-src 'self';";
+                headers["Content-Security-Policy"] =
+                    "default-src 'self'; "
+                    + "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+                    + "style-src 'self' 'unsafe-inline'; "
+                    + "img-src 'self' data: https:; "
+                    + "font-src 'self' data:; "
+                    + "connect-src 'self';";
             }
 
             await _next(context);
@@ -69,19 +71,19 @@ namespace Dawning.Identity.Api.Middleware
         public async Task InvokeAsync(HttpContext context)
         {
             // 为 GET 请求生成 CSRF Token（用于前端 SPA 获取）
-            if (_antiforgery != null && 
-                context.Request.Method == HttpMethods.Get &&
-                context.Request.Path == "/api/auth/csrf-token")
+            if (
+                _antiforgery != null
+                && context.Request.Method == HttpMethods.Get
+                && context.Request.Path == "/api/auth/csrf-token"
+            )
             {
                 var tokens = _antiforgery.GetAndStoreTokens(context);
                 context.Response.Headers["X-CSRF-TOKEN"] = tokens.RequestToken;
-                
+
                 context.Response.ContentType = "application/json";
-                await context.Response.WriteAsJsonAsync(new 
-                { 
-                    token = tokens.RequestToken,
-                    headerName = tokens.HeaderName 
-                });
+                await context.Response.WriteAsJsonAsync(
+                    new { token = tokens.RequestToken, headerName = tokens.HeaderName }
+                );
                 return;
             }
 

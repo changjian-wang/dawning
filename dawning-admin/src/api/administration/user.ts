@@ -190,9 +190,11 @@ export const user = {
     },
 
     // 批量删除用户
-    async batchDelete(
-      ids: string[]
-    ): Promise<{ successCount: number; failedCount: number; failedIds: string[] }> {
+    async batchDelete(ids: string[]): Promise<{
+      successCount: number;
+      failedCount: number;
+      failedIds: string[];
+    }> {
       const response = await axios.delete('/api/user/batch', { data: { ids } });
       return response.data;
     },
@@ -201,7 +203,11 @@ export const user = {
     async batchUpdateStatus(
       ids: string[],
       isActive: boolean
-    ): Promise<{ successCount: number; failedCount: number; failedIds: string[] }> {
+    ): Promise<{
+      successCount: number;
+      failedCount: number;
+      failedIds: string[];
+    }> {
       const response = await axios.post('/api/user/batch/status', {
         ids,
         isActive,

@@ -73,8 +73,8 @@ namespace Dawning.Identity.Api
             }
             else
             {
-                // 使用内存缓存作为回退
-                builder.Services.AddMemoryCache();
+                // 使用内存分布式缓存作为回退
+                builder.Services.AddDistributedMemoryCache();
                 builder.Services.AddScoped<
                     Dawning.Identity.Application.Interfaces.Token.ITokenBlacklistService,
                     Dawning.Identity.Application.Services.Token.InMemoryTokenBlacklistService

@@ -24,7 +24,8 @@ export default {
   'gateway.cluster.description': '描述',
   'gateway.cluster.descriptionPlaceholder': '请输入集群描述',
   'gateway.cluster.destinations': '目标地址',
-  'gateway.cluster.destinationsPlaceholder': 'JSON格式，如: {"dest1":{"Address":"http://localhost:5000"}}',
+  'gateway.cluster.destinationsPlaceholder':
+    'JSON格式，如: {"dest1":{"Address":"http://localhost:5000"}}',
   'gateway.cluster.destinationsRequired': '请输入目标地址',
   'gateway.cluster.isEnabled': '启用状态',
 

@@ -80,10 +80,18 @@ export class ApiResource implements IApiResource {
 
 export const apiResourceApi = {
   // 获取分页列表
-  async getPagedList(model: IApiResourceModel, page: number, pageSize: number): Promise<IPagedData<IApiResource>> {
-    const response = await axios.post('/api/openiddict/api-resource/paged', model, {
-      params: { page, pageSize },
-    });
+  async getPagedList(
+    model: IApiResourceModel,
+    page: number,
+    pageSize: number
+  ): Promise<IPagedData<IApiResource>> {
+    const response = await axios.post(
+      '/api/openiddict/api-resource/paged',
+      model,
+      {
+        params: { page, pageSize },
+      }
+    );
     const { items, totalCount, pageIndex, pageSize: size } = response.data.data;
     return { items, totalCount, pageIndex, pageSize: size };
   },
@@ -102,7 +110,10 @@ export const apiResourceApi = {
 
   // 更新
   async update(id: string, model: Partial<IApiResource>): Promise<boolean> {
-    const response = await axios.put(`/api/openiddict/api-resource/${id}`, model);
+    const response = await axios.put(
+      `/api/openiddict/api-resource/${id}`,
+      model
+    );
     return response.data.data;
   },
 
@@ -112,4 +123,3 @@ export const apiResourceApi = {
     return response.data.data;
   },
 };
-

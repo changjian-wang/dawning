@@ -256,5 +256,85 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             var result = await builder.AsListAsync();
             return result.Any();
         }
+
+        /// <summary>
+        /// 获取用户锁定结束时间（如果处于锁定状态）
+        /// </summary>
+        public async Task<DateTime?> GetLockoutEndAsync(string username)
+        {
+            var user = await GetByUsernameAsync(username);
+            if (user == null || !user.LockoutEnabled || user.LockoutEnd == null)
+            {
+                return null;
+            }
+
+            return user.LockoutEnd > DateTime.UtcNow ? user.LockoutEnd : null;
+        }
+
+        /// <summary>
+        /// 记录登录失败并返回更新后的状态
+        /// </summary>
+        public async Task<(int FailedCount, bool IsLockedOut, DateTime? LockoutEnd)> RecordFailedLoginAsync(
+            string username,
+            int maxFailedAttempts,
+            int lockoutDurationMinutes
+        )
+        {
+            var user = await GetByUsernameAsync(username);
+            if (user == null)
+            {
+                return (0, false, null);
+            }
+
+            user.FailedLoginCount++;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // 检查是否需要锁定
+            if (user.FailedLoginCount >= maxFailedAttempts && user.LockoutEnabled)
+            {
+                user.LockoutEnd = DateTime.UtcNow.AddMinutes(lockoutDurationMinutes);
+            }
+
+            await UpdateAsync(user);
+
+            var isLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd > DateTime.UtcNow;
+            return (user.FailedLoginCount, isLockedOut, user.LockoutEnd);
+        }
+
+        /// <summary>
+        /// 重置登录失败计数
+        /// </summary>
+        public async Task ResetFailedLoginCountAsync(string username)
+        {
+            var user = await GetByUsernameAsync(username);
+            if (user == null)
+            {
+                return;
+            }
+
+            user.FailedLoginCount = 0;
+            user.LockoutEnd = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await UpdateAsync(user);
+        }
+
+        /// <summary>
+        /// 解锁用户账户
+        /// </summary>
+        public async Task UnlockUserAsync(Guid userId)
+        {
+            var user = await GetAsync(userId);
+            if (user == null)
+            {
+                return;
+            }
+
+            user.FailedLoginCount = 0;
+            user.LockoutEnd = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await UpdateAsync(user);
+        }
     }
 }

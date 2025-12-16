@@ -95,10 +95,7 @@ export const healthApi = {
   },
 
   // 检查指定 URL 的健康状态
-  async checkService(
-    name: string,
-    url: string
-  ): Promise<ServiceStatus> {
+  async checkService(name: string, url: string): Promise<ServiceStatus> {
     const startTime = Date.now();
     try {
       await axios.get(url, { timeout: 5000 });

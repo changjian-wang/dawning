@@ -54,9 +54,18 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// </summary>
         [HttpPost("{group}/{key}")]
         [Authorize(Policy = "SystemAdmin")]
-        public async Task<IActionResult> SetValue(string group, string key, [FromBody] SetConfigRequest request)
+        public async Task<IActionResult> SetValue(
+            string group,
+            string key,
+            [FromBody] SetConfigRequest request
+        )
         {
-            var result = await _systemConfigService.SetValueAsync(group, key, request.Value, request.Description);
+            var result = await _systemConfigService.SetValueAsync(
+                group,
+                key,
+                request.Value,
+                request.Description
+            );
             return Ok(new { success = result });
         }
 
@@ -100,42 +109,157 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> InitDefaults()
         {
             // 系统配置
-            await _systemConfigService.SetValueAsync("System", "AppName", "Dawning Gateway", "应用名称");
+            await _systemConfigService.SetValueAsync(
+                "System",
+                "AppName",
+                "Dawning Gateway",
+                "应用名称"
+            );
             await _systemConfigService.SetValueAsync("System", "AppVersion", "1.0.0", "应用版本");
-            await _systemConfigService.SetValueAsync("System", "DefaultLanguage", "zh-CN", "默认语言");
-            await _systemConfigService.SetValueAsync("System", "TimeZone", "Asia/Shanghai", "默认时区");
+            await _systemConfigService.SetValueAsync(
+                "System",
+                "DefaultLanguage",
+                "zh-CN",
+                "默认语言"
+            );
+            await _systemConfigService.SetValueAsync(
+                "System",
+                "TimeZone",
+                "Asia/Shanghai",
+                "默认时区"
+            );
 
             // 安全配置
-            await _systemConfigService.SetValueAsync("Security", "PasswordMinLength", "8", "密码最小长度");
-            await _systemConfigService.SetValueAsync("Security", "PasswordRequireDigit", "true", "密码需要数字");
-            await _systemConfigService.SetValueAsync("Security", "PasswordRequireLowercase", "true", "密码需要小写字母");
-            await _systemConfigService.SetValueAsync("Security", "PasswordRequireUppercase", "true", "密码需要大写字母");
-            await _systemConfigService.SetValueAsync("Security", "PasswordRequireNonAlphanumeric", "false", "密码需要特殊字符");
-            await _systemConfigService.SetValueAsync("Security", "LockoutMaxAttempts", "5", "锁定前最大尝试次数");
-            await _systemConfigService.SetValueAsync("Security", "LockoutDurationMinutes", "15", "锁定持续时间（分钟）");
-            await _systemConfigService.SetValueAsync("Security", "AccessTokenLifetimeMinutes", "60", "访问令牌有效期（分钟）");
-            await _systemConfigService.SetValueAsync("Security", "RefreshTokenLifetimeDays", "7", "刷新令牌有效期（天）");
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "PasswordMinLength",
+                "8",
+                "密码最小长度"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "PasswordRequireDigit",
+                "true",
+                "密码需要数字"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "PasswordRequireLowercase",
+                "true",
+                "密码需要小写字母"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "PasswordRequireUppercase",
+                "true",
+                "密码需要大写字母"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "PasswordRequireNonAlphanumeric",
+                "false",
+                "密码需要特殊字符"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "LockoutMaxAttempts",
+                "5",
+                "锁定前最大尝试次数"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "LockoutDurationMinutes",
+                "15",
+                "锁定持续时间（分钟）"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "AccessTokenLifetimeMinutes",
+                "60",
+                "访问令牌有效期（分钟）"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Security",
+                "RefreshTokenLifetimeDays",
+                "7",
+                "刷新令牌有效期（天）"
+            );
 
             // 邮件配置
-            await _systemConfigService.SetValueAsync("Email", "SmtpHost", "smtp.example.com", "SMTP服务器地址");
+            await _systemConfigService.SetValueAsync(
+                "Email",
+                "SmtpHost",
+                "smtp.example.com",
+                "SMTP服务器地址"
+            );
             await _systemConfigService.SetValueAsync("Email", "SmtpPort", "587", "SMTP端口");
             await _systemConfigService.SetValueAsync("Email", "SmtpUsername", "", "SMTP用户名");
             await _systemConfigService.SetValueAsync("Email", "SmtpPassword", "", "SMTP密码");
             await _systemConfigService.SetValueAsync("Email", "EnableSsl", "true", "启用SSL");
-            await _systemConfigService.SetValueAsync("Email", "FromAddress", "noreply@example.com", "发件人地址");
-            await _systemConfigService.SetValueAsync("Email", "FromName", "Dawning Gateway", "发件人名称");
+            await _systemConfigService.SetValueAsync(
+                "Email",
+                "FromAddress",
+                "noreply@example.com",
+                "发件人地址"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Email",
+                "FromName",
+                "Dawning Gateway",
+                "发件人名称"
+            );
 
             // 日志配置
-            await _systemConfigService.SetValueAsync("Logging", "LogLevel", "Information", "日志级别");
-            await _systemConfigService.SetValueAsync("Logging", "RetentionDays", "30", "日志保留天数");
-            await _systemConfigService.SetValueAsync("Logging", "EnableRequestLogging", "true", "启用请求日志");
-            await _systemConfigService.SetValueAsync("Logging", "EnableAuditLogging", "true", "启用审计日志");
+            await _systemConfigService.SetValueAsync(
+                "Logging",
+                "LogLevel",
+                "Information",
+                "日志级别"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Logging",
+                "RetentionDays",
+                "30",
+                "日志保留天数"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Logging",
+                "EnableRequestLogging",
+                "true",
+                "启用请求日志"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Logging",
+                "EnableAuditLogging",
+                "true",
+                "启用审计日志"
+            );
 
             // 网关配置
-            await _systemConfigService.SetValueAsync("Gateway", "EnableRateLimiting", "true", "启用限流");
-            await _systemConfigService.SetValueAsync("Gateway", "DefaultRateLimit", "100", "默认限流次数/分钟");
-            await _systemConfigService.SetValueAsync("Gateway", "EnableCaching", "false", "启用缓存");
-            await _systemConfigService.SetValueAsync("Gateway", "CacheExpirationMinutes", "5", "缓存过期时间（分钟）");
+            await _systemConfigService.SetValueAsync(
+                "Gateway",
+                "EnableRateLimiting",
+                "true",
+                "启用限流"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Gateway",
+                "DefaultRateLimit",
+                "100",
+                "默认限流次数/分钟"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Gateway",
+                "EnableCaching",
+                "false",
+                "启用缓存"
+            );
+            await _systemConfigService.SetValueAsync(
+                "Gateway",
+                "CacheExpirationMinutes",
+                "5",
+                "缓存过期时间（分钟）"
+            );
 
             return Ok(new { success = true, message = "默认配置已初始化" });
         }
@@ -149,6 +273,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
     public class BatchConfigRequest
     {
-        public IEnumerable<SystemConfigItemDto> Configs { get; set; } = Enumerable.Empty<SystemConfigItemDto>();
+        public IEnumerable<SystemConfigItemDto> Configs { get; set; } =
+            Enumerable.Empty<SystemConfigItemDto>();
     }
 }

@@ -28,10 +28,11 @@ namespace Dawning.Identity.Application.Services.Administration
         private readonly IPasswordPolicyService? _passwordPolicyService;
 
         public UserService(
-            IUserRepository userRepository, 
-            IUnitOfWork uow, 
+            IUserRepository userRepository,
+            IUnitOfWork uow,
             IMapper mapper,
-            IPasswordPolicyService? passwordPolicyService = null)
+            IPasswordPolicyService? passwordPolicyService = null
+        )
         {
             _userRepository = userRepository;
             _uow = uow;
@@ -360,9 +361,10 @@ namespace Dawning.Identity.Application.Services.Administration
                 var result = await _passwordPolicyService.ValidatePasswordAsync(password);
                 if (!result.IsValid)
                 {
-                    var errorMessage = result.Errors.Count > 0 
-                        ? string.Join("; ", result.Errors) 
-                        : "密码不符合策略要求";
+                    var errorMessage =
+                        result.Errors.Count > 0
+                            ? string.Join("; ", result.Errors)
+                            : "密码不符合策略要求";
                     throw new InvalidOperationException(errorMessage);
                 }
             }
@@ -506,7 +508,11 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<UserStatisticsDto> GetUserStatisticsAsync()
         {
             // 获取所有用户用于统计（使用空模型获取全部）
-            var allUsers = await _userRepository.GetPagedListAsync(new UserModel(), 1, int.MaxValue);
+            var allUsers = await _userRepository.GetPagedListAsync(
+                new UserModel(),
+                1,
+                int.MaxValue
+            );
             var users = allUsers.Items.ToList();
 
             var now = DateTime.UtcNow;
@@ -518,15 +524,22 @@ namespace Dawning.Identity.Application.Services.Administration
             {
                 TotalUsers = users.Count,
                 ActiveUsers = users.Count(u => u.IsActive),
-                TodayLoginUsers = users.Count(u => u.LastLoginAt.HasValue && u.LastLoginAt.Value >= todayStart),
-                WeekLoginUsers = users.Count(u => u.LastLoginAt.HasValue && u.LastLoginAt.Value >= weekStart),
-                MonthLoginUsers = users.Count(u => u.LastLoginAt.HasValue && u.LastLoginAt.Value >= monthStart),
+                TodayLoginUsers = users.Count(u =>
+                    u.LastLoginAt.HasValue && u.LastLoginAt.Value >= todayStart
+                ),
+                WeekLoginUsers = users.Count(u =>
+                    u.LastLoginAt.HasValue && u.LastLoginAt.Value >= weekStart
+                ),
+                MonthLoginUsers = users.Count(u =>
+                    u.LastLoginAt.HasValue && u.LastLoginAt.Value >= monthStart
+                ),
                 NeverLoginUsers = users.Count(u => !u.LastLoginAt.HasValue),
-                GeneratedAt = now
+                GeneratedAt = now,
             };
 
             // 按角色统计
-            var roleGroups = users.GroupBy(u => u.Role ?? "unknown")
+            var roleGroups = users
+                .GroupBy(u => u.Role ?? "unknown")
                 .ToDictionary(g => g.Key, g => g.Count());
             stats.UsersByRole = roleGroups;
 
@@ -536,14 +549,16 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 获取最近活跃用户（基于最后登录时间）
         /// </summary>
-        public async Task<IEnumerable<RecentActiveUserDto>> GetRecentActiveUsersAsync(int count = 10)
+        public async Task<IEnumerable<RecentActiveUserDto>> GetRecentActiveUsersAsync(
+            int count = 10
+        )
         {
             // 获取有登录记录的用户，按最后登录时间降序
             var model = new UserModel { IsActive = true };
             var allUsers = await _userRepository.GetPagedListAsync(model, 1, int.MaxValue);
-            
-            var recentUsers = allUsers.Items
-                .Where(u => u.LastLoginAt.HasValue)
+
+            var recentUsers = allUsers
+                .Items.Where(u => u.LastLoginAt.HasValue)
                 .OrderByDescending(u => u.LastLoginAt)
                 .Take(count)
                 .Select(u => new RecentActiveUserDto
@@ -552,7 +567,7 @@ namespace Dawning.Identity.Application.Services.Administration
                     Username = u.Username,
                     DisplayName = u.DisplayName,
                     Email = u.Email,
-                    LastLoginAt = u.LastLoginAt
+                    LastLoginAt = u.LastLoginAt,
                 });
 
             return recentUsers;

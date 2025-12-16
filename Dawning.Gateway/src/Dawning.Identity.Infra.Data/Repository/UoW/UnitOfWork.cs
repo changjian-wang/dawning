@@ -25,6 +25,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
 
             // 所有Repository共享一个DbContext
             // Administration
+            User = new UserRepository(_context);
             ClaimType = new ClaimTypeRepository(_context);
             SystemMetadata = new SystemMetadataRepository(_context);
             Role = new RoleRepository(_context);
@@ -45,9 +46,12 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             // Gateway
             GatewayRoute = new GatewayRouteRepository(_context);
             GatewayCluster = new GatewayClusterRepository(_context);
+            RateLimitPolicy = new RateLimitPolicyRepository(_context);
+            IpAccessRule = new IpAccessRuleRepository(_context);
         }
 
         // Administration
+        public IUserRepository User { get; }
         public IClaimTypeRepository ClaimType { get; }
         public ISystemMetadataRepository SystemMetadata { get; }
         public IRoleRepository Role { get; }
@@ -68,6 +72,8 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         // Gateway
         public IGatewayRouteRepository GatewayRoute { get; }
         public IGatewayClusterRepository GatewayCluster { get; }
+        public IRateLimitPolicyRepository RateLimitPolicy { get; }
+        public IIpAccessRuleRepository IpAccessRule { get; }
 
         public void BeginTransaction()
         {

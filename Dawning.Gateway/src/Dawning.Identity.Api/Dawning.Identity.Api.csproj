@@ -6,11 +6,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <InternalsVisibleTo Include="Dawning.Identity.Api.Tests" />
   </ItemGroup>
-
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
@@ -18,15 +16,12 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
-
     <!-- 日志 -->
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-
     <!-- Redis 缓存 -->
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
-
     <!-- OpenIddict -->
     <PackageReference Include="OpenIddict.AspNetCore" Version="5.8.0" />
     <PackageReference Include="OpenIddict.Core" Version="5.8.0" />

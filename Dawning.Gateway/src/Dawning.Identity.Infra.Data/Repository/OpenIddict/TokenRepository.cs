@@ -200,5 +200,60 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 
             return deletedCount;
         }
+
+        /// <summary>
+        /// 获取用户的有效令牌列表
+        /// </summary>
+        public async Task<IEnumerable<Token>> GetValidTokensBySubjectAsync(string subject)
+        {
+            var result = await _context
+                .Connection.Builder<TokenEntity>(_context.Transaction)
+                .WhereIf(!string.IsNullOrWhiteSpace(subject), t => t.Subject == subject)
+                .WhereIf(true, t => t.Status == "valid")
+                .AsListAsync();
+
+            return result?.ToModels() ?? new List<Token>();
+        }
+
+        /// <summary>
+        /// 撤销用户的所有有效令牌
+        /// </summary>
+        public async Task<int> RevokeAllBySubjectAsync(string subject)
+        {
+            var validTokens = await GetValidTokensBySubjectAsync(subject);
+            var tokenList = validTokens.ToList();
+
+            if (tokenList.Count == 0)
+            {
+                return 0;
+            }
+
+            int revokedCount = 0;
+            foreach (var token in tokenList)
+            {
+                token.Status = "revoked";
+                if (await UpdateAsync(token))
+                {
+                    revokedCount++;
+                }
+            }
+
+            return revokedCount;
+        }
+
+        /// <summary>
+        /// 撤销指定令牌
+        /// </summary>
+        public async Task<bool> RevokeByIdAsync(Guid tokenId)
+        {
+            var token = await GetAsync(tokenId);
+            if (token == null || token.Id == Guid.Empty || token.Status != "valid")
+            {
+                return false;
+            }
+
+            token.Status = "revoked";
+            return await UpdateAsync(token);
+        }
     }
 }

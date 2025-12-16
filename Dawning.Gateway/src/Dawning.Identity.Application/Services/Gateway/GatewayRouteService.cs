@@ -59,7 +59,8 @@ namespace Dawning.Identity.Application.Services.Gateway
         public async Task<PagedData<GatewayRouteDto>> GetPagedListAsync(
             GatewayRouteQueryModel queryModel,
             int page,
-            int pageSize)
+            int pageSize
+        )
         {
             var pagedData = await _uow.GatewayRoute.GetPagedListAsync(queryModel, page, pageSize);
             return new PagedData<GatewayRouteDto>
@@ -67,14 +68,17 @@ namespace Dawning.Identity.Application.Services.Gateway
                 Items = _mapper.Map<IEnumerable<GatewayRouteDto>>(pagedData.Items),
                 TotalCount = pagedData.TotalCount,
                 PageIndex = pagedData.PageIndex,
-                PageSize = pagedData.PageSize
+                PageSize = pagedData.PageSize,
             };
         }
 
         /// <summary>
         /// 创建路由
         /// </summary>
-        public async Task<GatewayRouteDto> CreateAsync(CreateGatewayRouteDto dto, string? username = null)
+        public async Task<GatewayRouteDto> CreateAsync(
+            CreateGatewayRouteDto dto,
+            string? username = null
+        )
         {
             // 检查RouteId是否已存在
             if (await _uow.GatewayRoute.ExistsByRouteIdAsync(dto.RouteId))
@@ -102,7 +106,10 @@ namespace Dawning.Identity.Application.Services.Gateway
         /// <summary>
         /// 更新路由
         /// </summary>
-        public async Task<GatewayRouteDto?> UpdateAsync(UpdateGatewayRouteDto dto, string? username = null)
+        public async Task<GatewayRouteDto?> UpdateAsync(
+            UpdateGatewayRouteDto dto,
+            string? username = null
+        )
         {
             var existing = await _uow.GatewayRoute.GetAsync(dto.Id);
             if (existing == null)

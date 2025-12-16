@@ -158,7 +158,6 @@
     ],
   }));
 
-
   const resetPasswordForm = () => {
     passwordForm.oldPassword = '';
     passwordForm.newPassword = '';

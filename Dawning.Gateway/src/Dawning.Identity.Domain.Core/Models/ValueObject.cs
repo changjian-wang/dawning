@@ -9,9 +9,12 @@ namespace Dawning.Identity.Domain.Core.Models
     public abstract class ValueObject<T>
         where T : ValueObject<T>
     {
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            var valueObject = obj as T;
+            if (obj is not T valueObject)
+            {
+                return false;
+            }
             return EqualsCore(valueObject);
         }
 

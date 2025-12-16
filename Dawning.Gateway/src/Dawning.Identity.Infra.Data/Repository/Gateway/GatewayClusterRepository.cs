@@ -110,9 +110,9 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
             if (!string.IsNullOrWhiteSpace(model.Keyword))
             {
                 builder = builder.Where(c =>
-                    c.ClusterId.Contains(model.Keyword) ||
-                    c.Name.Contains(model.Keyword) ||
-                    (c.Description != null && c.Description.Contains(model.Keyword))
+                    c.ClusterId.Contains(model.Keyword)
+                    || c.Name.Contains(model.Keyword)
+                    || (c.Description != null && c.Description.Contains(model.Keyword))
                 );
             }
 
@@ -156,8 +156,12 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         /// </summary>
         public async ValueTask<int> DeleteAsync(Guid id)
         {
-            var entity = await _context.Connection.GetAsync<GatewayClusterEntity>(id, _context.Transaction);
-            if (entity == null) return 0;
+            var entity = await _context.Connection.GetAsync<GatewayClusterEntity>(
+                id,
+                _context.Transaction
+            );
+            if (entity == null)
+                return 0;
 
             var success = await _context.Connection.DeleteAsync(entity, _context.Transaction);
             return success ? 1 : 0;

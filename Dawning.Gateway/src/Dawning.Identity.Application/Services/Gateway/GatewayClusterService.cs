@@ -63,7 +63,7 @@ namespace Dawning.Identity.Application.Services.Gateway
             {
                 ClusterId = c.ClusterId,
                 Name = c.Name,
-                IsEnabled = c.IsEnabled
+                IsEnabled = c.IsEnabled,
             });
         }
 
@@ -73,7 +73,8 @@ namespace Dawning.Identity.Application.Services.Gateway
         public async Task<PagedData<GatewayClusterDto>> GetPagedListAsync(
             GatewayClusterQueryModel queryModel,
             int page,
-            int pageSize)
+            int pageSize
+        )
         {
             var pagedData = await _uow.GatewayCluster.GetPagedListAsync(queryModel, page, pageSize);
             return new PagedData<GatewayClusterDto>
@@ -81,14 +82,17 @@ namespace Dawning.Identity.Application.Services.Gateway
                 Items = _mapper.Map<IEnumerable<GatewayClusterDto>>(pagedData.Items),
                 TotalCount = pagedData.TotalCount,
                 PageIndex = pagedData.PageIndex,
-                PageSize = pagedData.PageSize
+                PageSize = pagedData.PageSize,
             };
         }
 
         /// <summary>
         /// 创建集群
         /// </summary>
-        public async Task<GatewayClusterDto> CreateAsync(CreateGatewayClusterDto dto, string? username = null)
+        public async Task<GatewayClusterDto> CreateAsync(
+            CreateGatewayClusterDto dto,
+            string? username = null
+        )
         {
             // 检查ClusterId是否已存在
             if (await _uow.GatewayCluster.ExistsByClusterIdAsync(dto.ClusterId))
@@ -109,7 +113,10 @@ namespace Dawning.Identity.Application.Services.Gateway
         /// <summary>
         /// 更新集群
         /// </summary>
-        public async Task<GatewayClusterDto?> UpdateAsync(UpdateGatewayClusterDto dto, string? username = null)
+        public async Task<GatewayClusterDto?> UpdateAsync(
+            UpdateGatewayClusterDto dto,
+            string? username = null
+        )
         {
             var existing = await _uow.GatewayCluster.GetAsync(dto.Id);
             if (existing == null)
@@ -128,7 +135,9 @@ namespace Dawning.Identity.Application.Services.Gateway
             {
                 if (await _uow.GatewayCluster.IsReferencedByRoutesAsync(existing.ClusterId))
                 {
-                    throw new InvalidOperationException($"集群 '{existing.ClusterId}' 正在被路由引用，无法更改集群ID");
+                    throw new InvalidOperationException(
+                        $"集群 '{existing.ClusterId}' 正在被路由引用，无法更改集群ID"
+                    );
                 }
             }
 

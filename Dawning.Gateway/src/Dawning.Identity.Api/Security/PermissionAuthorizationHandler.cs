@@ -1,7 +1,7 @@
+using System.Security.Claims;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Microsoft.AspNetCore.Authorization;
 using OpenIddict.Abstractions;
-using System.Security.Claims;
 
 namespace Dawning.Identity.Api.Security
 {
@@ -28,8 +28,8 @@ namespace Dawning.Identity.Api.Security
         )
         {
             // 获取用户ID
-            var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier)
-                ?? context.User.FindFirst("sub");
+            var userIdClaim =
+                context.User.FindFirst(ClaimTypes.NameIdentifier) ?? context.User.FindFirst("sub");
 
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
@@ -39,8 +39,8 @@ namespace Dawning.Identity.Api.Security
 
             // 检查是否是超级管理员（超级管理员拥有所有权限）
             // 注意：OpenIddict 使用 "role" claim type，需要直接检查 claims
-            var roles = context.User.Claims
-                .Where(c =>
+            var roles = context
+                .User.Claims.Where(c =>
                     c.Type == OpenIddictConstants.Claims.Role
                     || c.Type == ClaimTypes.Role
                     || c.Type == "role"
@@ -67,8 +67,10 @@ namespace Dawning.Identity.Api.Security
 
             // 使用 scope 获取仓储服务
             using var scope = _serviceProvider.CreateScope();
-            var userRoleRepository = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
-            var rolePermissionRepository = scope.ServiceProvider.GetRequiredService<IRolePermissionRepository>();
+            var userRoleRepository =
+                scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
+            var rolePermissionRepository =
+                scope.ServiceProvider.GetRequiredService<IRolePermissionRepository>();
 
             try
             {

@@ -24,7 +24,8 @@ namespace Dawning.Identity.Api.Configurations
                     {
                         Title = Title,
                         Version = Name,
-                        Description = @"
+                        Description =
+                            @"
 ## Dawning Gateway 身份认证 API
 
 Dawning Gateway 是一个功能完备的 API 网关和身份认证系统，提供以下核心功能：
@@ -65,13 +66,13 @@ Dawning Gateway 是一个功能完备的 API 网关和身份认证系统，提�
                         {
                             Name = "Dawning Team",
                             Email = "support@dawning.com",
-                            Url = new Uri("https://github.com/dawning-gateway")
+                            Url = new Uri("https://github.com/dawning-gateway"),
                         },
                         License = new OpenApiLicense
                         {
                             Name = "MIT License",
-                            Url = new Uri("https://opensource.org/licenses/MIT")
-                        }
+                            Url = new Uri("https://opensource.org/licenses/MIT"),
+                        },
                     }
                 );
 
@@ -109,7 +110,8 @@ Dawning Gateway 是一个功能完备的 API 网关和身份认证系统，提�
                     "Bearer",
                     new OpenApiSecurityScheme
                     {
-                        Description = @"
+                        Description =
+                            @"
 JWT 授权头使用 Bearer 方案。
 
 在下面输入框中输入 **Bearer {你的token}**
@@ -121,7 +123,7 @@ JWT 授权头使用 Bearer 方案。
                         In = ParameterLocation.Header,
                         Type = SecuritySchemeType.Http,
                         Scheme = "bearer",
-                        BearerFormat = "JWT"
+                        BearerFormat = "JWT",
                     }
                 );
 
@@ -156,13 +158,13 @@ JWT 授权头使用 Bearer 方案。
             {
                 options.SerializeAsV2 = false;
             });
-            
+
             app.UseSwaggerUI(options =>
             {
                 options.RoutePrefix = "";
                 options.SwaggerEndpoint($"/swagger/{Name}/swagger.json", Title);
                 options.DocumentTitle = Title;
-                
+
                 // UI 增强配置
                 options.DefaultModelsExpandDepth(2);
                 options.DefaultModelExpandDepth(2);

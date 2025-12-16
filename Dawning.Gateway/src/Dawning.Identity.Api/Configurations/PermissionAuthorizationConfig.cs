@@ -11,7 +11,9 @@ namespace Dawning.Identity.Api.Configurations
         /// <summary>
         /// 添加权限授权配置
         /// </summary>
-        public static IServiceCollection AddPermissionAuthorization(this IServiceCollection services)
+        public static IServiceCollection AddPermissionAuthorization(
+            this IServiceCollection services
+        )
         {
             // 注册自定义策略提供器
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();

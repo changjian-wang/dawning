@@ -217,11 +217,15 @@ namespace Dawning.Identity.Api.Controllers
                         [OpenIddictServerAspNetCoreConstants.Properties.Error] =
                             Errors.AccessDenied,
                         [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
-                            user.LockoutMessage ?? "Account is locked out due to too many failed login attempts.",
+                            user.LockoutMessage
+                            ?? "Account is locked out due to too many failed login attempts.",
                     }
                 );
 
-                return Forbid(lockoutProperties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+                return Forbid(
+                    lockoutProperties,
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+                );
             }
 
             if (user == null || string.IsNullOrEmpty(user.Id))

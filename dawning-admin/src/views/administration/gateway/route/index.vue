@@ -96,7 +96,11 @@
         </template>
         <template #policies="{ record }">
           <a-space wrap>
-            <a-tag v-if="record.authorizationPolicy" color="orange" size="small">
+            <a-tag
+              v-if="record.authorizationPolicy"
+              color="orange"
+              size="small"
+            >
               {{ record.authorizationPolicy }}
             </a-tag>
             <a-tag v-if="record.rateLimiterPolicy" color="purple" size="small">
@@ -168,7 +172,10 @@
           </a-col>
         </a-row>
 
-        <a-form-item field="description" :label="$t('gateway.route.description')">
+        <a-form-item
+          field="description"
+          :label="$t('gateway.route.description')"
+        >
           <a-textarea
             v-model="formData.description"
             :placeholder="$t('gateway.route.descriptionPlaceholder')"
@@ -179,8 +186,14 @@
 
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item field="clusterId" :label="$t('gateway.route.clusterId')">
-              <a-select v-model="formData.clusterId" :placeholder="$t('gateway.route.clusterIdPlaceholder')">
+            <a-form-item
+              field="clusterId"
+              :label="$t('gateway.route.clusterId')"
+            >
+              <a-select
+                v-model="formData.clusterId"
+                :placeholder="$t('gateway.route.clusterIdPlaceholder')"
+              >
                 <a-option
                   v-for="cluster in clusterOptions"
                   :key="cluster.clusterId"
@@ -192,7 +205,10 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="matchPath" :label="$t('gateway.route.matchPath')">
+            <a-form-item
+              field="matchPath"
+              :label="$t('gateway.route.matchPath')"
+            >
               <a-input
                 v-model="formData.matchPath"
                 :placeholder="$t('gateway.route.matchPathPlaceholder')"
@@ -203,7 +219,10 @@
 
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item field="matchMethods" :label="$t('gateway.route.matchMethods')">
+            <a-form-item
+              field="matchMethods"
+              :label="$t('gateway.route.matchMethods')"
+            >
               <a-select
                 v-model="formData.matchMethodsArray"
                 multiple
@@ -221,7 +240,11 @@
           </a-col>
           <a-col :span="12">
             <a-form-item field="order" :label="$t('gateway.route.order')">
-              <a-input-number v-model="formData.order" :min="0" :placeholder="$t('gateway.route.orderPlaceholder')" />
+              <a-input-number
+                v-model="formData.order"
+                :min="0"
+                :placeholder="$t('gateway.route.orderPlaceholder')"
+              />
             </a-form-item>
           </a-col>
         </a-row>
@@ -304,7 +327,10 @@
 
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item field="isEnabled" :label="$t('gateway.route.isEnabled')">
+            <a-form-item
+              field="isEnabled"
+              :label="$t('gateway.route.isEnabled')"
+            >
               <a-switch v-model="formData.isEnabled" />
             </a-form-item>
           </a-col>
@@ -368,7 +394,11 @@
     { title: t('gateway.route.name'), dataIndex: 'name', width: 120 },
     { title: t('gateway.route.clusterId'), slotName: 'clusterId', width: 120 },
     { title: t('gateway.route.matchPath'), slotName: 'matchPath', width: 180 },
-    { title: t('gateway.route.matchMethods'), slotName: 'matchMethods', width: 150 },
+    {
+      title: t('gateway.route.matchMethods'),
+      slotName: 'matchMethods',
+      width: 150,
+    },
     { title: t('gateway.route.policies'), slotName: 'policies', width: 180 },
     { title: t('gateway.route.order'), slotName: 'order', width: 60 },
     { title: t('gateway.status'), slotName: 'isEnabled', width: 80 },
@@ -419,8 +449,12 @@
   const formRules = {
     routeId: [{ required: true, message: t('gateway.route.routeIdRequired') }],
     name: [{ required: true, message: t('gateway.route.nameRequired') }],
-    clusterId: [{ required: true, message: t('gateway.route.clusterIdRequired') }],
-    matchPath: [{ required: true, message: t('gateway.route.matchPathRequired') }],
+    clusterId: [
+      { required: true, message: t('gateway.route.clusterIdRequired') },
+    ],
+    matchPath: [
+      { required: true, message: t('gateway.route.matchPathRequired') },
+    ],
   };
 
   // 获取HTTP方法颜色
@@ -522,7 +556,9 @@
   ) => {
     try {
       await toggleRouteEnabled(record.id, isEnabled);
-      Message.success(isEnabled ? t('gateway.enableSuccess') : t('gateway.disableSuccess'));
+      Message.success(
+        isEnabled ? t('gateway.enableSuccess') : t('gateway.disableSuccess')
+      );
       loadData();
     } catch (error) {
       Message.error(t('common.operationFailed'));
@@ -549,7 +585,9 @@
       modalVisible.value = false;
       loadData();
     } catch (error: any) {
-      Message.error(error.response?.data?.message || t('common.operationFailed'));
+      Message.error(
+        error.response?.data?.message || t('common.operationFailed')
+      );
     } finally {
       submitLoading.value = false;
     }

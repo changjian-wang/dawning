@@ -9,6 +9,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
     public interface IUnitOfWork
     {
         // Administration
+        IUserRepository User { get; }
         IClaimTypeRepository ClaimType { get; }
         ISystemMetadataRepository SystemMetadata { get; }
         IRoleRepository Role { get; }
@@ -29,6 +30,8 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         // Gateway
         IGatewayRouteRepository GatewayRoute { get; }
         IGatewayClusterRepository GatewayCluster { get; }
+        IRateLimitPolicyRepository RateLimitPolicy { get; }
+        IIpAccessRuleRepository IpAccessRule { get; }
 
         // 添加事务管理方法
         void BeginTransaction();

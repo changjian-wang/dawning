@@ -23,7 +23,12 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <summary>
         /// 设置配置值
         /// </summary>
-        Task<bool> SetValueAsync(string group, string key, string value, string? description = null);
+        Task<bool> SetValueAsync(
+            string group,
+            string key,
+            string value,
+            string? description = null
+        );
 
         /// <summary>
         /// 获取分组下的所有配置
@@ -171,9 +176,13 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<IEnumerable<string>> GetGroupsAsync()
         {
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(null, 1, 10000);
-            return result.Items
-                .Where(x => !string.IsNullOrEmpty(x.Name))
+            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(
+                new SystemMetadataModel(),
+                1,
+                10000
+            );
+            return result
+                .Items.Where(x => !string.IsNullOrEmpty(x.Name))
                 .Select(x => x.Name!)
                 .Distinct()
                 .OrderBy(x => x);
@@ -183,7 +192,12 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             foreach (var config in configs)
             {
-                await SetValueAsync(config.Group, config.Key, config.Value ?? string.Empty, config.Description);
+                await SetValueAsync(
+                    config.Group,
+                    config.Key,
+                    config.Value ?? string.Empty,
+                    config.Description
+                );
             }
             return true;
         }
@@ -197,7 +211,10 @@ namespace Dawning.Identity.Application.Services.Administration
             if (existing != null)
             {
                 return await _unitOfWork.SystemMetadata.DeleteAsync(
-                    new Dawning.Identity.Domain.Aggregates.Administration.SystemMetadata { Id = existing.Id }
+                    new Dawning.Identity.Domain.Aggregates.Administration.SystemMetadata
+                    {
+                        Id = existing.Id,
+                    }
                 );
             }
 
@@ -206,7 +223,11 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<long> GetLastUpdateTimestampAsync()
         {
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(null, 1, 1);
+            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(
+                new SystemMetadataModel(),
+                1,
+                1
+            );
             return result.Items.FirstOrDefault()?.Timestamp ?? 0;
         }
     }

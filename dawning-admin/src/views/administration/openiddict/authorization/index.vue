@@ -64,9 +64,9 @@
           showTotal: true,
           showPageSize: true,
         }"
+        :bordered="false"
         @page-change="handlePageChange"
         @page-size-change="handlePageSizeChange"
-        :bordered="false"
       >
         <template #status="{ record }">
           <a-tag :color="record.status === 'valid' ? 'green' : 'red'">
@@ -127,96 +127,109 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue';
-import { Message } from '@arco-design/web-vue';
-import { authorizationApi, IAuthorization, IAuthorizationModel } from '@/api/openiddict/authorization';
+  import { ref, reactive, onMounted } from 'vue';
+  import { Message } from '@arco-design/web-vue';
+  import {
+    authorizationApi,
+    IAuthorization,
+    IAuthorizationModel,
+  } from '@/api/openiddict/authorization';
 
-// 搜索表单
-const searchForm = reactive<IAuthorizationModel>({});
-const loading = ref(false);
-const data = ref<IAuthorization[]>([]);
-const total = ref(0);
-const pageIndex = ref(1);
-const pageSize = ref(10);
+  // 搜索表单
+  const searchForm = reactive<IAuthorizationModel>({});
+  const loading = ref(false);
+  const data = ref<IAuthorization[]>([]);
+  const total = ref(0);
+  const pageIndex = ref(1);
+  const pageSize = ref(10);
 
-// 详情
-const detailVisible = ref(false);
-const detailData = ref<any[]>([]);
+  // 详情
+  const detailVisible = ref(false);
+  const detailData = ref<any[]>([]);
 
-const columns = [
-  { title: 'ID', dataIndex: 'id', width: 180, ellipsis: true },
-  { title: '用户标识', dataIndex: 'subject', width: 200, ellipsis: true },
-  { title: '状态', slotName: 'status', width: 100 },
-  { title: '类型', slotName: 'type', width: 100 },
-  { title: '作用域', slotName: 'scopes', width: 200 },
-  { title: '创建时间', slotName: 'createdAt', width: 160 },
-  { title: '操作', slotName: 'optional', width: 120 },
-];
-
-function formatDate(dateStr?: string) {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  return d.toLocaleString('zh-CN');
-}
-
-// 加载数据
-async function loadData() {
-  loading.value = true;
-  try {
-    const res = await authorizationApi.getPagedList(searchForm, pageIndex.value, pageSize.value);
-    data.value = res.items;
-    total.value = res.totalCount;
-  } finally {
-    loading.value = false;
-  }
-}
-
-function handleSearch() {
-  pageIndex.value = 1;
-  loadData();
-}
-
-function handleReset() {
-  Object.keys(searchForm).forEach(k => (searchForm as any)[k] = undefined);
-  pageIndex.value = 1;
-  loadData();
-}
-
-function handlePageChange(page: number) {
-  pageIndex.value = page;
-  loadData();
-}
-
-function handlePageSizeChange(size: number) {
-  pageSize.value = size;
-  pageIndex.value = 1;
-  loadData();
-}
-
-function handleView(record: IAuthorization) {
-  detailData.value = [
-    { label: 'ID', value: record.id },
-    { label: '用户标识', value: record.subject || '-' },
-    { label: '应用程序ID', value: record.applicationId || '-' },
-    { label: '状态', value: record.status === 'valid' ? '有效' : '已撤销' },
-    { label: '类型', value: record.type === 'permanent' ? '永久授权' : '临时授权' },
-    { label: '作用域', value: (record.scopes || []).join(', ') || '-' },
-    { label: '创建时间', value: formatDate(record.createdAt) },
+  const columns = [
+    { title: 'ID', dataIndex: 'id', width: 180, ellipsis: true },
+    { title: '用户标识', dataIndex: 'subject', width: 200, ellipsis: true },
+    { title: '状态', slotName: 'status', width: 100 },
+    { title: '类型', slotName: 'type', width: 100 },
+    { title: '作用域', slotName: 'scopes', width: 200 },
+    { title: '创建时间', slotName: 'createdAt', width: 160 },
+    { title: '操作', slotName: 'optional', width: 120 },
   ];
-  detailVisible.value = true;
-}
 
-async function handleRevoke(record: IAuthorization) {
-  try {
-    await authorizationApi.revoke(record.id);
-    Message.success('授权已撤销');
-    loadData();
-  } catch (e: any) {
-    Message.error(e?.message || '撤销失败');
+  function formatDate(dateStr?: string) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleString('zh-CN');
   }
-}
 
-onMounted(loadData);
+  // 加载数据
+  async function loadData() {
+    loading.value = true;
+    try {
+      const res = await authorizationApi.getPagedList(
+        searchForm,
+        pageIndex.value,
+        pageSize.value
+      );
+      data.value = res.items;
+      total.value = res.totalCount;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  function handleSearch() {
+    pageIndex.value = 1;
+    loadData();
+  }
+
+  function handleReset() {
+    Object.keys(searchForm).forEach(
+      (k) => ((searchForm as any)[k] = undefined)
+    );
+    pageIndex.value = 1;
+    loadData();
+  }
+
+  function handlePageChange(page: number) {
+    pageIndex.value = page;
+    loadData();
+  }
+
+  function handlePageSizeChange(size: number) {
+    pageSize.value = size;
+    pageIndex.value = 1;
+    loadData();
+  }
+
+  function handleView(record: IAuthorization) {
+    detailData.value = [
+      { label: 'ID', value: record.id },
+      { label: '用户标识', value: record.subject || '-' },
+      { label: '应用程序ID', value: record.applicationId || '-' },
+      { label: '状态', value: record.status === 'valid' ? '有效' : '已撤销' },
+      {
+        label: '类型',
+        value: record.type === 'permanent' ? '永久授权' : '临时授权',
+      },
+      { label: '作用域', value: (record.scopes || []).join(', ') || '-' },
+      { label: '创建时间', value: formatDate(record.createdAt) },
+    ];
+    detailVisible.value = true;
+  }
+
+  async function handleRevoke(record: IAuthorization) {
+    try {
+      await authorizationApi.revoke(record.id);
+      Message.success('授权已撤销');
+      loadData();
+    } catch (e: any) {
+      Message.error(e?.message || '撤销失败');
+    }
+  }
+
+  onMounted(loadData);
 </script>
 
 <style scoped lang="less"></style>

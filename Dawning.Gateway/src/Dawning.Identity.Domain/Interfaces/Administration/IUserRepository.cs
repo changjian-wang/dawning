@@ -64,5 +64,29 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         /// 检查邮箱是否存在
         /// </summary>
         Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null);
+
+        /// <summary>
+        /// 获取用户锁定结束时间（如果处于锁定状态）
+        /// </summary>
+        Task<DateTime?> GetLockoutEndAsync(string username);
+
+        /// <summary>
+        /// 记录登录失败并返回更新后的状态
+        /// </summary>
+        Task<(int FailedCount, bool IsLockedOut, DateTime? LockoutEnd)> RecordFailedLoginAsync(
+            string username,
+            int maxFailedAttempts,
+            int lockoutDurationMinutes
+        );
+
+        /// <summary>
+        /// 重置登录失败计数
+        /// </summary>
+        Task ResetFailedLoginCountAsync(string username);
+
+        /// <summary>
+        /// 解锁用户账户
+        /// </summary>
+        Task UnlockUserAsync(Guid userId);
     }
 }

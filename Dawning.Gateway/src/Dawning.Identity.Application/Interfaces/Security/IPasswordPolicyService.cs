@@ -83,15 +83,13 @@ namespace Dawning.Identity.Application.Interfaces.Security
         /// <summary>
         /// 创建成功结果
         /// </summary>
-        public static PasswordValidationResult Success() => new PasswordValidationResult { IsValid = true };
+        public static PasswordValidationResult Success() =>
+            new PasswordValidationResult { IsValid = true };
 
         /// <summary>
         /// 创建失败结果
         /// </summary>
-        public static PasswordValidationResult Failure(params string[] errors) => new PasswordValidationResult
-        {
-            IsValid = false,
-            Errors = errors.ToList()
-        };
+        public static PasswordValidationResult Failure(params string[] errors) =>
+            new PasswordValidationResult { IsValid = false, Errors = errors.ToList() };
     }
 }

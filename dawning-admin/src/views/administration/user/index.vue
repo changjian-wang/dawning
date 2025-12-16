@@ -403,8 +403,8 @@
             style="margin-bottom: 16px"
           />
           <a-transfer
-            :data="allRoles"
             v-model="selectedRoleIds"
+            :data="allRoles"
             :title="['可分配角色', '已分配角色']"
             :show-search="false"
             @change="handleRoleChange"
@@ -415,7 +415,13 @@
                   v-for="item in sourceData"
                   :key="item.value"
                   class="role-item"
-                  @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter((k: string) => k !== item.value) : [...selectedKeys, item.value]])"
+                  @click="
+                    onSelect([
+                      ...(selectedKeys.includes(item.value)
+                        ? selectedKeys.filter((k: string) => k !== item.value)
+                        : [...selectedKeys, item.value]),
+                    ])
+                  "
                 >
                   <a-checkbox
                     :model-value="selectedKeys.includes(item.value)"
@@ -433,7 +439,13 @@
                   v-for="item in targetData"
                   :key="item.value"
                   class="role-item"
-                  @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter((k: string) => k !== item.value) : [...selectedKeys, item.value]])"
+                  @click="
+                    onSelect([
+                      ...(selectedKeys.includes(item.value)
+                        ? selectedKeys.filter((k: string) => k !== item.value)
+                        : [...selectedKeys, item.value]),
+                    ])
+                  "
                 >
                   <a-checkbox
                     :model-value="selectedKeys.includes(item.value)"
@@ -749,7 +761,9 @@
       ];
 
       exportData({
-        filename: `用户列表_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}`,
+        filename: `用户列表_${new Date()
+          .toLocaleDateString('zh-CN')
+          .replace(/\//g, '-')}`,
         columns: exportColumns,
         data: result.items,
         format,

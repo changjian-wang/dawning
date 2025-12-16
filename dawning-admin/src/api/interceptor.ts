@@ -98,7 +98,10 @@ function getErrorMessage(error: AxiosError<HttpResponse>): string {
 }
 
 // 延迟函数
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
 // 判断是否应该重试
 function shouldRetry(error: AxiosError, retryCount: number): boolean {
@@ -281,18 +284,19 @@ axios.interceptors.response.use(
     }
 
     // 获取当前重试次数
-    const config = error.config as AxiosRequestConfig & { _retryCount?: number };
-    const retryCount = config?._retryCount || 0;
+    const config = error.config as AxiosRequestConfig & { retryCount?: number };
+    const retryCount = config?.retryCount || 0;
 
     // 判断是否应该自动重试
     if (shouldRetry(error, retryCount)) {
-      config._retryCount = retryCount + 1;
+      config.retryCount = retryCount + 1;
 
       // 计算延迟时间（指数退避）
-      const delayMs = RETRY_CONFIG.retryDelay * Math.pow(2, retryCount);
+      const delayMs = RETRY_CONFIG.retryDelay * 2 ** retryCount;
 
+      // eslint-disable-next-line no-console
       console.log(
-        `[HTTP] 请求失败，${delayMs}ms 后进行第 ${config._retryCount} 次重试...`,
+        `[HTTP] 请求失败，${delayMs}ms 后进行第 ${config.retryCount} 次重试...`,
         error.config?.url
       );
 

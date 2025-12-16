@@ -1,14 +1,20 @@
 <template>
   <div class="permission-management">
     <div class="container">
-      <Breadcrumb :items="['menu.administration', 'menu.administration.permission']" />
-      
+      <Breadcrumb
+        :items="['menu.administration', 'menu.administration.permission']"
+      />
+
       <!-- 搜索卡片 -->
       <a-card class="general-card search-card">
         <a-form :model="searchForm" layout="inline" class="search-form">
           <a-row :gutter="[16, 16]" style="width: 100%">
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="code" label="权限代码" class="form-item-block">
+              <a-form-item
+                field="code"
+                label="权限代码"
+                class="form-item-block"
+              >
                 <a-input
                   v-model="searchForm.code"
                   placeholder="输入权限代码搜索"
@@ -22,7 +28,11 @@
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="resource" label="资源类型" class="form-item-block">
+              <a-form-item
+                field="resource"
+                label="资源类型"
+                class="form-item-block"
+              >
                 <a-select
                   v-model="searchForm.resource"
                   placeholder="选择资源类型"
@@ -31,14 +41,22 @@
                   <template #prefix>
                     <icon-apps />
                   </template>
-                  <a-option v-for="res in resourceOptions" :key="res" :value="res">
+                  <a-option
+                    v-for="res in resourceOptions"
+                    :key="res"
+                    :value="res"
+                  >
                     {{ res }}
                   </a-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="category" label="分类" class="form-item-block">
+              <a-form-item
+                field="category"
+                label="分类"
+                class="form-item-block"
+              >
                 <a-select
                   v-model="searchForm.category"
                   placeholder="选择分类"
@@ -54,7 +72,11 @@
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="isActive" label="状态" class="form-item-block">
+              <a-form-item
+                field="isActive"
+                label="状态"
+                class="form-item-block"
+              >
                 <a-select
                   v-model="searchForm.isActive"
                   placeholder="选择状态"
@@ -68,7 +90,14 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="action-col">
+            <a-col
+              :xs="24"
+              :sm="24"
+              :md="24"
+              :lg="24"
+              :xl="24"
+              class="action-col"
+            >
               <a-space :size="12">
                 <a-button type="primary" @click="search">
                   <template #icon><icon-search /></template>
@@ -139,8 +168,8 @@
                 type="text"
                 size="medium"
                 status="warning"
-                @click="handleEdit(record)"
                 :disabled="record.isSystem"
+                @click="handleEdit(record)"
               >
                 <template #icon><icon-edit :size="18" /></template>
               </a-button>
@@ -148,8 +177,8 @@
                 type="text"
                 size="medium"
                 status="danger"
-                @click="handleDelete(record)"
                 :disabled="record.isSystem"
+                @click="handleDelete(record)"
               >
                 <template #icon><icon-delete :size="18" /></template>
               </a-button>
@@ -162,9 +191,9 @@
       <a-modal
         v-model:visible="modalVisible"
         :title="isEdit ? '编辑权限' : '创建权限'"
+        width="600px"
         @ok="handleSubmit"
         @cancel="handleCancel"
-        width="600px"
       >
         <a-form ref="formRef" :model="formData" layout="vertical">
           <a-row :gutter="16">
@@ -206,8 +235,10 @@
               :disabled="isEdit"
             />
             <template #extra>
-              <div style="color: var(--color-text-3);">
-                建议格式: {{ formData.resource || 'resource' }}:{{ formData.action || 'action' }}
+              <div style="color: var(--color-text-3)">
+                建议格式: {{ formData.resource || 'resource' }}:{{
+                  formData.action || 'action'
+                }}
               </div>
             </template>
           </a-form-item>
@@ -216,10 +247,7 @@
             label="权限名称"
             :rules="[{ required: true, message: '请输入权限名称' }]"
           >
-            <a-input
-              v-model="formData.name"
-              placeholder="例如: 创建用户"
-            />
+            <a-input v-model="formData.name" placeholder="例如: 创建用户" />
           </a-form-item>
           <a-form-item field="description" label="描述">
             <a-textarea
@@ -244,10 +272,7 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item
-                field="displayOrder"
-                label="显示顺序"
-              >
+              <a-form-item field="displayOrder" label="显示顺序">
                 <a-input-number
                   v-model="formData.displayOrder"
                   :min="0"
@@ -270,11 +295,11 @@
       <a-modal
         v-model:visible="groupedModalVisible"
         title="按资源分组查看权限"
-        @cancel="groupedModalVisible = false"
         width="900px"
         :footer="false"
+        @cancel="groupedModalVisible = false"
       >
-        <a-spin :loading="groupedLoading" style="width: 100%;">
+        <a-spin :loading="groupedLoading" style="width: 100%">
           <a-collapse
             v-if="groupedPermissions.length > 0"
             :default-active-key="[0]"
@@ -296,7 +321,9 @@
                   <a-tag color="blue" size="small">{{ record.code }}</a-tag>
                 </template>
                 <template #isActive="{ record }">
-                  <a-tag v-if="record.isActive" color="green" size="small">启用</a-tag>
+                  <a-tag v-if="record.isActive" color="green" size="small"
+                    >启用</a-tag
+                  >
                   <a-tag v-else color="red" size="small">禁用</a-tag>
                 </template>
               </a-table>
@@ -310,202 +337,128 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted } from 'vue';
-import { Message, Modal } from '@arco-design/web-vue';
-import {
-  getPermissionList,
-  getGroupedPermissions,
-  createPermission,
-  updatePermission,
-  deletePermission,
-  type PermissionModel,
-  type PermissionQueryParams,
-  type CreatePermissionDto,
-  type UpdatePermissionDto,
-  type PermissionGroup,
-} from '@/api/administration/permission';
-import dayjs from 'dayjs';
+  import { ref, reactive, computed, onMounted } from 'vue';
+  import { Message, Modal } from '@arco-design/web-vue';
+  import {
+    getPermissionList,
+    getGroupedPermissions,
+    createPermission,
+    updatePermission,
+    deletePermission,
+    type PermissionModel,
+    type PermissionQueryParams,
+    type CreatePermissionDto,
+    type UpdatePermissionDto,
+    type PermissionGroup,
+  } from '@/api/administration/permission';
+  import dayjs from 'dayjs';
 
-// 搜索表单
-const searchForm = reactive<PermissionQueryParams>({
-  code: '',
-  resource: '',
-  category: '',
-  isActive: undefined,
-  page: 1,
-  pageSize: 10,
-});
-
-// 表格数据
-const loading = ref(false);
-const tableData = ref<PermissionModel[]>([]);
-const pagination = reactive({
-  current: 1,
-  pageSize: 10,
-  total: 0,
-  showTotal: true,
-  showPageSize: true,
-});
-
-// 资源选项（从数据中提取）
-const resourceOptions = ref<string[]>([]);
-
-// 表格列定义
-const columns = [
-  {
-    title: '权限代码',
-    dataIndex: 'code',
-    slotName: 'code',
-    width: 180,
-  },
-  {
-    title: '权限名称',
-    dataIndex: 'name',
-    width: 150,
-  },
-  {
-    title: '资源',
-    dataIndex: 'resource',
-    slotName: 'resource',
-    width: 120,
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: 100,
-  },
-  {
-    title: '分类',
-    dataIndex: 'category',
-    slotName: 'category',
-    width: 120,
-  },
-  {
-    title: '类型',
-    dataIndex: 'isSystem',
-    slotName: 'isSystem',
-    width: 90,
-  },
-  {
-    title: '状态',
-    dataIndex: 'isActive',
-    slotName: 'isActive',
-    width: 90,
-  },
-  {
-    title: '顺序',
-    dataIndex: 'displayOrder',
-    width: 80,
-  },
-  {
-    title: '操作',
-    slotName: 'operations',
-    width: 120,
-    fixed: 'right',
-  },
-];
-
-// 分组查看的列定义
-const groupedColumns = [
-  {
-    title: '代码',
-    dataIndex: 'code',
-    slotName: 'code',
-  },
-  {
-    title: '名称',
-    dataIndex: 'name',
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-  },
-  {
-    title: '状态',
-    dataIndex: 'isActive',
-    slotName: 'isActive',
-  },
-];
-
-// 对话框
-const modalVisible = ref(false);
-const isEdit = ref(false);
-const formRef = ref();
-const formData = reactive({
-  id: '',
-  code: '',
-  name: '',
-  description: '',
-  resource: '',
-  action: '',
-  category: 'administration',
-  isActive: true,
-  displayOrder: 0,
-});
-
-// 分组查看
-const groupedModalVisible = ref(false);
-const groupedLoading = ref(false);
-const groupedPermissions = ref<PermissionGroup[]>([]);
-
-// 加载数据
-const fetchData = async () => {
-  loading.value = true;
-  try {
-    const params = {
-      ...searchForm,
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-    };
-    const result = await getPermissionList(params);
-    tableData.value = result.items;
-    pagination.total = result.totalCount;
-
-    // 提取资源选项
-    const resources = new Set(result.items.map((item) => item.resource));
-    resourceOptions.value = Array.from(resources).sort();
-  } catch (error) {
-    Message.error('加载权限列表失败');
-    console.error(error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// 搜索
-const search = () => {
-  pagination.current = 1;
-  fetchData();
-};
-
-// 重置
-const reset = () => {
-  Object.assign(searchForm, {
+  // 搜索表单
+  const searchForm = reactive<PermissionQueryParams>({
     code: '',
     resource: '',
     category: '',
     isActive: undefined,
+    page: 1,
+    pageSize: 10,
   });
-  pagination.current = 1;
-  fetchData();
-};
 
-// 分页
-const onPageChange = (page: number) => {
-  pagination.current = page;
-  fetchData();
-};
+  // 表格数据
+  const loading = ref(false);
+  const tableData = ref<PermissionModel[]>([]);
+  const pagination = reactive({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    showTotal: true,
+    showPageSize: true,
+  });
 
-const onPageSizeChange = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.current = 1;
-  fetchData();
-};
+  // 资源选项（从数据中提取）
+  const resourceOptions = ref<string[]>([]);
 
-// 创建
-const handleCreate = () => {
-  isEdit.value = false;
-  Object.assign(formData, {
+  // 表格列定义
+  const columns = [
+    {
+      title: '权限代码',
+      dataIndex: 'code',
+      slotName: 'code',
+      width: 180,
+    },
+    {
+      title: '权限名称',
+      dataIndex: 'name',
+      width: 150,
+    },
+    {
+      title: '资源',
+      dataIndex: 'resource',
+      slotName: 'resource',
+      width: 120,
+    },
+    {
+      title: '操作',
+      dataIndex: 'action',
+      width: 100,
+    },
+    {
+      title: '分类',
+      dataIndex: 'category',
+      slotName: 'category',
+      width: 120,
+    },
+    {
+      title: '类型',
+      dataIndex: 'isSystem',
+      slotName: 'isSystem',
+      width: 90,
+    },
+    {
+      title: '状态',
+      dataIndex: 'isActive',
+      slotName: 'isActive',
+      width: 90,
+    },
+    {
+      title: '顺序',
+      dataIndex: 'displayOrder',
+      width: 80,
+    },
+    {
+      title: '操作',
+      slotName: 'operations',
+      width: 120,
+      fixed: 'right',
+    },
+  ];
+
+  // 分组查看的列定义
+  const groupedColumns = [
+    {
+      title: '代码',
+      dataIndex: 'code',
+      slotName: 'code',
+    },
+    {
+      title: '名称',
+      dataIndex: 'name',
+    },
+    {
+      title: '操作',
+      dataIndex: 'action',
+    },
+    {
+      title: '状态',
+      dataIndex: 'isActive',
+      slotName: 'isActive',
+    },
+  ];
+
+  // 对话框
+  const modalVisible = ref(false);
+  const isEdit = ref(false);
+  const formRef = ref();
+  const formData = reactive({
     id: '',
     code: '',
     name: '',
@@ -516,154 +469,228 @@ const handleCreate = () => {
     isActive: true,
     displayOrder: 0,
   });
-  modalVisible.value = true;
-};
 
-// 编辑
-const handleEdit = (record: PermissionModel) => {
-  isEdit.value = true;
-  Object.assign(formData, record);
-  modalVisible.value = true;
-};
+  // 分组查看
+  const groupedModalVisible = ref(false);
+  const groupedLoading = ref(false);
+  const groupedPermissions = ref<PermissionGroup[]>([]);
 
-// 删除
-const handleDelete = (record: PermissionModel) => {
-  Modal.confirm({
-    title: '确认删除',
-    content: `确定要删除权限 "${record.name}" (${record.code}) 吗？此操作不可恢复。`,
-    okText: '确认',
-    cancelText: '取消',
-    onOk: async () => {
+  // 加载数据
+  const fetchData = async () => {
+    loading.value = true;
+    try {
+      const params = {
+        ...searchForm,
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+      };
+      const result = await getPermissionList(params);
+      tableData.value = result.items;
+      pagination.total = result.totalCount;
+
+      // 提取资源选项
+      const resources = new Set(result.items.map((item) => item.resource));
+      resourceOptions.value = Array.from(resources).sort();
+    } catch (error) {
+      Message.error('加载权限列表失败');
+      console.error(error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 搜索
+  const search = () => {
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 重置
+  const reset = () => {
+    Object.assign(searchForm, {
+      code: '',
+      resource: '',
+      category: '',
+      isActive: undefined,
+    });
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 分页
+  const onPageChange = (page: number) => {
+    pagination.current = page;
+    fetchData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 创建
+  const handleCreate = () => {
+    isEdit.value = false;
+    Object.assign(formData, {
+      id: '',
+      code: '',
+      name: '',
+      description: '',
+      resource: '',
+      action: '',
+      category: 'administration',
+      isActive: true,
+      displayOrder: 0,
+    });
+    modalVisible.value = true;
+  };
+
+  // 编辑
+  const handleEdit = (record: PermissionModel) => {
+    isEdit.value = true;
+    Object.assign(formData, record);
+    modalVisible.value = true;
+  };
+
+  // 删除
+  const handleDelete = (record: PermissionModel) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: `确定要删除权限 "${record.name}" (${record.code}) 吗？此操作不可恢复。`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await deletePermission(record.id);
+          Message.success('删除成功');
+          fetchData();
+        } catch (error: any) {
+          Message.error(error.response?.data?.message || '删除失败');
+        }
+      },
+    });
+  };
+
+  // 提交表单
+  const handleSubmit = async () => {
+    const valid = await formRef.value?.validate();
+    if (!valid) {
       try {
-        await deletePermission(record.id);
-        Message.success('删除成功');
+        if (isEdit.value) {
+          const updateData: UpdatePermissionDto = {
+            name: formData.name,
+            description: formData.description,
+            isActive: formData.isActive,
+            displayOrder: formData.displayOrder,
+          };
+          await updatePermission(formData.id, updateData);
+          Message.success('更新成功');
+        } else {
+          const createData: CreatePermissionDto = {
+            code: formData.code,
+            name: formData.name,
+            description: formData.description,
+            resource: formData.resource,
+            action: formData.action,
+            category: formData.category,
+            isActive: formData.isActive,
+            displayOrder: formData.displayOrder,
+          };
+          await createPermission(createData);
+          Message.success('创建成功');
+        }
+        modalVisible.value = false;
         fetchData();
       } catch (error: any) {
-        Message.error(error.response?.data?.message || '删除失败');
+        Message.error(error.response?.data?.message || '操作失败');
       }
-    },
-  });
-};
-
-// 提交表单
-const handleSubmit = async () => {
-  const valid = await formRef.value?.validate();
-  if (!valid) {
-    try {
-      if (isEdit.value) {
-        const updateData: UpdatePermissionDto = {
-          name: formData.name,
-          description: formData.description,
-          isActive: formData.isActive,
-          displayOrder: formData.displayOrder,
-        };
-        await updatePermission(formData.id, updateData);
-        Message.success('更新成功');
-      } else {
-        const createData: CreatePermissionDto = {
-          code: formData.code,
-          name: formData.name,
-          description: formData.description,
-          resource: formData.resource,
-          action: formData.action,
-          category: formData.category,
-          isActive: formData.isActive,
-          displayOrder: formData.displayOrder,
-        };
-        await createPermission(createData);
-        Message.success('创建成功');
-      }
-      modalVisible.value = false;
-      fetchData();
-    } catch (error: any) {
-      Message.error(error.response?.data?.message || '操作失败');
     }
-  }
-};
-
-// 取消
-const handleCancel = () => {
-  modalVisible.value = false;
-};
-
-// 按资源查看
-const handleViewGrouped = async () => {
-  groupedModalVisible.value = true;
-  groupedLoading.value = true;
-  try {
-    const response = await getGroupedPermissions();
-    groupedPermissions.value = response;
-  } catch (error) {
-    Message.error('加载分组数据失败');
-  } finally {
-    groupedLoading.value = false;
-  }
-};
-
-// 格式化时间
-const formatDateTime = (dateStr: string | undefined) => {
-  if (!dateStr) return '-';
-  return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
-};
-
-// 获取分类颜色
-const getCategoryColor = (category: string) => {
-  const colors: Record<string, string> = {
-    administration: 'purple',
-    openiddict: 'orange',
-    system: 'cyan',
   };
-  return colors[category] || 'gray';
-};
 
-// 初始化
-onMounted(() => {
-  fetchData();
-});
+  // 取消
+  const handleCancel = () => {
+    modalVisible.value = false;
+  };
+
+  // 按资源查看
+  const handleViewGrouped = async () => {
+    groupedModalVisible.value = true;
+    groupedLoading.value = true;
+    try {
+      const response = await getGroupedPermissions();
+      groupedPermissions.value = response;
+    } catch (error) {
+      Message.error('加载分组数据失败');
+    } finally {
+      groupedLoading.value = false;
+    }
+  };
+
+  // 格式化时间
+  const formatDateTime = (dateStr: string | undefined) => {
+    if (!dateStr) return '-';
+    return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
+  };
+
+  // 获取分类颜色
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      administration: 'purple',
+      openiddict: 'orange',
+      system: 'cyan',
+    };
+    return colors[category] || 'gray';
+  };
+
+  // 初始化
+  onMounted(() => {
+    fetchData();
+  });
 </script>
 
 <style scoped lang="less">
-.permission-management {
-  padding: 20px;
+  .permission-management {
+    padding: 20px;
 
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .search-card {
-    margin-bottom: 16px;
-  }
-
-  .form-item-block {
-    width: 100%;
-  }
-
-  .action-col {
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-start;
-  }
-
-  .table-card {
-    .permissions-cell {
-      max-width: 300px;
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
-    .permissions-popover {
-      .permission-header {
-        font-weight: 600;
-        margin-bottom: 8px;
-        padding-bottom: 8px;
-        border-bottom: 1px solid var(--color-border);
+    .search-card {
+      margin-bottom: 16px;
+    }
+
+    .form-item-block {
+      width: 100%;
+    }
+
+    .action-col {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+    }
+
+    .table-card {
+      .permissions-cell {
+        max-width: 300px;
       }
 
-      .permission-item {
-        padding: 4px 0;
-        display: flex;
-        align-items: center;
+      .permissions-popover {
+        .permission-header {
+          font-weight: 600;
+          margin-bottom: 8px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--color-border);
+        }
+
+        .permission-item {
+          padding: 4px 0;
+          display: flex;
+          align-items: center;
+        }
       }
     }
   }
-}
 </style>

@@ -22,18 +22,21 @@
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
               <a-form-item field="key" label="键" class="form-item-block">
-                <a-input
-                  v-model="model.key"
-                  placeholder="请输入键"
-                  allow-clear
-                >
+                <a-input v-model="model.key" placeholder="请输入键" allow-clear>
                   <template #prefix>
                     <icon-code />
                   </template>
                 </a-input>
               </a-form-item>
             </a-col>
-            <a-col :xs="24" :sm="12" :md="24" :lg="12" :xl="12" class="action-col">
+            <a-col
+              :xs="24"
+              :sm="12"
+              :md="24"
+              :lg="12"
+              :xl="12"
+              class="action-col"
+            >
               <a-space :size="12">
                 <a-button type="primary" @click="handleSearch">
                   <template #icon><icon-search /></template>
@@ -87,7 +90,10 @@
               >
                 <template #icon><icon-edit :size="18" /></template>
               </a-button>
-              <a-popconfirm content="确定要删除此元数据吗？" @ok="handleDel(record.id)">
+              <a-popconfirm
+                content="确定要删除此元数据吗？"
+                @ok="handleDel(record.id)"
+              >
                 <a-button type="text" size="medium" status="danger">
                   <template #icon><icon-delete :size="18" /></template>
                 </a-button>
@@ -181,7 +187,12 @@
         <div class="detail-row">
           <span class="label">可编辑性</span>
           <span class="value">
-            <a-tag v-if="!currentRecord?.nonEditable" color="arcoblue" size="small">可编辑</a-tag>
+            <a-tag
+              v-if="!currentRecord?.nonEditable"
+              color="arcoblue"
+              size="small"
+              >可编辑</a-tag
+            >
             <a-tag v-else color="orange" size="small">锁定</a-tag>
           </span>
         </div>
@@ -197,8 +208,7 @@
 
 <script lang="ts" setup>
   import { reactive, ref, onMounted, onUnmounted } from 'vue';
-  import { PaginationProps } from '@arco-design/web-vue';
-  import { FieldRule } from '@arco-design/web-vue';
+  import { PaginationProps, FieldRule } from '@arco-design/web-vue';
   import {
     ISystemMetadata,
     ISystemMetadataModel,
@@ -370,7 +380,7 @@
 
       .form-item-block {
         width: 100%;
-        
+
         :deep(.arco-form-item-wrapper-col) {
           width: 100%;
         }

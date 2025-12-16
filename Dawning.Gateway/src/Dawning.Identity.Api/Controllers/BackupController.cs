@@ -27,15 +27,19 @@ namespace Dawning.Identity.Api.Controllers
         /// <param name="options">备份选项</param>
         /// <returns>备份结果</returns>
         [HttpPost]
-        public async Task<ActionResult<BackupResult>> CreateBackup([FromBody] BackupOptions? options = null)
+        public async Task<ActionResult<BackupResult>> CreateBackup(
+            [FromBody] BackupOptions? options = null
+        )
         {
-            var result = await _backupService.CreateBackupAsync(options ?? new BackupOptions { IsManual = true });
-            
+            var result = await _backupService.CreateBackupAsync(
+                options ?? new BackupOptions { IsManual = true }
+            );
+
             if (!result.Success)
             {
                 return BadRequest(result);
             }
-            
+
             return Ok(result);
         }
 
@@ -60,12 +64,12 @@ namespace Dawning.Identity.Api.Controllers
         public async Task<ActionResult> DeleteBackup(Guid id)
         {
             var success = await _backupService.DeleteBackupAsync(id);
-            
+
             if (!success)
             {
                 return NotFound(new { message = "备份不存在" });
             }
-            
+
             return Ok(new { message = "备份已删除" });
         }
 
@@ -81,15 +85,17 @@ namespace Dawning.Identity.Api.Controllers
             {
                 return BadRequest(new { message = "保留天数必须大于0" });
             }
-            
+
             var count = await _backupService.CleanupOldBackupsAsync(retentionDays);
-            
-            return Ok(new 
-            { 
-                message = $"已清理 {count} 个过期备份",
-                deletedCount = count,
-                retentionDays = retentionDays
-            });
+
+            return Ok(
+                new
+                {
+                    message = $"已清理 {count} 个过期备份",
+                    deletedCount = count,
+                    retentionDays = retentionDays,
+                }
+            );
         }
 
         /// <summary>
@@ -136,16 +142,18 @@ namespace Dawning.Identity.Api.Controllers
                     failedCount++;
             }
 
-            return Ok(new
-            {
-                totalBackups = history.Count,
-                successfulBackups = successCount,
-                failedBackups = failedCount,
-                totalSizeBytes = totalSize,
-                totalSizeFormatted = FormatFileSize(totalSize),
-                oldestBackup = history.Count > 0 ? history[^1].CreatedAt : (DateTime?)null,
-                latestBackup = history.Count > 0 ? history[0].CreatedAt : (DateTime?)null
-            });
+            return Ok(
+                new
+                {
+                    totalBackups = history.Count,
+                    successfulBackups = successCount,
+                    failedBackups = failedCount,
+                    totalSizeBytes = totalSize,
+                    totalSizeFormatted = FormatFileSize(totalSize),
+                    oldestBackup = history.Count > 0 ? history[^1].CreatedAt : (DateTime?)null,
+                    latestBackup = history.Count > 0 ? history[0].CreatedAt : (DateTime?)null,
+                }
+            );
         }
 
         private static string FormatFileSize(long bytes)

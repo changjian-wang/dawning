@@ -22,7 +22,8 @@ namespace Dawning.Identity.Api.Controllers
 
         public MonitoringController(
             IRequestLoggingService requestLoggingService,
-            IUserService userService)
+            IUserService userService
+        )
         {
             _requestLoggingService = requestLoggingService;
             _userService = userService;
@@ -59,7 +60,8 @@ namespace Dawning.Identity.Api.Controllers
             [FromQuery] bool? onlyErrors = null,
             [FromQuery] long? slowRequestThresholdMs = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20
+        )
         {
             var query = new RequestLogQuery
             {
@@ -75,7 +77,7 @@ namespace Dawning.Identity.Api.Controllers
                 OnlyErrors = onlyErrors,
                 SlowRequestThresholdMs = slowRequestThresholdMs,
                 Page = page,
-                PageSize = Math.Min(pageSize, 100) // Limit page size
+                PageSize = Math.Min(pageSize, 100), // Limit page size
             };
 
             var logs = await _requestLoggingService.GetLogsAsync(query);
@@ -91,7 +93,8 @@ namespace Dawning.Identity.Api.Controllers
         [HttpGet("statistics")]
         public async Task<ActionResult<RequestStatistics>> GetStatistics(
             [FromQuery] DateTime? startTime = null,
-            [FromQuery] DateTime? endTime = null)
+            [FromQuery] DateTime? endTime = null
+        )
         {
             var statistics = await _requestLoggingService.GetStatisticsAsync(startTime, endTime);
             return Ok(statistics);
@@ -135,7 +138,7 @@ namespace Dawning.Identity.Api.Controllers
                 PrivilegedProcessorTime = process.PrivilegedProcessorTime,
 
                 // 时间戳
-                Timestamp = DateTime.UtcNow
+                Timestamp = DateTime.UtcNow,
             };
 
             return Ok(metrics);
@@ -154,7 +157,7 @@ namespace Dawning.Identity.Api.Controllers
 
             // 获取最近1分钟的统计
             var recentStats = await _requestLoggingService.GetStatisticsAsync(oneMinuteAgo, now);
-            
+
             // 获取最近1小时的统计
             var hourlyStats = await _requestLoggingService.GetStatisticsAsync(oneHourAgo, now);
 
@@ -176,7 +179,7 @@ namespace Dawning.Identity.Api.Controllers
                 Uptime = DateTime.Now - process.StartTime,
 
                 // 时间戳
-                Timestamp = now
+                Timestamp = now,
             };
 
             return Ok(data);
@@ -188,7 +191,9 @@ namespace Dawning.Identity.Api.Controllers
         /// <param name="retentionDays">保留天数</param>
         /// <returns>删除的日志数量</returns>
         [HttpPost("logs/cleanup")]
-        public async Task<ActionResult<LogCleanupResult>> CleanupLogs([FromQuery] int retentionDays = 30)
+        public async Task<ActionResult<LogCleanupResult>> CleanupLogs(
+            [FromQuery] int retentionDays = 30
+        )
         {
             if (retentionDays < 1)
             {
@@ -196,13 +201,15 @@ namespace Dawning.Identity.Api.Controllers
             }
 
             var deletedCount = await _requestLoggingService.CleanupOldLogsAsync(retentionDays);
-            
-            return Ok(new LogCleanupResult
-            {
-                DeletedCount = deletedCount,
-                RetentionDays = retentionDays,
-                CleanupTime = DateTime.UtcNow
-            });
+
+            return Ok(
+                new LogCleanupResult
+                {
+                    DeletedCount = deletedCount,
+                    RetentionDays = retentionDays,
+                    CleanupTime = DateTime.UtcNow,
+                }
+            );
         }
 
         /// <summary>
@@ -222,10 +229,14 @@ namespace Dawning.Identity.Api.Controllers
         /// <param name="count">返回数量（默认10）</param>
         /// <returns>最近活跃用户列表</returns>
         [HttpGet("recent-active-users")]
-        public async Task<ActionResult<IEnumerable<RecentActiveUserDto>>> GetRecentActiveUsers([FromQuery] int count = 10)
+        public async Task<ActionResult<IEnumerable<RecentActiveUserDto>>> GetRecentActiveUsers(
+            [FromQuery] int count = 10
+        )
         {
-            if (count < 1) count = 10;
-            if (count > 100) count = 100;
+            if (count < 1)
+                count = 10;
+            if (count > 100)
+                count = 100;
 
             var users = await _userService.GetRecentActiveUsersAsync(count);
             return Ok(users);
@@ -239,20 +250,22 @@ namespace Dawning.Identity.Api.Controllers
         public ActionResult<GcResult> TriggerGarbageCollection()
         {
             var before = GC.GetTotalMemory(false);
-            
+
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            
+
             var after = GC.GetTotalMemory(true);
 
-            return Ok(new GcResult
-            {
-                MemoryBeforeMb = before / (1024.0 * 1024.0),
-                MemoryAfterMb = after / (1024.0 * 1024.0),
-                FreedMb = (before - after) / (1024.0 * 1024.0),
-                Timestamp = DateTime.UtcNow
-            });
+            return Ok(
+                new GcResult
+                {
+                    MemoryBeforeMb = before / (1024.0 * 1024.0),
+                    MemoryAfterMb = after / (1024.0 * 1024.0),
+                    FreedMb = (before - after) / (1024.0 * 1024.0),
+                    Timestamp = DateTime.UtcNow,
+                }
+            );
         }
     }
 

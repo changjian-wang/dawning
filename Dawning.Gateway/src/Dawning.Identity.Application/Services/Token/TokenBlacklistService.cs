@@ -17,9 +17,7 @@ namespace Dawning.Identity.Application.Services.Token
         private const string TokenBlacklistPrefix = "token:blacklist:";
         private const string UserBlacklistPrefix = "user:blacklist:";
 
-        public TokenBlacklistService(
-            IDistributedCache cache,
-            ILogger<TokenBlacklistService> logger)
+        public TokenBlacklistService(IDistributedCache cache, ILogger<TokenBlacklistService> logger)
         {
             _cache = cache;
             _logger = logger;
@@ -41,12 +39,17 @@ namespace Dawning.Identity.Application.Services.Token
                 // 只有在未过期的情况下才添加
                 if (ttl > TimeSpan.Zero)
                 {
-                    await _cache.SetStringAsync(key, "1", new DistributedCacheEntryOptions
-                    {
-                        AbsoluteExpiration = expiration
-                    });
+                    await _cache.SetStringAsync(
+                        key,
+                        "1",
+                        new DistributedCacheEntryOptions { AbsoluteExpiration = expiration }
+                    );
 
-                    _logger.LogDebug("Token {Jti} added to blacklist, expires at {Expiration}", jti, expiration);
+                    _logger.LogDebug(
+                        "Token {Jti} added to blacklist, expires at {Expiration}",
+                        jti,
+                        expiration
+                    );
                 }
             }
             catch (Exception ex)
@@ -89,12 +92,17 @@ namespace Dawning.Identity.Application.Services.Token
                 if (ttl > TimeSpan.Zero)
                 {
                     // 存储黑名单时间戳，之前的所有令牌都无效
-                    await _cache.SetStringAsync(key, DateTime.UtcNow.Ticks.ToString(), new DistributedCacheEntryOptions
-                    {
-                        AbsoluteExpiration = expiration
-                    });
+                    await _cache.SetStringAsync(
+                        key,
+                        DateTime.UtcNow.Ticks.ToString(),
+                        new DistributedCacheEntryOptions { AbsoluteExpiration = expiration }
+                    );
 
-                    _logger.LogInformation("User {UserId} tokens blacklisted until {Expiration}", userId, expiration);
+                    _logger.LogInformation(
+                        "User {UserId} tokens blacklisted until {Expiration}",
+                        userId,
+                        expiration
+                    );
                 }
             }
             catch (Exception ex)
@@ -144,7 +152,8 @@ namespace Dawning.Identity.Application.Services.Token
 
         public InMemoryTokenBlacklistService(
             Microsoft.Extensions.Caching.Memory.IMemoryCache cache,
-            ILogger<InMemoryTokenBlacklistService> logger)
+            ILogger<InMemoryTokenBlacklistService> logger
+        )
         {
             _cache = cache;
             _logger = logger;
@@ -158,7 +167,7 @@ namespace Dawning.Identity.Application.Services.Token
             var key = $"{TokenBlacklistPrefix}{jti}";
             var options = new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = expiration
+                AbsoluteExpiration = expiration,
             };
             _cache.Set(key, true, options);
             _logger.LogDebug("Token {Jti} added to in-memory blacklist", jti);
@@ -179,7 +188,7 @@ namespace Dawning.Identity.Application.Services.Token
             var key = $"{UserBlacklistPrefix}{userId}";
             var options = new Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = expiration
+                AbsoluteExpiration = expiration,
             };
             _cache.Set(key, DateTime.UtcNow.Ticks, options);
             _logger.LogInformation("User {UserId} tokens blacklisted in memory", userId);

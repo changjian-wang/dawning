@@ -22,7 +22,10 @@ namespace Dawning.Identity.Application.Interfaces.Logging
         /// <summary>
         /// 获取请求统计信息
         /// </summary>
-        Task<RequestStatistics> GetStatisticsAsync(DateTime? startTime = null, DateTime? endTime = null);
+        Task<RequestStatistics> GetStatisticsAsync(
+            DateTime? startTime = null,
+            DateTime? endTime = null
+        );
 
         /// <summary>
         /// 清理过期日志

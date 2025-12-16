@@ -297,7 +297,9 @@
               field="dangerousAcceptAnyServerCertificate"
               :label="$t('gateway.cluster.skipCertValidation')"
             >
-              <a-switch v-model="formData.dangerousAcceptAnyServerCertificate" />
+              <a-switch
+                v-model="formData.dangerousAcceptAnyServerCertificate"
+              />
             </a-form-item>
           </a-col>
         </a-row>
@@ -407,7 +409,9 @@
 
   // 表单验证规则
   const formRules = {
-    clusterId: [{ required: true, message: t('gateway.cluster.clusterIdRequired') }],
+    clusterId: [
+      { required: true, message: t('gateway.cluster.clusterIdRequired') },
+    ],
     name: [{ required: true, message: t('gateway.cluster.nameRequired') }],
   };
 
@@ -509,7 +513,9 @@
   ) => {
     try {
       await toggleClusterEnabled(record.id, isEnabled);
-      Message.success(isEnabled ? t('gateway.enableSuccess') : t('gateway.disableSuccess'));
+      Message.success(
+        isEnabled ? t('gateway.enableSuccess') : t('gateway.disableSuccess')
+      );
       loadData();
     } catch (error) {
       Message.error(t('common.operationFailed'));
@@ -533,7 +539,9 @@
       modalVisible.value = false;
       loadData();
     } catch (error: any) {
-      Message.error(error.response?.data?.message || t('common.operationFailed'));
+      Message.error(
+        error.response?.data?.message || t('common.operationFailed')
+      );
     } finally {
       submitLoading.value = false;
     }

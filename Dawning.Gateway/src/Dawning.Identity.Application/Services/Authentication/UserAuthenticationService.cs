@@ -16,7 +16,8 @@ namespace Dawning.Identity.Application.Services.Authentication
 
         public UserAuthenticationService(
             IUserService userService,
-            ILoginLockoutService? lockoutService = null)
+            ILoginLockoutService? lockoutService = null
+        )
         {
             _userService = userService;
             _lockoutService = lockoutService;
@@ -46,7 +47,8 @@ namespace Dawning.Identity.Application.Services.Authentication
                     {
                         IsLockedOut = true,
                         LockoutEnd = lockoutEnd.Value,
-                        LockoutMessage = $"账户已被锁定，请在 {lockoutEnd.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss} 后重试"
+                        LockoutMessage =
+                            $"账户已被锁定，请在 {lockoutEnd.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss} 后重试",
                     };
                 }
             }
@@ -62,16 +64,17 @@ namespace Dawning.Identity.Application.Services.Authentication
                 // 记录登录失败
                 if (_lockoutService != null)
                 {
-                    var (failedCount, isLockedOut, lockoutEndTime) = 
+                    var (failedCount, isLockedOut, lockoutEndTime) =
                         await _lockoutService.RecordFailedLoginAsync(username);
-                    
+
                     if (isLockedOut && lockoutEndTime.HasValue)
                     {
                         return new UserAuthenticationDto
                         {
                             IsLockedOut = true,
                             LockoutEnd = lockoutEndTime.Value,
-                            LockoutMessage = $"登录失败次数过多，账户已被锁定至 {lockoutEndTime.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss}"
+                            LockoutMessage =
+                                $"登录失败次数过多，账户已被锁定至 {lockoutEndTime.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss}",
                         };
                     }
                 }

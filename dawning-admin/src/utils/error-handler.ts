@@ -138,10 +138,7 @@ function getNetworkErrorMessage(code: string): string {
 /**
  * 统一处理错误
  */
-export function handleError(
-  error: unknown,
-  config: ErrorConfig = {}
-): string {
+export function handleError(error: unknown, config: ErrorConfig = {}): string {
   const finalConfig = { ...DEFAULT_CONFIG, ...config };
   const message = finalConfig.customMessage || extractErrorMessage(error);
 

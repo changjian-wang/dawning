@@ -20,7 +20,9 @@ namespace Dawning.Identity.Application.Interfaces.Security
         /// </summary>
         /// <param name="username">用户名</param>
         /// <returns>返回当前失败次数和是否被锁定</returns>
-        Task<(int failedCount, bool isLockedOut, DateTime? lockoutEnd)> RecordFailedLoginAsync(string username);
+        Task<(int failedCount, bool isLockedOut, DateTime? lockoutEnd)> RecordFailedLoginAsync(
+            string username
+        );
 
         /// <summary>
         /// 重置登录失败计数（登录成功后调用）

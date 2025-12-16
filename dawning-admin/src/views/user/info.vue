@@ -6,7 +6,7 @@
         <div class="avatar-section">
           <a-avatar :size="100" :style="{ backgroundColor: '#165dff' }">
             <template v-if="!userStore.avatar">
-              <span style="font-size: 40px; font-weight: 500; color: #fff;">
+              <span style="font-size: 40px; font-weight: 500; color: #fff">
                 {{ userInitial }}
               </span>
             </template>
@@ -37,7 +37,11 @@
               <span class="info-label">{{ $t('userCenter.role') }}</span>
               <span class="info-value">
                 <a-space>
-                  <a-tag v-for="role in userRoles" :key="role" :color="getRoleColor(role)">
+                  <a-tag
+                    v-for="role in userRoles"
+                    :key="role"
+                    :color="getRoleColor(role)"
+                  >
                     {{ getRoleLabel(role) }}
                   </a-tag>
                 </a-space>
@@ -48,8 +52,12 @@
               <span class="info-value">{{ userStore.phone || '-' }}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">{{ $t('userCenter.registrationDate') }}</span>
-              <span class="info-value">{{ userStore.registrationDate || '-' }}</span>
+              <span class="info-label">{{
+                $t('userCenter.registrationDate')
+              }}</span>
+              <span class="info-value">{{
+                userStore.registrationDate || '-'
+              }}</span>
             </div>
           </div>
         </div>
@@ -180,7 +188,7 @@
     width: 100%;
     background: var(--color-fill-2);
     border-radius: 12px;
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.03);
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.03);
     padding: 32px 32px 24px 32px;
     display: flex;
     flex-direction: column;

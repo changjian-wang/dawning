@@ -18,7 +18,10 @@ namespace Dawning.Identity.Application.Services.Logging
         private readonly IDbConnection _connection;
         private readonly ILogger<RequestLoggingService> _logger;
 
-        public RequestLoggingService(IDbConnection connection, ILogger<RequestLoggingService> logger)
+        public RequestLoggingService(
+            IDbConnection connection,
+            ILogger<RequestLoggingService> logger
+        )
         {
             _connection = connection;
             _logger = logger;
@@ -29,7 +32,8 @@ namespace Dawning.Identity.Application.Services.Logging
         {
             try
             {
-                const string sql = @"
+                const string sql =
+                    @"
                     INSERT INTO request_logs 
                     (id, request_id, method, path, query_string, status_code, response_time_ms, 
                      client_ip, user_agent, user_id, user_name, request_time, 
@@ -39,25 +43,28 @@ namespace Dawning.Identity.Application.Services.Logging
                      @ClientIp, @UserAgent, @UserId, @UserName, @RequestTime,
                      @RequestBodySize, @ResponseBodySize, @Exception, @AdditionalInfo)";
 
-                await _connection.ExecuteAsync(sql, new
-                {
-                    entry.Id,
-                    entry.RequestId,
-                    entry.Method,
-                    entry.Path,
-                    entry.QueryString,
-                    entry.StatusCode,
-                    entry.ResponseTimeMs,
-                    entry.ClientIp,
-                    entry.UserAgent,
-                    entry.UserId,
-                    entry.UserName,
-                    entry.RequestTime,
-                    entry.RequestBodySize,
-                    entry.ResponseBodySize,
-                    entry.Exception,
-                    entry.AdditionalInfo
-                });
+                await _connection.ExecuteAsync(
+                    sql,
+                    new
+                    {
+                        entry.Id,
+                        entry.RequestId,
+                        entry.Method,
+                        entry.Path,
+                        entry.QueryString,
+                        entry.StatusCode,
+                        entry.ResponseTimeMs,
+                        entry.ClientIp,
+                        entry.UserAgent,
+                        entry.UserId,
+                        entry.UserName,
+                        entry.RequestTime,
+                        entry.RequestBodySize,
+                        entry.ResponseBodySize,
+                        entry.Exception,
+                        entry.AdditionalInfo,
+                    }
+                );
             }
             catch (Exception ex)
             {
@@ -136,9 +143,8 @@ namespace Dawning.Identity.Application.Services.Logging
                 parameters.Add("SlowThreshold", query.SlowRequestThresholdMs.Value);
             }
 
-            var whereClause = whereConditions.Count > 0 
-                ? "WHERE " + string.Join(" AND ", whereConditions) 
-                : "";
+            var whereClause =
+                whereConditions.Count > 0 ? "WHERE " + string.Join(" AND ", whereConditions) : "";
 
             // Get total count
             var countSql = $"SELECT COUNT(*) FROM request_logs {whereClause}";
@@ -149,7 +155,8 @@ namespace Dawning.Identity.Application.Services.Logging
             parameters.Add("Offset", offset);
             parameters.Add("Limit", query.PageSize);
 
-            var dataSql = $@"
+            var dataSql =
+                $@"
                 SELECT 
                     id as Id, request_id as RequestId, method as Method, path as Path, 
                     query_string as QueryString, status_code as StatusCode, 
@@ -170,12 +177,15 @@ namespace Dawning.Identity.Application.Services.Logging
                 Items = items.ToList(),
                 TotalCount = totalCount,
                 Page = query.Page,
-                PageSize = query.PageSize
+                PageSize = query.PageSize,
             };
         }
 
         /// <inheritdoc />
-        public async Task<RequestStatistics> GetStatisticsAsync(DateTime? startTime = null, DateTime? endTime = null)
+        public async Task<RequestStatistics> GetStatisticsAsync(
+            DateTime? startTime = null,
+            DateTime? endTime = null
+        )
         {
             var start = startTime ?? DateTime.UtcNow.AddDays(-1);
             var end = endTime ?? DateTime.UtcNow;
@@ -183,7 +193,8 @@ namespace Dawning.Identity.Application.Services.Logging
             var parameters = new { StartTime = start, EndTime = end };
 
             // Basic statistics
-            var basicStatsSql = @"
+            var basicStatsSql =
+                @"
                 SELECT 
                     COUNT(*) as TotalRequests,
                     SUM(CASE WHEN status_code >= 200 AND status_code < 300 THEN 1 ELSE 0 END) as SuccessRequests,
@@ -207,11 +218,12 @@ namespace Dawning.Identity.Application.Services.Logging
                 MaxResponseTimeMs = basicStats.MaxResponseTimeMs ?? 0,
                 MinResponseTimeMs = basicStats.MinResponseTimeMs ?? 0,
                 StartTime = start,
-                EndTime = end
+                EndTime = end,
             };
 
             // Status code distribution
-            var statusDistSql = @"
+            var statusDistSql =
+                @"
                 SELECT status_code as StatusCode, COUNT(*) as Count
                 FROM request_logs
                 WHERE request_time >= @StartTime AND request_time <= @EndTime
@@ -219,11 +231,14 @@ namespace Dawning.Identity.Application.Services.Logging
                 ORDER BY Count DESC";
 
             var statusDist = await _connection.QueryAsync<dynamic>(statusDistSql, parameters);
-            statistics.StatusCodeDistribution = statusDist
-                .ToDictionary(x => (int)x.StatusCode, x => (long)x.Count);
+            statistics.StatusCodeDistribution = statusDist.ToDictionary(
+                x => (int)x.StatusCode,
+                x => (long)x.Count
+            );
 
             // Top paths
-            var topPathsSql = @"
+            var topPathsSql =
+                @"
                 SELECT 
                     path as Path,
                     COUNT(*) as RequestCount,
@@ -239,7 +254,8 @@ namespace Dawning.Identity.Application.Services.Logging
             statistics.TopPaths = topPaths.ToList();
 
             // Hourly requests
-            var hourlyRequestsSql = @"
+            var hourlyRequestsSql =
+                @"
                 SELECT 
                     DATE_FORMAT(request_time, '%Y-%m-%d %H:00') as Hour,
                     COUNT(*) as Count
@@ -248,28 +264,40 @@ namespace Dawning.Identity.Application.Services.Logging
                 GROUP BY Hour
                 ORDER BY Hour";
 
-            var hourlyRequests = await _connection.QueryAsync<dynamic>(hourlyRequestsSql, parameters);
-            statistics.HourlyRequests = hourlyRequests
-                .ToDictionary(x => (string)x.Hour, x => (long)x.Count);
+            var hourlyRequests = await _connection.QueryAsync<dynamic>(
+                hourlyRequestsSql,
+                parameters
+            );
+            statistics.HourlyRequests = hourlyRequests.ToDictionary(
+                x => (string)x.Hour,
+                x => (long)x.Count
+            );
 
             // P95 and P99 (approximate using percentile calculation)
             if (statistics.TotalRequests > 0)
             {
-                var percentilesSql = @"
+                var percentilesSql =
+                    @"
                     SELECT response_time_ms
                     FROM request_logs
                     WHERE request_time >= @StartTime AND request_time <= @EndTime
                     ORDER BY response_time_ms";
 
-                var responseTimes = (await _connection.QueryAsync<long>(percentilesSql, parameters)).ToList();
-                
+                var responseTimes = (
+                    await _connection.QueryAsync<long>(percentilesSql, parameters)
+                ).ToList();
+
                 if (responseTimes.Count > 0)
                 {
                     var p95Index = (int)Math.Ceiling(responseTimes.Count * 0.95) - 1;
                     var p99Index = (int)Math.Ceiling(responseTimes.Count * 0.99) - 1;
-                    
-                    statistics.P95ResponseTimeMs = responseTimes[Math.Max(0, Math.Min(p95Index, responseTimes.Count - 1))];
-                    statistics.P99ResponseTimeMs = responseTimes[Math.Max(0, Math.Min(p99Index, responseTimes.Count - 1))];
+
+                    statistics.P95ResponseTimeMs = responseTimes[
+                        Math.Max(0, Math.Min(p95Index, responseTimes.Count - 1))
+                    ];
+                    statistics.P99ResponseTimeMs = responseTimes[
+                        Math.Max(0, Math.Min(p99Index, responseTimes.Count - 1))
+                    ];
                 }
             }
 
@@ -280,14 +308,17 @@ namespace Dawning.Identity.Application.Services.Logging
         public async Task<int> CleanupOldLogsAsync(int retentionDays)
         {
             var cutoffDate = DateTime.UtcNow.AddDays(-retentionDays);
-            
+
             const string sql = "DELETE FROM request_logs WHERE request_time < @CutoffDate";
-            
+
             var deletedCount = await _connection.ExecuteAsync(sql, new { CutoffDate = cutoffDate });
-            
-            _logger.LogInformation("Cleaned up {DeletedCount} old request logs older than {RetentionDays} days", 
-                deletedCount, retentionDays);
-            
+
+            _logger.LogInformation(
+                "Cleaned up {DeletedCount} old request logs older than {RetentionDays} days",
+                deletedCount,
+                retentionDays
+            );
+
             return deletedCount;
         }
     }

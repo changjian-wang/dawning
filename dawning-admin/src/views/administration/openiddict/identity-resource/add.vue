@@ -10,7 +10,7 @@
         :rules="rules"
         @submit.prevent="handleSubmit"
       >
-        <a-tabs :default-active-key="1" v-model:active-key="activeKey">
+        <a-tabs v-model:active-key="activeKey" :default-active-key="1">
           <a-tab-pane :key="1" title="基本信息">
             <a-card class="general-card">
               <a-row :gutter="80">

@@ -11,7 +11,7 @@
         :rules="rules"
         @submit="handleSubmit"
       >
-        <a-tabs :default-active-key="1" v-model:active-key="activeKey">
+        <a-tabs v-model:active-key="activeKey" :default-active-key="1">
           <a-tab-pane :key="1" title="基本信息" @click="handleTabClick(1)">
             <a-card class="general-card">
               <a-row :gutter="80">
@@ -134,8 +134,8 @@
                 <a-col :span="24">
                   <a-form-item label="授权类型">
                     <a-select
-                      default-value="hybrid"
                       v-model="form.allowedGrantTypes"
+                      default-value="hybrid"
                     >
                       <a-option value="hybrid">Hybrid</a-option>
                       <a-option value="implicit" disabled>Implicit</a-option>
@@ -175,9 +175,9 @@
                   <a-form-item label="CORS">
                     <a-space>
                       <a-tag
-                        :color="'arcoblue'"
                         v-for="cors of corsOrigins"
                         :key="cors"
+                        :color="'arcoblue'"
                         :closable="true"
                         @close="handleCorsRemove(cors)"
                       >
@@ -186,9 +186,9 @@
                       <a-input
                         v-if="showCorsInput"
                         ref="corsInputRef"
+                        v-model.trim="corsInputVal"
                         :style="{ width: '90px' }"
                         size="mini"
-                        v-model.trim="corsInputVal"
                         @keyup.enter="handleCorsAdd"
                         @blur="handleCorsAdd"
                       />
@@ -222,7 +222,7 @@
                 <a-row :gutter="80">
                   <a-col :span="12">
                     <a-form-item label="类型">
-                      <a-select placeholder="请选择" v-model="secretForm.type">
+                      <a-select v-model="secretForm.type" placeholder="请选择">
                         <a-option>Shared Secret</a-option>
                         <a-option disabled>X509 Certificate Base64</a-option>
                         <a-option disabled>X509 Name</a-option>
@@ -234,7 +234,7 @@
                     <a-form-item label="密钥过期时间">
                       <a-date-picker
                         v-model="secretForm.expiration"
-                        :disabledDate="
+                        :disabled-date="
                           (current: any) => dayjs(current).isBefore(dayjs())
                         "
                       />
@@ -273,8 +273,8 @@
               >
                 <a-button
                   type="primary"
-                  @click="!!secretForm.value && handleAddSecret()"
                   :disabled="!secretForm.value"
+                  @click="!!secretForm.value && handleAddSecret()"
                 >
                   <template #icon>
                     <icon-plus />
@@ -473,8 +473,8 @@
                 </a-col>
                 <a-col :span="12">
                   <a-form-item
-                    label="刷新令牌滑动有效期"
                     v-if="form.refreshTokenExpiration == 0"
+                    label="刷新令牌滑动有效期"
                   >
                     <a-space>
                       <a-input-number
@@ -619,8 +619,8 @@
               >
                 <template #uri="{ record, rowIndex }">
                   <a-input
-                    :ref="(el: any) => setEditInputRef(el, rowIndex)"
                     v-if="record.isEditing"
+                    :ref="(el: any) => setEditInputRef(el, rowIndex)"
                     v-model="redirectUriData[rowIndex].uri"
                     @press-enter="
                       (event: any) => {
@@ -852,7 +852,7 @@
 
     <!-- Modals -->
     <div class="add-uri">
-      <a-modal width="800px" v-model:visible="visibleWithAddURI">
+      <a-modal v-model:visible="visibleWithAddURI" width="800px">
         <template #title> 新增URI </template>
         <a-form
           class="form"
@@ -873,10 +873,10 @@
               <a-col :span="24">
                 <a-form-item label="登录/注销">
                   <a-switch
+                    v-model="redirectUriForm.type"
                     checked-color="#14C9C9"
                     unchecked-color="#F53F3F"
                     type="round"
-                    v-model="redirectUriForm.type"
                     :checked-value="RedirectTypes.Callback"
                     :unchecked-value="RedirectTypes.Signout"
                   >
@@ -913,8 +913,8 @@
     </div>
     <div class="add-claim">
       <a-modal
-        width="800px"
         v-model:visible="visibleWithAddClaim"
+        width="800px"
         @ok="handleAddClaim"
       >
         <a-form
@@ -927,11 +927,11 @@
             <a-row :gutter="80">
               <a-col :span="24">
                 <a-form-item label="声明类型">
-                  <a-select placeholder="请选择类型" v-model="claimForm.type">
+                  <a-select v-model="claimForm.type" placeholder="请选择类型">
                     <a-option
                       v-for="(item, index) in claimTypeOptions"
-                      :value="item.name"
                       :key="index"
+                      :value="item.name"
                       >{{ item.displayName }}({{ item.name }})</a-option
                     >
                   </a-select>
@@ -940,8 +940,8 @@
               <a-col :span="24">
                 <a-form-item label="声明值">
                   <a-input
-                    placeholder="输入声明的值"
                     v-model="claimForm.value"
+                    placeholder="输入声明的值"
                   />
                 </a-form-item>
               </a-col>

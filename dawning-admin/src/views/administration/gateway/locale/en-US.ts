@@ -24,7 +24,8 @@ export default {
   'gateway.cluster.description': 'Description',
   'gateway.cluster.descriptionPlaceholder': 'Enter cluster description',
   'gateway.cluster.destinations': 'Destinations',
-  'gateway.cluster.destinationsPlaceholder': 'JSON format, e.g.: {"dest1":{"Address":"http://localhost:5000"}}',
+  'gateway.cluster.destinationsPlaceholder':
+    'JSON format, e.g.: {"dest1":{"Address":"http://localhost:5000"}}',
   'gateway.cluster.destinationsRequired': 'Destinations are required',
   'gateway.cluster.isEnabled': 'Enabled',
 
@@ -68,7 +69,8 @@ export default {
   'gateway.route.clusterIdPlaceholder': 'Select target cluster',
   'gateway.route.clusterIdRequired': 'Target cluster is required',
   'gateway.route.matchPath': 'Match Path',
-  'gateway.route.matchPathPlaceholder': 'Path pattern, e.g.: /api/{**catch-all}',
+  'gateway.route.matchPathPlaceholder':
+    'Path pattern, e.g.: /api/{**catch-all}',
   'gateway.route.matchPathRequired': 'Match path is required',
   'gateway.route.matchMethods': 'Match Methods',
   'gateway.route.matchMethodsPlaceholder': 'Leave empty to match all methods',

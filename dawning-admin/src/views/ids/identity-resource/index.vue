@@ -157,9 +157,9 @@
       @before-ok="handleModalOk"
     >
       <a-form
+        ref="formRef"
         :model="formData"
         :rules="formRules"
-        ref="formRef"
         layout="vertical"
       >
         <a-row :gutter="16">
@@ -260,10 +260,7 @@
         }}</a-divider>
         <a-form-item>
           <a-space direction="vertical" fill>
-            <a-space
-              v-for="(claim, index) in formData.userClaims"
-              :key="index"
-            >
+            <a-space v-for="(claim, index) in formData.userClaims" :key="index">
               <a-input
                 v-model="formData.userClaims[index]"
                 :placeholder="$t('ids.identityResource.userClaims.placeholder')"
@@ -279,12 +276,7 @@
                 <template #icon><icon-delete /></template>
               </a-button>
             </a-space>
-            <a-button
-              v-if="!isView"
-              type="dashed"
-              long
-              @click="handleAddClaim"
-            >
+            <a-button v-if="!isView" type="dashed" long @click="handleAddClaim">
               <template #icon><icon-plus /></template>
               {{ $t('ids.identityResource.userClaims.add') }}
             </a-button>
@@ -339,271 +331,117 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted } from 'vue';
-import { Message } from '@arco-design/web-vue';
-import { useI18n } from 'vue-i18n';
-import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
-import {
-  getIdentityResourcesPaged,
-  createIdentityResource,
-  updateIdentityResource,
-  deleteIdentityResource,
-  type IdentityResourceDto,
-  type IdentityResourcePagedQuery,
-} from '@/api/ids/identity-resource';
+  import { ref, reactive, computed, onMounted } from 'vue';
+  import { Message } from '@arco-design/web-vue';
+  import { useI18n } from 'vue-i18n';
+  import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
+  import {
+    getIdentityResourcesPaged,
+    createIdentityResource,
+    updateIdentityResource,
+    deleteIdentityResource,
+    type IdentityResourceDto,
+    type IdentityResourcePagedQuery,
+  } from '@/api/ids/identity-resource';
 
-const { t } = useI18n();
+  const { t } = useI18n();
 
-// 搜索表单
-const searchForm = reactive({
-  name: '',
-  displayName: '',
-  enabled: undefined as boolean | undefined,
-  required: undefined as boolean | undefined,
-});
+  // 搜索表单
+  const searchForm = reactive({
+    name: '',
+    displayName: '',
+    enabled: undefined as boolean | undefined,
+    required: undefined as boolean | undefined,
+  });
 
-// 表格数据
-const tableData = ref<IdentityResourceDto[]>([]);
-const loading = ref(false);
-const pagination = reactive({
-  current: 1,
-  pageSize: 10,
-  total: 0,
-  showTotal: true,
-  showPageSize: true,
-});
+  // 表格数据
+  const tableData = ref<IdentityResourceDto[]>([]);
+  const loading = ref(false);
+  const pagination = reactive({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    showTotal: true,
+    showPageSize: true,
+  });
 
-// 表格列配置
-const columns = computed<TableColumnData[]>(() => [
-  {
-    title: t('ids.identityResource.name'),
-    dataIndex: 'name',
-    slotName: 'name',
-    width: 150,
-  },
-  {
-    title: t('ids.identityResource.displayName'),
-    dataIndex: 'displayName',
-    width: 180,
-  },
-  {
-    title: t('ids.identityResource.description'),
-    dataIndex: 'description',
-    ellipsis: true,
-    tooltip: true,
-  },
-  {
-    title: t('ids.identityResource.enabled'),
-    dataIndex: 'enabled',
-    slotName: 'enabled',
-    width: 100,
-  },
-  {
-    title: t('ids.identityResource.required'),
-    dataIndex: 'required',
-    slotName: 'required',
-    width: 100,
-  },
-  {
-    title: t('ids.identityResource.emphasize'),
-    dataIndex: 'emphasize',
-    slotName: 'emphasize',
-    width: 100,
-  },
-  {
-    title: t('ids.identityResource.userClaims'),
-    dataIndex: 'userClaims',
-    slotName: 'userClaims',
-    width: 250,
-  },
-  {
-    title: t('ids.identityResource.createdAt'),
-    dataIndex: 'createdAt',
-    slotName: 'createdAt',
-    width: 180,
-  },
-  {
-    title: t('common.operations'),
-    slotName: 'operations',
-    width: 200,
-    fixed: 'right',
-  },
-]);
-
-// 模态框
-const modalVisible = ref(false);
-const modalMode = ref<'create' | 'edit' | 'view'>('create');
-const modalTitle = computed(() => {
-  switch (modalMode.value) {
-    case 'create':
-      return t('ids.identityResource.create');
-    case 'edit':
-      return t('ids.identityResource.edit');
-    case 'view':
-      return t('ids.identityResource.view');
-    default:
-      return '';
-  }
-});
-const isView = computed(() => modalMode.value === 'view');
-
-// 表单数据
-const formRef = ref();
-const formData = reactive<IdentityResourceDto>({
-  name: '',
-  displayName: '',
-  description: '',
-  enabled: true,
-  required: false,
-  emphasize: false,
-  showInDiscoveryDocument: true,
-  userClaims: [],
-  properties: {},
-});
-
-// 表单验证规则
-const formRules = {
-  name: [
-    { required: true, message: t('ids.identityResource.name.required') },
-    { minLength: 2, message: t('ids.identityResource.name.minLength') },
-  ],
-  displayName: [
+  // 表格列配置
+  const columns = computed<TableColumnData[]>(() => [
     {
-      required: true,
-      message: t('ids.identityResource.displayName.required'),
+      title: t('ids.identityResource.name'),
+      dataIndex: 'name',
+      slotName: 'name',
+      width: 150,
     },
-  ],
-};
+    {
+      title: t('ids.identityResource.displayName'),
+      dataIndex: 'displayName',
+      width: 180,
+    },
+    {
+      title: t('ids.identityResource.description'),
+      dataIndex: 'description',
+      ellipsis: true,
+      tooltip: true,
+    },
+    {
+      title: t('ids.identityResource.enabled'),
+      dataIndex: 'enabled',
+      slotName: 'enabled',
+      width: 100,
+    },
+    {
+      title: t('ids.identityResource.required'),
+      dataIndex: 'required',
+      slotName: 'required',
+      width: 100,
+    },
+    {
+      title: t('ids.identityResource.emphasize'),
+      dataIndex: 'emphasize',
+      slotName: 'emphasize',
+      width: 100,
+    },
+    {
+      title: t('ids.identityResource.userClaims'),
+      dataIndex: 'userClaims',
+      slotName: 'userClaims',
+      width: 250,
+    },
+    {
+      title: t('ids.identityResource.createdAt'),
+      dataIndex: 'createdAt',
+      slotName: 'createdAt',
+      width: 180,
+    },
+    {
+      title: t('common.operations'),
+      slotName: 'operations',
+      width: 200,
+      fixed: 'right',
+    },
+  ]);
 
-// 加载数据
-const fetchData = async () => {
-  loading.value = true;
-  try {
-    const query: IdentityResourcePagedQuery = {
-      pageIndex: pagination.current,
-      pageSize: pagination.pageSize,
-      model: {
-        name: searchForm.name || undefined,
-        displayName: searchForm.displayName || undefined,
-        enabled: searchForm.enabled,
-        required: searchForm.required,
-      },
-    };
-
-    const { data } = await getIdentityResourcesPaged(query);
-    tableData.value = data.items;
-    pagination.total = data.totalCount;
-  } catch (error) {
-    Message.error(t('common.loadFailed'));
-  } finally {
-    loading.value = false;
-  }
-};
-
-// 搜索
-const handleSearch = () => {
-  pagination.current = 1;
-  fetchData();
-};
-
-// 重置
-const handleReset = () => {
-  searchForm.name = '';
-  searchForm.displayName = '';
-  searchForm.enabled = undefined;
-  searchForm.required = undefined;
-  pagination.current = 1;
-  fetchData();
-};
-
-// 分页变化
-const handlePageChange = (page: number) => {
-  pagination.current = page;
-  fetchData();
-};
-
-const handlePageSizeChange = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.current = 1;
-  fetchData();
-};
-
-// 创建
-const handleCreate = () => {
-  modalMode.value = 'create';
-  resetFormData();
-  modalVisible.value = true;
-};
-
-// 查看
-const handleView = (record: IdentityResourceDto) => {
-  modalMode.value = 'view';
-  Object.assign(formData, {
-    ...record,
-    userClaims: [...(record.userClaims || [])],
-    properties: record.properties ? { ...record.properties } : {},
-  });
-  modalVisible.value = true;
-};
-
-// 编辑
-const handleEdit = (record: IdentityResourceDto) => {
-  modalMode.value = 'edit';
-  Object.assign(formData, {
-    ...record,
-    userClaims: [...(record.userClaims || [])],
-    properties: record.properties ? { ...record.properties } : {},
-  });
-  modalVisible.value = true;
-};
-
-// 删除
-const handleDelete = async (record: IdentityResourceDto) => {
-  try {
-    await deleteIdentityResource(record.id!);
-    Message.success(t('common.deleteSuccess'));
-    fetchData();
-  } catch (error) {
-    Message.error(t('common.deleteFailed'));
-  }
-};
-
-// 模态框确认
-const handleModalOk = async () => {
-  if (isView.value) {
-    modalVisible.value = false;
-    return true;
-  }
-
-  try {
-    await formRef.value.validate();
-
-    if (modalMode.value === 'create') {
-      await createIdentityResource(formData);
-      Message.success(t('common.createSuccess'));
-    } else {
-      await updateIdentityResource(formData.id!, formData);
-      Message.success(t('common.updateSuccess'));
+  // 模态框
+  const modalVisible = ref(false);
+  const modalMode = ref<'create' | 'edit' | 'view'>('create');
+  const modalTitle = computed(() => {
+    switch (modalMode.value) {
+      case 'create':
+        return t('ids.identityResource.create');
+      case 'edit':
+        return t('ids.identityResource.edit');
+      case 'view':
+        return t('ids.identityResource.view');
+      default:
+        return '';
     }
+  });
+  const isView = computed(() => modalMode.value === 'view');
 
-    modalVisible.value = false;
-    fetchData();
-    return true;
-  } catch (error) {
-    return false;
-  }
-};
-
-// 模态框取消
-const handleModalCancel = () => {
-  modalVisible.value = false;
-  formRef.value?.clearValidate();
-};
-
-// 重置表单数据
-const resetFormData = () => {
-  Object.assign(formData, {
-    id: undefined,
+  // 表单数据
+  const formRef = ref();
+  const formData = reactive<IdentityResourceDto>({
     name: '',
     displayName: '',
     description: '',
@@ -614,62 +452,216 @@ const resetFormData = () => {
     userClaims: [],
     properties: {},
   });
-  formRef.value?.clearValidate();
-};
 
-// 添加 Claim
-const handleAddClaim = () => {
-  formData.userClaims.push('');
-};
+  // 表单验证规则
+  const formRules = {
+    name: [
+      { required: true, message: t('ids.identityResource.name.required') },
+      { minLength: 2, message: t('ids.identityResource.name.minLength') },
+    ],
+    displayName: [
+      {
+        required: true,
+        message: t('ids.identityResource.displayName.required'),
+      },
+    ],
+  };
 
-// 删除 Claim
-const handleRemoveClaim = (index: number) => {
-  formData.userClaims.splice(index, 1);
-};
+  // 加载数据
+  const fetchData = async () => {
+    loading.value = true;
+    try {
+      const query: IdentityResourcePagedQuery = {
+        pageIndex: pagination.current,
+        pageSize: pagination.pageSize,
+        model: {
+          name: searchForm.name || undefined,
+          displayName: searchForm.displayName || undefined,
+          enabled: searchForm.enabled,
+          required: searchForm.required,
+        },
+      };
 
-// 添加属性
-const handleAddProperty = () => {
-  const key = `property_${Date.now()}`;
-  formData.properties = formData.properties || {};
-  formData.properties[key] = '';
-};
+      const { data } = await getIdentityResourcesPaged(query);
+      tableData.value = data.items;
+      pagination.total = data.totalCount;
+    } catch (error) {
+      Message.error(t('common.loadFailed'));
+    } finally {
+      loading.value = false;
+    }
+  };
 
-// 删除属性
-const handleRemoveProperty = (key: string) => {
-  if (formData.properties) {
-    delete formData.properties[key];
-  }
-};
+  // 搜索
+  const handleSearch = () => {
+    pagination.current = 1;
+    fetchData();
+  };
 
-// 修改属性键
-const handlePropertyKeyChange = (oldKey: string, newKey: string) => {
-  if (oldKey === newKey || !formData.properties) return;
+  // 重置
+  const handleReset = () => {
+    searchForm.name = '';
+    searchForm.displayName = '';
+    searchForm.enabled = undefined;
+    searchForm.required = undefined;
+    pagination.current = 1;
+    fetchData();
+  };
 
-  const value = formData.properties[oldKey];
-  delete formData.properties[oldKey];
-  formData.properties[newKey] = value;
-};
+  // 分页变化
+  const handlePageChange = (page: number) => {
+    pagination.current = page;
+    fetchData();
+  };
 
-// 格式化日期时间
-const formatDateTime = (dateStr: string | undefined) => {
-  if (!dateStr) return '-';
-  return new Date(dateStr).toLocaleString();
-};
+  const handlePageSizeChange = (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.current = 1;
+    fetchData();
+  };
 
-// 挂载时加载数据
-onMounted(() => {
-  fetchData();
-});
+  // 创建
+  const handleCreate = () => {
+    modalMode.value = 'create';
+    resetFormData();
+    modalVisible.value = true;
+  };
+
+  // 查看
+  const handleView = (record: IdentityResourceDto) => {
+    modalMode.value = 'view';
+    Object.assign(formData, {
+      ...record,
+      userClaims: [...(record.userClaims || [])],
+      properties: record.properties ? { ...record.properties } : {},
+    });
+    modalVisible.value = true;
+  };
+
+  // 编辑
+  const handleEdit = (record: IdentityResourceDto) => {
+    modalMode.value = 'edit';
+    Object.assign(formData, {
+      ...record,
+      userClaims: [...(record.userClaims || [])],
+      properties: record.properties ? { ...record.properties } : {},
+    });
+    modalVisible.value = true;
+  };
+
+  // 删除
+  const handleDelete = async (record: IdentityResourceDto) => {
+    try {
+      await deleteIdentityResource(record.id!);
+      Message.success(t('common.deleteSuccess'));
+      fetchData();
+    } catch (error) {
+      Message.error(t('common.deleteFailed'));
+    }
+  };
+
+  // 模态框确认
+  const handleModalOk = async () => {
+    if (isView.value) {
+      modalVisible.value = false;
+      return true;
+    }
+
+    try {
+      await formRef.value.validate();
+
+      if (modalMode.value === 'create') {
+        await createIdentityResource(formData);
+        Message.success(t('common.createSuccess'));
+      } else {
+        await updateIdentityResource(formData.id!, formData);
+        Message.success(t('common.updateSuccess'));
+      }
+
+      modalVisible.value = false;
+      fetchData();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  // 模态框取消
+  const handleModalCancel = () => {
+    modalVisible.value = false;
+    formRef.value?.clearValidate();
+  };
+
+  // 重置表单数据
+  const resetFormData = () => {
+    Object.assign(formData, {
+      id: undefined,
+      name: '',
+      displayName: '',
+      description: '',
+      enabled: true,
+      required: false,
+      emphasize: false,
+      showInDiscoveryDocument: true,
+      userClaims: [],
+      properties: {},
+    });
+    formRef.value?.clearValidate();
+  };
+
+  // 添加 Claim
+  const handleAddClaim = () => {
+    formData.userClaims.push('');
+  };
+
+  // 删除 Claim
+  const handleRemoveClaim = (index: number) => {
+    formData.userClaims.splice(index, 1);
+  };
+
+  // 添加属性
+  const handleAddProperty = () => {
+    const key = `property_${Date.now()}`;
+    formData.properties = formData.properties || {};
+    formData.properties[key] = '';
+  };
+
+  // 删除属性
+  const handleRemoveProperty = (key: string) => {
+    if (formData.properties) {
+      delete formData.properties[key];
+    }
+  };
+
+  // 修改属性键
+  const handlePropertyKeyChange = (oldKey: string, newKey: string) => {
+    if (oldKey === newKey || !formData.properties) return;
+
+    const value = formData.properties[oldKey];
+    delete formData.properties[oldKey];
+    formData.properties[newKey] = value;
+  };
+
+  // 格式化日期时间
+  const formatDateTime = (dateStr: string | undefined) => {
+    if (!dateStr) return '-';
+    return new Date(dateStr).toLocaleString();
+  };
+
+  // 挂载时加载数据
+  onMounted(() => {
+    fetchData();
+  });
 </script>
 
 <style scoped lang="less">
-.container {
-  padding: 20px;
-}
+  .container {
+    padding: 20px;
+  }
 
-.form-help-text {
-  font-size: 12px;
-  color: var(--color-text-3);
-  margin-top: 4px;
-}
+  .form-help-text {
+    font-size: 12px;
+    color: var(--color-text-3);
+    margin-top: 4px;
+  }
 </style>

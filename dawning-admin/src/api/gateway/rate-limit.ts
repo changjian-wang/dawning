@@ -61,7 +61,10 @@ export function createPolicy(data: CreateRateLimitPolicy) {
 
 // 更新限流策略
 export function updatePolicy(id: string, data: UpdateRateLimitPolicy) {
-  return axios.put<{ success: boolean }>(`/api/rate-limit/policies/${id}`, data);
+  return axios.put<{ success: boolean }>(
+    `/api/rate-limit/policies/${id}`,
+    data
+  );
 }
 
 // 删除限流策略
@@ -146,7 +149,10 @@ export function createIpRule(data: CreateIpAccessRule) {
 
 // 更新 IP 规则
 export function updateIpRule(id: string, data: UpdateIpAccessRule) {
-  return axios.put<{ success: boolean }>(`/api/rate-limit/ip-rules/${id}`, data);
+  return axios.put<{ success: boolean }>(
+    `/api/rate-limit/ip-rules/${id}`,
+    data
+  );
 }
 
 // 删除 IP 规则
@@ -156,18 +162,18 @@ export function deleteIpRule(id: string) {
 
 // 检查 IP 是否在黑名单中
 export function checkBlacklist(ip: string) {
-  return axios.get<{ success: boolean; data: { ip: string; isBlacklisted: boolean } }>(
-    '/api/rate-limit/check-blacklist',
-    { params: { ip } }
-  );
+  return axios.get<{
+    success: boolean;
+    data: { ip: string; isBlacklisted: boolean };
+  }>('/api/rate-limit/check-blacklist', { params: { ip } });
 }
 
 // 检查 IP 是否在白名单中
 export function checkWhitelist(ip: string) {
-  return axios.get<{ success: boolean; data: { ip: string; isWhitelisted: boolean } }>(
-    '/api/rate-limit/check-whitelist',
-    { params: { ip } }
-  );
+  return axios.get<{
+    success: boolean;
+    data: { ip: string; isWhitelisted: boolean };
+  }>('/api/rate-limit/check-whitelist', { params: { ip } });
 }
 
 // ==================== 常量 ====================

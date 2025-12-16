@@ -26,12 +26,14 @@ namespace Dawning.Identity.Application.Services.Administration
         public BackupService(
             IDbConnection connection,
             ILogger<BackupService> logger,
-            IConfiguration configuration)
+            IConfiguration configuration
+        )
         {
             _connection = connection;
             _logger = logger;
             _configuration = configuration;
-            _backupBasePath = configuration["Backup:Path"] ?? Path.Combine(AppContext.BaseDirectory, "backups");
+            _backupBasePath =
+                configuration["Backup:Path"] ?? Path.Combine(AppContext.BaseDirectory, "backups");
 
             // 确保备份目录存在
             if (!Directory.Exists(_backupBasePath))
@@ -59,7 +61,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 CreatedAt = DateTime.UtcNow,
                 Description = options.Description,
                 IsManual = options.IsManual,
-                Status = "pending"
+                Status = "pending",
             };
 
             try
@@ -68,7 +70,9 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 // 获取数据库连接信息
                 var connectionString = _configuration.GetConnectionString("DawningIdentity");
-                var (host, port, database, user, password) = ParseConnectionString(connectionString ?? "");
+                var (host, port, database, user, password) = ParseConnectionString(
+                    connectionString ?? ""
+                );
 
                 // 生成 mysqldump 命令
                 var dumpArgs = BuildMysqlDumpArgs(host, port, database, user, password, options);
@@ -107,13 +111,16 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 _logger.LogInformation(
                     "Database backup completed: {BackupId}, Size: {Size}, Duration: {Duration}s",
-                    backupId, record.FileSizeFormatted, stopwatch.Elapsed.TotalSeconds);
+                    backupId,
+                    record.FileSizeFormatted,
+                    stopwatch.Elapsed.TotalSeconds
+                );
 
                 return new BackupResult
                 {
                     Success = true,
                     Backup = record,
-                    DurationSeconds = stopwatch.Elapsed.TotalSeconds
+                    DurationSeconds = stopwatch.Elapsed.TotalSeconds,
                 };
             }
             catch (Exception ex)
@@ -126,14 +133,16 @@ namespace Dawning.Identity.Application.Services.Administration
                 await SaveBackupRecordAsync(record);
 
                 // 清理失败的备份文件
-                if (File.Exists(filePath)) File.Delete(filePath);
-                if (File.Exists(filePath + ".gz")) File.Delete(filePath + ".gz");
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+                if (File.Exists(filePath + ".gz"))
+                    File.Delete(filePath + ".gz");
 
                 return new BackupResult
                 {
                     Success = false,
                     ErrorMessage = ex.Message,
-                    DurationSeconds = stopwatch.Elapsed.TotalSeconds
+                    DurationSeconds = stopwatch.Elapsed.TotalSeconds,
                 };
             }
         }
@@ -141,7 +150,8 @@ namespace Dawning.Identity.Application.Services.Administration
         /// <inheritdoc />
         public async Task<List<BackupRecord>> GetBackupHistoryAsync(int count = 20)
         {
-            const string sql = @"
+            const string sql =
+                @"
                 SELECT 
                     id as Id, file_name as FileName, file_path as FilePath,
                     file_size_bytes as FileSizeBytes, backup_type as BackupType,
@@ -159,7 +169,10 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<bool> DeleteBackupAsync(Guid backupId)
         {
             const string selectSql = "SELECT file_path FROM backup_records WHERE id = @Id";
-            var filePath = await _connection.QueryFirstOrDefaultAsync<string>(selectSql, new { Id = backupId.ToString() });
+            var filePath = await _connection.QueryFirstOrDefaultAsync<string>(
+                selectSql,
+                new { Id = backupId.ToString() }
+            );
 
             if (filePath != null && File.Exists(filePath))
             {
@@ -167,7 +180,10 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             const string deleteSql = "DELETE FROM backup_records WHERE id = @Id";
-            var affected = await _connection.ExecuteAsync(deleteSql, new { Id = backupId.ToString() });
+            var affected = await _connection.ExecuteAsync(
+                deleteSql,
+                new { Id = backupId.ToString() }
+            );
             return affected > 0;
         }
 
@@ -176,12 +192,16 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             var cutoffDate = DateTime.UtcNow.AddDays(-retentionDays);
 
-            const string selectSql = @"
+            const string selectSql =
+                @"
                 SELECT id as Id, file_path as FilePath 
                 FROM backup_records 
                 WHERE created_at < @CutoffDate";
 
-            var oldBackups = await _connection.QueryAsync<dynamic>(selectSql, new { CutoffDate = cutoffDate });
+            var oldBackups = await _connection.QueryAsync<dynamic>(
+                selectSql,
+                new { CutoffDate = cutoffDate }
+            );
             var count = 0;
 
             foreach (var backup in oldBackups)
@@ -196,8 +216,11 @@ namespace Dawning.Identity.Application.Services.Administration
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning("Failed to delete backup file: {FilePath} - {Error}", 
-                        (string?)backup.FilePath, ex.Message);
+                    _logger.LogWarning(
+                        "Failed to delete backup file: {FilePath} - {Error}",
+                        (string?)backup.FilePath,
+                        ex.Message
+                    );
                 }
             }
 
@@ -213,7 +236,8 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             var config = new BackupConfiguration();
 
-            const string sql = @"
+            const string sql =
+                @"
                 SELECT config_key, config_value 
                 FROM system_configs 
                 WHERE config_group = 'Backup'";
@@ -230,13 +254,17 @@ namespace Dawning.Identity.Application.Services.Administration
                         config.AutoBackupEnabled = bool.TryParse(value, out var enabled) && enabled;
                         break;
                     case "AutoBackupIntervalHours":
-                        config.AutoBackupIntervalHours = int.TryParse(value, out var hours) ? hours : 24;
+                        config.AutoBackupIntervalHours = int.TryParse(value, out var hours)
+                            ? hours
+                            : 24;
                         break;
                     case "RetentionDays":
                         config.RetentionDays = int.TryParse(value, out var days) ? days : 30;
                         break;
                     case "MaxBackupCount":
-                        config.MaxBackupCount = int.TryParse(value, out var maxCount) ? maxCount : 50;
+                        config.MaxBackupCount = int.TryParse(value, out var maxCount)
+                            ? maxCount
+                            : 50;
                         break;
                     case "BackupPath":
                         config.BackupPath = value ?? "backups";
@@ -245,7 +273,8 @@ namespace Dawning.Identity.Application.Services.Administration
                         config.CompressBackups = bool.TryParse(value, out var compress) && compress;
                         break;
                     case "AutoBackupIncludeLogs":
-                        config.AutoBackupIncludeLogs = bool.TryParse(value, out var includeLogs) && includeLogs;
+                        config.AutoBackupIncludeLogs =
+                            bool.TryParse(value, out var includeLogs) && includeLogs;
                         break;
                     case "LastAutoBackupAt":
                         if (DateTime.TryParse(value, out var lastBackup))
@@ -268,12 +297,13 @@ namespace Dawning.Identity.Application.Services.Administration
                 ["MaxBackupCount"] = config.MaxBackupCount.ToString(),
                 ["BackupPath"] = config.BackupPath,
                 ["CompressBackups"] = config.CompressBackups.ToString().ToLower(),
-                ["AutoBackupIncludeLogs"] = config.AutoBackupIncludeLogs.ToString().ToLower()
+                ["AutoBackupIncludeLogs"] = config.AutoBackupIncludeLogs.ToString().ToLower(),
             };
 
             foreach (var (key, value) in updates)
             {
-                const string sql = @"
+                const string sql =
+                    @"
                     INSERT INTO system_configs (id, config_group, config_key, config_value, created_at, updated_at)
                     VALUES (UUID(), 'Backup', @Key, @Value, NOW(), NOW())
                     ON DUPLICATE KEY UPDATE config_value = @Value, updated_at = NOW()";
@@ -284,23 +314,52 @@ namespace Dawning.Identity.Application.Services.Administration
 
         #region Private Methods
 
-        private static (string host, int port, string database, string user, string password) ParseConnectionString(string connectionString)
+        private static (
+            string host,
+            int port,
+            string database,
+            string user,
+            string password
+        ) ParseConnectionString(string connectionString)
         {
-            var parts = connectionString.Split(';')
+            var parts = connectionString
+                .Split(';')
                 .Select(p => p.Split('='))
                 .Where(p => p.Length == 2)
                 .ToDictionary(p => p[0].Trim().ToLower(), p => p[1].Trim());
 
-            var host = parts.GetValueOrDefault("server") ?? parts.GetValueOrDefault("host") ?? "localhost";
+            var host =
+                parts.GetValueOrDefault("server") ?? parts.GetValueOrDefault("host") ?? "localhost";
             var portStr = parts.GetValueOrDefault("port") ?? "3306";
-            var database = parts.GetValueOrDefault("database") ?? parts.GetValueOrDefault("initial catalog") ?? "";
-            var user = parts.GetValueOrDefault("user id") ?? parts.GetValueOrDefault("uid") ?? parts.GetValueOrDefault("user") ?? "root";
-            var password = parts.GetValueOrDefault("password") ?? parts.GetValueOrDefault("pwd") ?? "";
+            var database =
+                parts.GetValueOrDefault("database")
+                ?? parts.GetValueOrDefault("initial catalog")
+                ?? "";
+            var user =
+                parts.GetValueOrDefault("user id")
+                ?? parts.GetValueOrDefault("uid")
+                ?? parts.GetValueOrDefault("user")
+                ?? "root";
+            var password =
+                parts.GetValueOrDefault("password") ?? parts.GetValueOrDefault("pwd") ?? "";
 
-            return (host, int.TryParse(portStr, out var port) ? port : 3306, database, user, password);
+            return (
+                host,
+                int.TryParse(portStr, out var port) ? port : 3306,
+                database,
+                user,
+                password
+            );
         }
 
-        private static string BuildMysqlDumpArgs(string host, int port, string database, string user, string password, BackupOptions options)
+        private static string BuildMysqlDumpArgs(
+            string host,
+            int port,
+            string database,
+            string user,
+            string password,
+            BackupOptions options
+        )
         {
             var args = $"-h {host} -P {port} -u {user}";
             if (!string.IsNullOrEmpty(password))
@@ -332,11 +391,16 @@ namespace Dawning.Identity.Application.Services.Administration
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
                 };
 
                 using var process = new Process { StartInfo = startInfo };
-                using var output = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+                using var output = new FileStream(
+                    outputPath,
+                    FileMode.Create,
+                    FileAccess.Write,
+                    FileShare.None
+                );
 
                 process.Start();
 
@@ -349,7 +413,11 @@ namespace Dawning.Identity.Application.Services.Administration
                 if (process.ExitCode != 0)
                 {
                     var error = await errorTask;
-                    _logger.LogWarning("mysqldump exited with code {ExitCode}: {Error}", process.ExitCode, error);
+                    _logger.LogWarning(
+                        "mysqldump exited with code {ExitCode}: {Error}",
+                        process.ExitCode,
+                        error
+                    );
                     return false;
                 }
 
@@ -368,7 +436,9 @@ namespace Dawning.Identity.Application.Services.Administration
 
             // 写入头部信息
             await writer.WriteLineAsync("-- Dawning Gateway Database Backup");
-            await writer.WriteLineAsync($"-- Generated at: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
+            await writer.WriteLineAsync(
+                $"-- Generated at: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC"
+            );
             await writer.WriteLineAsync($"-- Backup Type: {options.BackupType}");
             await writer.WriteLineAsync();
             await writer.WriteLineAsync("SET FOREIGN_KEY_CHECKS=0;");
@@ -376,7 +446,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
             // 获取所有表
             var tables = await _connection.QueryAsync<string>("SHOW TABLES");
-            
+
             foreach (var table in tables)
             {
                 // 跳过日志表（如果不需要）
@@ -386,16 +456,20 @@ namespace Dawning.Identity.Application.Services.Administration
                 }
 
                 // 写入表结构
-                var createTable = await _connection.QueryFirstAsync<dynamic>($"SHOW CREATE TABLE `{table}`");
+                var createTable = await _connection.QueryFirstAsync<dynamic>(
+                    $"SHOW CREATE TABLE `{table}`"
+                );
                 await writer.WriteLineAsync($"-- Table: {table}");
                 await writer.WriteLineAsync($"DROP TABLE IF EXISTS `{table}`;");
-                await writer.WriteLineAsync(((IDictionary<string, object>)createTable).Values.Last()?.ToString() + ";");
+                await writer.WriteLineAsync(
+                    ((IDictionary<string, object>)createTable).Values.Last()?.ToString() + ";"
+                );
                 await writer.WriteLineAsync();
 
                 // 写入数据
                 var data = await _connection.QueryAsync($"SELECT * FROM `{table}`");
                 var dataList = data.ToList();
-                
+
                 if (dataList.Count > 0)
                 {
                     foreach (var row in dataList)
@@ -403,7 +477,9 @@ namespace Dawning.Identity.Application.Services.Administration
                         var dict = (IDictionary<string, object>)row;
                         var columns = string.Join(", ", dict.Keys.Select(k => $"`{k}`"));
                         var values = string.Join(", ", dict.Values.Select(FormatValue));
-                        await writer.WriteLineAsync($"INSERT INTO `{table}` ({columns}) VALUES ({values});");
+                        await writer.WriteLineAsync(
+                            $"INSERT INTO `{table}` ({columns}) VALUES ({values});"
+                        );
                     }
                     await writer.WriteLineAsync();
                 }
@@ -424,40 +500,52 @@ namespace Dawning.Identity.Application.Services.Administration
                 return $"X'{BitConverter.ToString(bytes).Replace("-", "")}'";
             if (value is int or long or float or double or decimal)
                 return value.ToString() ?? "NULL";
-            
+
             var str = value.ToString() ?? "";
             return $"'{str.Replace("'", "''").Replace("\\", "\\\\")}'";
         }
 
         private static async Task CompressFileAsync(string sourcePath, string destPath)
         {
-            await using var sourceStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read);
-            await using var destStream = new FileStream(destPath, FileMode.Create, FileAccess.Write);
+            await using var sourceStream = new FileStream(
+                sourcePath,
+                FileMode.Open,
+                FileAccess.Read
+            );
+            await using var destStream = new FileStream(
+                destPath,
+                FileMode.Create,
+                FileAccess.Write
+            );
             await using var gzipStream = new GZipStream(destStream, CompressionLevel.Optimal);
             await sourceStream.CopyToAsync(gzipStream);
         }
 
         private async Task SaveBackupRecordAsync(BackupRecord record)
         {
-            const string sql = @"
+            const string sql =
+                @"
                 INSERT INTO backup_records 
                 (id, file_name, file_path, file_size_bytes, backup_type, created_at, description, is_manual, status, error_message)
                 VALUES 
                 (@Id, @FileName, @FilePath, @FileSizeBytes, @BackupType, @CreatedAt, @Description, @IsManual, @Status, @ErrorMessage)";
 
-            await _connection.ExecuteAsync(sql, new
-            {
-                Id = record.Id.ToString(),
-                record.FileName,
-                record.FilePath,
-                record.FileSizeBytes,
-                record.BackupType,
-                record.CreatedAt,
-                record.Description,
-                record.IsManual,
-                record.Status,
-                record.ErrorMessage
-            });
+            await _connection.ExecuteAsync(
+                sql,
+                new
+                {
+                    Id = record.Id.ToString(),
+                    record.FileName,
+                    record.FilePath,
+                    record.FileSizeBytes,
+                    record.BackupType,
+                    record.CreatedAt,
+                    record.Description,
+                    record.IsManual,
+                    record.Status,
+                    record.ErrorMessage,
+                }
+            );
         }
 
         #endregion

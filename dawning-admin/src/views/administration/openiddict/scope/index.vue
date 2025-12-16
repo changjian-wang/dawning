@@ -11,7 +11,11 @@
       <a-form :model="searchForm" layout="inline" class="search-form">
         <a-row :gutter="[16, 16]" style="width: 100%">
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="name" label="作用域名称" class="form-item-block">
+            <a-form-item
+              field="name"
+              label="作用域名称"
+              class="form-item-block"
+            >
               <a-input
                 v-model="searchForm.name"
                 placeholder="请输入作用域名称"
@@ -24,7 +28,11 @@
             </a-form-item>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="displayName" label="显示名称" class="form-item-block">
+            <a-form-item
+              field="displayName"
+              label="显示名称"
+              class="form-item-block"
+            >
               <a-input
                 v-model="searchForm.displayName"
                 placeholder="请输入显示名称"
@@ -36,7 +44,14 @@
               </a-input>
             </a-form-item>
           </a-col>
-          <a-col :xs="24" :sm="12" :md="24" :lg="12" :xl="12" class="action-col">
+          <a-col
+            :xs="24"
+            :sm="12"
+            :md="24"
+            :lg="12"
+            :xl="12"
+            class="action-col"
+          >
             <a-space :size="12">
               <a-button type="primary" @click="handleSearch">
                 <template #icon><icon-search /></template>
@@ -210,12 +225,16 @@
 
         <div class="detail-row">
           <span class="label">创建时间</span>
-          <span class="value">{{ formatDateTime(currentRecord?.createdAt) }}</span>
+          <span class="value">{{
+            formatDateTime(currentRecord?.createdAt)
+          }}</span>
         </div>
 
         <div class="detail-row">
           <span class="label">更新时间</span>
-          <span class="value">{{ formatDateTime(currentRecord?.updatedAt) || '-' }}</span>
+          <span class="value">{{
+            formatDateTime(currentRecord?.updatedAt) || '-'
+          }}</span>
         </div>
       </div>
     </a-modal>
@@ -432,7 +451,7 @@
 
       .form-item-block {
         width: 100%;
-        
+
         :deep(.arco-form-item-wrapper-col) {
           width: 100%;
         }

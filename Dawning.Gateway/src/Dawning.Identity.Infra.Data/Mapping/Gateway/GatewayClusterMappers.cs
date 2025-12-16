@@ -40,7 +40,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Gateway
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
                 CreatedBy = entity.CreatedBy,
-                UpdatedBy = entity.UpdatedBy
+                UpdatedBy = entity.UpdatedBy,
             };
         }
 
@@ -74,14 +74,16 @@ namespace Dawning.Identity.Infra.Data.Mapping.Gateway
                 CreatedAt = model.CreatedAt,
                 UpdatedAt = model.UpdatedAt,
                 CreatedBy = model.CreatedBy,
-                UpdatedBy = model.UpdatedBy
+                UpdatedBy = model.UpdatedBy,
             };
         }
 
         /// <summary>
         /// 批量将数据库实体转换为领域模型
         /// </summary>
-        public static IEnumerable<GatewayCluster> ToModels(this IEnumerable<GatewayClusterEntity> entities)
+        public static IEnumerable<GatewayCluster> ToModels(
+            this IEnumerable<GatewayClusterEntity> entities
+        )
         {
             return entities.Select(e => e.ToModel());
         }
@@ -89,7 +91,9 @@ namespace Dawning.Identity.Infra.Data.Mapping.Gateway
         /// <summary>
         /// 批量将领域模型转换为数据库实体
         /// </summary>
-        public static IEnumerable<GatewayClusterEntity> ToEntities(this IEnumerable<GatewayCluster> models)
+        public static IEnumerable<GatewayClusterEntity> ToEntities(
+            this IEnumerable<GatewayCluster> models
+        )
         {
             return models.Select(m => m.ToEntity());
         }

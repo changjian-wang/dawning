@@ -148,10 +148,14 @@
         <a-dropdown trigger="click">
           <a-avatar
             :size="32"
-            :style="{ marginRight: '8px', cursor: 'pointer', backgroundColor: '#165dff' }"
+            :style="{
+              marginRight: '8px',
+              cursor: 'pointer',
+              backgroundColor: '#165dff',
+            }"
           >
             <template v-if="!avatar">
-              <span style="font-size: 14px; font-weight: 500; color: #fff;">
+              <span style="font-size: 14px; font-weight: 500; color: #fff">
                 {{ userInitial }}
               </span>
             </template>

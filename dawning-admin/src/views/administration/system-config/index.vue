@@ -43,8 +43,8 @@
             <a-button
               size="small"
               type="outline"
-              @click="handleSaveAll"
               :loading="saving"
+              @click="handleSaveAll"
             >
               <template #icon><icon-save /></template>
               {{ $t('systemConfig.saveAll') }}
@@ -60,7 +60,9 @@
               >
                 <div class="config-info">
                   <div class="config-key">
-                    <a-tag size="small" color="arcoblue">{{ config.key }}</a-tag>
+                    <a-tag size="small" color="arcoblue">{{
+                      config.key
+                    }}</a-tag>
                     <span v-if="config.isReadonly" class="readonly-badge">
                       <icon-lock />
                     </span>
@@ -97,7 +99,10 @@
             <div v-else class="no-configs">
               <a-empty :description="$t('systemConfig.noConfigs')">
                 <template #image>
-                  <icon-settings :size="60" style="color: var(--color-text-4)" />
+                  <icon-settings
+                    :size="60"
+                    style="color: var(--color-text-4)"
+                  />
                 </template>
               </a-empty>
             </div>
@@ -135,7 +140,10 @@
             :placeholder="$t('systemConfig.inputValue')"
           />
         </a-form-item>
-        <a-form-item field="description" :label="$t('systemConfig.description')">
+        <a-form-item
+          field="description"
+          :label="$t('systemConfig.description')"
+        >
           <a-textarea
             v-model="addForm.description"
             :placeholder="$t('systemConfig.inputDescription')"
@@ -148,305 +156,305 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
-import { Message, Modal } from '@arco-design/web-vue';
-import { useI18n } from 'vue-i18n';
-import {
-  getConfigGroups,
-  getConfigsByGroup,
-  setConfigValue,
-  batchUpdateConfigs,
-  deleteConfig,
-  initDefaultConfigs,
-  SystemConfigItem,
-} from '@/api/system-config';
+  import { ref, computed, onMounted } from 'vue';
+  import { Message, Modal } from '@arco-design/web-vue';
+  import { useI18n } from 'vue-i18n';
+  import {
+    getConfigGroups,
+    getConfigsByGroup,
+    setConfigValue,
+    batchUpdateConfigs,
+    deleteConfig,
+    initDefaultConfigs,
+    SystemConfigItem,
+  } from '@/api/system-config';
 
-const { t } = useI18n();
+  const { t } = useI18n();
 
-const loading = ref(false);
-const saving = ref(false);
-const groups = ref<string[]>([]);
-const selectedGroupKeys = ref<string[]>([]);
-const configsByGroup = ref<Record<string, SystemConfigItem[]>>({});
-const modifiedConfigs = ref<Set<string>>(new Set());
+  const loading = ref(false);
+  const saving = ref(false);
+  const groups = ref<string[]>([]);
+  const selectedGroupKeys = ref<string[]>([]);
+  const configsByGroup = ref<Record<string, SystemConfigItem[]>>({});
+  const modifiedConfigs = ref<Set<string>>(new Set());
 
-// 添加配置弹窗
-const addModalVisible = ref(false);
-const addForm = ref({
-  group: '',
-  key: '',
-  value: '',
-  description: '',
-});
-
-const selectedGroup = computed(() => selectedGroupKeys.value[0] || '');
-
-const currentConfigs = computed(() => {
-  if (!selectedGroup.value) return [];
-  return configsByGroup.value[selectedGroup.value] || [];
-});
-
-const getGroupCount = (group: string) => {
-  return configsByGroup.value[group]?.length || 0;
-};
-
-// 加载分组
-const loadGroups = async () => {
-  try {
-    const res = await getConfigGroups();
-    if (res.data.success) {
-      groups.value = res.data.data;
-      // 自动选择第一个分组
-      if (groups.value.length > 0 && !selectedGroup.value) {
-        selectedGroupKeys.value = [groups.value[0]];
-        await loadGroupConfigs(groups.value[0]);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to load groups:', error);
-  }
-};
-
-// 加载分组配置
-const loadGroupConfigs = async (group: string) => {
-  loading.value = true;
-  try {
-    const res = await getConfigsByGroup(group);
-    if (res.data.success) {
-      configsByGroup.value[group] = res.data.data;
-    }
-  } catch (error) {
-    console.error('Failed to load configs:', error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// 处理分组点击
-const handleGroupClick = async (key: string) => {
-  if (!configsByGroup.value[key]) {
-    await loadGroupConfigs(key);
-  }
-};
-
-// 处理值变更
-const handleValueChange = (config: SystemConfigItem) => {
-  modifiedConfigs.value.add(`${config.group}:${config.key}`);
-};
-
-// 保存所有修改
-const handleSaveAll = async () => {
-  if (modifiedConfigs.value.size === 0) {
-    Message.info(t('systemConfig.noChanges'));
-    return;
-  }
-
-  saving.value = true;
-  try {
-    const configsToSave = currentConfigs.value.filter((c) =>
-      modifiedConfigs.value.has(`${c.group}:${c.key}`)
-    );
-    await batchUpdateConfigs(configsToSave);
-    modifiedConfigs.value.clear();
-    Message.success(t('systemConfig.saveSuccess'));
-  } catch (error) {
-    Message.error(t('systemConfig.saveFailed'));
-  } finally {
-    saving.value = false;
-  }
-};
-
-// 删除配置
-const handleDeleteConfig = (config: SystemConfigItem) => {
-  Modal.confirm({
-    title: t('systemConfig.deleteConfirm'),
-    content: t('systemConfig.deleteConfirmContent', { key: config.key }),
-    okButtonProps: { status: 'danger' },
-    onOk: async () => {
-      try {
-        await deleteConfig(config.group, config.key);
-        // 刷新当前分组
-        await loadGroupConfigs(config.group);
-        Message.success(t('systemConfig.deleteSuccess'));
-      } catch (error) {
-        Message.error(t('systemConfig.deleteFailed'));
-      }
-    },
-  });
-};
-
-// 添加配置
-const handleAddConfig = () => {
-  addForm.value = {
-    group: selectedGroup.value || '',
+  // 添加配置弹窗
+  const addModalVisible = ref(false);
+  const addForm = ref({
+    group: '',
     key: '',
     value: '',
     description: '',
-  };
-  addModalVisible.value = true;
-};
-
-const handleAddSubmit = async () => {
-  if (!addForm.value.group || !addForm.value.key) {
-    Message.warning(t('systemConfig.fillRequired'));
-    return;
-  }
-
-  try {
-    await setConfigValue(
-      addForm.value.group,
-      addForm.value.key,
-      addForm.value.value,
-      addForm.value.description
-    );
-    addModalVisible.value = false;
-    // 刷新分组列表和配置
-    await loadGroups();
-    if (addForm.value.group) {
-      selectedGroupKeys.value = [addForm.value.group];
-      await loadGroupConfigs(addForm.value.group);
-    }
-    Message.success(t('systemConfig.addSuccess'));
-  } catch (error) {
-    Message.error(t('systemConfig.addFailed'));
-  }
-};
-
-// 初始化默认配置
-const handleInitDefaults = () => {
-  Modal.confirm({
-    title: t('systemConfig.initDefaultsConfirm'),
-    content: t('systemConfig.initDefaultsContent'),
-    onOk: async () => {
-      try {
-        await initDefaultConfigs();
-        await loadGroups();
-        // 重新加载所有已加载的分组
-        for (const group of Object.keys(configsByGroup.value)) {
-          await loadGroupConfigs(group);
-        }
-        Message.success(t('systemConfig.initDefaultsSuccess'));
-      } catch (error) {
-        Message.error(t('systemConfig.initDefaultsFailed'));
-      }
-    },
   });
-};
 
-onMounted(() => {
-  loadGroups();
-});
+  const selectedGroup = computed(() => selectedGroupKeys.value[0] || '');
+
+  const currentConfigs = computed(() => {
+    if (!selectedGroup.value) return [];
+    return configsByGroup.value[selectedGroup.value] || [];
+  });
+
+  const getGroupCount = (group: string) => {
+    return configsByGroup.value[group]?.length || 0;
+  };
+
+  // 加载分组
+  const loadGroups = async () => {
+    try {
+      const res = await getConfigGroups();
+      if (res.data.success) {
+        groups.value = res.data.data;
+        // 自动选择第一个分组
+        if (groups.value.length > 0 && !selectedGroup.value) {
+          selectedGroupKeys.value = [groups.value[0]];
+          await loadGroupConfigs(groups.value[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load groups:', error);
+    }
+  };
+
+  // 加载分组配置
+  const loadGroupConfigs = async (group: string) => {
+    loading.value = true;
+    try {
+      const res = await getConfigsByGroup(group);
+      if (res.data.success) {
+        configsByGroup.value[group] = res.data.data;
+      }
+    } catch (error) {
+      console.error('Failed to load configs:', error);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 处理分组点击
+  const handleGroupClick = async (key: string) => {
+    if (!configsByGroup.value[key]) {
+      await loadGroupConfigs(key);
+    }
+  };
+
+  // 处理值变更
+  const handleValueChange = (config: SystemConfigItem) => {
+    modifiedConfigs.value.add(`${config.group}:${config.key}`);
+  };
+
+  // 保存所有修改
+  const handleSaveAll = async () => {
+    if (modifiedConfigs.value.size === 0) {
+      Message.info(t('systemConfig.noChanges'));
+      return;
+    }
+
+    saving.value = true;
+    try {
+      const configsToSave = currentConfigs.value.filter((c) =>
+        modifiedConfigs.value.has(`${c.group}:${c.key}`)
+      );
+      await batchUpdateConfigs(configsToSave);
+      modifiedConfigs.value.clear();
+      Message.success(t('systemConfig.saveSuccess'));
+    } catch (error) {
+      Message.error(t('systemConfig.saveFailed'));
+    } finally {
+      saving.value = false;
+    }
+  };
+
+  // 删除配置
+  const handleDeleteConfig = (config: SystemConfigItem) => {
+    Modal.confirm({
+      title: t('systemConfig.deleteConfirm'),
+      content: t('systemConfig.deleteConfirmContent', { key: config.key }),
+      okButtonProps: { status: 'danger' },
+      onOk: async () => {
+        try {
+          await deleteConfig(config.group, config.key);
+          // 刷新当前分组
+          await loadGroupConfigs(config.group);
+          Message.success(t('systemConfig.deleteSuccess'));
+        } catch (error) {
+          Message.error(t('systemConfig.deleteFailed'));
+        }
+      },
+    });
+  };
+
+  // 添加配置
+  const handleAddConfig = () => {
+    addForm.value = {
+      group: selectedGroup.value || '',
+      key: '',
+      value: '',
+      description: '',
+    };
+    addModalVisible.value = true;
+  };
+
+  const handleAddSubmit = async () => {
+    if (!addForm.value.group || !addForm.value.key) {
+      Message.warning(t('systemConfig.fillRequired'));
+      return;
+    }
+
+    try {
+      await setConfigValue(
+        addForm.value.group,
+        addForm.value.key,
+        addForm.value.value,
+        addForm.value.description
+      );
+      addModalVisible.value = false;
+      // 刷新分组列表和配置
+      await loadGroups();
+      if (addForm.value.group) {
+        selectedGroupKeys.value = [addForm.value.group];
+        await loadGroupConfigs(addForm.value.group);
+      }
+      Message.success(t('systemConfig.addSuccess'));
+    } catch (error) {
+      Message.error(t('systemConfig.addFailed'));
+    }
+  };
+
+  // 初始化默认配置
+  const handleInitDefaults = () => {
+    Modal.confirm({
+      title: t('systemConfig.initDefaultsConfirm'),
+      content: t('systemConfig.initDefaultsContent'),
+      onOk: async () => {
+        try {
+          await initDefaultConfigs();
+          await loadGroups();
+          // 重新加载所有已加载的分组
+          for (const group of Object.keys(configsByGroup.value)) {
+            await loadGroupConfigs(group);
+          }
+          Message.success(t('systemConfig.initDefaultsSuccess'));
+        } catch (error) {
+          Message.error(t('systemConfig.initDefaultsFailed'));
+        }
+      },
+    });
+  };
+
+  onMounted(() => {
+    loadGroups();
+  });
 </script>
 
 <style scoped lang="less">
-.container {
-  padding: 16px;
-}
-
-.config-layout {
-  display: flex;
-  gap: 16px;
-  min-height: 500px;
-}
-
-.group-list {
-  width: 220px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--color-border);
-  padding-right: 16px;
-
-  .group-item {
-    .config-count {
-      color: var(--color-text-3);
-      font-size: 12px;
-      margin-left: 4px;
-    }
+  .container {
+    padding: 16px;
   }
 
-  .no-groups {
-    padding: 40px 0;
-    text-align: center;
-  }
-}
-
-.config-panel {
-  flex: 1;
-  min-width: 0;
-
-  .config-header {
+  .config-layout {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--color-border);
-
-    h3 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 500;
-    }
-  }
-}
-
-.config-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.config-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
-  background: var(--color-fill-1);
-  border-radius: 6px;
-  transition: background 0.2s;
-
-  &:hover {
-    background: var(--color-fill-2);
+    gap: 16px;
+    min-height: 500px;
   }
 
-  .config-info {
-    width: 280px;
+  .group-list {
+    width: 220px;
     flex-shrink: 0;
+    border-right: 1px solid var(--color-border);
+    padding-right: 16px;
 
-    .config-key {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 4px;
-
-      .readonly-badge {
+    .group-item {
+      .config-count {
         color: var(--color-text-3);
         font-size: 12px;
+        margin-left: 4px;
       }
     }
 
-    .config-desc {
-      font-size: 12px;
-      color: var(--color-text-3);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .no-groups {
+      padding: 40px 0;
+      text-align: center;
     }
   }
 
-  .config-value {
+  .config-panel {
     flex: 1;
     min-width: 0;
+
+    .config-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--color-border);
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
   }
 
-  .config-actions {
-    width: 40px;
-    flex-shrink: 0;
-    text-align: right;
+  .config-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
-}
 
-.no-configs {
-  padding: 60px 0;
-  text-align: center;
-}
+  .config-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--color-fill-1);
+    border-radius: 6px;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--color-fill-2);
+    }
+
+    .config-info {
+      width: 280px;
+      flex-shrink: 0;
+
+      .config-key {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+
+        .readonly-badge {
+          color: var(--color-text-3);
+          font-size: 12px;
+        }
+      }
+
+      .config-desc {
+        font-size: 12px;
+        color: var(--color-text-3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .config-value {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .config-actions {
+      width: 40px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+  }
+
+  .no-configs {
+    padding: 60px 0;
+    text-align: center;
+  }
 </style>

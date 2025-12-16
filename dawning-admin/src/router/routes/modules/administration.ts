@@ -180,8 +180,7 @@ const ADMINISTRATION: AppRouteRecordRaw = {
     {
       path: 'gateway-route',
       name: 'GatewayRoute',
-      component: () =>
-        import('@/views/administration/gateway/route/index.vue'),
+      component: () => import('@/views/administration/gateway/route/index.vue'),
       meta: {
         locale: 'menu.gateway.route',
         requiresAuth: true,
@@ -216,8 +215,7 @@ const ADMINISTRATION: AppRouteRecordRaw = {
     {
       path: 'system-config',
       name: 'SystemConfig',
-      component: () =>
-        import('@/views/administration/system-config/index.vue'),
+      component: () => import('@/views/administration/system-config/index.vue'),
       meta: {
         locale: 'menu.systemConfig',
         requiresAuth: true,

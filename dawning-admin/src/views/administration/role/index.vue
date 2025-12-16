@@ -204,8 +204,8 @@
               style="margin-bottom: 16px"
             />
             <a-transfer
-              :data="allPermissions"
               v-model="selectedPermissionIds"
+              :data="allPermissions"
               :title="['可分配权限', '已分配权限']"
               :show-search="false"
               @change="handlePermissionChange"
@@ -216,7 +216,13 @@
                     v-for="item in sourceData"
                     :key="item.value"
                     class="permission-item"
-                    @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter((k: string) => k !== item.value) : [...selectedKeys, item.value]])"
+                    @click="
+                      onSelect([
+                        ...(selectedKeys.includes(item.value)
+                          ? selectedKeys.filter((k: string) => k !== item.value)
+                          : [...selectedKeys, item.value]),
+                      ])
+                    "
                   >
                     <a-checkbox
                       :model-value="selectedKeys.includes(item.value)"
@@ -234,7 +240,13 @@
                     v-for="item in targetData"
                     :key="item.value"
                     class="permission-item"
-                    @click="onSelect([...selectedKeys.includes(item.value) ? selectedKeys.filter((k: string) => k !== item.value) : [...selectedKeys, item.value]])"
+                    @click="
+                      onSelect([
+                        ...(selectedKeys.includes(item.value)
+                          ? selectedKeys.filter((k: string) => k !== item.value)
+                          : [...selectedKeys, item.value]),
+                      ])
+                    "
                   >
                     <a-checkbox
                       :model-value="selectedKeys.includes(item.value)"

@@ -58,7 +58,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         /// </summary>
         public async Task<IEnumerable<GatewayRoute>> GetAllEnabledAsync()
         {
-            var sql = "SELECT * FROM gateway_routes WHERE is_enabled = true ORDER BY \"order\", route_id";
+            var sql =
+                "SELECT * FROM gateway_routes WHERE is_enabled = true ORDER BY \"order\", route_id";
             var entities = await _context.Connection.QueryAsync<GatewayRouteEntity>(
                 sql,
                 transaction: _context.Transaction
@@ -101,10 +102,10 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
             if (!string.IsNullOrWhiteSpace(model.Keyword))
             {
                 builder = builder.Where(r =>
-                    r.RouteId.Contains(model.Keyword) ||
-                    r.Name.Contains(model.Keyword) ||
-                    (r.Description != null && r.Description.Contains(model.Keyword)) ||
-                    r.MatchPath.Contains(model.Keyword)
+                    r.RouteId.Contains(model.Keyword)
+                    || r.Name.Contains(model.Keyword)
+                    || (r.Description != null && r.Description.Contains(model.Keyword))
+                    || r.MatchPath.Contains(model.Keyword)
                 );
             }
 
@@ -149,8 +150,12 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         /// </summary>
         public async ValueTask<int> DeleteAsync(Guid id)
         {
-            var entity = await _context.Connection.GetAsync<GatewayRouteEntity>(id, _context.Transaction);
-            if (entity == null) return 0;
+            var entity = await _context.Connection.GetAsync<GatewayRouteEntity>(
+                id,
+                _context.Transaction
+            );
+            if (entity == null)
+                return 0;
 
             var success = await _context.Connection.DeleteAsync(entity, _context.Transaction);
             return success ? 1 : 0;

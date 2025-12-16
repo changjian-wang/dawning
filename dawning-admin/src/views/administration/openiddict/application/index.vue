@@ -11,7 +11,11 @@
       <a-form :model="searchForm" layout="inline" class="search-form">
         <a-row :gutter="[16, 16]" style="width: 100%">
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="clientId" label="客户端ID" class="form-item-block">
+            <a-form-item
+              field="clientId"
+              label="客户端ID"
+              class="form-item-block"
+            >
               <a-input
                 v-model="searchForm.clientId"
                 placeholder="请输入客户端ID"
@@ -24,7 +28,11 @@
             </a-form-item>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="displayName" label="显示名称" class="form-item-block">
+            <a-form-item
+              field="displayName"
+              label="显示名称"
+              class="form-item-block"
+            >
               <a-input
                 v-model="searchForm.displayName"
                 placeholder="请输入显示名称"
@@ -308,7 +316,11 @@
           <span class="label">重定向URI</span>
           <span class="value">
             <div v-if="currentRecord?.redirectUris?.length">
-              <div v-for="(uri, index) in currentRecord?.redirectUris" :key="index" style="margin-bottom: 4px">
+              <div
+                v-for="(uri, index) in currentRecord?.redirectUris"
+                :key="index"
+                style="margin-bottom: 4px"
+              >
                 {{ uri }}
               </div>
             </div>
@@ -334,7 +346,9 @@
 
         <div class="detail-row">
           <span class="label">创建时间</span>
-          <span class="value">{{ formatDateTime(currentRecord?.createdAt) }}</span>
+          <span class="value">{{
+            formatDateTime(currentRecord?.createdAt)
+          }}</span>
         </div>
       </div>
     </a-modal>
@@ -636,7 +650,7 @@
 
       .form-item-block {
         width: 100%;
-        
+
         :deep(.arco-form-item-wrapper-col) {
           width: 100%;
         }

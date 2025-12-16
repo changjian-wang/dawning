@@ -54,12 +54,18 @@
           </a-button>
         </template>
 
-        <a-table :columns="healthColumns" :data="healthChecks" :pagination="false">
+        <a-table
+          :columns="healthColumns"
+          :data="healthChecks"
+          :pagination="false"
+        >
           <template #status="{ record }">
             <a-tag :color="getStatusColor(record.status)" size="small">
               <template #icon>
                 <icon-check-circle-fill v-if="record.status === 'Healthy'" />
-                <icon-exclamation-circle-fill v-else-if="record.status === 'Warning'" />
+                <icon-exclamation-circle-fill
+                  v-else-if="record.status === 'Warning'"
+                />
                 <icon-close-circle-fill v-else />
               </template>
               {{ record.status }}
@@ -120,7 +126,10 @@
       <a-card class="general-card" title="服务端点" style="margin-top: 16px">
         <a-table :columns="serviceColumns" :data="services" :pagination="false">
           <template #status="{ record }">
-            <a-tag :color="record.status === 'healthy' ? 'green' : 'red'" size="small">
+            <a-tag
+              :color="record.status === 'healthy' ? 'green' : 'red'"
+              size="small"
+            >
               <template #icon>
                 <icon-check-circle-fill v-if="record.status === 'healthy'" />
                 <icon-close-circle-fill v-else />
@@ -137,7 +146,11 @@
             {{ formatDateTime(record.lastChecked) }}
           </template>
           <template #optional="{ record }">
-            <a-button type="text" size="small" @click="checkSingleService(record)">
+            <a-button
+              type="text"
+              size="small"
+              @click="checkSingleService(record)"
+            >
               <template #icon><icon-sync /></template>
               检查
             </a-button>
@@ -151,7 +164,12 @@
 <script lang="ts" setup>
   import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
-  import { healthApi, type DetailedHealthStatus, type Metrics, type ServiceStatus } from '@/api/administration/health';
+  import {
+    healthApi,
+    type DetailedHealthStatus,
+    type Metrics,
+    type ServiceStatus,
+  } from '@/api/administration/health';
 
   const loading = ref(false);
   const detailedHealth = ref<DetailedHealthStatus | null>(null);
@@ -173,7 +191,12 @@
   const healthColumns = reactive([
     { title: '检查项', dataIndex: 'name', width: 150 },
     { title: '状态', dataIndex: 'status', slotName: 'status', width: 120 },
-    { title: '响应时间', dataIndex: 'responseTime', slotName: 'responseTime', width: 120 },
+    {
+      title: '响应时间',
+      dataIndex: 'responseTime',
+      slotName: 'responseTime',
+      width: 120,
+    },
     { title: '详情', dataIndex: 'detail' },
   ]);
 
@@ -182,8 +205,18 @@
     { title: '服务名称', dataIndex: 'name', width: 150 },
     { title: 'URL', dataIndex: 'url' },
     { title: '状态', dataIndex: 'status', slotName: 'status', width: 100 },
-    { title: '响应时间', dataIndex: 'responseTime', slotName: 'responseTime', width: 120 },
-    { title: '最后检查', dataIndex: 'lastChecked', slotName: 'lastChecked', width: 180 },
+    {
+      title: '响应时间',
+      dataIndex: 'responseTime',
+      slotName: 'responseTime',
+      width: 120,
+    },
+    {
+      title: '最后检查',
+      dataIndex: 'lastChecked',
+      slotName: 'lastChecked',
+      width: 180,
+    },
     { title: '操作', slotName: 'optional', width: 100 },
   ]);
 

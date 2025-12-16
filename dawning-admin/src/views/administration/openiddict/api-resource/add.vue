@@ -9,7 +9,7 @@
         auto-label-width
         :model="form"
       >
-        <a-tabs :default-active-key="1" v-model:active-key="activeKey">
+        <a-tabs v-model:active-key="activeKey" :default-active-key="1">
           <a-tab-pane key="1" tab="基本信息">
             <a-form-item label="资源名称" field="name">
               <a-input v-model:value="form.name" placeholder="请输入资源名称" />

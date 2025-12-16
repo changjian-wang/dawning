@@ -314,342 +314,345 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Message } from '@arco-design/web-vue';
-import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
-import {
-  getAuditLogs,
-  type AuditLog,
-  type AuditLogQueryParams,
-} from '@/api/audit-log';
-import dayjs from 'dayjs';
-import {
-  exportData,
-  formatDateTime as exportFormatDateTime,
-  type ExportColumn,
-} from '@/utils/export';
+  import { ref, reactive, computed, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { Message } from '@arco-design/web-vue';
+  import type { TableColumnData } from '@arco-design/web-vue/es/table/interface';
+  import {
+    getAuditLogs,
+    type AuditLog,
+    type AuditLogQueryParams,
+  } from '@/api/audit-log';
+  import dayjs from 'dayjs';
+  import {
+    exportData,
+    formatDateTime as exportFormatDateTime,
+    type ExportColumn,
+  } from '@/utils/export';
 
-const { t } = useI18n();
+  const { t } = useI18n();
 
-// 搜索表单（包含前端专用的dateRange字段）
-interface SearchFormData extends AuditLogQueryParams {
-  dateRange?: [string, string];
-}
-
-const searchForm = reactive<SearchFormData>({
-  username: '',
-  action: undefined,
-  entityType: undefined,
-  ipAddress: '',
-  dateRange: undefined,
-});
-
-// 表格数据
-const loading = ref(false);
-const tableData = ref<AuditLog[]>([]);
-const pagination = reactive({
-  current: 1,
-  pageSize: 20,
-  total: 0,
-  showTotal: true,
-  showPageSize: true,
-});
-
-// 详情对话框
-const detailVisible = ref(false);
-const currentLog = ref<AuditLog | null>(null);
-
-// 表格列定义
-const columns = computed<TableColumnData[]>(() => [
-  {
-    title: t('auditLog.columns.username'),
-    dataIndex: 'username',
-    width: 120,
-  },
-  {
-    title: t('auditLog.columns.action'),
-    dataIndex: 'action',
-    slotName: 'action',
-    width: 120,
-  },
-  {
-    title: t('auditLog.columns.entityType'),
-    dataIndex: 'entityType',
-    slotName: 'entityType',
-    width: 120,
-  },
-  {
-    title: t('auditLog.columns.description'),
-    dataIndex: 'description',
-    ellipsis: true,
-    tooltip: true,
-  },
-  {
-    title: t('auditLog.columns.ipAddress'),
-    dataIndex: 'ipAddress',
-    width: 140,
-  },
-  {
-    title: t('auditLog.columns.statusCode'),
-    dataIndex: 'statusCode',
-    slotName: 'statusCode',
-    width: 100,
-  },
-  {
-    title: t('auditLog.columns.createdAt'),
-    dataIndex: 'createdAt',
-    slotName: 'createdAt',
-    width: 180,
-  },
-  {
-    title: t('auditLog.columns.operations'),
-    slotName: 'operations',
-    width: 100,
-    fixed: 'right',
-  },
-]);
-
-// 加载数据
-const fetchData = async () => {
-  loading.value = true;
-  try {
-    // 格式化日期范围
-    let startDate: string | undefined;
-    let endDate: string | undefined;
-
-    if (searchForm.dateRange?.[0]) {
-      const startValue = searchForm.dateRange[0];
-      startDate =
-        typeof startValue === 'string'
-          ? dayjs(startValue).format('YYYY-MM-DDTHH:mm:ss')
-          : dayjs(startValue as any).format('YYYY-MM-DDTHH:mm:ss');
-    }
-
-    if (searchForm.dateRange?.[1]) {
-      const endValue = searchForm.dateRange[1];
-      endDate =
-        typeof endValue === 'string'
-          ? dayjs(endValue).format('YYYY-MM-DDTHH:mm:ss')
-          : dayjs(endValue as any).format('YYYY-MM-DDTHH:mm:ss');
-    }
-
-    const params: AuditLogQueryParams = {
-      page: pagination.current,
-      pageSize: pagination.pageSize,
-      username: searchForm.username || undefined,
-      action: searchForm.action,
-      entityType: searchForm.entityType,
-      ipAddress: searchForm.ipAddress || undefined,
-      startDate,
-      endDate,
-    };
-
-    const result = await getAuditLogs(params);
-
-    tableData.value = result.items;
-    pagination.total = result.totalCount;
-    pagination.current = result.pageIndex;
-    pagination.pageSize = result.pageSize;
-  } catch (error) {
-    Message.error(t('auditLog.message.error'));
-  } finally {
-    loading.value = false;
+  // 搜索表单（包含前端专用的dateRange字段）
+  interface SearchFormData extends AuditLogQueryParams {
+    dateRange?: [string, string];
   }
-};
 
-// 搜索
-const handleSearch = () => {
-  pagination.current = 1;
-  fetchData();
-};
+  const searchForm = reactive<SearchFormData>({
+    username: '',
+    action: undefined,
+    entityType: undefined,
+    ipAddress: '',
+    dateRange: undefined,
+  });
 
-// 重置
-const handleReset = () => {
-  searchForm.username = '';
-  searchForm.action = undefined;
-  searchForm.entityType = undefined;
-  searchForm.ipAddress = '';
-  searchForm.dateRange = undefined;
-  pagination.current = 1;
-  fetchData();
-};
+  // 表格数据
+  const loading = ref(false);
+  const tableData = ref<AuditLog[]>([]);
+  const pagination = reactive({
+    current: 1,
+    pageSize: 20,
+    total: 0,
+    showTotal: true,
+    showPageSize: true,
+  });
 
-// 导出审计日志
-const handleExport = async (format: 'csv' | 'xlsx') => {
-  try {
-    Message.loading({ content: '正在导出...', id: 'export' });
+  // 详情对话框
+  const detailVisible = ref(false);
+  const currentLog = ref<AuditLog | null>(null);
 
-    // 构建查询参数
-    const params: AuditLogQueryParams = {
-      ...searchForm,
-      page: 1,
-      pageSize: 10000, // 获取最多10000条
-    };
+  // 表格列定义
+  const columns = computed<TableColumnData[]>(() => [
+    {
+      title: t('auditLog.columns.username'),
+      dataIndex: 'username',
+      width: 120,
+    },
+    {
+      title: t('auditLog.columns.action'),
+      dataIndex: 'action',
+      slotName: 'action',
+      width: 120,
+    },
+    {
+      title: t('auditLog.columns.entityType'),
+      dataIndex: 'entityType',
+      slotName: 'entityType',
+      width: 120,
+    },
+    {
+      title: t('auditLog.columns.description'),
+      dataIndex: 'description',
+      ellipsis: true,
+      tooltip: true,
+    },
+    {
+      title: t('auditLog.columns.ipAddress'),
+      dataIndex: 'ipAddress',
+      width: 140,
+    },
+    {
+      title: t('auditLog.columns.statusCode'),
+      dataIndex: 'statusCode',
+      slotName: 'statusCode',
+      width: 100,
+    },
+    {
+      title: t('auditLog.columns.createdAt'),
+      dataIndex: 'createdAt',
+      slotName: 'createdAt',
+      width: 180,
+    },
+    {
+      title: t('auditLog.columns.operations'),
+      slotName: 'operations',
+      width: 100,
+      fixed: 'right',
+    },
+  ]);
 
-    if (searchForm.dateRange?.length === 2) {
-      params.startDate = searchForm.dateRange[0];
-      params.endDate = searchForm.dateRange[1];
-    }
-
-    const result = await getAuditLogs(params);
-
-    const exportColumns: ExportColumn[] = [
-      { field: 'username', title: t('auditLog.detail.username') },
-      {
-        field: 'action',
-        title: t('auditLog.detail.action'),
-        formatter: (value) => t(`auditLog.action.${value}`),
-      },
-      {
-        field: 'entityType',
-        title: t('auditLog.detail.entityType'),
-        formatter: (value) => (value ? t(`auditLog.entityType.${value}`) : '-'),
-      },
-      { field: 'entityId', title: t('auditLog.detail.entityId') },
-      { field: 'description', title: t('auditLog.detail.description') },
-      { field: 'ipAddress', title: t('auditLog.detail.ipAddress') },
-      { field: 'requestPath', title: t('auditLog.detail.requestPath') },
-      { field: 'requestMethod', title: t('auditLog.detail.requestMethod') },
-      { field: 'statusCode', title: t('auditLog.detail.statusCode') },
-      {
-        field: 'createdAt',
-        title: t('auditLog.detail.createdAt'),
-        formatter: (value) => exportFormatDateTime(value),
-      },
-    ];
-
-    exportData({
-      filename: `审计日志_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}`,
-      columns: exportColumns,
-      data: result.items,
-      format,
-    });
-
-    Message.success({ content: '导出成功', id: 'export' });
-  } catch (error: any) {
-    Message.error({ content: error?.message || '导出失败', id: 'export' });
-  }
-};
-
-// 分页变化
-const handlePageChange = (page: number) => {
-  pagination.current = page;
-  fetchData();
-};
-
-const handlePageSizeChange = (pageSize: number) => {
-  pagination.pageSize = pageSize;
-  pagination.current = 1;
-  fetchData();
-};
-
-// 查看详情
-const handleViewDetail = (record: AuditLog) => {
-  currentLog.value = record;
-  detailVisible.value = true;
-};
-
-// 辅助函数
-const getActionColor = (action: string) => {
-  const colorMap: Record<string, string> = {
-    Create: 'green',
-    Update: 'blue',
-    Delete: 'red',
-    ChangePassword: 'orange',
-    ResetPassword: 'purple',
-  };
-  return colorMap[action] || 'gray';
-};
-
-const getStatusColor = (statusCode: number) => {
-  if (statusCode >= 200 && statusCode < 300) return 'green';
-  if (statusCode >= 400 && statusCode < 500) return 'orange';
-  if (statusCode >= 500) return 'red';
-  return 'gray';
-};
-
-const formatDateTime = (dateTime: string) => {
-  return dayjs(dateTime).format('YYYY-MM-DD HH:mm:ss');
-};
-
-const formatJson = (obj: any) => {
-  if (typeof obj === 'string') {
+  // 加载数据
+  const fetchData = async () => {
+    loading.value = true;
     try {
-      obj = JSON.parse(obj);
-    } catch {
-      return obj;
-    }
-  }
-  return JSON.stringify(obj, null, 2);
-};
+      // 格式化日期范围
+      let startDate: string | undefined;
+      let endDate: string | undefined;
 
-onMounted(() => {
-  fetchData();
-});
+      if (searchForm.dateRange?.[0]) {
+        const startValue = searchForm.dateRange[0];
+        startDate =
+          typeof startValue === 'string'
+            ? dayjs(startValue).format('YYYY-MM-DDTHH:mm:ss')
+            : dayjs(startValue as any).format('YYYY-MM-DDTHH:mm:ss');
+      }
+
+      if (searchForm.dateRange?.[1]) {
+        const endValue = searchForm.dateRange[1];
+        endDate =
+          typeof endValue === 'string'
+            ? dayjs(endValue).format('YYYY-MM-DDTHH:mm:ss')
+            : dayjs(endValue as any).format('YYYY-MM-DDTHH:mm:ss');
+      }
+
+      const params: AuditLogQueryParams = {
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        username: searchForm.username || undefined,
+        action: searchForm.action,
+        entityType: searchForm.entityType,
+        ipAddress: searchForm.ipAddress || undefined,
+        startDate,
+        endDate,
+      };
+
+      const result = await getAuditLogs(params);
+
+      tableData.value = result.items;
+      pagination.total = result.totalCount;
+      pagination.current = result.pageIndex;
+      pagination.pageSize = result.pageSize;
+    } catch (error) {
+      Message.error(t('auditLog.message.error'));
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 搜索
+  const handleSearch = () => {
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 重置
+  const handleReset = () => {
+    searchForm.username = '';
+    searchForm.action = undefined;
+    searchForm.entityType = undefined;
+    searchForm.ipAddress = '';
+    searchForm.dateRange = undefined;
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 导出审计日志
+  const handleExport = async (format: 'csv' | 'xlsx') => {
+    try {
+      Message.loading({ content: '正在导出...', id: 'export' });
+
+      // 构建查询参数
+      const params: AuditLogQueryParams = {
+        ...searchForm,
+        page: 1,
+        pageSize: 10000, // 获取最多10000条
+      };
+
+      if (searchForm.dateRange?.length === 2) {
+        params.startDate = searchForm.dateRange[0];
+        params.endDate = searchForm.dateRange[1];
+      }
+
+      const result = await getAuditLogs(params);
+
+      const exportColumns: ExportColumn[] = [
+        { field: 'username', title: t('auditLog.detail.username') },
+        {
+          field: 'action',
+          title: t('auditLog.detail.action'),
+          formatter: (value) => t(`auditLog.action.${value}`),
+        },
+        {
+          field: 'entityType',
+          title: t('auditLog.detail.entityType'),
+          formatter: (value) =>
+            value ? t(`auditLog.entityType.${value}`) : '-',
+        },
+        { field: 'entityId', title: t('auditLog.detail.entityId') },
+        { field: 'description', title: t('auditLog.detail.description') },
+        { field: 'ipAddress', title: t('auditLog.detail.ipAddress') },
+        { field: 'requestPath', title: t('auditLog.detail.requestPath') },
+        { field: 'requestMethod', title: t('auditLog.detail.requestMethod') },
+        { field: 'statusCode', title: t('auditLog.detail.statusCode') },
+        {
+          field: 'createdAt',
+          title: t('auditLog.detail.createdAt'),
+          formatter: (value) => exportFormatDateTime(value),
+        },
+      ];
+
+      exportData({
+        filename: `审计日志_${new Date()
+          .toLocaleDateString('zh-CN')
+          .replace(/\//g, '-')}`,
+        columns: exportColumns,
+        data: result.items,
+        format,
+      });
+
+      Message.success({ content: '导出成功', id: 'export' });
+    } catch (error: any) {
+      Message.error({ content: error?.message || '导出失败', id: 'export' });
+    }
+  };
+
+  // 分页变化
+  const handlePageChange = (page: number) => {
+    pagination.current = page;
+    fetchData();
+  };
+
+  const handlePageSizeChange = (pageSize: number) => {
+    pagination.pageSize = pageSize;
+    pagination.current = 1;
+    fetchData();
+  };
+
+  // 查看详情
+  const handleViewDetail = (record: AuditLog) => {
+    currentLog.value = record;
+    detailVisible.value = true;
+  };
+
+  // 辅助函数
+  const getActionColor = (action: string) => {
+    const colorMap: Record<string, string> = {
+      Create: 'green',
+      Update: 'blue',
+      Delete: 'red',
+      ChangePassword: 'orange',
+      ResetPassword: 'purple',
+    };
+    return colorMap[action] || 'gray';
+  };
+
+  const getStatusColor = (statusCode: number) => {
+    if (statusCode >= 200 && statusCode < 300) return 'green';
+    if (statusCode >= 400 && statusCode < 500) return 'orange';
+    if (statusCode >= 500) return 'red';
+    return 'gray';
+  };
+
+  const formatDateTime = (dateTime: string) => {
+    return dayjs(dateTime).format('YYYY-MM-DD HH:mm:ss');
+  };
+
+  const formatJson = (obj: any) => {
+    if (typeof obj === 'string') {
+      try {
+        obj = JSON.parse(obj);
+      } catch {
+        return obj;
+      }
+    }
+    return JSON.stringify(obj, null, 2);
+  };
+
+  onMounted(() => {
+    fetchData();
+  });
 </script>
 
 <style scoped lang="less">
-.container {
-  padding: 0 20px 20px 20px;
-}
+  .container {
+    padding: 0 20px 20px 20px;
+  }
 
-// 极简列表风格
-.detail-content {
-  .detail-row {
-    display: flex;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--color-border-1);
-    align-items: flex-start;
+  // 极简列表风格
+  .detail-content {
+    .detail-row {
+      display: flex;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-border-1);
+      align-items: flex-start;
 
-    &:last-child {
-      border-bottom: none;
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        width: 110px;
+        flex-shrink: 0;
+        font-size: 14px;
+        color: var(--color-text-3);
+        line-height: 1.5;
+      }
+
+      .value {
+        flex: 1;
+        font-size: 14px;
+        color: var(--color-text-1);
+        line-height: 1.5;
+        word-break: break-word;
+      }
     }
 
-    .label {
-      width: 110px;
-      flex-shrink: 0;
+    h3 {
+      margin-bottom: 16px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    h4 {
+      margin-bottom: 8px;
       font-size: 14px;
-      color: var(--color-text-3);
-      line-height: 1.5;
-    }
-
-    .value {
-      flex: 1;
-      font-size: 14px;
-      color: var(--color-text-1);
-      line-height: 1.5;
-      word-break: break-word;
+      font-weight: 500;
     }
   }
 
-  h3 {
-    margin-bottom: 16px;
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  h4 {
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 500;
-  }
-}
-
-.change-section {
-  padding: 12px;
-  background-color: var(--color-fill-2);
-  border-radius: 4px;
-
-  .json-display {
-    margin: 0;
+  .change-section {
     padding: 12px;
-    background-color: var(--color-bg-1);
+    background-color: var(--color-fill-2);
     border-radius: 4px;
-    font-size: 12px;
-    line-height: 1.5;
-    max-height: 300px;
-    overflow: auto;
+
+    .json-display {
+      margin: 0;
+      padding: 12px;
+      background-color: var(--color-bg-1);
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 1.5;
+      max-height: 300px;
+      overflow: auto;
+    }
   }
-}
 </style>

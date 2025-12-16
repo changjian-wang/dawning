@@ -46,17 +46,22 @@ namespace Dawning.Identity.Domain.Core.Security
         private readonly ILogger<AesDataEncryptionService>? _logger;
         private const string EncryptionPrefix = "ENC:";
 
-        public AesDataEncryptionService(IConfiguration configuration, ILogger<AesDataEncryptionService>? logger = null)
+        public AesDataEncryptionService(
+            IConfiguration configuration,
+            ILogger<AesDataEncryptionService>? logger = null
+        )
         {
             _logger = logger;
 
             // 从配置读取加密密钥
             var keyBase64 = configuration["Security:EncryptionKey"];
-            
+
             if (string.IsNullOrEmpty(keyBase64))
             {
                 // 如果未配置，生成一个警告并使用默认密钥（仅用于开发）
-                _logger?.LogWarning("Security:EncryptionKey not configured. Using a default key. THIS IS NOT SECURE FOR PRODUCTION!");
+                _logger?.LogWarning(
+                    "Security:EncryptionKey not configured. Using a default key. THIS IS NOT SECURE FOR PRODUCTION!"
+                );
                 _key = GenerateDefaultKey();
             }
             else
@@ -71,7 +76,9 @@ namespace Dawning.Identity.Domain.Core.Security
                 }
                 catch (FormatException)
                 {
-                    throw new ArgumentException("Invalid encryption key format. Must be a valid Base64 string.");
+                    throw new ArgumentException(
+                        "Invalid encryption key format. Must be a valid Base64 string."
+                    );
                 }
             }
         }
@@ -96,11 +103,13 @@ namespace Dawning.Identity.Domain.Core.Security
 
                 using var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
                 using var msEncrypt = new MemoryStream();
-                
+
                 // 先写入 IV
                 msEncrypt.Write(aes.IV, 0, aes.IV.Length);
 
-                using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                using (
+                    var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write)
+                )
                 using (var swEncrypt = new StreamWriter(csEncrypt, Encoding.UTF8))
                 {
                     swEncrypt.Write(plainText);
@@ -149,7 +158,7 @@ namespace Dawning.Identity.Domain.Core.Security
                 using var msDecrypt = new MemoryStream(actualCipherBytes);
                 using var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read);
                 using var srDecrypt = new StreamReader(csDecrypt, Encoding.UTF8);
-                
+
                 return srDecrypt.ReadToEnd();
             }
             catch (Exception ex)

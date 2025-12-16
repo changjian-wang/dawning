@@ -177,7 +177,11 @@ namespace Dawning.Identity.Api.Controllers
             try
             {
                 // 尝试简单的数据库查询
-                var metadata = await _unitOfWork.SystemMetadata.GetPagedListAsync(null, 1, 1);
+                var metadata = await _unitOfWork.SystemMetadata.GetPagedListAsync(
+                    new Dawning.Identity.Domain.Models.Administration.SystemMetadataModel(),
+                    1,
+                    1
+                );
                 stopwatch.Stop();
 
                 return new

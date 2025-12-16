@@ -27,7 +27,7 @@ namespace Dawning.Identity.Api.Middleware
             "/swagger",
             "/favicon.ico",
             "/_framework",
-            "/api/monitoring/realtime"
+            "/api/monitoring/realtime",
         };
 
         public RequestLoggingMiddleware(
@@ -100,16 +100,29 @@ namespace Dawning.Identity.Api.Middleware
             finally
             {
                 // 记录到数据库
-                await LogToDatabaseAsync(context, requestId, requestTime, stopwatch.ElapsedMilliseconds, exception);
+                await LogToDatabaseAsync(
+                    context,
+                    requestId,
+                    requestTime,
+                    stopwatch.ElapsedMilliseconds,
+                    exception
+                );
             }
         }
 
-        private async Task LogToDatabaseAsync(HttpContext context, string requestId, DateTime requestTime, long responseTimeMs, string? exception)
+        private async Task LogToDatabaseAsync(
+            HttpContext context,
+            string requestId,
+            DateTime requestTime,
+            long responseTimeMs,
+            string? exception
+        )
         {
             try
             {
                 var loggingService = context.RequestServices.GetService<IRequestLoggingService>();
-                if (loggingService == null) return;
+                if (loggingService == null)
+                    return;
 
                 // 获取用户信息
                 Guid? userId = null;
@@ -139,7 +152,7 @@ namespace Dawning.Identity.Api.Middleware
                     RequestTime = requestTime,
                     RequestBodySize = context.Request.ContentLength,
                     ResponseBodySize = context.Response.ContentLength,
-                    Exception = exception
+                    Exception = exception,
                 };
 
                 // 异步写入数据库（fire and forget）
@@ -177,7 +190,8 @@ namespace Dawning.Identity.Api.Middleware
 
         private static bool ShouldIgnore(PathString path)
         {
-            if (!path.HasValue) return false;
+            if (!path.HasValue)
+                return false;
 
             foreach (var ignorePath in IgnorePaths)
             {

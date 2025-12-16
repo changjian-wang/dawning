@@ -22,7 +22,11 @@
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
               <a-form-item field="type" label="类型" class="form-item-block">
-                <a-select v-model="model.type" placeholder="请选择类型" allow-clear>
+                <a-select
+                  v-model="model.type"
+                  placeholder="请选择类型"
+                  allow-clear
+                >
                   <template #prefix>
                     <icon-code />
                   </template>
@@ -34,7 +38,14 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :xs="24" :sm="12" :md="24" :lg="12" :xl="12" class="action-col">
+            <a-col
+              :xs="24"
+              :sm="12"
+              :md="24"
+              :lg="12"
+              :xl="12"
+              class="action-col"
+            >
               <a-space :size="12">
                 <a-button type="primary" @click="handleSearch">
                   <template #icon><icon-search /></template>
@@ -93,7 +104,10 @@
               >
                 <template #icon><icon-edit :size="18" /></template>
               </a-button>
-              <a-popconfirm content="确定要删除此声明类型吗？" @ok="handleDel(record.id)">
+              <a-popconfirm
+                content="确定要删除此声明类型吗？"
+                @ok="handleDel(record.id)"
+              >
                 <a-button type="text" size="medium" status="danger">
                   <template #icon><icon-delete :size="18" /></template>
                 </a-button>
@@ -205,7 +219,9 @@
         <div class="detail-row">
           <span class="label">是否必需</span>
           <span class="value">
-            <a-tag v-if="currentRecord?.required" color="green" size="small">必需</a-tag>
+            <a-tag v-if="currentRecord?.required" color="green" size="small"
+              >必需</a-tag
+            >
             <a-tag v-else color="gray" size="small">可选</a-tag>
           </span>
         </div>
@@ -213,7 +229,12 @@
         <div class="detail-row">
           <span class="label">可编辑性</span>
           <span class="value">
-            <a-tag v-if="!currentRecord?.nonEditable" color="arcoblue" size="small">可编辑</a-tag>
+            <a-tag
+              v-if="!currentRecord?.nonEditable"
+              color="arcoblue"
+              size="small"
+              >可编辑</a-tag
+            >
             <a-tag v-else color="orange" size="small">锁定</a-tag>
           </span>
         </div>
@@ -397,7 +418,7 @@
 
       .form-item-block {
         width: 100%;
-        
+
         :deep(.arco-form-item-wrapper-col) {
           width: 100%;
         }

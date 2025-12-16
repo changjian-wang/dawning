@@ -40,7 +40,9 @@ export function setConfigValue(
   description?: string
 ) {
   return axios.post<{ success: boolean }>(
-    `/api/system-config/${encodeURIComponent(group)}/${encodeURIComponent(key)}`,
+    `/api/system-config/${encodeURIComponent(group)}/${encodeURIComponent(
+      key
+    )}`,
     { value, description }
   );
 }

@@ -29,7 +29,8 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         public ApplicationService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService
+        )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

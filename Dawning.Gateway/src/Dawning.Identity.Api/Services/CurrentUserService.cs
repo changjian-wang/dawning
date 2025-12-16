@@ -32,7 +32,8 @@ namespace Dawning.Identity.Api.Services
                     return null;
 
                 // 尝试从多个声明类型获取用户ID
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
+                var userIdClaim =
+                    User.FindFirst(ClaimTypes.NameIdentifier)
                     ?? User.FindFirst("sub")
                     ?? User.FindFirst("user_id");
 

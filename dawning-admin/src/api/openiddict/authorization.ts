@@ -24,10 +24,18 @@ export interface IAuthorizationModel {
 
 export const authorizationApi = {
   // 获取分页列表
-  async getPagedList(model: IAuthorizationModel, page: number, pageSize: number): Promise<IPagedData<IAuthorization>> {
-    const response = await axios.post('/api/openiddict/authorization/get-paged-list', model, {
-      params: { page, pageSize },
-    });
+  async getPagedList(
+    model: IAuthorizationModel,
+    page: number,
+    pageSize: number
+  ): Promise<IPagedData<IAuthorization>> {
+    const response = await axios.post(
+      '/api/openiddict/authorization/get-paged-list',
+      model,
+      {
+        params: { page, pageSize },
+      }
+    );
     const { items, totalCount, pageIndex, pageSize: size } = response.data.data;
     return { items, totalCount, pageIndex, pageSize: size };
   },
@@ -40,19 +48,25 @@ export const authorizationApi = {
 
   // 按用户获取
   async getBySubject(subject: string): Promise<IAuthorization[]> {
-    const response = await axios.get(`/api/openiddict/authorization/get-by-subject/${subject}`);
+    const response = await axios.get(
+      `/api/openiddict/authorization/get-by-subject/${subject}`
+    );
     return response.data.data;
   },
 
   // 按应用获取
   async getByApplicationId(applicationId: string): Promise<IAuthorization[]> {
-    const response = await axios.get(`/api/openiddict/authorization/get-by-application/${applicationId}`);
+    const response = await axios.get(
+      `/api/openiddict/authorization/get-by-application/${applicationId}`
+    );
     return response.data.data;
   },
 
   // 撤销授权（删除）
   async revoke(id: string): Promise<boolean> {
-    const response = await axios.delete(`/api/openiddict/authorization/delete/${id}`);
+    const response = await axios.delete(
+      `/api/openiddict/authorization/delete/${id}`
+    );
     return response.data.data;
   },
 };
