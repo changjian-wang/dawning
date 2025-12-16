@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.Gateway;
@@ -49,6 +50,11 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             RateLimitPolicy = new RateLimitPolicyRepository(_context);
             IpAccessRule = new IpAccessRuleRepository(_context);
         }
+
+        /// <summary>
+        /// 获取数据库连接（用于直接执行 SQL）
+        /// </summary>
+        public IDbConnection Connection => _context.Connection;
 
         // Administration
         public IUserRepository User { get; }

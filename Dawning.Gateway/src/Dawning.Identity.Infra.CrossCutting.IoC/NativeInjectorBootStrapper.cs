@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Dawning.Identity.Application.Services.Monitoring;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Repository.UoW;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,12 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         {
             // 注册 UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // 注册 HttpClientFactory（用于 Webhook 通知）
+            services.AddHttpClient();
+
+            // 注册告警检查后台服务
+            services.AddHostedService<AlertCheckBackgroundService>();
 
             // 扫描并注册程序集中的服务和仓储
             foreach (var assembly in LoadAssemblies())

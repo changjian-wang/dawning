@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.Gateway;
@@ -8,6 +9,11 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
 {
     public interface IUnitOfWork
     {
+        /// <summary>
+        /// 获取数据库连接（用于直接执行 SQL）
+        /// </summary>
+        IDbConnection Connection { get; }
+
         // Administration
         IUserRepository User { get; }
         IClaimTypeRepository ClaimType { get; }
