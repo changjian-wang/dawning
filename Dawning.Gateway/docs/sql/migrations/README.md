@@ -9,6 +9,7 @@
 | V2 | V2_remove_soft_delete.sql | 移除软删除字段，简化数据模型 | 2024-12-15 |
 | V3 | V3_add_login_lockout.sql | 添加登录锁定功能和密码策略配置 | 2024-12-16 |
 | V4 | V4_add_user_sessions.sql | 添加用户会话表和登录策略配置 | 2024-12-16 |
+| V5 | V5_add_request_logs.sql | 添加请求日志表用于监控和审计 | 2024-12-16 |
 
 ## 执行顺序
 

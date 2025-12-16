@@ -99,6 +99,12 @@ namespace Dawning.Identity.Api
                 Dawning.Identity.Api.Services.CurrentUserService
             >();
 
+            // ===== Request Logging Service =====
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Logging.IRequestLoggingService,
+                Dawning.Identity.Application.Services.Logging.RequestLoggingService
+            >();
+
             // ===== CSRF Protection =====
             builder.Services.AddCsrfProtection();
 

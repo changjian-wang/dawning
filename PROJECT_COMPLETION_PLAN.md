@@ -207,10 +207,11 @@
   - 已实现: `Application.ValidateClientSecret()` 方法
   - 使用 `PasswordHasher.Verify()` 进行 PBKDF2 验证
 
-- [ ] **刷新令牌管理** (待完善)
+- [x] **刷新令牌管理** ✅
   - 实现令牌撤销（Revoke）功能 - 端点已配置 `/connect/revoke`
-  - 实现单设备登录/多设备登录策略
-  - 实现 Token 黑名单（Redis）
+  - 实现单设备登录/多设备登录策略 - `TokenManagementService`
+  - 实现 Token 黑名单（Redis） - `TokenBlacklistService`
+  - 实现 Session 管理 - `TokenController`
 
 - [x] **权限管理系统** ✅
   - 实现基于角色的访问控制（RBAC）
@@ -275,10 +276,11 @@
   - ✅ 支持多种限流算法（固定窗口、滑动窗口、令牌桶）
   - ✅ IP 黑白名单管理（支持临时封禁/过期时间）
 
-- [ ] **日志和监控** (待完善)
-  - 实现请求日志记录
-  - 实现性能监控面板
-  - 实现告警规则配置
+- [x] **日志和监控** ✅
+  - ✅ 实现请求日志记录（数据库存储）
+  - ✅ 实现性能监控面板（MonitoringController）
+  - ✅ 请求统计和分析（状态码分布、Top路径、响应时间）
+  - 告警规则配置（待实现）
 
 **预计时间**: 7-10天 → 已完成核心功能
 
