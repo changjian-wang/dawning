@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using TokenEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Token;
 
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
@@ -18,19 +18,19 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
             Mapper = new MapperConfiguration(cfg => cfg.AddProfile<TokenProfile>()).CreateMapper();
         }
 
-        public static TokenDto? ToDto(this Token model)
+        public static TokenDto? ToDto(this TokenEntity model)
         {
             return model == null ? null : Mapper.Map<TokenDto>(model);
         }
 
-        public static IEnumerable<TokenDto>? ToDtos(this IEnumerable<Token> models)
+        public static IEnumerable<TokenDto>? ToDtos(this IEnumerable<TokenEntity> models)
         {
             return models == null ? null : Mapper.Map<IEnumerable<TokenDto>>(models);
         }
 
-        public static Token? ToModel(this TokenDto dto)
+        public static TokenEntity? ToModel(this TokenDto dto)
         {
-            return dto == null ? null : Mapper.Map<Token>(dto);
+            return dto == null ? null : Mapper.Map<TokenEntity>(dto);
         }
     }
 }

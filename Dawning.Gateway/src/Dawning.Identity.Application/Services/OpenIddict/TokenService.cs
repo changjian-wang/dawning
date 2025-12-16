@@ -7,10 +7,10 @@ using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.OpenIddict;
+using TokenEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Token;
 
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
@@ -30,13 +30,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async Task<TokenDto> GetAsync(Guid id)
         {
-            Token model = await _unitOfWork.Token.GetAsync(id);
+            TokenEntity model = await _unitOfWork.Token.GetAsync(id);
             return model?.ToDto() ?? new TokenDto();
         }
 
         public async Task<TokenDto?> GetByReferenceIdAsync(string referenceId)
         {
-            Token? model = await _unitOfWork.Token.GetByReferenceIdAsync(referenceId);
+            TokenEntity? model = await _unitOfWork.Token.GetByReferenceIdAsync(referenceId);
             return model?.ToDto();
         }
 
@@ -64,7 +64,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             int itemsPerPage
         )
         {
-            PagedData<Token> data = await _unitOfWork.Token.GetPagedListAsync(
+            PagedData<TokenEntity> data = await _unitOfWork.Token.GetPagedListAsync(
                 model,
                 page,
                 itemsPerPage
@@ -89,19 +89,19 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<int> InsertAsync(TokenDto dto)
         {
-            Token model = _mapper.Map<Token>(dto);
+            TokenEntity model = _mapper.Map<TokenEntity>(dto);
             return await _unitOfWork.Token.InsertAsync(model);
         }
 
         public async ValueTask<bool> UpdateAsync(TokenDto dto)
         {
-            Token model = _mapper.Map<Token>(dto);
+            TokenEntity model = _mapper.Map<TokenEntity>(dto);
             return await _unitOfWork.Token.UpdateAsync(model);
         }
 
         public async ValueTask<bool> DeleteAsync(TokenDto dto)
         {
-            Token model = dto?.ToModel() ?? new Token();
+            TokenEntity model = dto?.ToModel() ?? new TokenEntity();
             return await _unitOfWork.Token.DeleteAsync(model);
         }
 

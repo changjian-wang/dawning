@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
-using Dawning.Identity.Domain.Aggregates.OpenIddict;
+using TokenEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Token;
 
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
@@ -13,7 +13,7 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
     {
         public TokenProfile()
         {
-            CreateMap<Token, TokenDto>().ReverseMap();
+            CreateMap<TokenEntity, TokenDto>().ReverseMap();
         }
     }
 }

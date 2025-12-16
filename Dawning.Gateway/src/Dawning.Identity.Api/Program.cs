@@ -52,6 +52,35 @@ namespace Dawning.Identity.Api
                 Dawning.Identity.Application.Services.Security.PasswordPolicyService
             >();
 
+            // ===== Token Management Services =====
+            // 配置 Redis 分布式缓存（如果配置了连接字符串）
+            var redisConnection = builder.Configuration.GetConnectionString("Redis");
+            if (!string.IsNullOrEmpty(redisConnection))
+            {
+                builder.Services.AddStackExchangeRedisCache(options =>
+                {
+                    options.Configuration = redisConnection;
+                    options.InstanceName = "DawningIdentity:";
+                });
+                builder.Services.AddScoped<
+                    Dawning.Identity.Application.Interfaces.Token.ITokenBlacklistService,
+                    Dawning.Identity.Application.Services.Token.TokenBlacklistService
+                >();
+            }
+            else
+            {
+                // 使用内存缓存作为回退
+                builder.Services.AddMemoryCache();
+                builder.Services.AddScoped<
+                    Dawning.Identity.Application.Interfaces.Token.ITokenBlacklistService,
+                    Dawning.Identity.Application.Services.Token.InMemoryTokenBlacklistService
+                >();
+            }
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Token.ITokenManagementService,
+                Dawning.Identity.Application.Services.Token.TokenManagementService
+            >();
+
             // ===== User Authentication Service =====
             builder.Services.AddScoped<
                 Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService,
