@@ -16,16 +16,18 @@ public class PasswordPolicyServiceTests
         // 使用真实配置而非 Mock（extension methods 不能被 mock）
         // 注意：实际服务使用的配置路径是 Security:Password
         var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Security:Password:MinLength"] = "8",
-            ["Security:Password:MaxLength"] = "128",
-            ["Security:Password:RequireUppercase"] = "true",
-            ["Security:Password:RequireLowercase"] = "true",
-            ["Security:Password:RequireDigit"] = "true",
-            ["Security:Password:RequireSpecialChar"] = "true",
-            ["Security:Password:SpecialCharacters"] = "!@#$%^&*()"
-        });
+        configBuilder.AddInMemoryCollection(
+            new Dictionary<string, string?>
+            {
+                ["Security:Password:MinLength"] = "8",
+                ["Security:Password:MaxLength"] = "128",
+                ["Security:Password:RequireUppercase"] = "true",
+                ["Security:Password:RequireLowercase"] = "true",
+                ["Security:Password:RequireDigit"] = "true",
+                ["Security:Password:RequireSpecialChar"] = "true",
+                ["Security:Password:SpecialCharacters"] = "!@#$%^&*()",
+            }
+        );
         _configuration = configBuilder.Build();
 
         _policyService = new PasswordPolicyService(_configuration);

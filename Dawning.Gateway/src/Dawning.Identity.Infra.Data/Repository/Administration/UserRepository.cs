@@ -274,7 +274,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <summary>
         /// 记录登录失败并返回更新后的状态
         /// </summary>
-        public async Task<(int FailedCount, bool IsLockedOut, DateTime? LockoutEnd)> RecordFailedLoginAsync(
+        public async Task<(
+            int FailedCount,
+            bool IsLockedOut,
+            DateTime? LockoutEnd
+        )> RecordFailedLoginAsync(
             string username,
             int maxFailedAttempts,
             int lockoutDurationMinutes

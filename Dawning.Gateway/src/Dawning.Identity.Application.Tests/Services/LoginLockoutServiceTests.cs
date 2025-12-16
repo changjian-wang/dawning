@@ -25,12 +25,14 @@ public class LoginLockoutServiceTests
 
         // 使用真实配置而非 Mock（extension methods 不能被 mock）
         var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Security:Lockout:Enabled"] = "true",
-            ["Security:Lockout:MaxFailedAttempts"] = "5",
-            ["Security:Lockout:LockoutDurationMinutes"] = "30"
-        });
+        configBuilder.AddInMemoryCollection(
+            new Dictionary<string, string?>
+            {
+                ["Security:Lockout:Enabled"] = "true",
+                ["Security:Lockout:MaxFailedAttempts"] = "5",
+                ["Security:Lockout:LockoutDurationMinutes"] = "30",
+            }
+        );
         _configuration = configBuilder.Build();
 
         _lockoutService = new LoginLockoutService(_uowMock.Object, _configuration);
@@ -41,7 +43,9 @@ public class LoginLockoutServiceTests
     {
         // Arrange
         var username = "testuser";
-        _userRepositoryMock.Setup(x => x.GetLockoutEndAsync(username)).ReturnsAsync((DateTime?)null);
+        _userRepositoryMock
+            .Setup(x => x.GetLockoutEndAsync(username))
+            .ReturnsAsync((DateTime?)null);
 
         // Act
         var result = await _lockoutService.IsLockedOutAsync(username);
@@ -108,7 +112,9 @@ public class LoginLockoutServiceTests
     {
         // Arrange
         var username = "testuser";
-        _userRepositoryMock.Setup(x => x.ResetFailedLoginCountAsync(username)).Returns(Task.CompletedTask);
+        _userRepositoryMock
+            .Setup(x => x.ResetFailedLoginCountAsync(username))
+            .Returns(Task.CompletedTask);
 
         // Act
         await _lockoutService.ResetFailedCountAsync(username);
@@ -149,12 +155,14 @@ public class LoginLockoutServiceTests
     {
         // Arrange - 创建禁用锁定的配置
         var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Security:Lockout:Enabled"] = "false",
-            ["Security:Lockout:MaxFailedAttempts"] = "5",
-            ["Security:Lockout:LockoutDurationMinutes"] = "30"
-        });
+        configBuilder.AddInMemoryCollection(
+            new Dictionary<string, string?>
+            {
+                ["Security:Lockout:Enabled"] = "false",
+                ["Security:Lockout:MaxFailedAttempts"] = "5",
+                ["Security:Lockout:LockoutDurationMinutes"] = "30",
+            }
+        );
         var disabledConfig = configBuilder.Build();
 
         var service = new LoginLockoutService(_uowMock.Object, disabledConfig);
@@ -172,12 +180,14 @@ public class LoginLockoutServiceTests
     {
         // Arrange - 创建禁用锁定的配置
         var configBuilder = new ConfigurationBuilder();
-        configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
-        {
-            ["Security:Lockout:Enabled"] = "false",
-            ["Security:Lockout:MaxFailedAttempts"] = "5",
-            ["Security:Lockout:LockoutDurationMinutes"] = "30"
-        });
+        configBuilder.AddInMemoryCollection(
+            new Dictionary<string, string?>
+            {
+                ["Security:Lockout:Enabled"] = "false",
+                ["Security:Lockout:MaxFailedAttempts"] = "5",
+                ["Security:Lockout:LockoutDurationMinutes"] = "30",
+            }
+        );
         var disabledConfig = configBuilder.Build();
 
         var service = new LoginLockoutService(_uowMock.Object, disabledConfig);

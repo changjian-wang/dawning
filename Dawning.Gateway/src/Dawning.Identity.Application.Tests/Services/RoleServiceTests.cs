@@ -158,7 +158,9 @@ public class RoleServiceTests
 
         // Act & Assert
         var action = async () => await _roleService.CreateAsync(createDto, null);
-        await action.Should().ThrowAsync<InvalidOperationException>()
+        await action
+            .Should()
+            .ThrowAsync<InvalidOperationException>()
             .WithMessage("*already exists*");
     }
 
@@ -215,8 +217,7 @@ public class RoleServiceTests
 
         // Act & Assert
         var action = async () => await _roleService.UpdateAsync(updateDto, null);
-        await action.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*not found*");
+        await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("*not found*");
     }
 
     [Fact]
@@ -231,7 +232,9 @@ public class RoleServiceTests
 
         // Act & Assert
         var action = async () => await _roleService.UpdateAsync(updateDto, null);
-        await action.Should().ThrowAsync<InvalidOperationException>()
+        await action
+            .Should()
+            .ThrowAsync<InvalidOperationException>()
             .WithMessage("*System roles cannot be modified*");
     }
 
@@ -241,14 +244,34 @@ public class RoleServiceTests
         // Arrange
         var roles = new List<Role>
         {
-            new() { Id = Guid.NewGuid(), Name = "admin", DisplayName = "Admin" },
-            new() { Id = Guid.NewGuid(), Name = "user", DisplayName = "User" },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "admin",
+                DisplayName = "Admin",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "user",
+                DisplayName = "User",
+            },
         };
 
         var roleDtos = new List<RoleDto>
         {
-            new() { Id = roles[0].Id, Name = "admin", DisplayName = "Admin" },
-            new() { Id = roles[1].Id, Name = "user", DisplayName = "User" },
+            new()
+            {
+                Id = roles[0].Id,
+                Name = "admin",
+                DisplayName = "Admin",
+            },
+            new()
+            {
+                Id = roles[1].Id,
+                Name = "user",
+                DisplayName = "User",
+            },
         };
 
         _roleRepositoryMock.Setup(x => x.GetAllAsync()).ReturnsAsync(roles);

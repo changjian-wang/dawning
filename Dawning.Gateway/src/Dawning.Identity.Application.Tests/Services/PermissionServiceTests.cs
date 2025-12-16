@@ -62,7 +62,9 @@ public class PermissionServiceTests
     {
         // Arrange
         var permissionId = Guid.NewGuid();
-        _permissionRepositoryMock.Setup(x => x.GetAsync(permissionId)).ReturnsAsync((Permission?)null);
+        _permissionRepositoryMock
+            .Setup(x => x.GetAsync(permissionId))
+            .ReturnsAsync((Permission?)null);
 
         // Act
         var result = await _permissionService.GetAsync(permissionId);
@@ -109,8 +111,12 @@ public class PermissionServiceTests
             DisplayOrder = 1,
         };
 
-        _permissionRepositoryMock.Setup(x => x.CodeExistsAsync(createDto.Code, null)).ReturnsAsync(false);
-        _permissionRepositoryMock.Setup(x => x.InsertAsync(It.IsAny<Permission>())).ReturnsAsync(true);
+        _permissionRepositoryMock
+            .Setup(x => x.CodeExistsAsync(createDto.Code, null))
+            .ReturnsAsync(false);
+        _permissionRepositoryMock
+            .Setup(x => x.InsertAsync(It.IsAny<Permission>()))
+            .ReturnsAsync(true);
         _auditLogRepositoryMock.Setup(x => x.InsertAsync(It.IsAny<AuditLog>())).ReturnsAsync(1);
 
         // Act
@@ -131,12 +137,13 @@ public class PermissionServiceTests
         // Arrange
         var createDto = new CreatePermissionDto { Code = "existing:code" };
 
-        _permissionRepositoryMock.Setup(x => x.CodeExistsAsync(createDto.Code, null)).ReturnsAsync(true);
+        _permissionRepositoryMock
+            .Setup(x => x.CodeExistsAsync(createDto.Code, null))
+            .ReturnsAsync(true);
 
         // Act & Assert
         var action = async () => await _permissionService.CreateAsync(createDto, null);
-        await action.Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*已存在*");
+        await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("*已存在*");
     }
 
     [Fact]
@@ -145,8 +152,18 @@ public class PermissionServiceTests
         // Arrange
         var permissions = new List<Permission>
         {
-            new() { Id = Guid.NewGuid(), Code = "user:read", Name = "Read Users" },
-            new() { Id = Guid.NewGuid(), Code = "user:write", Name = "Write Users" },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "user:read",
+                Name = "Read Users",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "user:write",
+                Name = "Write Users",
+            },
         };
 
         _permissionRepositoryMock.Setup(x => x.GetAllAsync()).ReturnsAsync(permissions);
@@ -183,9 +200,27 @@ public class PermissionServiceTests
         // Arrange
         var permissions = new List<Permission>
         {
-            new() { Id = Guid.NewGuid(), Code = "user:read", Resource = "user", DisplayOrder = 1 },
-            new() { Id = Guid.NewGuid(), Code = "user:write", Resource = "user", DisplayOrder = 2 },
-            new() { Id = Guid.NewGuid(), Code = "role:read", Resource = "role", DisplayOrder = 1 },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "user:read",
+                Resource = "user",
+                DisplayOrder = 1,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "user:write",
+                Resource = "user",
+                DisplayOrder = 2,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "role:read",
+                Resource = "role",
+                DisplayOrder = 1,
+            },
         };
 
         _permissionRepositoryMock.Setup(x => x.GetAllAsync()).ReturnsAsync(permissions);
@@ -219,7 +254,9 @@ public class PermissionServiceTests
             Items = permissions,
         };
 
-        _permissionRepositoryMock.Setup(x => x.GetPagedListAsync(model, 1, 10)).ReturnsAsync(pagedData);
+        _permissionRepositoryMock
+            .Setup(x => x.GetPagedListAsync(model, 1, 10))
+            .ReturnsAsync(pagedData);
 
         // Act
         var result = await _permissionService.GetPagedListAsync(model, 1, 10);
