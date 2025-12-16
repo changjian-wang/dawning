@@ -1,8 +1,75 @@
 # Dawning 网关管理系统 - 完成计划
 
 **制定日期**: 2025-12-08  
-**最后更新**: 2025-12-16  
-**当前状态**: 核心功能已实现，安全加固已完成
+**最后更新**: 2025-12-17  
+**当前状态**: 核心功能已实现，安全加固已完成，生产化准备完毕
+
+---
+
+## 📋 2025-12-17 会话完成记录
+
+### 本次会话完成的功能
+
+#### 1. 数据库性能优化 ✅
+**迁移脚本**:
+- `V7_add_performance_indexes.sql` - 性能索引迁移
+  - 用户表复合索引（is_active + created_at, role + is_active, username + is_active, last_login_at）
+  - OpenIddict tokens 表索引（status + expires_at, subject + status）
+  - OpenIddict authorizations 表索引
+  - 权限表和系统配置表索引
+
+**迁移工具**:
+- `migrate-db.ps1` - PowerShell 数据库迁移工具
+  - 支持 status/migrate/rollback/init 操作
+  - 自动创建 __migration_history 表
+  - 校验和验证、彩色输出
+
+#### 2. 用户统计 API ✅
+**后端服务**:
+- `IUserService.cs` - 添加 UserStatisticsDto、RecentActiveUserDto
+- `UserService.cs` - 实现 GetUserStatisticsAsync、GetRecentActiveUsersAsync
+- `MonitoringController.cs` - 添加 /user-statistics、/recent-active-users 端点
+
+**统计指标**:
+- 总用户数、活跃用户数
+- 今日/本周/本月登录用户数
+- 从未登录用户数
+- 按角色分布统计
+- 最近活跃用户列表
+
+#### 3. 会话超时配置 ✅
+**配置项** (appsettings.json):
+```json
+"OpenIddict": {
+  "AccessTokenLifetimeMinutes": 60,
+  "RefreshTokenLifetimeDays": 7,
+  "IdentityTokenLifetimeMinutes": 10
+}
+```
+
+**实现**:
+- `OpenIddictConfig.cs` - 读取配置并应用到 Token 生命周期
+
+#### 4. 敏感数据加密服务 ✅
+**新增文件**:
+- `DataEncryptionService.cs` - AES-256 加密服务
+  - IDataEncryptionService 接口
+  - AesDataEncryptionService 实现
+  - Encrypt/Decrypt/TryDecrypt/IsEncrypted 方法
+  - ENC: 前缀标识加密数据
+
+**配置项**:
+```json
+"Security": {
+  "EncryptionKey": "" // 32字节 Base64 编码密钥
+}
+```
+
+#### 5. 依赖包安全更新 ✅
+**更新的包**:
+- Microsoft.Extensions.Caching.StackExchangeRedis: 8.0.0 → 8.0.11
+- Swashbuckle.AspNetCore: 6.5.0 → 6.9.0
+- Swashbuckle.AspNetCore.Annotations: 6.5.0 → 6.9.0
 
 ---
 
@@ -443,7 +510,7 @@
   - ✅ SQL 注入防护验证（Dapper 参数化查询）
   - ✅ XSS 防护验证（X-XSS-Protection 安全头）
   - ✅ CSRF 防护实现（SecurityMiddleware、/api/auth/csrf-token）
-  - 敏感数据加密（待实现）
+  - ✅ 敏感数据加密（AesDataEncryptionService）
 
 - [x] **安全响应头** ✅
   - ✅ X-Content-Type-Options: nosniff
@@ -456,11 +523,15 @@
 - [x] **安全策略** ✅
   - ✅ 密码复杂度策略（IPasswordPolicyService）
   - ✅ 登录失败锁定（ILoginLockoutService）
-  - 会话超时配置（待实现）
+  - ✅ 会话超时配置（OpenIddict Token Lifetime 配置）
   - ✅ IP 白名单（已在限流服务中实现）
 
-- [ ] **依赖安全**
-  - 更新所有依赖包到最新稳定版
+- [x] **敏感数据加密** ✅
+  - ✅ AES-256 加密服务（IDataEncryptionService）
+  - ✅ 可配置加密密钥（Security:EncryptionKey）
+
+- [x] **依赖安全** ✅
+  - ✅ 更新 NuGet 包到最新稳定版
   - ✅ 扫描已知安全漏洞（CI/CD Trivy）
   - 定期安全审查
 
