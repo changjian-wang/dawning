@@ -80,6 +80,13 @@ namespace Dawning.Identity.Api
                     Dawning.Identity.Application.Services.Token.InMemoryTokenBlacklistService
                 >();
             }
+
+            // ===== Cache Service (统一缓存服务) =====
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Caching.ICacheService,
+                Dawning.Identity.Application.Services.Caching.DistributedCacheService
+            >();
+
             builder.Services.AddScoped<
                 Dawning.Identity.Application.Interfaces.Token.ITokenManagementService,
                 Dawning.Identity.Application.Services.Token.TokenManagementService
@@ -200,6 +207,7 @@ namespace Dawning.Identity.Api
             app.UseMiddleware<Dawning.Identity.Api.Middleware.ExceptionHandlingMiddleware>();
             app.UseMiddleware<Dawning.Identity.Api.Middleware.RequestLoggingMiddleware>();
             app.UseMiddleware<Dawning.Identity.Api.Middleware.PerformanceMonitoringMiddleware>();
+            app.UseMiddleware<Dawning.Identity.Api.Middleware.ResponseCacheMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseRouting();

@@ -1,5 +1,6 @@
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Interfaces.Caching;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models.Administration;
 
@@ -77,17 +78,37 @@ namespace Dawning.Identity.Application.Services.Administration
     public class SystemConfigService : ISystemConfigService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICacheService? _cacheService;
 
-        public SystemConfigService(IUnitOfWork unitOfWork)
+        public SystemConfigService(IUnitOfWork unitOfWork, ICacheService? cacheService = null)
         {
             _unitOfWork = unitOfWork;
+            _cacheService = cacheService;
         }
 
         public async Task<string?> GetValueAsync(string group, string key)
         {
-            var model = new SystemMetadataModel { Name = group, Key = key };
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, 1, 1);
-            return result.Items.FirstOrDefault()?.Value;
+            // 使用缓存（如果可用）
+            if (_cacheService != null)
+            {
+                var cacheKey = CacheKeys.SystemConfig(group, key);
+                return await _cacheService.GetOrSetWithNullProtectionAsync<string>(
+                    cacheKey,
+                    async _ =>
+                    {
+                        var model = new SystemMetadataModel { Name = group, Key = key };
+                        var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, 1, 1);
+                        return result.Items.FirstOrDefault()?.Value;
+                    },
+                    CacheEntryOptions.Medium, // 15分钟缓存
+                    TimeSpan.FromMinutes(2)   // 空值缓存2分钟
+                );
+            }
+
+            // 无缓存时直接查询
+            var queryModel = new SystemMetadataModel { Name = group, Key = key };
+            var queryResult = await _unitOfWork.SystemMetadata.GetPagedListAsync(queryModel, 1, 1);
+            return queryResult.Items.FirstOrDefault()?.Value;
         }
 
         public async Task<T> GetValueAsync<T>(string group, string key, T defaultValue)
@@ -137,7 +158,15 @@ namespace Dawning.Identity.Application.Services.Administration
                 if (description != null)
                     existing.Description = description;
 
-                return await _unitOfWork.SystemMetadata.UpdateAsync(existing);
+                var success = await _unitOfWork.SystemMetadata.UpdateAsync(existing);
+
+                // 更新后使缓存失效
+                if (success && _cacheService != null)
+                {
+                    await _cacheService.RemoveAsync(CacheKeys.SystemConfig(group, key));
+                }
+
+                return success;
             }
             else
             {
@@ -153,7 +182,15 @@ namespace Dawning.Identity.Application.Services.Administration
                     Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
 
-                return await _unitOfWork.SystemMetadata.InsertAsync(newItem) > 0;
+                var success = await _unitOfWork.SystemMetadata.InsertAsync(newItem) > 0;
+
+                // 新增后使缓存失效
+                if (success && _cacheService != null)
+                {
+                    await _cacheService.RemoveAsync(CacheKeys.SystemConfig(group, key));
+                }
+
+                return success;
             }
         }
 
@@ -210,12 +247,20 @@ namespace Dawning.Identity.Application.Services.Administration
 
             if (existing != null)
             {
-                return await _unitOfWork.SystemMetadata.DeleteAsync(
+                var success = await _unitOfWork.SystemMetadata.DeleteAsync(
                     new Dawning.Identity.Domain.Aggregates.Administration.SystemMetadata
                     {
                         Id = existing.Id,
                     }
                 );
+
+                // 删除后使缓存失效
+                if (success && _cacheService != null)
+                {
+                    await _cacheService.RemoveAsync(CacheKeys.SystemConfig(group, key));
+                }
+
+                return success;
             }
 
             return false;

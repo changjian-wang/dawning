@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Dawning.Identity.Application.Attributes;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Logging;
 using Microsoft.AspNetCore.Authorization;
@@ -91,6 +92,7 @@ namespace Dawning.Identity.Api.Controllers
         /// <param name="endTime">结束时间（默认现在）</param>
         /// <returns>请求统计信息</returns>
         [HttpGet("statistics")]
+        [CacheResponse(60, VaryByQueryKeys = "startTime,endTime")] // 缓存1分钟
         public async Task<ActionResult<RequestStatistics>> GetStatistics(
             [FromQuery] DateTime? startTime = null,
             [FromQuery] DateTime? endTime = null
@@ -105,6 +107,7 @@ namespace Dawning.Identity.Api.Controllers
         /// </summary>
         /// <returns>系统性能指标</returns>
         [HttpGet("performance")]
+        [CacheResponse(30)] // 缓存30秒
         public ActionResult<SystemPerformanceMetrics> GetPerformanceMetrics()
         {
             var process = Process.GetCurrentProcess();
@@ -149,6 +152,7 @@ namespace Dawning.Identity.Api.Controllers
         /// </summary>
         /// <returns>实时监控数据</returns>
         [HttpGet("realtime")]
+        [CacheResponse(15)] // 缓存15秒
         public async Task<ActionResult<RealtimeMonitoringData>> GetRealtimeData()
         {
             var now = DateTime.UtcNow;
@@ -217,6 +221,7 @@ namespace Dawning.Identity.Api.Controllers
         /// </summary>
         /// <returns>用户统计数据</returns>
         [HttpGet("user-statistics")]
+        [CacheResponse(120)] // 缓存2分钟
         public async Task<ActionResult<UserStatisticsDto>> GetUserStatistics()
         {
             var stats = await _userService.GetUserStatisticsAsync();
@@ -229,6 +234,7 @@ namespace Dawning.Identity.Api.Controllers
         /// <param name="count">返回数量（默认10）</param>
         /// <returns>最近活跃用户列表</returns>
         [HttpGet("recent-active-users")]
+        [CacheResponse(60, VaryByQueryKeys = "count")] // 缓存1分钟
         public async Task<ActionResult<IEnumerable<RecentActiveUserDto>>> GetRecentActiveUsers(
             [FromQuery] int count = 10
         )
