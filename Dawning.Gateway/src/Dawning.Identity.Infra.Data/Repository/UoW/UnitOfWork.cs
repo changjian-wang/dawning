@@ -3,11 +3,13 @@ using System.Data;
 using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.Gateway;
+using Dawning.Identity.Domain.Interfaces.Monitoring;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Repository.Administration;
 using Dawning.Identity.Infra.Data.Repository.Gateway;
+using Dawning.Identity.Infra.Data.Repository.Monitoring;
 using Dawning.Identity.Infra.Data.Repository.OpenIddict;
 
 namespace Dawning.Identity.Infra.Data.Repository.UoW
@@ -49,6 +51,10 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             GatewayCluster = new GatewayClusterRepository(_context);
             RateLimitPolicy = new RateLimitPolicyRepository(_context);
             IpAccessRule = new IpAccessRuleRepository(_context);
+
+            // Monitoring
+            AlertRule = new AlertRuleRepository(_context);
+            AlertHistory = new AlertHistoryRepository(_context);
         }
 
         /// <summary>
@@ -80,6 +86,10 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public IGatewayClusterRepository GatewayCluster { get; }
         public IRateLimitPolicyRepository RateLimitPolicy { get; }
         public IIpAccessRuleRepository IpAccessRule { get; }
+
+        // Monitoring
+        public IAlertRuleRepository AlertRule { get; }
+        public IAlertHistoryRepository AlertHistory { get; }
 
         public void BeginTransaction()
         {
