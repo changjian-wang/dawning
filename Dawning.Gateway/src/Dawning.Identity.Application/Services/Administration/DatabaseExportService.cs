@@ -1,4 +1,5 @@
 using System.Data;
+using System.Data.Common;
 using System.Text;
 using Dapper;
 
@@ -20,7 +21,7 @@ public interface IDatabaseExportService
 
 /// <summary>
 /// 数据库导出服务实现
-/// 注意：此服务需要直接执行数据库元数据查询命令，这是导出功能的本质需求
+/// 使用 ADO.NET GetSchema() 实现跨数据库兼容
 /// </summary>
 public class DatabaseExportService : IDatabaseExportService
 {
@@ -32,6 +33,7 @@ public class DatabaseExportService : IDatabaseExportService
         var sb = new StringBuilder();
         sb.AppendLine("-- Database Backup");
         sb.AppendLine($"-- Generated at: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC");
+        sb.AppendLine($"-- Database Type: {connection.GetType().Name}");
         sb.AppendLine();
 
         excludeTables ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -44,14 +46,11 @@ public class DatabaseExportService : IDatabaseExportService
 
         try
         {
-            // 获取所有表名
-            var tables = await GetAllTableNamesAsync(connection);
+            // 使用 ADO.NET GetSchema 获取表列表（跨数据库兼容）
+            var tables = GetTableNames(connection, excludeTables);
 
-            foreach (var table in tables.Where(t => !excludeTables.Contains(t)))
+            foreach (var table in tables)
             {
-                // 导出表结构
-                await ExportTableStructureAsync(connection, table, sb);
-
                 // 导出表数据
                 await ExportTableDataAsync(connection, table, sb);
             }
@@ -68,46 +67,73 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 获取所有表名
+    /// 获取所有表名（使用 ADO.NET GetSchema，跨数据库兼容）
     /// </summary>
-    private async Task<List<string>> GetAllTableNamesAsync(IDbConnection connection)
+    private List<string> GetTableNames(IDbConnection connection, HashSet<string> excludeTables)
     {
-        // MySQL/MariaDB 元数据查询 - 无法避免直接 SQL
-        return (await connection.QueryAsync<string>("SHOW TABLES")).ToList();
-    }
+        var tables = new List<string>();
 
-    /// <summary>
-    /// 导出表结构
-    /// </summary>
-    private async Task ExportTableStructureAsync(IDbConnection connection, string tableName, StringBuilder sb)
-    {
-        // MySQL/MariaDB DDL 元数据查询 - 无法避免直接 SQL
-        var createTableResult = await connection.QueryFirstOrDefaultAsync<dynamic>(
-            $"SHOW CREATE TABLE `{tableName}`"
-        );
-
-        if (createTableResult != null)
+        if (connection is DbConnection dbConnection)
         {
-            sb.AppendLine($"-- Table structure for `{tableName}`");
-            sb.AppendLine($"DROP TABLE IF EXISTS `{tableName}`;");
+            // 使用 ADO.NET 标准方式获取表信息
+            var schema = dbConnection.GetSchema("Tables");
 
-            var dict = (IDictionary<string, object>)createTableResult;
-            var createStatement = dict.Values.Skip(1).FirstOrDefault()?.ToString();
-            if (!string.IsNullOrEmpty(createStatement))
+            foreach (DataRow row in schema.Rows)
             {
-                sb.AppendLine(createStatement + ";");
+                // 不同数据库的列名可能不同，尝试常见的列名
+                var tableName = GetTableNameFromRow(row);
+
+                if (!string.IsNullOrEmpty(tableName) && 
+                    !excludeTables.Contains(tableName) &&
+                    !IsSystemTable(tableName))
+                {
+                    tables.Add(tableName);
+                }
             }
-            sb.AppendLine();
         }
+
+        return tables.OrderBy(t => t).ToList();
     }
 
     /// <summary>
-    /// 导出表数据
+    /// 从 DataRow 获取表名
+    /// </summary>
+    private string? GetTableNameFromRow(DataRow row)
+    {
+        // 不同数据库使用不同的列名
+        string[] possibleColumns = { "TABLE_NAME", "table_name", "TableName", "Name" };
+
+        foreach (var col in possibleColumns)
+        {
+            if (row.Table.Columns.Contains(col) && row[col] != DBNull.Value)
+            {
+                return row[col]?.ToString();
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 判断是否为系统表
+    /// </summary>
+    private bool IsSystemTable(string tableName)
+    {
+        // 排除常见的系统表前缀
+        var systemPrefixes = new[] { "sys", "pg_", "sqlite_", "mysql.", "information_schema." };
+        var lowerName = tableName.ToLowerInvariant();
+
+        return systemPrefixes.Any(prefix => lowerName.StartsWith(prefix));
+    }
+
+    /// <summary>
+    /// 导出表数据（使用 Dapper，跨数据库兼容）
     /// </summary>
     private async Task ExportTableDataAsync(IDbConnection connection, string tableName, StringBuilder sb)
     {
-        // 动态数据导出 - 必须使用动态 SQL
-        var rows = await connection.QueryAsync($"SELECT * FROM `{tableName}`");
+        // 使用参数化的表名（注意：表名无法参数化，但这里的表名来自 GetSchema，是安全的）
+        var quotedTable = QuoteIdentifier(tableName, connection);
+        var rows = await connection.QueryAsync($"SELECT * FROM {quotedTable}");
         var rowList = rows.ToList();
 
         if (rowList.Any())
@@ -117,12 +143,28 @@ public class DatabaseExportService : IDatabaseExportService
             foreach (var row in rowList)
             {
                 var dict = (IDictionary<string, object>)row;
-                var columns = string.Join(", ", dict.Keys.Select(k => $"`{k}`"));
+                var columns = string.Join(", ", dict.Keys.Select(k => QuoteIdentifier(k, connection)));
                 var values = string.Join(", ", dict.Values.Select(FormatSqlValue));
-                sb.AppendLine($"INSERT INTO `{tableName}` ({columns}) VALUES ({values});");
+                sb.AppendLine($"INSERT INTO {quotedTable} ({columns}) VALUES ({values});");
             }
             sb.AppendLine();
         }
+    }
+
+    /// <summary>
+    /// 引用标识符（根据数据库类型使用不同的引号）
+    /// </summary>
+    private string QuoteIdentifier(string identifier, IDbConnection connection)
+    {
+        var connType = connection.GetType().Name.ToLowerInvariant();
+
+        return connType switch
+        {
+            var t when t.Contains("mysql") => $"`{identifier}`",
+            var t when t.Contains("sqlserver") || t.Contains("sqlconnection") => $"[{identifier}]",
+            var t when t.Contains("npgsql") || t.Contains("postgres") => $"\"{identifier}\"",
+            _ => $"`{identifier}`" // 默认使用反引号
+        };
     }
 
     /// <summary>
@@ -137,6 +179,7 @@ public class DatabaseExportService : IDatabaseExportService
         {
             string s => $"'{EscapeSqlString(s)}'",
             DateTime dt => $"'{dt:yyyy-MM-dd HH:mm:ss}'",
+            DateTimeOffset dto => $"'{dto:yyyy-MM-dd HH:mm:ss}'",
             Guid g => $"'{g}'",
             bool b => b ? "1" : "0",
             byte[] bytes => $"0x{BitConverter.ToString(bytes).Replace("-", "")}",
@@ -151,9 +194,6 @@ public class DatabaseExportService : IDatabaseExportService
     {
         return value
             .Replace("\\", "\\\\")
-            .Replace("'", "\\'")
-            .Replace("\r", "\\r")
-            .Replace("\n", "\\n")
-            .Replace("\t", "\\t");
+            .Replace("'", "''"); // SQL 标准转义
     }
 }
