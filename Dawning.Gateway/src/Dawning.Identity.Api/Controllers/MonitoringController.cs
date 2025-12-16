@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +18,14 @@ namespace Dawning.Identity.Api.Controllers
     public class MonitoringController : ControllerBase
     {
         private readonly IRequestLoggingService _requestLoggingService;
+        private readonly IUserService _userService;
 
-        public MonitoringController(IRequestLoggingService requestLoggingService)
+        public MonitoringController(
+            IRequestLoggingService requestLoggingService,
+            IUserService userService)
         {
             _requestLoggingService = requestLoggingService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -197,6 +203,32 @@ namespace Dawning.Identity.Api.Controllers
                 RetentionDays = retentionDays,
                 CleanupTime = DateTime.UtcNow
             });
+        }
+
+        /// <summary>
+        /// 获取用户统计信息
+        /// </summary>
+        /// <returns>用户统计数据</returns>
+        [HttpGet("user-statistics")]
+        public async Task<ActionResult<UserStatisticsDto>> GetUserStatistics()
+        {
+            var stats = await _userService.GetUserStatisticsAsync();
+            return Ok(stats);
+        }
+
+        /// <summary>
+        /// 获取最近活跃用户
+        /// </summary>
+        /// <param name="count">返回数量（默认10）</param>
+        /// <returns>最近活跃用户列表</returns>
+        [HttpGet("recent-active-users")]
+        public async Task<ActionResult<IEnumerable<RecentActiveUserDto>>> GetRecentActiveUsers([FromQuery] int count = 10)
+        {
+            if (count < 1) count = 10;
+            if (count > 100) count = 100;
+
+            var users = await _userService.GetRecentActiveUsersAsync(count);
+            return Ok(users);
         }
 
         /// <summary>

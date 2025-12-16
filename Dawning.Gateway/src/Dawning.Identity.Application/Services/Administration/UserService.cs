@@ -499,5 +499,63 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             return await _uow.UserRole.RemoveRoleAsync(userId, roleId);
         }
+
+        /// <summary>
+        /// 获取用户统计信息
+        /// </summary>
+        public async Task<UserStatisticsDto> GetUserStatisticsAsync()
+        {
+            // 获取所有用户用于统计（使用空模型获取全部）
+            var allUsers = await _userRepository.GetPagedListAsync(new UserModel(), 1, int.MaxValue);
+            var users = allUsers.Items.ToList();
+
+            var now = DateTime.UtcNow;
+            var todayStart = now.Date;
+            var weekStart = now.Date.AddDays(-(int)now.DayOfWeek);
+            var monthStart = new DateTime(now.Year, now.Month, 1);
+
+            var stats = new UserStatisticsDto
+            {
+                TotalUsers = users.Count,
+                ActiveUsers = users.Count(u => u.IsActive),
+                TodayLoginUsers = users.Count(u => u.LastLoginAt.HasValue && u.LastLoginAt.Value >= todayStart),
+                WeekLoginUsers = users.Count(u => u.LastLoginAt.HasValue && u.LastLoginAt.Value >= weekStart),
+                MonthLoginUsers = users.Count(u => u.LastLoginAt.HasValue && u.LastLoginAt.Value >= monthStart),
+                NeverLoginUsers = users.Count(u => !u.LastLoginAt.HasValue),
+                GeneratedAt = now
+            };
+
+            // 按角色统计
+            var roleGroups = users.GroupBy(u => u.Role ?? "unknown")
+                .ToDictionary(g => g.Key, g => g.Count());
+            stats.UsersByRole = roleGroups;
+
+            return stats;
+        }
+
+        /// <summary>
+        /// 获取最近活跃用户（基于最后登录时间）
+        /// </summary>
+        public async Task<IEnumerable<RecentActiveUserDto>> GetRecentActiveUsersAsync(int count = 10)
+        {
+            // 获取有登录记录的用户，按最后登录时间降序
+            var model = new UserModel { IsActive = true };
+            var allUsers = await _userRepository.GetPagedListAsync(model, 1, int.MaxValue);
+            
+            var recentUsers = allUsers.Items
+                .Where(u => u.LastLoginAt.HasValue)
+                .OrderByDescending(u => u.LastLoginAt)
+                .Take(count)
+                .Select(u => new RecentActiveUserDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    DisplayName = u.DisplayName,
+                    Email = u.Email,
+                    LastLoginAt = u.LastLoginAt
+                });
+
+            return recentUsers;
+        }
     }
 }

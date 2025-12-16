@@ -11,13 +11,32 @@
 | V4 | V4_add_user_sessions.sql | 添加用户会话表和登录策略配置 | 2024-12-16 |
 | V5 | V5_add_request_logs.sql | 添加请求日志表用于监控和审计 | 2024-12-16 |
 | V6 | V6_add_backup_records.sql | 添加数据库备份记录表 | 2024-12-16 |
+| V7 | V7_add_performance_indexes.sql | 添加性能优化索引 | 2024-12-16 |
+
+## 自动化迁移工具
+
+推荐使用自动化迁移工具执行迁移：
+
+```powershell
+# 查看迁移状态
+.\migrate-db.ps1 -Action status
+
+# 执行所有待执行迁移
+.\migrate-db.ps1 -Action migrate
+
+# 回滚指定版本
+.\migrate-db.ps1 -Action rollback -Version V7
+
+# 初始化数据库
+.\migrate-db.ps1 -Action init
+```
 
 ## 执行顺序
 
 1. **首次部署**：先执行主表创建脚本（`dawning_identity.sql`、`gateway_tables.sql` 等）
 2. **增量迁移**：按版本号顺序执行 migrations 目录下的脚本
 
-## 执行方式
+## 手动执行方式
 
 ### 使用 MySQL 命令行
 

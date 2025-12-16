@@ -110,5 +110,57 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         /// 移除用户的角色
         /// </summary>
         Task<bool> RemoveRoleAsync(Guid userId, Guid roleId);
+
+        /// <summary>
+        /// 获取用户统计信息
+        /// </summary>
+        Task<UserStatisticsDto> GetUserStatisticsAsync();
+
+        /// <summary>
+        /// 获取最近活跃用户（基于最后登录时间）
+        /// </summary>
+        Task<IEnumerable<RecentActiveUserDto>> GetRecentActiveUsersAsync(int count = 10);
+    }
+
+    /// <summary>
+    /// 用户统计信息 DTO
+    /// </summary>
+    public class UserStatisticsDto
+    {
+        /// <summary>总用户数</summary>
+        public int TotalUsers { get; set; }
+
+        /// <summary>活跃用户数（is_active = true）</summary>
+        public int ActiveUsers { get; set; }
+
+        /// <summary>今日登录用户数</summary>
+        public int TodayLoginUsers { get; set; }
+
+        /// <summary>本周登录用户数</summary>
+        public int WeekLoginUsers { get; set; }
+
+        /// <summary>本月登录用户数</summary>
+        public int MonthLoginUsers { get; set; }
+
+        /// <summary>从未登录用户数</summary>
+        public int NeverLoginUsers { get; set; }
+
+        /// <summary>按角色统计</summary>
+        public Dictionary<string, int> UsersByRole { get; set; } = new();
+
+        /// <summary>统计时间</summary>
+        public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// 最近活跃用户 DTO
+    /// </summary>
+    public class RecentActiveUserDto
+    {
+        public Guid Id { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string? DisplayName { get; set; }
+        public string? Email { get; set; }
+        public DateTime? LastLoginAt { get; set; }
     }
 }
