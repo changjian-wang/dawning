@@ -29,5 +29,20 @@ namespace Dawning.Identity.Application.Dtos.Authentication
         /// 是否启用
         /// </summary>
         public bool IsActive { get; set; } = true;
+
+        /// <summary>
+        /// 账户是否被锁定
+        /// </summary>
+        public bool IsLockedOut { get; set; } = false;
+
+        /// <summary>
+        /// 锁定结束时间
+        /// </summary>
+        public DateTime? LockoutEnd { get; set; }
+
+        /// <summary>
+        /// 锁定提示消息
+        /// </summary>
+        public string? LockoutMessage { get; set; }
     }
 }

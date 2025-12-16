@@ -83,6 +83,24 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
         public DateTime? LastLoginAt { get; set; }
 
         /// <summary>
+        /// 连续登录失败次数
+        /// </summary>
+        [Column("failed_login_count")]
+        public int FailedLoginCount { get; set; } = 0;
+
+        /// <summary>
+        /// 锁定结束时间
+        /// </summary>
+        [Column("lockout_end")]
+        public DateTime? LockoutEnd { get; set; }
+
+        /// <summary>
+        /// 是否启用锁定功能
+        /// </summary>
+        [Column("lockout_enabled")]
+        public bool LockoutEnabled { get; set; } = true;
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         [Column("created_at")]

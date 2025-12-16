@@ -124,7 +124,7 @@ public class UserServiceTests
         var createDto = new CreateUserDto
         {
             Username = "newuser",
-            Password = "password123",
+            Password = "Password123!",
             Email = "new@test.com",
             DisplayName = "New User",
             Role = "user",
@@ -310,7 +310,7 @@ public class UserServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var newPassword = "newPassword123";
+        var newPassword = "NewPassword123!";
         var user = new User
         {
             Id = userId,

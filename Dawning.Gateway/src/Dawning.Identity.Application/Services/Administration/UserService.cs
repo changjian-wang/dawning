@@ -7,6 +7,7 @@ using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Interfaces.Security;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Core.Security;
 using Dawning.Identity.Domain.Interfaces.Administration;
@@ -24,12 +25,18 @@ namespace Dawning.Identity.Application.Services.Administration
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly IPasswordPolicyService? _passwordPolicyService;
 
-        public UserService(IUserRepository userRepository, IUnitOfWork uow, IMapper mapper)
+        public UserService(
+            IUserRepository userRepository, 
+            IUnitOfWork uow, 
+            IMapper mapper,
+            IPasswordPolicyService? passwordPolicyService = null)
         {
             _userRepository = userRepository;
             _uow = uow;
             _mapper = mapper;
+            _passwordPolicyService = passwordPolicyService;
         }
 
         /// <summary>
@@ -114,12 +121,8 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"Email '{dto.Email}' already exists.");
             }
 
-            // 验证密码复杂度
-            var (isValid, errorMessage) = ValidatePasswordComplexity(dto.Password);
-            if (!isValid)
-            {
-                throw new InvalidOperationException(errorMessage);
-            }
+            // 验证密码复杂度（优先使用密码策略服务）
+            await ValidatePasswordAsync(dto.Password);
 
             // 创建用户实体
             var user = new User
@@ -228,11 +231,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 验证密码复杂度
-            var (isValid, errorMessage) = ValidatePasswordComplexity(dto.NewPassword);
-            if (!isValid)
-            {
-                throw new InvalidOperationException(errorMessage);
-            }
+            await ValidatePasswordAsync(dto.NewPassword);
 
             // 更新密码
             user.PasswordHash = HashPassword(dto.NewPassword);
@@ -255,11 +254,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 验证密码复杂度
-            var (isValid, errorMessage) = ValidatePasswordComplexity(newPassword);
-            if (!isValid)
-            {
-                throw new InvalidOperationException(errorMessage);
-            }
+            await ValidatePasswordAsync(newPassword);
 
             // 直接更新密码，不需要验证旧密码
             user.PasswordHash = HashPassword(newPassword);
@@ -353,6 +348,33 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             return (true, string.Empty);
+        }
+
+        /// <summary>
+        /// 异步验证密码（优先使用密码策略服务，回退到本地验证）
+        /// </summary>
+        private async Task ValidatePasswordAsync(string password)
+        {
+            if (_passwordPolicyService != null)
+            {
+                var result = await _passwordPolicyService.ValidatePasswordAsync(password);
+                if (!result.IsValid)
+                {
+                    var errorMessage = result.Errors.Count > 0 
+                        ? string.Join("; ", result.Errors) 
+                        : "密码不符合策略要求";
+                    throw new InvalidOperationException(errorMessage);
+                }
+            }
+            else
+            {
+                // 回退到静态验证方法
+                var (isValid, errorMessage) = ValidatePasswordComplexity(password);
+                if (!isValid)
+                {
+                    throw new InvalidOperationException(errorMessage);
+                }
+            }
         }
 
         #endregion

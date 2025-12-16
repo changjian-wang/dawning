@@ -1,4 +1,5 @@
 using Dawning.Identity.Api.Configurations;
+using Dawning.Identity.Api.Middleware;
 using Serilog;
 
 namespace Dawning.Identity.Api
@@ -41,6 +42,16 @@ namespace Dawning.Identity.Api
             // 使用基于 Dapper + MySQL 的自定义 Stores
             builder.Services.AddOpenIddictConfiguration(builder.Configuration);
 
+            // ===== Security Services =====
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Security.ILoginLockoutService,
+                Dawning.Identity.Application.Services.Security.LoginLockoutService
+            >();
+            builder.Services.AddScoped<
+                Dawning.Identity.Application.Interfaces.Security.IPasswordPolicyService,
+                Dawning.Identity.Application.Services.Security.PasswordPolicyService
+            >();
+
             // ===== User Authentication Service =====
             builder.Services.AddScoped<
                 Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService,
@@ -58,6 +69,9 @@ namespace Dawning.Identity.Api
                 Dawning.Identity.Application.Interfaces.ICurrentUserService,
                 Dawning.Identity.Api.Services.CurrentUserService
             >();
+
+            // ===== CSRF Protection =====
+            builder.Services.AddCsrfProtection();
 
             // ===== Audit Log Helper =====
             builder.Services.AddHttpContextAccessor();
@@ -131,6 +145,10 @@ namespace Dawning.Identity.Api
 
             // Serilog request logging
             app.UseSerilogRequestLogging();
+
+            // ===== Security Middleware =====
+            app.UseSecurityHeaders();
+            app.UseCsrfToken();
 
             // ===== Middleware Configuration =====
             // 所有中间件已测试

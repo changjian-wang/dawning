@@ -69,6 +69,21 @@ namespace Dawning.Identity.Domain.Aggregates.Administration
         public DateTime? LastLoginAt { get; set; }
 
         /// <summary>
+        /// 连续登录失败次数
+        /// </summary>
+        public int FailedLoginCount { get; set; } = 0;
+
+        /// <summary>
+        /// 锁定结束时间
+        /// </summary>
+        public DateTime? LockoutEnd { get; set; }
+
+        /// <summary>
+        /// 是否启用锁定功能
+        /// </summary>
+        public bool LockoutEnabled { get; set; } = true;
+
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

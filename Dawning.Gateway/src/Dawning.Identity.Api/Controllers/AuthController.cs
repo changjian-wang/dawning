@@ -208,7 +208,23 @@ namespace Dawning.Identity.Api.Controllers
                 request.Password ?? string.Empty
             );
 
-            if (user == null)
+            // 检查是否账户被锁定
+            if (user != null && user.IsLockedOut)
+            {
+                var lockoutProperties = new AuthenticationProperties(
+                    new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] =
+                            Errors.AccessDenied,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            user.LockoutMessage ?? "Account is locked out due to too many failed login attempts.",
+                    }
+                );
+
+                return Forbid(lockoutProperties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            }
+
+            if (user == null || string.IsNullOrEmpty(user.Id))
             {
                 var properties = new AuthenticationProperties(
                     new Dictionary<string, string?>
