@@ -128,6 +128,15 @@ namespace Dawning.Identity.Api.Configurations
                         "api"
                     );
 
+                    // 配置令牌生命周期（从配置文件读取，可通过数据库覆盖）
+                    var accessTokenLifetimeMinutes = configuration.GetValue<int>("OpenIddict:AccessTokenLifetimeMinutes", 60);
+                    var refreshTokenLifetimeDays = configuration.GetValue<int>("OpenIddict:RefreshTokenLifetimeDays", 7);
+                    var identityTokenLifetimeMinutes = configuration.GetValue<int>("OpenIddict:IdentityTokenLifetimeMinutes", 10);
+
+                    options.SetAccessTokenLifetime(TimeSpan.FromMinutes(accessTokenLifetimeMinutes));
+                    options.SetRefreshTokenLifetime(TimeSpan.FromDays(refreshTokenLifetimeDays));
+                    options.SetIdentityTokenLifetime(TimeSpan.FromMinutes(identityTokenLifetimeMinutes));
+
                     // 配置 ASP.NET Core 集成
                     options
                         .UseAspNetCore()

@@ -51,6 +51,10 @@ namespace Dawning.Identity.Api
                 Dawning.Identity.Application.Interfaces.Security.IPasswordPolicyService,
                 Dawning.Identity.Application.Services.Security.PasswordPolicyService
             >();
+            builder.Services.AddSingleton<
+                Dawning.Identity.Domain.Core.Security.IDataEncryptionService,
+                Dawning.Identity.Domain.Core.Security.AesDataEncryptionService
+            >();
 
             // ===== Token Management Services =====
             // 配置 Redis 分布式缓存（如果配置了连接字符串）
