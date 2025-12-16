@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
+using Dawning.Identity.Application.Interfaces;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.OpenIddict;
 using Dawning.Identity.Domain.Aggregates.Administration;
@@ -20,14 +21,19 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICurrentUserService _currentUserService;
 
         /// <summary>
         /// Service for managing OpenIddict applications
         /// </summary>
-        public ApplicationService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ApplicationService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _currentUserService = currentUserService;
         }
 
         /// <summary>
@@ -173,7 +179,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             // 记录审计日志
             await LogAuditAsync(
-                Guid.Empty, // TODO: 从JWT获取操作员ID
+                _currentUserService.UserId ?? Guid.Empty,
                 "Create",
                 "Application",
                 model.Id,
@@ -232,7 +238,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             // 记录审计日志
             await LogAuditAsync(
-                Guid.Empty, // TODO: 从JWT获取操作员ID
+                _currentUserService.UserId ?? Guid.Empty,
                 "Update",
                 "Application",
                 model.Id,
@@ -263,7 +269,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             // 记录审计日志
             await LogAuditAsync(
-                Guid.Empty, // TODO: 从JWT获取操作员ID
+                _currentUserService.UserId ?? Guid.Empty,
                 "Delete",
                 "Application",
                 existing.Id,

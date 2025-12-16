@@ -1,0 +1,48 @@
+# Docker Compose for Development
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # Override Identity API for development
+  identity-api:
+    build:
+      context: ./Dawning.Gateway
+      dockerfile: src/Dawning.Identity.Api/Dockerfile
+      target: build  # Stop at build stage for hot reload
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - OpenIddict__UseDevelopmentCertificate=true
+    volumes:
+      - ./Dawning.Gateway:/src
+    ports:
+      - "5001:5001"
+      - "5002:5002"  # Debug port
+
+  # Override Gateway API for development
+  gateway-api:
+    build:
+      context: ./Dawning.Gateway
+      dockerfile: src/Dawning.Gateway.Api/Dockerfile
+      target: build
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ./Dawning.Gateway:/src
+    ports:
+      - "5000:5000"
+      - "5003:5003"  # Debug port
+
+  # Development admin frontend with hot reload
+  admin-frontend:
+    image: node:20-alpine
+    container_name: dawning-admin-dev
+    working_dir: /app
+    command: sh -c "npm install -g pnpm && pnpm install && pnpm dev --host 0.0.0.0"
+    volumes:
+      - ./dawning-admin:/app
+      - /app/node_modules
+    ports:
+      - "3000:5173"
+    environment:
+      - NODE_ENV=development
