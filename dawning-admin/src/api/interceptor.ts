@@ -19,12 +19,101 @@ const ERROR_CODES = {
   TOKEN_EXPIRED: 50014,
 } as const;
 
+// HTTP 状态码错误消息映射
+const HTTP_ERROR_MESSAGES: Record<number, string> = {
+  400: '请求参数错误',
+  401: '未授权，请重新登录',
+  403: '拒绝访问，权限不足',
+  404: '请求的资源不存在',
+  405: '请求方法不允许',
+  408: '请求超时',
+  409: '资源冲突',
+  410: '资源已被删除',
+  422: '请求数据验证失败',
+  429: '请求过于频繁，请稍后再试',
+  500: '服务器内部错误',
+  501: '服务未实现',
+  502: '网关错误',
+  503: '服务不可用',
+  504: '网关超时',
+};
+
+// 网络错误消息
+const NETWORK_ERROR_MESSAGES: Record<string, string> = {
+  ECONNABORTED: '请求超时，请检查网络连接',
+  ENOTFOUND: '无法连接到服务器',
+  ECONNREFUSED: '服务器拒绝连接',
+  ECONNRESET: '连接被重置',
+  ERR_NETWORK: '网络连接失败，请检查网络',
+  ERR_CANCELED: '请求已取消',
+};
+
 // 需要自动登出的错误码
 const LOGOUT_ERROR_CODES: number[] = [
   ERROR_CODES.ILLEGAL_TOKEN,
   ERROR_CODES.OTHER_CLIENT_LOGIN,
   ERROR_CODES.TOKEN_EXPIRED,
 ];
+
+// 重试配置
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  retryDelay: 1000,
+  retryStatusCodes: [408, 429, 500, 502, 503, 504],
+};
+
+// 获取友好的错误消息
+function getErrorMessage(error: AxiosError<HttpResponse>): string {
+  // 1. 检查是否有后端返回的业务错误消息
+  if (error.response?.data) {
+    const { message, msg } = error.response.data;
+    if (message && message !== 'Error') return message;
+    if (msg && msg !== 'Error') return msg;
+  }
+
+  // 2. 检查 HTTP 状态码
+  if (error.response?.status) {
+    const httpMessage = HTTP_ERROR_MESSAGES[error.response.status];
+    if (httpMessage) return httpMessage;
+  }
+
+  // 3. 检查网络错误
+  if (error.code) {
+    const networkMessage = NETWORK_ERROR_MESSAGES[error.code];
+    if (networkMessage) return networkMessage;
+  }
+
+  // 4. 检查是否是超时
+  if (error.message?.includes('timeout')) {
+    return '请求超时，请稍后重试';
+  }
+
+  // 5. 检查是否是网络错误
+  if (error.message?.includes('Network Error')) {
+    return '网络连接失败，请检查网络';
+  }
+
+  // 6. 默认错误消息
+  return error.message || '请求失败，请稍后重试';
+}
+
+// 延迟函数
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// 判断是否应该重试
+function shouldRetry(error: AxiosError, retryCount: number): boolean {
+  // 超过最大重试次数
+  if (retryCount >= RETRY_CONFIG.maxRetries) return false;
+
+  // 请求被取消不重试
+  if (axios.isCancel(error)) return false;
+
+  // 网络错误可以重试
+  if (!error.response) return true;
+
+  // 特定状态码可以重试
+  return RETRY_CONFIG.retryStatusCodes.includes(error.response.status);
+}
 
 // 设置基础URL
 if (import.meta.env.VITE_API_BASE_URL) {
@@ -191,10 +280,30 @@ axios.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // 处理网络错误或其他HTTP错误
-    const message =
-      error.response?.data?.msg || error.message || 'Request Error';
+    // 获取当前重试次数
+    const config = error.config as AxiosRequestConfig & { _retryCount?: number };
+    const retryCount = config?._retryCount || 0;
 
+    // 判断是否应该自动重试
+    if (shouldRetry(error, retryCount)) {
+      config._retryCount = retryCount + 1;
+
+      // 计算延迟时间（指数退避）
+      const delayMs = RETRY_CONFIG.retryDelay * Math.pow(2, retryCount);
+
+      console.log(
+        `[HTTP] 请求失败，${delayMs}ms 后进行第 ${config._retryCount} 次重试...`,
+        error.config?.url
+      );
+
+      await delay(delayMs);
+      return axios(config);
+    }
+
+    // 获取友好的错误消息
+    const message = getErrorMessage(error);
+
+    // 显示错误消息
     Message.error({
       content: message,
       duration: 5000,

@@ -1,3 +1,4 @@
+using Dawning.Gateway.Api.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
@@ -16,9 +17,22 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // ===== YARP =====
-builder
-    .Services.AddReverseProxy()
-    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+var useDatabase = builder.Configuration.GetValue<bool>("Gateway:UseDatabase");
+
+if (useDatabase)
+{
+    // 从数据库加载配置
+    builder.Services.AddReverseProxy().LoadFromDatabase();
+    Log.Information("YARP configured to load routes from database");
+}
+else
+{
+    // 从配置文件加载（静态配置，作为后备）
+    builder
+        .Services.AddReverseProxy()
+        .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    Log.Information("YARP configured to load routes from appsettings.json");
+}
 
 // ===== 认证 =====
 builder
@@ -112,6 +126,12 @@ builder
 
 var app = builder.Build();
 
+// ===== 初始化数据库配置 =====
+if (useDatabase)
+{
+    await app.InitializeDatabaseProxyConfigAsync();
+}
+
 // ===== 开发环境 =====
 if (app.Environment.IsDevelopment())
 {
@@ -129,6 +149,12 @@ app.UseAuthorization();
 
 // Health
 app.MapHealthChecks("/health");
+
+// Gateway config reload endpoint
+if (useDatabase)
+{
+    app.MapProxyConfigReloadEndpoint("/gateway/reload");
+}
 
 // YARP
 app.MapReverseProxy();

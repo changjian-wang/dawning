@@ -188,5 +188,25 @@ export const user = {
       await axios.post(`/api/user/${userId}/roles`, { roleIds });
       return true;
     },
+
+    // 批量删除用户
+    async batchDelete(
+      ids: string[]
+    ): Promise<{ successCount: number; failedCount: number; failedIds: string[] }> {
+      const response = await axios.delete('/api/user/batch', { data: { ids } });
+      return response.data;
+    },
+
+    // 批量更新用户状态
+    async batchUpdateStatus(
+      ids: string[],
+      isActive: boolean
+    ): Promise<{ successCount: number; failedCount: number; failedIds: string[] }> {
+      const response = await axios.post('/api/user/batch/status', {
+        ids,
+        isActive,
+      });
+      return response.data;
+    },
   },
 };

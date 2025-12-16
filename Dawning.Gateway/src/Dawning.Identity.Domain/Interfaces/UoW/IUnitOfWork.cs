@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
+using Dawning.Identity.Domain.Interfaces.Gateway;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 
 namespace Dawning.Identity.Domain.Interfaces.UoW
@@ -24,6 +25,10 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         IIdentityResourceRepository IdentityResource { get; }
         IAuthorizationRepository Authorization { get; }
         ITokenRepository Token { get; }
+
+        // Gateway
+        IGatewayRouteRepository GatewayRoute { get; }
+        IGatewayClusterRepository GatewayCluster { get; }
 
         // 添加事务管理方法
         void BeginTransaction();

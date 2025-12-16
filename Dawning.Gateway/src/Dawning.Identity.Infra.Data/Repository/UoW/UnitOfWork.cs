@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
+using Dawning.Identity.Domain.Interfaces.Gateway;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Repository.Administration;
+using Dawning.Identity.Infra.Data.Repository.Gateway;
 using Dawning.Identity.Infra.Data.Repository.OpenIddict;
 
 namespace Dawning.Identity.Infra.Data.Repository.UoW
@@ -39,6 +41,10 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             IdentityResource = new IdentityResourceRepository(_context);
             Authorization = new AuthorizationRepository(_context);
             Token = new TokenRepository(_context);
+
+            // Gateway
+            GatewayRoute = new GatewayRouteRepository(_context);
+            GatewayCluster = new GatewayClusterRepository(_context);
         }
 
         // Administration
@@ -58,6 +64,10 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public IIdentityResourceRepository IdentityResource { get; }
         public IAuthorizationRepository Authorization { get; }
         public ITokenRepository Token { get; }
+
+        // Gateway
+        public IGatewayRouteRepository GatewayRoute { get; }
+        public IGatewayClusterRepository GatewayCluster { get; }
 
         public void BeginTransaction()
         {

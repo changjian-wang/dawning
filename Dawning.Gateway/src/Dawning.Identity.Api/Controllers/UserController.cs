@@ -398,6 +398,152 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
+        /// 批量删除用户
+        /// </summary>
+        [HttpDelete("batch")]
+        [Authorize(Roles = "admin,super_admin,user_manager")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> BatchDeleteUsers([FromBody] BatchUserIdsRequest request)
+        {
+            try
+            {
+                if (request.Ids == null || !request.Ids.Any())
+                {
+                    return BadRequest(ApiResponse.Error(40000, "No user IDs provided"));
+                }
+
+                var operatorId = GetCurrentUserId();
+                var successCount = 0;
+                var failedIds = new List<Guid>();
+
+                foreach (var id in request.Ids)
+                {
+                    try
+                    {
+                        await _userService.DeleteAsync(id, operatorId);
+                        successCount++;
+                    }
+                    catch
+                    {
+                        failedIds.Add(id);
+                    }
+                }
+
+                _logger.LogInformation(
+                    "Batch delete users: success={SuccessCount}, failed={FailedCount}",
+                    successCount,
+                    failedIds.Count
+                );
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: "BatchDelete",
+                    entityType: "User",
+                    entityId: null,
+                    description: $"Batch deleted {successCount} users, {failedIds.Count} failed"
+                );
+
+                return Ok(
+                    ApiResponse<object>.Success(
+                        new
+                        {
+                            successCount,
+                            failedCount = failedIds.Count,
+                            failedIds,
+                        },
+                        $"成功删除 {successCount} 个用户"
+                    )
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error batch deleting users");
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
+            }
+        }
+
+        /// <summary>
+        /// 批量启用/禁用用户
+        /// </summary>
+        [HttpPost("batch/status")]
+        [Authorize(Roles = "admin,super_admin,user_manager")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> BatchUpdateUserStatus(
+            [FromBody] BatchUpdateStatusRequest request
+        )
+        {
+            try
+            {
+                if (request.Ids == null || !request.Ids.Any())
+                {
+                    return BadRequest(ApiResponse.Error(40000, "No user IDs provided"));
+                }
+
+                var operatorId = GetCurrentUserId();
+                var successCount = 0;
+                var failedIds = new List<Guid>();
+
+                foreach (var id in request.Ids)
+                {
+                    try
+                    {
+                        var user = await _userRepository.GetAsync(id);
+                        if (user != null)
+                        {
+                            user.IsActive = request.IsActive;
+                            user.UpdatedAt = DateTime.UtcNow;
+                            user.UpdatedBy = operatorId;
+                            await _userRepository.UpdateAsync(user);
+                            successCount++;
+                        }
+                        else
+                        {
+                            failedIds.Add(id);
+                        }
+                    }
+                    catch
+                    {
+                        failedIds.Add(id);
+                    }
+                }
+
+                _logger.LogInformation(
+                    "Batch update user status: isActive={IsActive}, success={SuccessCount}, failed={FailedCount}",
+                    request.IsActive,
+                    successCount,
+                    failedIds.Count
+                );
+
+                // 记录审计日志
+                await _auditLogHelper.LogAsync(
+                    action: request.IsActive ? "BatchEnable" : "BatchDisable",
+                    entityType: "User",
+                    entityId: null,
+                    description: $"Batch {(request.IsActive ? "enabled" : "disabled")} {successCount} users, {failedIds.Count} failed"
+                );
+
+                return Ok(
+                    ApiResponse<object>.Success(
+                        new
+                        {
+                            successCount,
+                            failedCount = failedIds.Count,
+                            failedIds,
+                        },
+                        $"成功{(request.IsActive ? "启用" : "禁用")} {successCount} 个用户"
+                    )
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error batch updating user status");
+                return StatusCode(500, ApiResponse.Error(50000, "Internal server error"));
+            }
+        }
+
+        /// <summary>
         /// 修改密码
         /// </summary>
         [HttpPost("change-password")]
@@ -715,7 +861,11 @@ namespace Dawning.Identity.Api.Controllers
                 {
                     return Ok(
                         ApiResponse<object>.Success(
-                            new { adminId = admin.Id, message = "Admin already has super_admin role" }
+                            new
+                            {
+                                adminId = admin.Id,
+                                message = "Admin already has super_admin role",
+                            }
                         )
                     );
                 }
@@ -873,4 +1023,35 @@ namespace Dawning.Identity.Api.Controllers
 
         #endregion
     }
+
+    #region 请求模型
+
+    /// <summary>
+    /// 批量用户ID请求
+    /// </summary>
+    public class BatchUserIdsRequest
+    {
+        /// <summary>
+        /// 用户ID列表
+        /// </summary>
+        public List<Guid> Ids { get; set; } = new();
+    }
+
+    /// <summary>
+    /// 批量更新状态请求
+    /// </summary>
+    public class BatchUpdateStatusRequest
+    {
+        /// <summary>
+        /// 用户ID列表
+        /// </summary>
+        public List<Guid> Ids { get; set; } = new();
+
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsActive { get; set; }
+    }
+
+    #endregion
 }

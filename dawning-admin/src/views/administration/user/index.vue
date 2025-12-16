@@ -94,13 +94,56 @@
         </a-form>
       </a-card>
       <a-card class="general-card table-card">
+        <!-- 批量操作栏 -->
+        <div v-if="selectedRowKeys.length > 0" class="batch-action-bar">
+          <a-space>
+            <span class="selected-count">
+              已选择 <strong>{{ selectedRowKeys.length }}</strong> 项
+            </span>
+            <a-button size="small" @click="handleClearSelection">
+              取消选择
+            </a-button>
+            <a-divider direction="vertical" />
+            <a-button
+              type="primary"
+              status="success"
+              size="small"
+              @click="handleBatchEnable"
+            >
+              <template #icon><icon-check-circle /></template>
+              批量启用
+            </a-button>
+            <a-button
+              type="primary"
+              status="warning"
+              size="small"
+              @click="handleBatchDisable"
+            >
+              <template #icon><icon-close-circle /></template>
+              批量禁用
+            </a-button>
+            <a-button
+              type="primary"
+              status="danger"
+              size="small"
+              @click="handleBatchDelete"
+            >
+              <template #icon><icon-delete /></template>
+              批量删除
+            </a-button>
+          </a-space>
+        </div>
         <a-table
           :columns="columns"
           :data="data"
           :pagination="pagination"
           :bordered="false"
           :loading="loading"
+          :row-selection="rowSelection"
+          :selected-keys="selectedRowKeys"
+          row-key="id"
           @page-change="handlePaginationChange"
+          @selection-change="handleSelectionChange"
         >
           <template #isActive="{ record }">
             <a-tag v-if="record.isActive" color="arcoblue" size="small">
@@ -437,6 +480,14 @@
   const formRef = ref<any>(null);
   const currentUserId = ref<string>('');
   const currentUser = ref<IUser | null>(null);
+
+  // 批量选择相关状态
+  const selectedRowKeys = ref<string[]>([]);
+  const rowSelection = reactive({
+    type: 'checkbox' as const,
+    showCheckedAll: true,
+    onlyCurrent: false,
+  });
 
   // 角色分配相关状态
   const roleLoading = ref(false);
@@ -827,12 +878,142 @@
     roleSearchText.value = '';
     currentUser.value = null;
   };
+
+  // 批量操作相关处理函数
+  const handleSelectionChange = (rowKeys: string[]) => {
+    selectedRowKeys.value = rowKeys;
+  };
+
+  const handleClearSelection = () => {
+    selectedRowKeys.value = [];
+  };
+
+  const handleBatchDelete = async () => {
+    if (selectedRowKeys.value.length === 0) {
+      Message.warning('请先选择要删除的用户');
+      return;
+    }
+
+    const modal = (window as any).$modal;
+    modal.confirm({
+      title: '批量删除确认',
+      content: `确定要删除选中的 ${selectedRowKeys.value.length} 个用户吗？此操作不可恢复。`,
+      onOk: async () => {
+        try {
+          loading.value = true;
+          const result = await user.api.batchDelete(selectedRowKeys.value);
+          if (result.successCount > 0) {
+            Message.success(`成功删除 ${result.successCount} 个用户`);
+          }
+          if (result.failedCount > 0) {
+            Message.warning(`${result.failedCount} 个用户删除失败`);
+          }
+          selectedRowKeys.value = [];
+          fetchData();
+        } catch (error: any) {
+          const errorMsg = error?.response?.data?.message || '批量删除失败';
+          Message.error(errorMsg);
+          console.error(error);
+        } finally {
+          loading.value = false;
+        }
+      },
+    });
+  };
+
+  const handleBatchEnable = async () => {
+    if (selectedRowKeys.value.length === 0) {
+      Message.warning('请先选择要启用的用户');
+      return;
+    }
+
+    const modal = (window as any).$modal;
+    modal.confirm({
+      title: '批量启用确认',
+      content: `确定要启用选中的 ${selectedRowKeys.value.length} 个用户吗？`,
+      onOk: async () => {
+        try {
+          loading.value = true;
+          const result = await user.api.batchUpdateStatus(
+            selectedRowKeys.value,
+            true
+          );
+          if (result.successCount > 0) {
+            Message.success(`成功启用 ${result.successCount} 个用户`);
+          }
+          if (result.failedCount > 0) {
+            Message.warning(`${result.failedCount} 个用户启用失败`);
+          }
+          selectedRowKeys.value = [];
+          fetchData();
+        } catch (error: any) {
+          const errorMsg = error?.response?.data?.message || '批量启用失败';
+          Message.error(errorMsg);
+          console.error(error);
+        } finally {
+          loading.value = false;
+        }
+      },
+    });
+  };
+
+  const handleBatchDisable = async () => {
+    if (selectedRowKeys.value.length === 0) {
+      Message.warning('请先选择要禁用的用户');
+      return;
+    }
+
+    const modal = (window as any).$modal;
+    modal.confirm({
+      title: '批量禁用确认',
+      content: `确定要禁用选中的 ${selectedRowKeys.value.length} 个用户吗？`,
+      onOk: async () => {
+        try {
+          loading.value = true;
+          const result = await user.api.batchUpdateStatus(
+            selectedRowKeys.value,
+            false
+          );
+          if (result.successCount > 0) {
+            Message.success(`成功禁用 ${result.successCount} 个用户`);
+          }
+          if (result.failedCount > 0) {
+            Message.warning(`${result.failedCount} 个用户禁用失败`);
+          }
+          selectedRowKeys.value = [];
+          fetchData();
+        } catch (error: any) {
+          const errorMsg = error?.response?.data?.message || '批量禁用失败';
+          Message.error(errorMsg);
+          console.error(error);
+        } finally {
+          loading.value = false;
+        }
+      },
+    });
+  };
 </script>
 
 <style scoped lang="less">
   .user-management {
     .search-card {
       margin-bottom: 16px;
+    }
+
+    .batch-action-bar {
+      background-color: #e8f4ff;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      border: 1px solid #bedaff;
+
+      .selected-count {
+        color: #1d2129;
+
+        strong {
+          color: #165dff;
+        }
+      }
     }
 
     .search-form {

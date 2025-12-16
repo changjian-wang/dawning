@@ -16,6 +16,8 @@ import localeIdsApiResource from '@/views/ids/api-resource/locale/en-US';
 import localeSystemMetadata from '@/views/administration/system-metadata/locale/en-US';
 import localeAuditLog from '@/views/administration/audit-log/locale/en-US';
 import localeSystemLog from '@/views/administration/system-log/locale/en-US';
+import localeGateway from '@/views/administration/gateway/locale/en-US';
+import localeSystemConfig from '@/views/administration/system-config/locale/en-US';
 
 import localeSettings from './en-US/settings';
 
@@ -58,6 +60,8 @@ export default {
   ...localeIdsScope,
   ...localeIdsIdentityResource,
   ...localeIdsApiResource,
+  ...localeGateway,
+  ...localeSystemConfig,
 
   ...localeSettings,
   ...localeMessageBox,

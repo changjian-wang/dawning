@@ -47,6 +47,12 @@ namespace Dawning.Identity.Api
                 Dawning.Identity.Application.Services.Authentication.UserAuthenticationService
             >();
 
+            // ===== Rate Limit Service =====
+            builder.Services.AddScoped<
+                Dawning.Identity.Api.Services.IRateLimitService,
+                Dawning.Identity.Api.Services.RateLimitService
+            >();
+
             // ===== Audit Log Helper =====
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<Dawning.Identity.Api.Helpers.AuditLogHelper>();

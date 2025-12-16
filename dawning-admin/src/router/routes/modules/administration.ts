@@ -165,6 +165,66 @@ const ADMINISTRATION: AppRouteRecordRaw = {
         icon: 'icon-safe',
       },
     },
+    {
+      path: 'gateway-cluster',
+      name: 'GatewayCluster',
+      component: () =>
+        import('@/views/administration/gateway/cluster/index.vue'),
+      meta: {
+        locale: 'menu.gateway.cluster',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-cloud',
+      },
+    },
+    {
+      path: 'gateway-route',
+      name: 'GatewayRoute',
+      component: () =>
+        import('@/views/administration/gateway/route/index.vue'),
+      meta: {
+        locale: 'menu.gateway.route',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-branch',
+      },
+    },
+    {
+      path: 'rate-limit',
+      name: 'RateLimit',
+      component: () =>
+        import('@/views/administration/gateway/rate-limit/index.vue'),
+      meta: {
+        locale: 'menu.gateway.rateLimit',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-filter',
+      },
+    },
+    {
+      path: 'system-monitor',
+      name: 'SystemMonitor',
+      component: () =>
+        import('@/views/administration/system-monitor/index.vue'),
+      meta: {
+        locale: 'menu.administration.systemMonitor',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-dashboard',
+      },
+    },
+    {
+      path: 'system-config',
+      name: 'SystemConfig',
+      component: () =>
+        import('@/views/administration/system-config/index.vue'),
+      meta: {
+        locale: 'menu.systemConfig',
+        requiresAuth: true,
+        roles: ['admin', 'super_admin'],
+        icon: 'icon-tool',
+      },
+    },
   ],
 };
 
