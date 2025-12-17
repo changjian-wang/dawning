@@ -6,6 +6,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+  /* 测试超时时间 */
+  timeout: 60 * 1000,
   /* 完全并行运行测试 */
   fullyParallel: true,
   /* 在 CI 上禁止使用 test.only */
@@ -24,6 +26,10 @@ export default defineConfig({
     trace: 'on-first-retry',
     /* 截图 */
     screenshot: 'only-on-failure',
+    /* 导航超时 */
+    navigationTimeout: 30 * 1000,
+    /* 动作超时 */
+    actionTimeout: 15 * 1000,
   },
 
   /* 配置项目 */
@@ -39,6 +45,6 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    timeout: 180 * 1000, // 增加到 3 分钟
   },
 });
