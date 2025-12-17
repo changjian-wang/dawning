@@ -7,21 +7,21 @@ import type { Plugin } from 'vite';
 import compressPlugin from 'vite-plugin-compression';
 
 export default function configCompressPlugin(
-  compress: 'gzip' | 'brotli',
+  compress: 'gzip' | 'brotli' | 'both',
   deleteOriginFile = false
 ): Plugin | Plugin[] {
   const plugins: Plugin[] = [];
 
-  if (compress === 'gzip') {
+  if (compress === 'gzip' || compress === 'both') {
     plugins.push(
       compressPlugin({
         ext: '.gz',
-        deleteOriginFile,
+        deleteOriginFile: compress === 'gzip' ? deleteOriginFile : false,
       })
     );
   }
 
-  if (compress === 'brotli') {
+  if (compress === 'brotli' || compress === 'both') {
     plugins.push(
       compressPlugin({
         ext: '.br',
