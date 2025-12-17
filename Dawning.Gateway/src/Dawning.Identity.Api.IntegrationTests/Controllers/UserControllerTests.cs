@@ -36,8 +36,8 @@ public class UserControllerTests : IntegrationTestBase
     [Fact]
     public async Task GetUserById_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act
-        var response = await Client.GetAsync("/api/user/1");
+        // Act - 使用有效的 GUID 格式
+        var response = await Client.GetAsync("/api/user/00000000-0000-0000-0000-000000000001");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -67,8 +67,8 @@ public class UserControllerTests : IntegrationTestBase
         // Arrange
         var updateData = new { email = "updated@test.com" };
 
-        // Act
-        var response = await Client.PutAsJsonAsync("/api/user/1", updateData);
+        // Act - 使用有效的 GUID 格式
+        var response = await Client.PutAsJsonAsync("/api/user/00000000-0000-0000-0000-000000000001", updateData);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -77,8 +77,8 @@ public class UserControllerTests : IntegrationTestBase
     [Fact]
     public async Task DeleteUser_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act
-        var response = await Client.DeleteAsync("/api/user/1");
+        // Act - 使用有效的 GUID 格式
+        var response = await Client.DeleteAsync("/api/user/00000000-0000-0000-0000-000000000001");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -104,8 +104,8 @@ public class UserControllerTests : IntegrationTestBase
     [Fact]
     public async Task GetUserRoles_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act
-        var response = await Client.GetAsync("/api/user/1/roles");
+        // Act - 使用有效的 GUID 格式
+        var response = await Client.GetAsync("/api/user/00000000-0000-0000-0000-000000000001/roles");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

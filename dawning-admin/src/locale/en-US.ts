@@ -10,9 +10,6 @@ import localePermission from '@/views/administration/permission/locale/en-US';
 import localeApplication from '@/views/administration/openiddict/application/locale/en-US';
 import localeScope from '@/views/administration/openiddict/scope/locale/en-US';
 import localeClaimType from '@/views/administration/claim-type/locale/en-US';
-import localeIdsScope from '@/views/ids/scope/locale/en-US';
-import localeIdsIdentityResource from '@/views/ids/identity-resource/locale/en-US';
-import localeIdsApiResource from '@/views/ids/api-resource/locale/en-US';
 import localeSystemMetadata from '@/views/administration/system-metadata/locale/en-US';
 import localeAuditLog from '@/views/administration/audit-log/locale/en-US';
 import localeSystemLog from '@/views/administration/system-log/locale/en-US';
@@ -57,9 +54,6 @@ export default {
   ...localeSystemMetadata,
   ...localeAuditLog,
   ...localeSystemLog,
-  ...localeIdsScope,
-  ...localeIdsIdentityResource,
-  ...localeIdsApiResource,
   ...localeGateway,
   ...localeSystemConfig,
 

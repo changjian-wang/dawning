@@ -13,6 +13,7 @@ export interface IScope {
   properties?: Record<string, string>;
   timestamp?: number;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 /**

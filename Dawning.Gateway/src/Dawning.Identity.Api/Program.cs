@@ -236,18 +236,22 @@ namespace Dawning.Identity.Api
             );
 
             // ===== Database Seeding =====
-            using (var scope = app.Services.CreateScope())
+            // 在测试环境下跳过数据库种子
+            if (!app.Environment.IsEnvironment("Testing"))
             {
-                var seeder =
-                    scope.ServiceProvider.GetRequiredService<Dawning.Identity.Api.Data.DatabaseSeeder>();
-                try
+                using (var scope = app.Services.CreateScope())
                 {
-                    await seeder.SeedAsync();
-                    Log.Information("Database seeding completed successfully");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, "An error occurred while seeding the database");
+                    var seeder =
+                        scope.ServiceProvider.GetRequiredService<Dawning.Identity.Api.Data.DatabaseSeeder>();
+                    try
+                    {
+                        await seeder.SeedAsync();
+                        Log.Information("Database seeding completed successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "An error occurred while seeding the database");
+                    }
                 }
             }
 

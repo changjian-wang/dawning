@@ -11,9 +11,6 @@ import localeApplication from '@/views/administration/openiddict/application/loc
 import localeScope from '@/views/administration/openiddict/scope/locale/zh-CN';
 import localeOpenIddict from '@/views/administration/openiddict/locale/zh-CN';
 import localeClaimType from '@/views/administration/claim-type/locale/zh-CN';
-import localeIdsScope from '@/views/ids/scope/locale/zh-CN';
-import localeIdsIdentityResource from '@/views/ids/identity-resource/locale/zh-CN';
-import localeIdsApiResource from '@/views/ids/api-resource/locale/zh-CN';
 import localeSystemMetadata from '@/views/administration/system-metadata/locale/zh-CN';
 import localeAuditLog from '@/views/administration/audit-log/locale/zh-CN';
 import localeSystemLog from '@/views/administration/system-log/locale/zh-CN';
@@ -60,9 +57,6 @@ export default {
   ...localeSystemLog,
   ...localeGateway,
   ...localeSystemConfig,
-  ...localeIdsScope,
-  ...localeIdsIdentityResource,
-  ...localeIdsApiResource,
   ...localeOpenIddict,
 
   ...localeSettings,

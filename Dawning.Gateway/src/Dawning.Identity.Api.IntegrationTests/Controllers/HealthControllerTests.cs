@@ -62,7 +62,7 @@ public class HealthControllerTests : IntegrationTestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
-        content.Should().Contain("Live");
+        content.Should().Contain("Alive");
     }
 
     [Fact]
