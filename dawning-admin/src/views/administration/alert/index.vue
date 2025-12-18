@@ -221,7 +221,7 @@
       v-model:visible="ruleModalVisible"
       :title="isEditMode ? '编辑告警规则' : '添加告警规则'"
       :ok-loading="ruleSubmitting"
-      @ok="handleSubmitRule"
+      @before-ok="handleRuleBeforeOk"
       @cancel="handleCancelRule"
       width="600px"
     >
@@ -598,9 +598,12 @@ const handleEditRule = (record: AlertRuleDto) => {
   ruleModalVisible.value = true;
 };
 
-const handleSubmitRule = async () => {
-  const valid = await ruleFormRef.value?.validate();
-  if (valid) return;
+const handleRuleBeforeOk = async (done: (closed: boolean) => void) => {
+  const errors = await ruleFormRef.value?.validate();
+  if (errors) {
+    done(false);
+    return;
+  }
 
   ruleSubmitting.value = true;
   try {
@@ -611,11 +614,12 @@ const handleSubmitRule = async () => {
       await createRule(ruleForm);
       Message.success('创建成功');
     }
-    ruleModalVisible.value = false;
+    done(true);
     loadRules();
     loadStatistics();
   } catch (error) {
     Message.error(isEditMode.value ? '更新失败' : '创建失败');
+    done(false);
   } finally {
     ruleSubmitting.value = false;
   }

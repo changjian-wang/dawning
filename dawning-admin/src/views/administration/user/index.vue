@@ -200,8 +200,8 @@
       v-model:visible="modalVisible"
       :title="modalTitle"
       width="800px"
-      @before-ok="handleValidateForm"
-      @ok="handleSubmit"
+      :ok-loading="submitLoading"
+      @before-ok="handleBeforeOk"
       @cancel="handleModalCancel"
     >
       <a-form ref="formRef" :rules="rules" :model="form">
@@ -349,17 +349,25 @@
 
         <div class="detail-row">
           <span class="label">最后登录</span>
-          <span class="value">{{ currentUser?.lastLoginAt || '-' }}</span>
+          <span class="value">{{
+            currentUser?.lastLoginAt
+              ? formatDateTime(currentUser.lastLoginAt)
+              : '-'
+          }}</span>
         </div>
 
         <div class="detail-row">
           <span class="label">创建时间</span>
-          <span class="value">{{ currentUser?.createdAt || '-' }}</span>
+          <span class="value">{{
+            currentUser?.createdAt ? formatDateTime(currentUser.createdAt) : '-'
+          }}</span>
         </div>
 
         <div class="detail-row">
           <span class="label">更新时间</span>
-          <span class="value">{{ currentUser?.updatedAt || '-' }}</span>
+          <span class="value">{{
+            currentUser?.updatedAt ? formatDateTime(currentUser.updatedAt) : '-'
+          }}</span>
         </div>
 
         <div class="detail-row">
@@ -373,7 +381,8 @@
     <a-modal
       v-model:visible="resetPasswordVisible"
       title="重置密码"
-      @ok="handleResetPasswordSubmit"
+      :ok-loading="resetPasswordLoading"
+      @before-ok="handleResetPasswordBeforeOk"
     >
       <a-form :model="resetPasswordForm">
         <a-form-item label="新密码">
@@ -477,7 +486,7 @@
   import { FieldRule, PaginationProps, Message } from '@arco-design/web-vue';
   import {
     exportData,
-    formatDateTime as exportFormatDateTime,
+    formatDateTime,
     formatBoolean,
     type ExportColumn,
   } from '@/utils/export';
@@ -686,15 +695,21 @@
     viewModalVisible.value = true;
   };
 
-  const handleValidateForm = async () => {
-    if (await formRef.value.validate()) {
-      return false;
-    }
-    return true;
-  };
+  const submitLoading = ref(false);
 
-  const handleSubmit = async () => {
+  const handleBeforeOk = async (done: (closed: boolean) => void) => {
     try {
+      // 先验证表单
+      const errors = await formRef.value?.validate();
+      if (errors) {
+        // 验证失败，不关闭弹窗
+        done(false);
+        return;
+      }
+
+      submitLoading.value = true;
+
+      // 提交数据
       if (isEdit.value) {
         await user.api.update(form as IUpdateUserModel);
         Message.success('更新成功');
@@ -702,7 +717,9 @@
         await user.api.create(form as ICreateUserModel);
         Message.success('创建成功');
       }
-      modalVisible.value = false;
+
+      // 成功后关闭弹窗并刷新数据
+      done(true);
       fetchData();
     } catch (error: any) {
       const errorMsg =
@@ -710,6 +727,10 @@
         (isEdit.value ? '更新失败' : '创建失败');
       Message.error(errorMsg);
       console.error(error);
+      // 提交失败，不关闭弹窗
+      done(false);
+    } finally {
+      submitLoading.value = false;
     }
   };
 
@@ -751,12 +772,12 @@
         {
           field: 'createdAt',
           title: '创建时间',
-          formatter: (value) => exportFormatDateTime(value),
+          formatter: (value) => formatDateTime(value),
         },
         {
           field: 'lastLoginAt',
           title: '最后登录',
-          formatter: (value) => exportFormatDateTime(value),
+          formatter: (value) => formatDateTime(value),
         },
       ];
 
@@ -802,28 +823,35 @@
     resetPasswordVisible.value = true;
   };
 
-  const handleResetPasswordSubmit = async () => {
+  const resetPasswordLoading = ref(false);
+
+  const handleResetPasswordBeforeOk = async (
+    done: (closed: boolean) => void
+  ) => {
     if (
       !resetPasswordForm.newPassword ||
       resetPasswordForm.newPassword.length < 6
     ) {
       Message.warning('密码至少6个字符');
-      return false;
+      done(false);
+      return;
     }
 
     try {
+      resetPasswordLoading.value = true;
       await user.api.resetPassword(
         currentUserId.value,
         resetPasswordForm.newPassword
       );
       Message.success('密码重置成功');
-      resetPasswordVisible.value = false;
-      return true;
+      done(true);
     } catch (error: any) {
       const errorMsg = error?.response?.data?.message || '密码重置失败';
       Message.error(errorMsg);
       console.error(error);
-      return false;
+      done(false);
+    } finally {
+      resetPasswordLoading.value = false;
     }
   };
 

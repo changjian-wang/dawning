@@ -65,9 +65,13 @@
                   <template #prefix>
                     <icon-folder />
                   </template>
-                  <a-option value="administration">Administration</a-option>
-                  <a-option value="openiddict">OpenIddict</a-option>
-                  <a-option value="system">System</a-option>
+                  <a-option
+                    v-for="cat in categoryOptions"
+                    :key="cat"
+                    :value="cat"
+                  >
+                    {{ cat }}
+                  </a-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -192,7 +196,8 @@
         v-model:visible="modalVisible"
         :title="isEdit ? '编辑权限' : '创建权限'"
         width="600px"
-        @ok="handleSubmit"
+        :ok-loading="submitLoading"
+        @before-ok="handleBeforeOk"
         @cancel="handleCancel"
       >
         <a-form ref="formRef" :model="formData" layout="vertical">
@@ -342,6 +347,8 @@
   import {
     getPermissionList,
     getGroupedPermissions,
+    getResourceTypes,
+    getCategories,
     createPermission,
     updatePermission,
     deletePermission,
@@ -374,8 +381,10 @@
     showPageSize: true,
   });
 
-  // 资源选项（从数据中提取）
+  // 资源选项（从后端获取）
   const resourceOptions = ref<string[]>([]);
+  // 分类选项（从后端获取）
+  const categoryOptions = ref<string[]>([]);
 
   // 表格列定义
   const columns = [
@@ -487,15 +496,25 @@
       const result = await getPermissionList(params);
       tableData.value = result.items;
       pagination.total = result.totalCount;
-
-      // 提取资源选项
-      const resources = new Set(result.items.map((item) => item.resource));
-      resourceOptions.value = Array.from(resources).sort();
     } catch (error) {
       Message.error('加载权限列表失败');
       console.error(error);
     } finally {
       loading.value = false;
+    }
+  };
+
+  // 加载下拉选项（资源类型和分类）
+  const loadOptions = async () => {
+    try {
+      const [resources, categories] = await Promise.all([
+        getResourceTypes(),
+        getCategories(),
+      ]);
+      resourceOptions.value = resources;
+      categoryOptions.value = categories;
+    } catch (error) {
+      console.error('加载选项失败', error);
     }
   };
 
@@ -572,39 +591,48 @@
     });
   };
 
+  const submitLoading = ref(false);
+
   // 提交表单
-  const handleSubmit = async () => {
-    const valid = await formRef.value?.validate();
-    if (!valid) {
-      try {
-        if (isEdit.value) {
-          const updateData: UpdatePermissionDto = {
-            name: formData.name,
-            description: formData.description,
-            isActive: formData.isActive,
-            displayOrder: formData.displayOrder,
-          };
-          await updatePermission(formData.id, updateData);
-          Message.success('更新成功');
-        } else {
-          const createData: CreatePermissionDto = {
-            code: formData.code,
-            name: formData.name,
-            description: formData.description,
-            resource: formData.resource,
-            action: formData.action,
-            category: formData.category,
-            isActive: formData.isActive,
-            displayOrder: formData.displayOrder,
-          };
-          await createPermission(createData);
-          Message.success('创建成功');
-        }
-        modalVisible.value = false;
-        fetchData();
-      } catch (error: any) {
-        Message.error(error.response?.data?.message || '操作失败');
+  const handleBeforeOk = async (done: (closed: boolean) => void) => {
+    const errors = await formRef.value?.validate();
+    if (errors) {
+      done(false);
+      return;
+    }
+
+    try {
+      submitLoading.value = true;
+      if (isEdit.value) {
+        const updateData: UpdatePermissionDto = {
+          name: formData.name,
+          description: formData.description,
+          isActive: formData.isActive,
+          displayOrder: formData.displayOrder,
+        };
+        await updatePermission(formData.id, updateData);
+        Message.success('更新成功');
+      } else {
+        const createData: CreatePermissionDto = {
+          code: formData.code,
+          name: formData.name,
+          description: formData.description,
+          resource: formData.resource,
+          action: formData.action,
+          category: formData.category,
+          isActive: formData.isActive,
+          displayOrder: formData.displayOrder,
+        };
+        await createPermission(createData);
+        Message.success('创建成功');
       }
+      done(true);
+      fetchData();
+    } catch (error: any) {
+      Message.error(error.response?.data?.message || '操作失败');
+      done(false);
+    } finally {
+      submitLoading.value = false;
     }
   };
 
@@ -645,6 +673,7 @@
 
   // 初始化
   onMounted(() => {
+    loadOptions(); // 加载下拉选项
     fetchData();
   });
 </script>

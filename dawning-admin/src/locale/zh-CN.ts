@@ -16,6 +16,8 @@ import localeAuditLog from '@/views/administration/audit-log/locale/zh-CN';
 import localeSystemLog from '@/views/administration/system-log/locale/zh-CN';
 import localeGateway from '@/views/administration/gateway/locale/zh-CN';
 import localeSystemConfig from '@/views/administration/system-config/locale/zh-CN';
+import localeSystemMonitor from '@/views/administration/system-monitor/locale/zh-CN';
+import localeAlert from '@/views/administration/alert/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
 
@@ -57,6 +59,8 @@ export default {
   ...localeSystemLog,
   ...localeGateway,
   ...localeSystemConfig,
+  ...localeSystemMonitor,
+  ...localeAlert,
   ...localeOpenIddict,
 
   ...localeSettings,

@@ -80,6 +80,30 @@ namespace Dawning.Identity.Application.Services.Administration
             return grouped;
         }
 
+        public async Task<IEnumerable<string>> GetResourceTypesAsync()
+        {
+            var permissions = await _unitOfWork.Permission.GetAllAsync();
+            return permissions
+                .Select(p => p.Resource)
+                .Where(r => !string.IsNullOrEmpty(r))
+                .Distinct()
+                .OrderBy(r => r)
+                .Select(r => r!)
+                .ToList();
+        }
+
+        public async Task<IEnumerable<string>> GetCategoriesAsync()
+        {
+            var permissions = await _unitOfWork.Permission.GetAllAsync();
+            return permissions
+                .Select(p => p.Category)
+                .Where(c => !string.IsNullOrEmpty(c))
+                .Distinct()
+                .OrderBy(c => c)
+                .Select(c => c!)
+                .ToList();
+        }
+
         public async Task<PermissionDto> CreateAsync(
             CreatePermissionDto dto,
             Guid? operatorId = null

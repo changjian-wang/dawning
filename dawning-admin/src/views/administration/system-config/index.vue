@@ -115,7 +115,8 @@
     <a-modal
       v-model:visible="addModalVisible"
       :title="$t('systemConfig.addConfig')"
-      @ok="handleAddSubmit"
+      :ok-loading="addSubmitLoading"
+      @before-ok="handleAddBeforeOk"
       @cancel="addModalVisible = false"
     >
       <a-form :model="addForm" layout="vertical">
@@ -294,20 +295,23 @@
     addModalVisible.value = true;
   };
 
-  const handleAddSubmit = async () => {
+  const addSubmitLoading = ref(false);
+
+  const handleAddBeforeOk = async (done: (closed: boolean) => void) => {
     if (!addForm.value.group || !addForm.value.key) {
       Message.warning(t('systemConfig.fillRequired'));
+      done(false);
       return;
     }
 
     try {
+      addSubmitLoading.value = true;
       await setConfigValue(
         addForm.value.group,
         addForm.value.key,
         addForm.value.value,
         addForm.value.description
       );
-      addModalVisible.value = false;
       // 刷新分组列表和配置
       await loadGroups();
       if (addForm.value.group) {
@@ -315,8 +319,12 @@
         await loadGroupConfigs(addForm.value.group);
       }
       Message.success(t('systemConfig.addSuccess'));
+      done(true);
     } catch (error) {
       Message.error(t('systemConfig.addFailed'));
+      done(false);
+    } finally {
+      addSubmitLoading.value = false;
     }
   };
 

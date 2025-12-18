@@ -22,10 +22,25 @@ export default function setupUserLoginInfoGuard(router: Router) {
             const { parseJwtToken } = await import('@/api/auth');
             const userInfo = parseJwtToken(token);
             if (userInfo) {
+              // 处理角色（可能是单个字符串或数组）
+              let roles: string[] = [];
+              if (Array.isArray(userInfo.role)) {
+                roles = userInfo.role;
+              } else if (userInfo.role) {
+                roles = [userInfo.role];
+              }
+              const primaryRole = (roles[0] || 'user') as
+                | ''
+                | '*'
+                | 'admin'
+                | 'user'
+                | 'super_admin';
+
               userStore.setInfo({
                 name: userInfo.name || userInfo.sub,
                 email: userInfo.email,
-                role: userInfo.role || 'admin',
+                role: primaryRole,
+                roles,
                 accountId: userInfo.sub,
               });
               next();

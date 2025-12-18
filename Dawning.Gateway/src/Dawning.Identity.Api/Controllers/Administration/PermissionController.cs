@@ -29,7 +29,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// <summary>
         /// 获取单个权限
         /// </summary>
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         [RequirePermission("permission.read")]
         public async Task<IActionResult> GetAsync(Guid id)
         {
@@ -109,6 +109,26 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
+        /// 获取所有资源类型
+        /// </summary>
+        [HttpGet("resources")]
+        public async Task<IActionResult> GetResourceTypesAsync()
+        {
+            var resources = await _permissionService.GetResourceTypesAsync();
+            return Ok(ApiResponse<object>.Success(resources));
+        }
+
+        /// <summary>
+        /// 获取所有分类
+        /// </summary>
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategoriesAsync()
+        {
+            var categories = await _permissionService.GetCategoriesAsync();
+            return Ok(ApiResponse<object>.Success(categories));
+        }
+
+        /// <summary>
         /// 获取角色的权限
         /// </summary>
         [HttpGet("role/{roleId}")]
@@ -140,7 +160,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// <summary>
         /// 更新权限
         /// </summary>
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [RequirePermission("permission.update")]
         public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UpdatePermissionDto dto)
         {
@@ -164,7 +184,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         /// <summary>
         /// 删除权限
         /// </summary>
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [RequirePermission("permission.delete")]
         public async Task<IActionResult> DeleteAsync(Guid id)
         {

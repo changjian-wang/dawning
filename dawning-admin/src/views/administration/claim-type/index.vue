@@ -122,8 +122,8 @@
         v-model:visible="visible"
         width="auto"
         title="新增"
-        @before-ok="handleValidateForm"
-        @ok="handleSubmit"
+        :ok-loading="submitLoading"
+        @before-ok="handleBeforeOk"
       >
         <a-form ref="formRef" :rules="rules" :model="form">
           <a-card class="general-card">
@@ -350,19 +350,29 @@
     claimType.form.reset(form);
   });
 
-  const handleValidateForm = async () => {
-    if (await formRef.value.validate()) {
-      return false;
+  const submitLoading = ref(false);
+
+  const handleBeforeOk = async (done: (closed: boolean) => void) => {
+    const errors = await formRef.value?.validate();
+    if (errors) {
+      done(false);
+      return;
     }
 
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    const result: number = await claimType.api.create(form);
-    if (result) {
-      claimType.form.reset(form);
-      fetchData();
+    try {
+      submitLoading.value = true;
+      const result: number = await claimType.api.create(form);
+      if (result) {
+        claimType.form.reset(form);
+        fetchData();
+        done(true);
+      } else {
+        done(false);
+      }
+    } catch (error) {
+      done(false);
+    } finally {
+      submitLoading.value = false;
     }
   };
 

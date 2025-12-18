@@ -22,6 +22,17 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         Task<IEnumerable<PermissionDto>> GetAllAsync();
         Task<IEnumerable<PermissionDto>> GetByRoleIdAsync(Guid roleId);
         Task<IEnumerable<PermissionGroupDto>> GetGroupedPermissionsAsync();
+
+        /// <summary>
+        /// 获取所有资源类型
+        /// </summary>
+        Task<IEnumerable<string>> GetResourceTypesAsync();
+
+        /// <summary>
+        /// 获取所有分类
+        /// </summary>
+        Task<IEnumerable<string>> GetCategoriesAsync();
+
         Task<PermissionDto> CreateAsync(CreatePermissionDto dto, Guid? operatorId = null);
         Task<PermissionDto> UpdateAsync(UpdatePermissionDto dto, Guid? operatorId = null);
         Task<bool> DeleteAsync(Guid id);

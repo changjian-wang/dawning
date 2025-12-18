@@ -107,6 +107,22 @@ export async function getGroupedPermissions(): Promise<PermissionGroup[]> {
 }
 
 /**
+ * 获取所有资源类型
+ */
+export async function getResourceTypes(): Promise<string[]> {
+  const response = await axios.get<string[]>('/api/permission/resources');
+  return response.data;
+}
+
+/**
+ * 获取所有分类
+ */
+export async function getCategories(): Promise<string[]> {
+  const response = await axios.get<string[]>('/api/permission/categories');
+  return response.data;
+}
+
+/**
  * 根据ID获取权限
  */
 export async function getPermissionById(id: string): Promise<PermissionModel> {
