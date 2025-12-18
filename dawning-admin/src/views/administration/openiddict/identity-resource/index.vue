@@ -101,16 +101,25 @@
         </template>
         <template #optional="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleEdit(record)">
-              编辑
-            </a-button>
+            <a-tooltip content="编辑">
+              <a-button
+                type="text"
+                size="medium"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit :size="18" /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
               content="确定删除该资源吗？"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                删除
-              </a-button>
+              <a-tooltip content="删除">
+                <a-button type="text" size="medium" status="danger">
+                  <template #icon><icon-delete :size="18" /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -209,13 +218,12 @@
   });
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 180 },
-    { title: '名称', dataIndex: 'name' },
-    { title: '显示名', dataIndex: 'displayName' },
-    { title: '启用', slotName: 'enabled', width: 80 },
-    { title: '必须同意', slotName: 'required', width: 90 },
-    { title: '声明', slotName: 'userClaims', width: 200 },
-    { title: '操作', slotName: 'optional', width: 140 },
+    { title: '名称', dataIndex: 'name', width: 120 },
+    { title: '显示名', dataIndex: 'displayName', width: 160 },
+    { title: '声明', slotName: 'userClaims' },
+    { title: '启用', slotName: 'enabled', width: 70, align: 'center' },
+    { title: '必须同意', slotName: 'required', width: 80, align: 'center' },
+    { title: '操作', slotName: 'optional', width: 120, align: 'center' },
   ];
 
   // 加载数据
@@ -240,9 +248,9 @@
   }
 
   function handleReset() {
-    Object.keys(searchForm).forEach(
-      (k) => ((searchForm as any)[k] = undefined)
-    );
+    Object.keys(searchForm).forEach((k) => {
+      (searchForm as any)[k] = undefined;
+    });
     pageIndex.value = 1;
     loadData();
   }

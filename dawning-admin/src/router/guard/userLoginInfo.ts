@@ -14,20 +14,26 @@ export default function setupUserLoginInfoGuard(router: Router) {
       } else {
         try {
           // 尝试从 token 中恢复用户信息
-          const token =
-            localStorage.getItem('id_token') ||
-            localStorage.getItem('access_token');
-          if (token) {
+          // 注意：角色信息只存在于 access_token 中，id_token 不包含角色
+          const accessToken = localStorage.getItem('access_token');
+          const idToken = localStorage.getItem('id_token');
+          
+          if (accessToken) {
             // 从 JWT 解析用户信息
             const { parseJwtToken } = await import('@/api/auth');
-            const userInfo = parseJwtToken(token);
-            if (userInfo) {
-              // 处理角色（可能是单个字符串或数组）
+            
+            // 从 access_token 获取角色信息
+            const accessTokenInfo = parseJwtToken(accessToken);
+            // 从 id_token 获取用户基本信息（如果有的话）
+            const idTokenInfo = idToken ? parseJwtToken(idToken) : null;
+            
+            if (accessTokenInfo) {
+              // 处理角色（可能是单个字符串或数组）- 从 access_token 获取
               let roles: string[] = [];
-              if (Array.isArray(userInfo.role)) {
-                roles = userInfo.role;
-              } else if (userInfo.role) {
-                roles = [userInfo.role];
+              if (Array.isArray(accessTokenInfo.role)) {
+                roles = accessTokenInfo.role;
+              } else if (accessTokenInfo.role) {
+                roles = [accessTokenInfo.role];
               }
               const primaryRole = (roles[0] || 'user') as
                 | ''
@@ -36,6 +42,9 @@ export default function setupUserLoginInfoGuard(router: Router) {
                 | 'user'
                 | 'super_admin';
 
+              // 优先使用 id_token 中的用户信息，角色信息从 access_token 获取
+              const userInfo = idTokenInfo || accessTokenInfo;
+              
               userStore.setInfo({
                 name: userInfo.name || userInfo.sub,
                 email: userInfo.email,

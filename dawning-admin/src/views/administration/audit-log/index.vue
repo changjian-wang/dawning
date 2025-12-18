@@ -182,6 +182,7 @@
             <template #icon>
               <icon-eye />
             </template>
+            {{ $t('common.detail') }}
           </a-button>
         </template>
       </a-table>

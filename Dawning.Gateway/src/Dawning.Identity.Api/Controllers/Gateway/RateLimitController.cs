@@ -1,5 +1,5 @@
-using Dawning.Identity.Api.Services;
 using Dawning.Identity.Application.Dtos.Gateway;
+using Dawning.Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

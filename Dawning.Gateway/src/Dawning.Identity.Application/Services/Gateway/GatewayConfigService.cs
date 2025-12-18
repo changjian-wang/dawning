@@ -1,57 +1,37 @@
 using System.Text.Json;
-using Dapper;
-using MySqlConnector;
+using Dawning.Identity.Application.Interfaces;
+using Dawning.Identity.Domain.Aggregates.Gateway;
+using Dawning.Identity.Domain.Interfaces.Gateway;
+using Microsoft.Extensions.Logging;
 using Yarp.ReverseProxy.Configuration;
 using Yarp.ReverseProxy.Forwarder;
 using Yarp.ReverseProxy.LoadBalancing;
 
-namespace Dawning.Gateway.Api.Configuration;
+namespace Dawning.Identity.Application.Services.Gateway;
 
 /// <summary>
 /// 网关配置服务 - 从数据库读取 YARP 配置
 /// </summary>
 public class GatewayConfigService : IGatewayConfigService
 {
-    private readonly string _connectionString;
+    private readonly IGatewayRouteRepository _routeRepository;
+    private readonly IGatewayClusterRepository _clusterRepository;
     private readonly ILogger<GatewayConfigService> _logger;
 
-    public GatewayConfigService(IConfiguration configuration, ILogger<GatewayConfigService> logger)
+    public GatewayConfigService(
+        IGatewayRouteRepository routeRepository,
+        IGatewayClusterRepository clusterRepository,
+        ILogger<GatewayConfigService> logger
+    )
     {
-        _connectionString =
-            configuration.GetConnectionString("MySQL")
-            ?? throw new InvalidOperationException("MySQL connection string is not configured");
+        _routeRepository = routeRepository;
+        _clusterRepository = clusterRepository;
         _logger = logger;
     }
 
     public async Task<IReadOnlyList<RouteConfig>> GetRoutesAsync()
     {
-        const string sql =
-            @"
-            SELECT 
-                route_id AS RouteId,
-                name AS Name,
-                cluster_id AS ClusterId,
-                match_path AS MatchPath,
-                match_methods AS MatchMethods,
-                match_hosts AS MatchHosts,
-                match_headers AS MatchHeaders,
-                match_query_parameters AS MatchQueryParameters,
-                authorization_policy AS AuthorizationPolicy,
-                rate_limiter_policy AS RateLimiterPolicy,
-                cors_policy AS CorsPolicy,
-                timeout_seconds AS TimeoutSeconds,
-                `order` AS `Order`,
-                transform_path_prefix AS TransformPathPrefix,
-                transform_path_remove_prefix AS TransformPathRemovePrefix,
-                transform_request_headers AS TransformRequestHeaders,
-                transform_response_headers AS TransformResponseHeaders,
-                metadata AS Metadata
-            FROM gateway_routes
-            WHERE is_enabled = 1
-            ORDER BY `order` ASC, route_id ASC";
-
-        await using var connection = new MySqlConnection(_connectionString);
-        var dbRoutes = await connection.QueryAsync<GatewayRouteRecord>(sql);
+        var dbRoutes = await _routeRepository.GetAllEnabledAsync();
 
         var routes = new List<RouteConfig>();
         foreach (var dbRoute in dbRoutes)
@@ -72,28 +52,7 @@ public class GatewayConfigService : IGatewayConfigService
 
     public async Task<IReadOnlyList<ClusterConfig>> GetClustersAsync()
     {
-        const string sql =
-            @"
-            SELECT 
-                cluster_id AS ClusterId,
-                name AS Name,
-                load_balancing_policy AS LoadBalancingPolicy,
-                destinations AS Destinations,
-                health_check_enabled AS HealthCheckEnabled,
-                health_check_interval AS HealthCheckInterval,
-                health_check_timeout AS HealthCheckTimeout,
-                health_check_path AS HealthCheckPath,
-                session_affinity_enabled AS SessionAffinityEnabled,
-                session_affinity_policy AS SessionAffinityPolicy,
-                session_affinity_key_name AS SessionAffinityKeyName,
-                max_connections_per_server AS MaxConnectionsPerServer,
-                request_timeout_seconds AS RequestTimeoutSeconds,
-                metadata AS Metadata
-            FROM gateway_clusters
-            WHERE is_enabled = 1";
-
-        await using var connection = new MySqlConnection(_connectionString);
-        var dbClusters = await connection.QueryAsync<GatewayClusterRecord>(sql);
+        var dbClusters = await _clusterRepository.GetAllEnabledAsync();
 
         var clusters = new List<ClusterConfig>();
         foreach (var dbCluster in dbClusters)
@@ -116,7 +75,7 @@ public class GatewayConfigService : IGatewayConfigService
         return clusters;
     }
 
-    private RouteConfig ConvertToRouteConfig(GatewayRouteRecord dbRoute)
+    private RouteConfig ConvertToRouteConfig(Dawning.Identity.Domain.Aggregates.Gateway.GatewayRoute dbRoute)
     {
         // 解析 Match
         var match = new RouteMatch
@@ -139,7 +98,7 @@ public class GatewayConfigService : IGatewayConfigService
             RouteId = dbRoute.RouteId,
             ClusterId = dbRoute.ClusterId,
             Match = match,
-            Order = dbRoute.Order,
+            Order = dbRoute.SortOrder,
             AuthorizationPolicy = string.IsNullOrEmpty(dbRoute.AuthorizationPolicy)
                 ? null
                 : dbRoute.AuthorizationPolicy,
@@ -155,7 +114,9 @@ public class GatewayConfigService : IGatewayConfigService
         };
     }
 
-    private ClusterConfig ConvertToClusterConfig(GatewayClusterRecord dbCluster)
+    private ClusterConfig ConvertToClusterConfig(
+        Dawning.Identity.Domain.Aggregates.Gateway.GatewayCluster dbCluster
+    )
     {
         // 解析目标地址
         var destinations = ParseDestinations(dbCluster.Destinations);
@@ -305,7 +266,7 @@ public class GatewayConfigService : IGatewayConfigService
     }
 
     private IReadOnlyList<IReadOnlyDictionary<string, string>>? BuildTransforms(
-        GatewayRouteRecord dbRoute
+        GatewayRoute dbRoute
     )
     {
         var transforms = new List<Dictionary<string, string>>();
@@ -475,47 +436,3 @@ public class GatewayConfigService : IGatewayConfigService
 
     #endregion
 }
-
-#region Database Records
-
-internal class GatewayRouteRecord
-{
-    public string RouteId { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string ClusterId { get; set; } = "";
-    public string MatchPath { get; set; } = "";
-    public string? MatchMethods { get; set; }
-    public string? MatchHosts { get; set; }
-    public string? MatchHeaders { get; set; }
-    public string? MatchQueryParameters { get; set; }
-    public string? AuthorizationPolicy { get; set; }
-    public string? RateLimiterPolicy { get; set; }
-    public string? CorsPolicy { get; set; }
-    public int? TimeoutSeconds { get; set; }
-    public int Order { get; set; }
-    public string? TransformPathPrefix { get; set; }
-    public string? TransformPathRemovePrefix { get; set; }
-    public string? TransformRequestHeaders { get; set; }
-    public string? TransformResponseHeaders { get; set; }
-    public string? Metadata { get; set; }
-}
-
-internal class GatewayClusterRecord
-{
-    public string ClusterId { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string? LoadBalancingPolicy { get; set; }
-    public string? Destinations { get; set; }
-    public bool HealthCheckEnabled { get; set; }
-    public int? HealthCheckInterval { get; set; }
-    public int? HealthCheckTimeout { get; set; }
-    public string? HealthCheckPath { get; set; }
-    public bool SessionAffinityEnabled { get; set; }
-    public string? SessionAffinityPolicy { get; set; }
-    public string? SessionAffinityKeyName { get; set; }
-    public int? MaxConnectionsPerServer { get; set; }
-    public int? RequestTimeoutSeconds { get; set; }
-    public string? Metadata { get; set; }
-}
-
-#endregion

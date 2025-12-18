@@ -28,6 +28,7 @@
     <PackageReference Include="Dapper" Version="2.1.66" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />
     <ProjectReference Include="..\Shared\Dawning.Shared.Authentication\Dawning.Shared.Authentication.csproj" />
     <ProjectReference Include="..\Shared\Dawning.Shared.Core\Dawning.Shared.Core.csproj" />
     <ProjectReference Include="..\Shared\Dawning.Shared.Logging\Dawning.Shared.Logging.csproj" />

@@ -135,17 +135,24 @@ const useUserStore = defineStore('user', {
         }
         setTokenExpiresAt(expires_in);
 
-        // 从 ID Token 或 Access Token 中解析用户信息
-        const userInfo = parseJwtToken(id_token || access_token);
-        if (userInfo) {
-          // 处理角色（可能是单个字符串或数组）
+        // 注意：角色信息只存在于 access_token 中，id_token 不包含角色
+        // 从 access_token 获取角色信息
+        const accessTokenInfo = parseJwtToken(access_token);
+        // 从 id_token 获取用户基本信息（如果有的话）
+        const idTokenInfo = id_token ? parseJwtToken(id_token) : null;
+
+        if (accessTokenInfo) {
+          // 处理角色（可能是单个字符串或数组）- 从 access_token 获取
           let roles: string[] = [];
-          if (Array.isArray(userInfo.role)) {
-            roles = userInfo.role;
-          } else if (userInfo.role) {
-            roles = [userInfo.role];
+          if (Array.isArray(accessTokenInfo.role)) {
+            roles = accessTokenInfo.role;
+          } else if (accessTokenInfo.role) {
+            roles = [accessTokenInfo.role];
           }
           const primaryRole = (roles[0] || 'user') as RoleType;
+
+          // 优先使用 id_token 中的用户信息，角色信息从 access_token 获取
+          const userInfo = idTokenInfo || accessTokenInfo;
 
           this.setInfo({
             name: userInfo.name || userInfo.sub,

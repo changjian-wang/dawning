@@ -98,6 +98,7 @@
         <template #optional="{ record }">
           <a-space>
             <a-button type="text" size="small" @click="handleView(record)">
+              <template #icon><icon-eye /></template>
               详情
             </a-button>
             <a-popconfirm
@@ -106,6 +107,7 @@
               @ok="handleRevoke(record)"
             >
               <a-button type="text" size="small" status="danger">
+                <template #icon><icon-stop /></template>
                 撤销
               </a-button>
             </a-popconfirm>
@@ -118,10 +120,85 @@
     <a-modal
       v-model:visible="detailVisible"
       title="授权详情"
-      :width="600"
+      width="650px"
       :footer="false"
     >
-      <a-descriptions :data="detailData" :column="1" bordered />
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">ID</span>
+          <span class="value">
+            <a-typography-text copyable>
+              {{ currentRecord?.id }}
+            </a-typography-text>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">用户标识</span>
+          <span class="value">
+            <a-typography-text v-if="currentRecord?.subject" copyable>
+              {{ currentRecord.subject }}
+            </a-typography-text>
+            <template v-else>-</template>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">应用程序ID</span>
+          <span class="value">
+            <a-typography-text v-if="currentRecord?.applicationId" copyable>
+              {{ currentRecord.applicationId }}
+            </a-typography-text>
+            <template v-else>-</template>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">状态</span>
+          <span class="value">
+            <a-tag
+              :color="currentRecord?.status === 'valid' ? 'green' : 'red'"
+              size="small"
+            >
+              {{ currentRecord?.status === 'valid' ? '有效' : '已撤销' }}
+            </a-tag>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">类型</span>
+          <span class="value">
+            <a-tag
+              :color="currentRecord?.type === 'permanent' ? 'blue' : 'orange'"
+              size="small"
+            >
+              {{ currentRecord?.type === 'permanent' ? '永久授权' : '临时授权' }}
+            </a-tag>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">作用域</span>
+          <span class="value">
+            <a-space wrap>
+              <a-tag
+                v-for="scope in currentRecord?.scopes || []"
+                :key="scope"
+                color="arcoblue"
+                size="small"
+              >
+                {{ scope }}
+              </a-tag>
+              <template v-if="!currentRecord?.scopes?.length">-</template>
+            </a-space>
+          </span>
+        </div>
+
+        <div class="detail-row">
+          <span class="label">创建时间</span>
+          <span class="value">{{ formatDate(currentRecord?.createdAt) }}</span>
+        </div>
+      </div>
     </a-modal>
   </div>
 </template>
@@ -145,16 +222,15 @@
 
   // 详情
   const detailVisible = ref(false);
-  const detailData = ref<any[]>([]);
+  const currentRecord = ref<IAuthorization | null>(null);
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 180, ellipsis: true },
     { title: '用户标识', dataIndex: 'subject', width: 200, ellipsis: true },
     { title: '状态', slotName: 'status', width: 100 },
     { title: '类型', slotName: 'type', width: 100 },
     { title: '作用域', slotName: 'scopes', width: 200 },
     { title: '创建时间', slotName: 'createdAt', width: 160 },
-    { title: '操作', slotName: 'optional', width: 120 },
+    { title: '操作', slotName: 'optional', width: 160 },
   ];
 
   function formatDate(dateStr?: string) {
@@ -185,9 +261,9 @@
   }
 
   function handleReset() {
-    Object.keys(searchForm).forEach(
-      (k) => ((searchForm as any)[k] = undefined)
-    );
+    Object.keys(searchForm).forEach((k) => {
+      (searchForm as any)[k] = undefined;
+    });
     pageIndex.value = 1;
     loadData();
   }
@@ -204,18 +280,7 @@
   }
 
   function handleView(record: IAuthorization) {
-    detailData.value = [
-      { label: 'ID', value: record.id },
-      { label: '用户标识', value: record.subject || '-' },
-      { label: '应用程序ID', value: record.applicationId || '-' },
-      { label: '状态', value: record.status === 'valid' ? '有效' : '已撤销' },
-      {
-        label: '类型',
-        value: record.type === 'permanent' ? '永久授权' : '临时授权',
-      },
-      { label: '作用域', value: (record.scopes || []).join(', ') || '-' },
-      { label: '创建时间', value: formatDate(record.createdAt) },
-    ];
+    currentRecord.value = record;
     detailVisible.value = true;
   }
 
@@ -232,4 +297,33 @@
   onMounted(loadData);
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+  .detail-content {
+    .detail-row {
+      display: flex;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--color-border-1);
+      align-items: flex-start;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        width: 110px;
+        flex-shrink: 0;
+        font-size: 14px;
+        color: var(--color-text-3);
+        line-height: 1.5;
+      }
+
+      .value {
+        flex: 1;
+        font-size: 14px;
+        color: var(--color-text-1);
+        line-height: 1.5;
+        word-break: break-word;
+      }
+    }
+  }
+</style>

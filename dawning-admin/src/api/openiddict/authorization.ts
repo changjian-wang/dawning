@@ -36,14 +36,14 @@ export const authorizationApi = {
         params: { page, pageSize },
       }
     );
-    const { items, totalCount, pageIndex, pageSize: size } = response.data.data;
+    const { items, totalCount, pageIndex, pageSize: size } = response.data;
     return { items, totalCount, pageIndex, pageSize: size };
   },
 
   // 获取详情
   async get(id: string): Promise<IAuthorization> {
     const response = await axios.get(`/api/openiddict/authorization/get/${id}`);
-    return response.data.data;
+    return response.data;
   },
 
   // 按用户获取
@@ -51,7 +51,7 @@ export const authorizationApi = {
     const response = await axios.get(
       `/api/openiddict/authorization/get-by-subject/${subject}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   // 按应用获取
@@ -59,7 +59,7 @@ export const authorizationApi = {
     const response = await axios.get(
       `/api/openiddict/authorization/get-by-application/${applicationId}`
     );
-    return response.data.data;
+    return response.data;
   },
 
   // 撤销授权（删除）
@@ -67,6 +67,6 @@ export const authorizationApi = {
     const response = await axios.delete(
       `/api/openiddict/authorization/delete/${id}`
     );
-    return response.data.data;
+    return response.data;
   },
 };

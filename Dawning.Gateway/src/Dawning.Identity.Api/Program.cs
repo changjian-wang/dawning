@@ -100,14 +100,14 @@ namespace Dawning.Identity.Api
 
             // ===== Rate Limit Service =====
             builder.Services.AddScoped<
-                Dawning.Identity.Api.Services.IRateLimitService,
-                Dawning.Identity.Api.Services.RateLimitService
+                Dawning.Identity.Application.Interfaces.IRateLimitService,
+                Dawning.Identity.Application.Services.RateLimit.RateLimitService
             >();
 
             // ===== Current User Service =====
             builder.Services.AddScoped<
                 Dawning.Identity.Application.Interfaces.ICurrentUserService,
-                Dawning.Identity.Api.Services.CurrentUserService
+                Dawning.Identity.Application.Services.CurrentUserService
             >();
 
             // ===== Request Logging Service =====

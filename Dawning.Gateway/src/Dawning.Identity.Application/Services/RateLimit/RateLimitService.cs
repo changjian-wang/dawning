@@ -1,35 +1,13 @@
 using Dawning.Identity.Application.Dtos.Gateway;
+using Dawning.Identity.Application.Interfaces;
 using Dawning.Identity.Domain.Aggregates.Gateway;
 using Dawning.Identity.Domain.Interfaces.UoW;
 
-namespace Dawning.Identity.Api.Services
+namespace Dawning.Identity.Application.Services.RateLimit
 {
-    public interface IRateLimitService
-    {
-        // Rate Limit Policies
-        Task<IEnumerable<RateLimitPolicyDto>> GetAllPoliciesAsync();
-        Task<RateLimitPolicyDto?> GetPolicyByIdAsync(Guid id);
-        Task<RateLimitPolicyDto?> GetPolicyByNameAsync(string name);
-        Task<Guid> CreatePolicyAsync(CreateRateLimitPolicyDto dto);
-        Task<bool> UpdatePolicyAsync(UpdateRateLimitPolicyDto dto);
-        Task<bool> DeletePolicyAsync(Guid id);
-
-        // IP Access Rules
-        Task<(IEnumerable<IpAccessRuleDto> Items, long Total)> GetIpRulesPagedAsync(
-            string? ruleType,
-            bool? isEnabled,
-            int page,
-            int pageSize
-        );
-        Task<IpAccessRuleDto?> GetIpRuleByIdAsync(Guid id);
-        Task<IEnumerable<IpAccessRuleDto>> GetActiveRulesByTypeAsync(string ruleType);
-        Task<Guid> CreateIpRuleAsync(CreateIpAccessRuleDto dto, string? createdBy);
-        Task<bool> UpdateIpRuleAsync(UpdateIpAccessRuleDto dto);
-        Task<bool> DeleteIpRuleAsync(Guid id);
-        Task<bool> IsIpBlacklistedAsync(string ipAddress);
-        Task<bool> IsIpWhitelistedAsync(string ipAddress);
-    }
-
+    /// <summary>
+    /// 限流和访问控制服务实现
+    /// </summary>
     public class RateLimitService : IRateLimitService
     {
         private readonly IUnitOfWork _unitOfWork;

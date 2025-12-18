@@ -134,23 +134,25 @@
 
         <template #operations="{ record }">
           <a-space>
-            <a-button type="text" size="medium" @click="handleView(record)">
-              <template #icon><icon-eye :size="18" /></template>
+            <a-button type="text" size="small" @click="handleView(record)">
+              <template #icon><icon-eye /></template>
+              {{ $t('common.detail') }}
             </a-button>
             <a-button
               type="text"
-              size="medium"
-              status="warning"
+              size="small"
               @click="handleEdit(record)"
             >
-              <template #icon><icon-edit :size="18" /></template>
+              <template #icon><icon-edit /></template>
+              {{ $t('common.edit') }}
             </a-button>
             <a-popconfirm
-              content="确定要删除此应用程序吗？"
+              :content="$t('common.deleteConfirm')"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="medium" status="danger">
-                <template #icon><icon-delete :size="18" /></template>
+              <a-button type="text" size="small" status="danger">
+                <template #icon><icon-delete /></template>
+                {{ $t('common.delete') }}
               </a-button>
             </a-popconfirm>
           </a-space>
@@ -400,7 +402,7 @@
       slotName: 'createdAt',
       width: 180,
     },
-    { title: '操作', slotName: 'operations', width: 150, fixed: 'right' },
+    { title: '操作', slotName: 'operations', width: 220, fixed: 'right' },
   ];
 
   // 对话框状态

@@ -22,6 +22,19 @@ import localeAlert from '@/views/administration/alert/locale/en-US';
 import localeSettings from './en-US/settings';
 
 export default {
+  // Common translations
+  'common.search': 'Search',
+  'common.reset': 'Reset',
+  'common.create': 'Create',
+  'common.edit': 'Edit',
+  'common.delete': 'Delete',
+  'common.operations': 'Operations',
+  'common.confirm': 'Confirm',
+  'common.cancel': 'Cancel',
+  'common.save': 'Save',
+  'common.detail': 'Detail',
+  'common.deleteConfirm': 'Are you sure you want to delete?',
+
   'menu.dashboard': 'Dashboard',
   'menu.server.dashboard': 'Dashboard-Server',
   'menu.server.workplace': 'Workplace-Server',
@@ -39,6 +52,10 @@ export default {
   'navbar.action.locale': 'Switch to English',
   // --begin--
   'menu.administration': 'Administration',
+  'menu.administration.userPermission': 'User & Permission',
+  'menu.administration.openiddict': 'Authentication',
+  'menu.administration.monitoring': 'Monitoring',
+  'menu.administration.settings': 'Settings',
   'menu.data.list': 'Data List',
   'menu.add': 'Add',
   'menu.info': 'Info',

@@ -92,20 +92,20 @@ export const apiResourceApi = {
         params: { page, pageSize },
       }
     );
-    const { items, totalCount, pageIndex, pageSize: size } = response.data.data;
+    const { items, totalCount, pageIndex, pageSize: size } = response.data;
     return { items, totalCount, pageIndex, pageSize: size };
   },
 
   // 获取详情
   async get(id: string): Promise<IApiResource> {
     const response = await axios.get(`/api/openiddict/api-resource/${id}`);
-    return response.data.data;
+    return response.data;
   },
 
   // 创建
   async create(model: Partial<IApiResource>): Promise<number> {
     const response = await axios.post('/api/openiddict/api-resource', model);
-    return response.data.data;
+    return response.data;
   },
 
   // 更新
@@ -114,12 +114,12 @@ export const apiResourceApi = {
       `/api/openiddict/api-resource/${id}`,
       model
     );
-    return response.data.data;
+    return response.data;
   },
 
   // 删除
   async remove(id: string): Promise<boolean> {
     const response = await axios.delete(`/api/openiddict/api-resource/${id}`);
-    return response.data.data;
+    return response.data;
   },
 };

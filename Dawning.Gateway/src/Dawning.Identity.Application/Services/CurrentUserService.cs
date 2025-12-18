@@ -4,7 +4,7 @@ using System.Security.Claims;
 using Dawning.Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace Dawning.Identity.Api.Services
+namespace Dawning.Identity.Application.Services
 {
     /// <summary>
     /// 当前用户服务实现

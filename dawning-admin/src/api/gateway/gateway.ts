@@ -49,7 +49,7 @@ export interface CreateGatewayRouteDto {
   rateLimiterPolicy?: string;
   corsPolicy?: string;
   timeoutSeconds?: number;
-  order: number;
+  sortOrder: number;
   isEnabled: boolean;
   metadata?: string;
 }

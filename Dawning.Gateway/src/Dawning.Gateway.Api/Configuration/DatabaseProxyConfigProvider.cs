@@ -1,3 +1,4 @@
+using Dawning.Identity.Application.Interfaces;
 using Microsoft.Extensions.Primitives;
 using Yarp.ReverseProxy.Configuration;
 

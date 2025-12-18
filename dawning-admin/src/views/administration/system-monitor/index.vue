@@ -287,6 +287,14 @@
   }
 
   // 刷新所有数据
+  // 检查所有服务端点
+  async function checkAllServices() {
+    const results = await Promise.all(
+      defaultServices.map((s) => healthApi.checkService(s.name, s.url))
+    );
+    services.value = results;
+  }
+
   async function refreshAll() {
     loading.value = true;
     try {
@@ -300,19 +308,9 @@
 
       // 检查所有服务端点
       await checkAllServices();
-    } catch (error) {
-      console.error('Failed to refresh health data:', error);
     } finally {
       loading.value = false;
     }
-  }
-
-  // 检查所有服务端点
-  async function checkAllServices() {
-    const results = await Promise.all(
-      defaultServices.map((s) => healthApi.checkService(s.name, s.url))
-    );
-    services.value = results;
   }
 
   // 检查单个服务

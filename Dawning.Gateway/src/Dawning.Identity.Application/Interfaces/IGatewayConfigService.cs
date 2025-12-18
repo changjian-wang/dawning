@@ -1,6 +1,6 @@
 using Yarp.ReverseProxy.Configuration;
 
-namespace Dawning.Gateway.Api.Configuration;
+namespace Dawning.Identity.Application.Interfaces;
 
 /// <summary>
 /// 网关配置服务接口

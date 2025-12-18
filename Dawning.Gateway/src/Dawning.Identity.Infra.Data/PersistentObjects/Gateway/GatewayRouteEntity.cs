@@ -121,8 +121,8 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Gateway
         /// <summary>
         /// 路由顺序
         /// </summary>
-        [Column("order")]
-        public int Order { get; set; }
+        [Column("sort_order")]
+        public int SortOrder { get; set; }
 
         /// <summary>
         /// 是否启用

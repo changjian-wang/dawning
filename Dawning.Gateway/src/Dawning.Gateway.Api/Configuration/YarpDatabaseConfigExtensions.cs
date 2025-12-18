@@ -1,3 +1,4 @@
+using Dawning.Identity.Application.Interfaces;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Dawning.Gateway.Api.Configuration;
@@ -12,7 +13,8 @@ public static class YarpDatabaseConfigExtensions
     /// </summary>
     public static IReverseProxyBuilder LoadFromDatabase(this IReverseProxyBuilder builder)
     {
-        builder.Services.AddSingleton<IGatewayConfigService, GatewayConfigService>();
+        // 注册配置提供程序
+        // 注意：GatewayConfigService 和 Repository 由 NativeInjectorBootStrapper 自动注册
         builder.Services.AddSingleton<DatabaseProxyConfigProvider>();
         builder.Services.AddSingleton<IProxyConfigProvider>(sp =>
             sp.GetRequiredService<DatabaseProxyConfigProvider>()

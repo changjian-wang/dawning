@@ -26,7 +26,7 @@ namespace Dawning.Identity.Application.Dtos.Gateway
         public string? RateLimiterPolicy { get; set; }
         public string? CorsPolicy { get; set; }
         public int? TimeoutSeconds { get; set; }
-        public int Order { get; set; }
+        public int SortOrder { get; set; }
         public bool IsEnabled { get; set; }
         public string? Metadata { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -71,7 +71,7 @@ namespace Dawning.Identity.Application.Dtos.Gateway
         public string? RateLimiterPolicy { get; set; }
         public string? CorsPolicy { get; set; }
         public int? TimeoutSeconds { get; set; }
-        public int Order { get; set; }
+        public int SortOrder { get; set; }
         public bool IsEnabled { get; set; } = true;
         public string? Metadata { get; set; }
     }
@@ -115,7 +115,7 @@ namespace Dawning.Identity.Application.Dtos.Gateway
         public string? RateLimiterPolicy { get; set; }
         public string? CorsPolicy { get; set; }
         public int? TimeoutSeconds { get; set; }
-        public int Order { get; set; }
+        public int SortOrder { get; set; }
         public bool IsEnabled { get; set; } = true;
         public string? Metadata { get; set; }
     }

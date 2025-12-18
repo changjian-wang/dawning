@@ -158,30 +158,35 @@
             <a-space>
               <a-button
                 type="text"
-                size="medium"
-                status="success"
+                size="small"
                 @click="handleAssignPermissions(record)"
               >
-                <template #icon><icon-safe :size="18" /></template>
+                <template #icon><icon-safe /></template>
+                权限
               </a-button>
               <a-button
                 type="text"
-                size="medium"
-                status="warning"
+                size="small"
                 :disabled="record.isSystem"
                 @click="handleEdit(record)"
               >
-                <template #icon><icon-edit :size="18" /></template>
+                <template #icon><icon-edit /></template>
+                {{ $t('common.edit') }}
               </a-button>
-              <a-button
-                type="text"
-                size="medium"
-                status="danger"
-                :disabled="record.isSystem"
-                @click="handleDelete(record)"
+              <a-popconfirm
+                :content="$t('common.deleteConfirm')"
+                @ok="handleDelete(record)"
               >
-                <template #icon><icon-delete :size="18" /></template>
-              </a-button>
+                <a-button
+                  type="text"
+                  size="small"
+                  status="danger"
+                  :disabled="record.isSystem"
+                >
+                  <template #icon><icon-delete /></template>
+                  {{ $t('common.delete') }}
+                </a-button>
+              </a-popconfirm>
             </a-space>
           </template>
         </a-table>
@@ -383,16 +388,19 @@
     {
       title: t('role.columns.name'),
       dataIndex: 'name',
-      width: 150,
+      width: 120,
+      ellipsis: true,
+      tooltip: true,
     },
     {
       title: t('role.columns.displayName'),
       dataIndex: 'displayName',
-      width: 150,
+      width: 100,
     },
     {
       title: t('role.columns.description'),
       dataIndex: 'description',
+      width: 200,
       ellipsis: true,
       tooltip: true,
     },
@@ -400,19 +408,19 @@
       title: t('role.columns.isSystem'),
       dataIndex: 'isSystem',
       slotName: 'isSystem',
-      width: 100,
+      width: 80,
     },
     {
       title: t('role.columns.isActive'),
       dataIndex: 'isActive',
       slotName: 'isActive',
-      width: 100,
+      width: 80,
     },
     {
       title: t('role.columns.permissions'),
       dataIndex: 'permissions',
       slotName: 'permissions',
-      width: 280,
+      width: 200,
       ellipsis: true,
       tooltip: false,
     },
@@ -420,12 +428,12 @@
       title: t('role.columns.createdAt'),
       dataIndex: 'createdAt',
       slotName: 'createdAt',
-      width: 180,
+      width: 160,
     },
     {
       title: t('role.columns.operations'),
       slotName: 'operations',
-      width: 150,
+      width: 220,
       fixed: 'right',
     },
   ]);

@@ -22,6 +22,19 @@ import localeAlert from '@/views/administration/alert/locale/zh-CN';
 import localeSettings from './zh-CN/settings';
 
 export default {
+  // 通用翻译
+  'common.search': '搜索',
+  'common.reset': '重置',
+  'common.create': '新建',
+  'common.edit': '编辑',
+  'common.delete': '删除',
+  'common.operations': '操作',
+  'common.confirm': '确认',
+  'common.cancel': '取消',
+  'common.save': '保存',
+  'common.detail': '详情',
+  'common.deleteConfirm': '确定要删除吗？',
+
   'menu.dashboard': '仪表盘',
   'menu.server.dashboard': '仪表盘-服务端',
   'menu.server.workplace': '工作台-服务端',
@@ -38,7 +51,11 @@ export default {
   'navbar.docs': '文档中心',
   'navbar.action.locale': '切换为中文',
   // --begin--
-  'menu.administration': '管理',
+  'menu.administration': '系统管理',
+  'menu.administration.userPermission': '用户权限',
+  'menu.administration.openiddict': '认证授权',
+  'menu.administration.monitoring': '监控告警',
+  'menu.administration.settings': '系统设置',
   'menu.data.list': '数据列表',
   'menu.add': '新增信息',
   'menu.info': '基本信息',

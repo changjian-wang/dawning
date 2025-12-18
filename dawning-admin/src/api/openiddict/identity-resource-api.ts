@@ -36,14 +36,14 @@ export const identityResourceApi = {
         params: { page, pageSize },
       }
     );
-    const { items, totalCount, pageIndex, pageSize: size } = response.data.data;
+    const { items, totalCount, pageIndex, pageSize: size } = response.data;
     return { items, totalCount, pageIndex, pageSize: size };
   },
 
   // 获取详情
   async get(id: string): Promise<IIdentityResource> {
     const response = await axios.get(`/api/openiddict/identity-resource/${id}`);
-    return response.data.data;
+    return response.data;
   },
 
   // 创建
@@ -52,7 +52,7 @@ export const identityResourceApi = {
       '/api/openiddict/identity-resource',
       model
     );
-    return response.data.data;
+    return response.data;
   },
 
   // 更新
@@ -64,7 +64,7 @@ export const identityResourceApi = {
       `/api/openiddict/identity-resource/${id}`,
       model
     );
-    return response.data.data;
+    return response.data;
   },
 
   // 删除
@@ -72,6 +72,6 @@ export const identityResourceApi = {
     const response = await axios.delete(
       `/api/openiddict/identity-resource/${id}`
     );
-    return response.data.data;
+    return response.data;
   },
 };

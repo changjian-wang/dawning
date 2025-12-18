@@ -42,6 +42,7 @@
                   @click="handleEditPolicy(record)"
                 >
                   <template #icon><icon-edit /></template>
+                  {{ $t('common.edit') }}
                 </a-button>
                 <a-popconfirm
                   :content="$t('rateLimit.deleteConfirm')"
@@ -49,6 +50,7 @@
                 >
                   <a-button type="text" size="small" status="danger">
                     <template #icon><icon-delete /></template>
+                    {{ $t('common.delete') }}
                   </a-button>
                 </a-popconfirm>
               </a-space>
@@ -120,6 +122,7 @@
                   @click="handleEditIpRule(record)"
                 >
                   <template #icon><icon-edit /></template>
+                  {{ $t('common.edit') }}
                 </a-button>
                 <a-popconfirm
                   :content="$t('rateLimit.deleteConfirm')"
@@ -127,6 +130,7 @@
                 >
                   <a-button type="text" size="small" status="danger">
                     <template #icon><icon-delete /></template>
+                    {{ $t('common.delete') }}
                   </a-button>
                 </a-popconfirm>
               </a-space>
@@ -317,7 +321,7 @@
     { title: t('rateLimit.policyType'), slotName: 'policyType' },
     { title: t('rateLimit.limit'), slotName: 'permitLimit' },
     { title: t('rateLimit.enabled'), slotName: 'isEnabled', width: 100 },
-    { title: t('rateLimit.operations'), slotName: 'operations', width: 120 },
+    { title: t('rateLimit.operations'), slotName: 'operations', width: 160 },
   ]);
 
   const loadPolicies = async () => {
@@ -467,7 +471,7 @@
     },
     { title: t('rateLimit.expiresAt'), slotName: 'expiresAt', width: 160 },
     { title: t('rateLimit.enabled'), slotName: 'isEnabled', width: 80 },
-    { title: t('rateLimit.operations'), slotName: 'operations', width: 120 },
+    { title: t('rateLimit.operations'), slotName: 'operations', width: 160 },
   ]);
 
   const loadIpRules = async () => {

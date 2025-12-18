@@ -104,7 +104,7 @@ namespace Dawning.Identity.Domain.Aggregates.Gateway
         /// <summary>
         /// 路由顺序（越小越优先）
         /// </summary>
-        public int Order { get; set; }
+        public int SortOrder { get; set; }
 
         /// <summary>
         /// 是否启用

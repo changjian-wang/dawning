@@ -481,6 +481,25 @@
     loadData();
   };
 
+  // 重置表单
+  const resetForm = () => {
+    formData.id = '';
+    formData.clusterId = '';
+    formData.name = '';
+    formData.description = '';
+    formData.loadBalancingPolicy = 'RoundRobin';
+    formData.destinations = '[]';
+    formData.healthCheckEnabled = false;
+    formData.healthCheckInterval = undefined;
+    formData.healthCheckTimeout = undefined;
+    formData.healthCheckPath = '';
+    formData.maxConnectionsPerServer = undefined;
+    formData.requestTimeoutSeconds = undefined;
+    formData.dangerousAcceptAnyServerCertificate = false;
+    formData.isEnabled = true;
+    formRef.value?.resetFields();
+  };
+
   // 创建
   const handleCreate = () => {
     isEdit.value = false;
@@ -551,25 +570,6 @@
   const handleCancel = () => {
     modalVisible.value = false;
     resetForm();
-  };
-
-  // 重置表单
-  const resetForm = () => {
-    formData.id = '';
-    formData.clusterId = '';
-    formData.name = '';
-    formData.description = '';
-    formData.loadBalancingPolicy = 'RoundRobin';
-    formData.destinations = '[]';
-    formData.healthCheckEnabled = false;
-    formData.healthCheckInterval = undefined;
-    formData.healthCheckTimeout = undefined;
-    formData.healthCheckPath = '';
-    formData.maxConnectionsPerServer = undefined;
-    formData.requestTimeoutSeconds = undefined;
-    formData.dangerousAcceptAnyServerCertificate = false;
-    formData.isEnabled = true;
-    formRef.value?.resetFields();
   };
 
   onMounted(() => {

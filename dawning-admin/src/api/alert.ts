@@ -37,7 +37,7 @@ export interface CreateAlertRuleRequest {
 }
 
 // 更新告警规则请求
-export interface UpdateAlertRuleRequest extends CreateAlertRuleRequest {}
+export type UpdateAlertRuleRequest = CreateAlertRuleRequest;
 
 // 告警历史 DTO
 export interface AlertHistoryDto {
@@ -138,7 +138,7 @@ export const notifyChannelOptions = [
 ];
 
 // API 基础路径
-const BASE_URL = '/api/alert';
+const BASE_URL = '/api/admin/alert';
 
 // ========== 告警规则 API ==========
 

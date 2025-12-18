@@ -170,22 +170,25 @@
             <a-space>
               <a-button
                 type="text"
-                size="medium"
-                status="warning"
-                :disabled="record.isSystem"
+                size="small"
                 @click="handleEdit(record)"
               >
-                <template #icon><icon-edit :size="18" /></template>
+                <template #icon><icon-edit /></template>
+                {{ $t('common.edit') }}
               </a-button>
-              <a-button
-                type="text"
-                size="medium"
-                status="danger"
-                :disabled="record.isSystem"
-                @click="handleDelete(record)"
+              <a-popconfirm
+                :content="$t('common.deleteConfirm')"
+                @ok="handleDelete(record)"
               >
-                <template #icon><icon-delete :size="18" /></template>
-              </a-button>
+                <a-button
+                  type="text"
+                  size="small"
+                  status="danger"
+                >
+                  <template #icon><icon-delete /></template>
+                  {{ $t('common.delete') }}
+                </a-button>
+              </a-popconfirm>
             </a-space>
           </template>
         </a-table>

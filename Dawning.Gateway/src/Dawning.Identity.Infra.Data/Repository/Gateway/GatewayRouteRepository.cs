@@ -111,7 +111,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
 
             // 按顺序和ID排序
             var result = await builder
-                .OrderBy(r => r.Order)
+                .OrderBy(r => r.SortOrder)
                 .ThenBy(r => r.RouteId)
                 .AsPagedListAsync(page, itemsPerPage);
 

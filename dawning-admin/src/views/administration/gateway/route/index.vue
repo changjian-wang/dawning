@@ -109,7 +109,7 @@
           </a-space>
         </template>
         <template #order="{ record }">
-          <a-tag>{{ record.order }}</a-tag>
+          <a-tag>{{ record.sortOrder }}</a-tag>
         </template>
         <template #isEnabled="{ record }">
           <a-switch
@@ -239,9 +239,9 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="order" :label="$t('gateway.route.order')">
+            <a-form-item field="sortOrder" :label="$t('gateway.route.order')">
               <a-input-number
-                v-model="formData.order"
+                v-model="formData.sortOrder"
                 :min="0"
                 :placeholder="$t('gateway.route.orderPlaceholder')"
               />
@@ -432,7 +432,7 @@
     rateLimiterPolicy: '',
     corsPolicy: '',
     timeoutSeconds: undefined as number | undefined,
-    order: 0,
+    sortOrder: 0,
     isEnabled: true,
     metadata: '',
   });
@@ -521,6 +521,26 @@
     loadData();
   };
 
+  // 重置表单
+  const resetForm = () => {
+    formData.id = '';
+    formData.routeId = '';
+    formData.name = '';
+    formData.description = '';
+    formData.clusterId = '';
+    formData.matchPath = '';
+    formData.matchMethods = '';
+    formData.matchMethodsArray = [];
+    formData.transformPathPrefix = '';
+    formData.transformPathRemovePrefix = '';
+    formData.authorizationPolicy = '';
+    formData.rateLimiterPolicy = '';
+    formData.timeoutSeconds = undefined;
+    formData.sortOrder = 0;
+    formData.isEnabled = true;
+    formRef.value?.resetFields();
+  };
+
   // 创建
   const handleCreate = () => {
     isEdit.value = false;
@@ -597,26 +617,6 @@
   const handleCancel = () => {
     modalVisible.value = false;
     resetForm();
-  };
-
-  // 重置表单
-  const resetForm = () => {
-    formData.id = '';
-    formData.routeId = '';
-    formData.name = '';
-    formData.description = '';
-    formData.clusterId = '';
-    formData.matchPath = '';
-    formData.matchMethods = '';
-    formData.matchMethodsArray = [];
-    formData.transformPathPrefix = '';
-    formData.transformPathRemovePrefix = '';
-    formData.authorizationPolicy = '';
-    formData.rateLimiterPolicy = '';
-    formData.timeoutSeconds = undefined;
-    formData.order = 0;
-    formData.isEnabled = true;
-    formRef.value?.resetFields();
   };
 
   onMounted(() => {

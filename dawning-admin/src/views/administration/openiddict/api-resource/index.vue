@@ -82,16 +82,25 @@
         </template>
         <template #optional="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleEdit(record)">
-              编辑
-            </a-button>
+            <a-tooltip content="编辑">
+              <a-button
+                type="text"
+                size="medium"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit :size="18" /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
               content="确定删除该资源吗？"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                删除
-              </a-button>
+              <a-tooltip content="删除">
+                <a-button type="text" size="medium" status="danger">
+                  <template #icon><icon-delete :size="18" /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -166,11 +175,10 @@
   });
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 180 },
     { title: '名称', dataIndex: 'name' },
     { title: '显示名', dataIndex: 'displayName' },
-    { title: '启用', slotName: 'enabled', width: 80 },
-    { title: '操作', slotName: 'optional', width: 140 },
+    { title: '启用', slotName: 'enabled', width: 80, align: 'center' },
+    { title: '操作', slotName: 'optional', width: 100, align: 'center' },
   ];
 
   // 加载数据
@@ -195,9 +203,9 @@
   }
 
   function handleReset() {
-    Object.keys(searchForm).forEach(
-      (k) => ((searchForm as any)[k] = undefined)
-    );
+    Object.keys(searchForm).forEach((k) => {
+      (searchForm as any)[k] = undefined;
+    });
     pageIndex.value = 1;
     loadData();
   }
