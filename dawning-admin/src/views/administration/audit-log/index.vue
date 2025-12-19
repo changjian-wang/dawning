@@ -489,8 +489,9 @@
       };
 
       if (searchForm.dateRange?.length === 2) {
-        params.startDate = searchForm.dateRange[0];
-        params.endDate = searchForm.dateRange[1];
+        const [startDate, endDate] = searchForm.dateRange;
+        params.startDate = startDate;
+        params.endDate = endDate;
       }
 
       const result = await getAuditLogs(params);

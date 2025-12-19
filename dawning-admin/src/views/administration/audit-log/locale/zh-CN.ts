@@ -28,10 +28,13 @@ export default {
   'auditLog.action.ResetPassword': '重置密码',
   'auditLog.action.Login': '登录',
   'auditLog.action.Logout': '登出',
+  'auditLog.action.AssignPermissions': '分配权限',
+  'auditLog.action.RemovePermissions': '移除权限',
 
   // 实体类型
   'auditLog.entityType.User': '用户',
   'auditLog.entityType.Role': '角色',
+  'auditLog.entityType.Permission': '权限',
   'auditLog.entityType.Application': '应用',
   'auditLog.entityType.Scope': '作用域',
   'auditLog.entityType.ClaimType': '声明类型',

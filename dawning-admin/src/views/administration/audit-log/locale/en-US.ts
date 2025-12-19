@@ -28,10 +28,13 @@ export default {
   'auditLog.action.ResetPassword': 'Reset Password',
   'auditLog.action.Login': 'Login',
   'auditLog.action.Logout': 'Logout',
+  'auditLog.action.AssignPermissions': 'Assign Permissions',
+  'auditLog.action.RemovePermissions': 'Remove Permissions',
 
   // Entity types
   'auditLog.entityType.User': 'User',
   'auditLog.entityType.Role': 'Role',
+  'auditLog.entityType.Permission': 'Permission',
   'auditLog.entityType.Application': 'Application',
   'auditLog.entityType.Scope': 'Scope',
   'auditLog.entityType.ClaimType': 'Claim Type',

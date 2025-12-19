@@ -1,8 +1,11 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Dawning.Identity.Application.Interfaces.Monitoring;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 
 namespace Dawning.Identity.Application.Services.Monitoring;
 
@@ -107,10 +110,42 @@ public class AlertNotificationService : IAlertNotificationService
                 };
             }
 
-            // TODO: 实现真实的邮件发送
-            // 可以使用 MailKit 或其他邮件库
+            // 使用 MailKit 发送真实邮件
+            var smtpHost = smtpConfig.GetValue<string>("Host") ?? "localhost";
+            var smtpPort = smtpConfig.GetValue<int>("Port", 587);
+            var smtpUsername = smtpConfig.GetValue<string>("Username");
+            var smtpPassword = smtpConfig.GetValue<string>("Password");
+            var fromEmail = smtpConfig.GetValue<string>("FromEmail") ?? smtpUsername;
+            var fromName = smtpConfig.GetValue<string>("FromName") ?? "Dawning Alert System";
+            var useSsl = smtpConfig.GetValue<bool>("UseSsl", true);
+
             var subject = $"[{context.Severity.ToUpper()}] 告警: {context.RuleName}";
             var body = BuildEmailBody(context);
+
+            // 构建邮件消息
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(fromName, fromEmail));
+            
+            // 解析收件人邮箱（逗号分隔）
+            var emailAddresses = context.NotifyEmails.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var email in emailAddresses)
+            {
+                var trimmedEmail = email.Trim();
+                if (!string.IsNullOrEmpty(trimmedEmail))
+                {
+                    message.To.Add(MailboxAddress.Parse(trimmedEmail));
+                }
+            }
+
+            message.Subject = subject;
+            
+            // 创建 HTML 正文
+            var bodyBuilder = new BodyBuilder
+            {
+                HtmlBody = body,
+                TextBody = BuildPlainTextBody(context)
+            };
+            message.Body = bodyBuilder.ToMessageBody();
 
             _logger.LogInformation(
                 "Sending email notification to {Emails}: {Subject}",
@@ -118,13 +153,29 @@ public class AlertNotificationService : IAlertNotificationService
                 subject
             );
 
-            // 模拟发送延迟
-            await Task.Delay(100);
+            // 发送邮件
+            using var client = new SmtpClient();
+            
+            var secureSocketOptions = useSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+            await client.ConnectAsync(smtpHost, smtpPort, secureSocketOptions);
+            
+            if (!string.IsNullOrEmpty(smtpUsername) && !string.IsNullOrEmpty(smtpPassword))
+            {
+                await client.AuthenticateAsync(smtpUsername, smtpPassword);
+            }
+            
+            var messageId = await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+
+            _logger.LogInformation(
+                "Email sent successfully. MessageId: {MessageId}",
+                messageId
+            );
 
             return new NotificationResult
             {
                 Success = true,
-                NotificationId = Guid.NewGuid().ToString(),
+                NotificationId = messageId ?? Guid.NewGuid().ToString(),
                 SentAt = DateTime.UtcNow,
             };
         }
@@ -284,4 +335,25 @@ public class AlertNotificationService : IAlertNotificationService
             "eq" => "=",
             _ => op,
         };
+
+    private static string BuildPlainTextBody(AlertNotificationContext context)
+    {
+        return $"""
+            ⚠️ 系统告警通知
+            ================
+            
+            规则名称: {context.RuleName}
+            {context.Message}
+            
+            详细信息:
+            - 告警级别: {GetSeverityDisplay(context.Severity)}
+            - 指标类型: {GetMetricTypeDisplay(context.MetricType)}
+            - 当前值: {context.MetricValue:F2}
+            - 阈值: {GetOperatorDisplay(context.Operator)} {context.Threshold}
+            - 触发时间: {context.TriggeredAt:yyyy-MM-dd HH:mm:ss} UTC
+            
+            ---
+            此邮件由 Dawning Gateway 系统自动发送，请勿直接回复。
+            """;
+    }
 }

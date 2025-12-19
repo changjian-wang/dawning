@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Dawning.Identity.Application.Dtos.Gateway;
 using Dawning.Identity.Application.Interfaces;
 using Dawning.Identity.Domain.Aggregates.Gateway;
@@ -17,7 +22,7 @@ namespace Dawning.Identity.Application.Services.RateLimit
             _unitOfWork = unitOfWork;
         }
 
-        #region Rate Limit Policies
+        // ===== Rate Limit Policies =====
 
         public async Task<IEnumerable<RateLimitPolicyDto>> GetAllPoliciesAsync()
         {
@@ -93,9 +98,7 @@ namespace Dawning.Identity.Application.Services.RateLimit
             return result;
         }
 
-        #endregion
-
-        #region IP Access Rules
+        // ===== IP Access Rules =====
 
         public async Task<(IEnumerable<IpAccessRuleDto> Items, long Total)> GetIpRulesPagedAsync(
             string? ruleType,
@@ -180,9 +183,7 @@ namespace Dawning.Identity.Application.Services.RateLimit
             return await _unitOfWork.IpAccessRule.IsIpWhitelistedAsync(ipAddress);
         }
 
-        #endregion
-
-        #region Mappers
+        // ===== Mappers =====
 
         private static RateLimitPolicyDto MapToDto(RateLimitPolicy model)
         {
@@ -220,7 +221,5 @@ namespace Dawning.Identity.Application.Services.RateLimit
                 CreatedBy = model.CreatedBy,
             };
         }
-
-        #endregion
     }
 }
