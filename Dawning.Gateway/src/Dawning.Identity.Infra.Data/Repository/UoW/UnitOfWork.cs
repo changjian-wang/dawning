@@ -30,7 +30,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             // Administration
             User = new UserRepository(_context);
             ClaimType = new ClaimTypeRepository(_context);
-            SystemMetadata = new SystemMetadataRepository(_context);
+            SystemConfig = new SystemConfigRepository(_context);
             Role = new RoleRepository(_context);
             UserRole = new UserRoleRepository(_context);
             AuditLog = new AuditLogRepository(_context);
@@ -66,7 +66,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         // Administration
         public IUserRepository User { get; }
         public IClaimTypeRepository ClaimType { get; }
-        public ISystemMetadataRepository SystemMetadata { get; }
+        public ISystemConfigRepository SystemConfig { get; }
         public IRoleRepository Role { get; }
         public IUserRoleRepository UserRole { get; }
         public IAuditLogRepository AuditLog { get; }

@@ -38,7 +38,7 @@ export default {
   'auditLog.entityType.Application': '应用',
   'auditLog.entityType.Scope': '作用域',
   'auditLog.entityType.ClaimType': '声明类型',
-  'auditLog.entityType.SystemMetadata': '系统元数据',
+  'auditLog.entityType.SystemConfig': '系统配置',
 
   // 表格列
   'auditLog.columns.username': '操作用户',

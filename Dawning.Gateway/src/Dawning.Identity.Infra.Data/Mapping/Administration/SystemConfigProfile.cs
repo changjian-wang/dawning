@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +9,11 @@ using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
-    public class SystemMetadataProfile : Profile
+    public class SystemConfigProfile : Profile
     {
-        public SystemMetadataProfile()
+        public SystemConfigProfile()
         {
-            CreateMap<SystemMetadataEntity, SystemMetadata>(MemberList.Destination).ReverseMap();
+            CreateMap<SystemConfigEntity, SystemConfigAggregate>(MemberList.Destination).ReverseMap();
         }
     }
 }

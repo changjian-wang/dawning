@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,7 @@ using Dawning.Identity.Domain.Core.Interfaces;
 
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {
-    public class SystemMetadata : IAggregateRoot
+    public class SystemConfigAggregate : IAggregateRoot
     {
         /// <summary>
         /// 唯一Id

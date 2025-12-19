@@ -45,30 +45,30 @@ ALTER TABLE request_logs COMMENT = 'API请求日志表';
 -- =====================================================
 
 -- 添加日志保留天数配置
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Logging', 'RequestLogRetentionDays', '30', '请求日志保留天数', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Logging', 'RequestLogRetentionDays', '30', '请求日志保留天数', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Logging' AND config_key = 'RequestLogRetentionDays'
+    WHERE name = 'Logging' AND `key` = 'RequestLogRetentionDays'
 );
 
 -- 添加慢请求阈值配置
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Logging', 'SlowRequestThresholdMs', '1000', '慢请求阈值（毫秒）', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Logging', 'SlowRequestThresholdMs', '1000', '慢请求阈值（毫秒）', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Logging' AND config_key = 'SlowRequestThresholdMs'
+    WHERE name = 'Logging' AND `key` = 'SlowRequestThresholdMs'
 );
 
 -- 添加请求日志启用配置
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Logging', 'RequestLoggingEnabled', 'true', '是否启用请求日志记录', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Logging', 'RequestLoggingEnabled', 'true', '是否启用请求日志记录', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Logging' AND config_key = 'RequestLoggingEnabled'
+    WHERE name = 'Logging' AND `key` = 'RequestLoggingEnabled'
 );
 
 -- =====================================================
@@ -88,9 +88,9 @@ WHERE NOT EXISTS (
 --     DECLARE retention_days INT DEFAULT 30;
 --     
 --     -- 从配置表获取保留天数
---     SELECT CAST(config_value AS UNSIGNED) INTO retention_days
+--     SELECT CAST(value AS UNSIGNED) INTO retention_days
 --     FROM system_configs 
---     WHERE config_group = 'Logging' AND config_key = 'RequestLogRetentionDays'
+--     WHERE name = 'Logging' AND `key` = 'RequestLogRetentionDays'
 --     LIMIT 1;
 --     
 --     -- 删除过期日志
@@ -107,4 +107,4 @@ WHERE NOT EXISTS (
 DESCRIBE request_logs;
 
 -- 显示配置
-SELECT * FROM system_configs WHERE config_group = 'Logging';
+SELECT * FROM system_configs WHERE name = 'Logging';

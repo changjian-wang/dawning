@@ -18,7 +18,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         // Administration
         IUserRepository User { get; }
         IClaimTypeRepository ClaimType { get; }
-        ISystemMetadataRepository SystemMetadata { get; }
+        ISystemConfigRepository SystemConfig { get; }
         IRoleRepository Role { get; }
         IUserRoleRepository UserRole { get; }
         IAuditLogRepository AuditLog { get; }

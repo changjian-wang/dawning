@@ -173,11 +173,22 @@
           <a-switch v-model="formData.showInDiscoveryDocument" />
         </a-form-item>
         <a-form-item field="userClaims" label="声明类型">
-          <a-input-tag
+          <a-select
             v-model="formData.userClaims"
-            placeholder="输入后按回车添加"
+            placeholder="请选择声明类型"
+            multiple
             allow-clear
-          />
+            :max-tag-count="3"
+            style="width: 100%"
+          >
+            <a-option
+              v-for="item in claimTypeOptions"
+              :key="item.id"
+              :value="item.name"
+            >
+              {{ item.displayName || item.name }}
+            </a-option>
+          </a-select>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -192,6 +203,16 @@
     IIdentityResource,
     IIdentityResourceModel,
   } from '@/api/openiddict/identity-resource-api';
+  import { claimType, IClaimType } from '@/api/administration/claim-type';
+
+  // 声明类型选项
+  const claimTypeOptions = reactive<IClaimType[]>([]);
+
+  const handleGetAllClaimType = async () => {
+    claimTypeOptions.splice(0, claimTypeOptions.length);
+    const result = await claimType.api.getAll();
+    result.forEach((item) => claimTypeOptions.push(item));
+  };
 
   // 搜索表单
   const searchForm = reactive<IIdentityResourceModel>({});
@@ -331,7 +352,10 @@
     loadData();
   }
 
-  onMounted(loadData);
+  onMounted(async () => {
+    await handleGetAllClaimType();
+    loadData();
+  });
 </script>
 
 <style scoped lang="less"></style>

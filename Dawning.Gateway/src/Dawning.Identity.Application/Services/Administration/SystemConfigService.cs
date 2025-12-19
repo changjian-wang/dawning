@@ -1,6 +1,7 @@
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Caching;
+using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models.Administration;
 
@@ -96,8 +97,8 @@ namespace Dawning.Identity.Application.Services.Administration
                     cacheKey,
                     async _ =>
                     {
-                        var model = new SystemMetadataModel { Name = group, Key = key };
-                        var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, 1, 1);
+                        var model = new SystemConfigModel { Name = group, Key = key };
+                        var result = await _unitOfWork.SystemConfig.GetPagedListAsync(model, 1, 1);
                         return result.Items.FirstOrDefault()?.Value;
                     },
                     CacheEntryOptions.Medium, // 15分钟缓存
@@ -106,8 +107,8 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // 无缓存时直接查询
-            var queryModel = new SystemMetadataModel { Name = group, Key = key };
-            var queryResult = await _unitOfWork.SystemMetadata.GetPagedListAsync(queryModel, 1, 1);
+            var queryModel = new SystemConfigModel { Name = group, Key = key };
+            var queryResult = await _unitOfWork.SystemConfig.GetPagedListAsync(queryModel, 1, 1);
             return queryResult.Items.FirstOrDefault()?.Value;
         }
 
@@ -146,8 +147,8 @@ namespace Dawning.Identity.Application.Services.Administration
             string? description = null
         )
         {
-            var model = new SystemMetadataModel { Name = group, Key = key };
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, 1, 1);
+            var model = new SystemConfigModel { Name = group, Key = key };
+            var result = await _unitOfWork.SystemConfig.GetPagedListAsync(model, 1, 1);
             var existing = result.Items.FirstOrDefault();
 
             if (existing != null)
@@ -158,7 +159,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 if (description != null)
                     existing.Description = description;
 
-                var success = await _unitOfWork.SystemMetadata.UpdateAsync(existing);
+                var success = await _unitOfWork.SystemConfig.UpdateAsync(existing);
 
                 // 更新后使缓存失效
                 if (success && _cacheService != null)
@@ -170,7 +171,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
             else
             {
-                var newItem = new Dawning.Identity.Domain.Aggregates.Administration.SystemMetadata
+                var newItem = new SystemConfigAggregate
                 {
                     Id = Guid.NewGuid(),
                     Name = group,
@@ -182,7 +183,7 @@ namespace Dawning.Identity.Application.Services.Administration
                     Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
                 };
 
-                var success = await _unitOfWork.SystemMetadata.InsertAsync(newItem) > 0;
+                var success = await _unitOfWork.SystemConfig.InsertAsync(newItem) > 0;
 
                 // 新增后使缓存失效
                 if (success && _cacheService != null)
@@ -196,8 +197,8 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<IEnumerable<SystemConfigItemDto>> GetByGroupAsync(string group)
         {
-            var model = new SystemMetadataModel { Name = group };
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, 1, 1000);
+            var model = new SystemConfigModel { Name = group };
+            var result = await _unitOfWork.SystemConfig.GetPagedListAsync(model, 1, 1000);
 
             return result.Items.Select(x => new SystemConfigItemDto
             {
@@ -213,8 +214,8 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<IEnumerable<string>> GetGroupsAsync()
         {
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(
-                new SystemMetadataModel(),
+            var result = await _unitOfWork.SystemConfig.GetPagedListAsync(
+                new SystemConfigModel(),
                 1,
                 10000
             );
@@ -241,14 +242,14 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<bool> DeleteAsync(string group, string key)
         {
-            var model = new SystemMetadataModel { Name = group, Key = key };
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(model, 1, 1);
+            var model = new SystemConfigModel { Name = group, Key = key };
+            var result = await _unitOfWork.SystemConfig.GetPagedListAsync(model, 1, 1);
             var existing = result.Items.FirstOrDefault();
 
             if (existing != null)
             {
-                var success = await _unitOfWork.SystemMetadata.DeleteAsync(
-                    new Dawning.Identity.Domain.Aggregates.Administration.SystemMetadata
+                var success = await _unitOfWork.SystemConfig.DeleteAsync(
+                    new SystemConfigAggregate
                     {
                         Id = existing.Id,
                     }
@@ -268,8 +269,8 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<long> GetLastUpdateTimestampAsync()
         {
-            var result = await _unitOfWork.SystemMetadata.GetPagedListAsync(
-                new SystemMetadataModel(),
+            var result = await _unitOfWork.SystemConfig.GetPagedListAsync(
+                new SystemConfigModel(),
                 1,
                 1
             );

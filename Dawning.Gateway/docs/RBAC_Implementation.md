@@ -83,7 +83,7 @@ Applied `[Authorize(Roles = "...")]` attributes to all controllers:
 All require `admin` or `super_admin` role:
 - **RoleController**: All role management operations
 - **ClaimTypeController**: Claim type management
-- **SystemMetadataController**: System metadata management
+- **SystemConfigController**: System config management
 - **ApplicationController**: OAuth2 application management
 - **ScopeController**: OAuth2 scope management
 
@@ -169,7 +169,7 @@ This affects the `/api/user/info` endpoint response structure.
    - `UserController.cs`: Added role-based [Authorize] attributes
    - `RoleController.cs`: Added [Authorize(Roles = "admin,super_admin")]
    - `ClaimTypeController.cs`: Added [Authorize(Roles = "admin,super_admin")]
-   - `SystemMetadataController.cs`: Added [Authorize(Roles = "admin,super_admin")]
+   - `SystemConfigController.cs`: Added [Authorize(Roles = "admin,super_admin")]
    - `ApplicationController.cs`: Added [Authorize(Roles = "admin,super_admin")]
    - `ScopeController.cs`: Added [Authorize(Roles = "admin,super_admin")]
 

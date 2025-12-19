@@ -1,7 +1,7 @@
 -- ====================================================
--- Create claim_types and system_metadatas Tables
--- Date: 2025-12-09
--- Description: 创建声明类型和系统元数据表
+-- Create claim_types and system_configs Tables
+-- Date: 2025-12-09 (Updated: 2025-12-19)
+-- Description: 创建声明类型和系统配置表
 -- ====================================================
 
 USE `dawning_identity`;
@@ -30,17 +30,17 @@ CREATE TABLE `claim_types` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='声明类型表';
 
 -- ====================================================
--- 2. 系统元数据表 (System Metadata)
+-- 2. 系统配置表 (System Config)
 -- ====================================================
-DROP TABLE IF EXISTS `system_metadatas`;
+DROP TABLE IF EXISTS `system_configs`;
 
-CREATE TABLE `system_metadatas` (
+CREATE TABLE `system_configs` (
     `id` CHAR(36) NOT NULL COMMENT '主键 (GUID)',
-    `name` VARCHAR(200) NOT NULL COMMENT '类型名称（Client，IdentityResource，ApiResource，ApiScope等）',
-    `key` VARCHAR(200) NOT NULL COMMENT '键',
-    `value` TEXT NULL COMMENT '值',
+    `name` VARCHAR(200) NOT NULL COMMENT '配置分组名称',
+    `key` VARCHAR(200) NOT NULL COMMENT '配置键',
+    `value` TEXT NULL COMMENT '配置值',
     `description` VARCHAR(500) NULL COMMENT '描述说明',
-    `non_editable` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '用户是否可编辑（0=可编辑，1=不可编辑）',
+    `non_editable` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否只读（0=可编辑，1=不可编辑）',
     `timestamp` BIGINT NOT NULL COMMENT 'Unix时间戳-毫秒（UTC，用于索引和分页）',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（UTC）',
     `updated_at` DATETIME NULL COMMENT '更新时间（UTC）',
@@ -50,7 +50,7 @@ CREATE TABLE `system_metadatas` (
     INDEX `idx_name_key` (`name`, `key`),
     INDEX `idx_timestamp` (`timestamp`),
     INDEX `idx_created_at` (`created_at`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统元数据表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表';
 
 -- ====================================================
 -- 3. 插入初始数据 (Optional)
@@ -69,8 +69,8 @@ INSERT INTO `claim_types` (`id`, `name`, `display_name`, `type`, `description`, 
 (UUID(), 'gender', 'Gender', 'Enum', '性别', 0, 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
 (UUID(), 'locale', 'Locale', 'String', '语言区域', 0, 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW());
 
--- 插入系统元数据示例
-INSERT INTO `system_metadatas` (`id`, `name`, `key`, `value`, `description`, `non_editable`, `timestamp`, `created_at`) VALUES
+-- 插入系统配置示例
+INSERT INTO `system_configs` (`id`, `name`, `key`, `value`, `description`, `non_editable`, `timestamp`, `created_at`) VALUES
 (UUID(), 'System', 'Version', '1.0.0', '系统版本号', 1, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
 (UUID(), 'System', 'Environment', 'Development', '系统运行环境', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
 (UUID(), 'Client', 'DefaultRedirectUri', 'http://localhost:5173/callback', '默认重定向URI', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
@@ -87,4 +87,4 @@ SELECT
     TABLE_COMMENT AS '注释'
 FROM information_schema.TABLES 
 WHERE TABLE_SCHEMA = 'dawning_identity' 
-AND TABLE_NAME IN ('claim_types', 'system_metadatas');
+AND TABLE_NAME IN ('claim_types', 'system_configs');

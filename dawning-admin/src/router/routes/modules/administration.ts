@@ -267,29 +267,6 @@ const ADMINISTRATION: AppRouteRecordRaw = {
           },
         },
         {
-          path: 'system-metadata',
-          name: 'SystemMetadata',
-          component: () =>
-            import('@/views/administration/system-metadata/index.vue'),
-          meta: {
-            locale: 'menu.administration.system.metadata',
-            requiresAuth: true,
-            roles: ['*'],
-          },
-        },
-        {
-          path: 'system-metadata/:id/info',
-          name: 'SystemMetadataInfo',
-          component: () =>
-            import('@/views/administration/system-metadata/add.vue'),
-          meta: {
-            locale: 'menu.add',
-            requiresAuth: true,
-            roles: ['*'],
-            hideInMenu: true,
-          },
-        },
-        {
           path: 'system-config',
           name: 'SystemConfig',
           component: () =>

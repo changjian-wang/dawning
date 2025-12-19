@@ -167,9 +167,12 @@
           {{ formatDateTime(record.createdAt) }}
         </template>
 
-        <template #actions="{ record }">
+        <template #operations="{ record }">
           <a-button type="text" size="small" @click="handleDetail(record)">
-            <icon-eye />
+            <template #icon>
+              <icon-eye />
+            </template>
+            {{ $t('common.detail') }}
           </a-button>
         </template>
       </a-table>
@@ -354,7 +357,7 @@
     },
     {
       title: t('common.actions'),
-      slotName: 'actions',
+      slotName: 'operations',
       width: 100,
       fixed: 'right' as const,
     },

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +7,8 @@ using Dawning.Shared.Dapper.Contrib;
 
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {
-    [Table("system_metadatas")]
-    public class SystemMetadataEntity
+    [Table("system_configs")]
+    public class SystemConfigEntity
     {
         /// <summary>
         /// 主键

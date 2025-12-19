@@ -11,7 +11,6 @@ import localeApplication from '@/views/administration/openiddict/application/loc
 import localeScope from '@/views/administration/openiddict/scope/locale/en-US';
 import localeOpenIddict from '@/views/administration/openiddict/locale/en-US';
 import localeClaimType from '@/views/administration/claim-type/locale/en-US';
-import localeSystemMetadata from '@/views/administration/system-metadata/locale/en-US';
 import localeAuditLog from '@/views/administration/audit-log/locale/en-US';
 import localeSystemLog from '@/views/administration/system-log/locale/en-US';
 import localeGateway from '@/views/administration/gateway/locale/en-US';
@@ -71,7 +70,6 @@ export default {
   ...localeApplication,
   ...localeScope,
   ...localeClaimType,
-  ...localeSystemMetadata,
   ...localeAuditLog,
   ...localeSystemLog,
   ...localeGateway,

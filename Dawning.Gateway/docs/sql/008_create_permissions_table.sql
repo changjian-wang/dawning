@@ -75,11 +75,11 @@ INSERT INTO permissions (id, code, name, description, resource, action, category
 (UUID(), 'audit-log:export', '导出审计日志', '允许导出审计日志', 'audit-log', 'export', 'administration', 1, 401),
 (UUID(), 'audit-log:cleanup', '清理审计日志', '允许清理旧的审计日志', 'audit-log', 'cleanup', 'administration', 1, 402),
 
--- 系统元数据权限
-(UUID(), 'system-metadata:create', '创建元数据', '允许创建系统元数据', 'system-metadata', 'create', 'administration', 1, 500),
-(UUID(), 'system-metadata:read', '查看元数据', '允许查看系统元数据', 'system-metadata', 'read', 'administration', 1, 501),
-(UUID(), 'system-metadata:update', '更新元数据', '允许更新系统元数据', 'system-metadata', 'update', 'administration', 1, 502),
-(UUID(), 'system-metadata:delete', '删除元数据', '允许删除系统元数据', 'system-metadata', 'delete', 'administration', 1, 503),
+-- 系统配置权限 (原 system-metadata)
+(UUID(), 'system-config:create', '创建配置', '允许创建系统配置', 'system-config', 'create', 'administration', 1, 500),
+(UUID(), 'system-config:read', '查看配置', '允许查看系统配置', 'system-config', 'read', 'administration', 1, 501),
+(UUID(), 'system-config:update', '更新配置', '允许更新系统配置', 'system-config', 'update', 'administration', 1, 502),
+(UUID(), 'system-config:delete', '删除配置', '允许删除系统配置', 'system-config', 'delete', 'administration', 1, 503),
 
 -- OpenIddict客户端权限
 (UUID(), 'client:create', '创建客户端', '允许创建OpenIddict客户端', 'client', 'create', 'openiddict', 1, 600),

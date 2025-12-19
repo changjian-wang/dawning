@@ -31,61 +31,61 @@ ALTER TABLE backup_records COMMENT = '数据库备份记录表';
 -- 备份配置项
 -- =====================================================
 
--- 添加备份配置到系统配置表
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'AutoBackupEnabled', 'true', '是否启用自动备份', FALSE, NOW(), NOW()
+-- 添加备份配置到系统元数据表
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'AutoBackupEnabled', 'true', '是否启用自动备份', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'AutoBackupEnabled'
+    WHERE name = 'Backup' AND `key` = 'AutoBackupEnabled'
 );
 
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'AutoBackupIntervalHours', '24', '自动备份间隔（小时）', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'AutoBackupIntervalHours', '24', '自动备份间隔（小时）', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'AutoBackupIntervalHours'
+    WHERE name = 'Backup' AND `key` = 'AutoBackupIntervalHours'
 );
 
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'RetentionDays', '30', '备份保留天数', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'RetentionDays', '30', '备份保留天数', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'RetentionDays'
+    WHERE name = 'Backup' AND `key` = 'RetentionDays'
 );
 
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'MaxBackupCount', '50', '最大备份数量', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'MaxBackupCount', '50', '最大备份数量', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'MaxBackupCount'
+    WHERE name = 'Backup' AND `key` = 'MaxBackupCount'
 );
 
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'BackupPath', 'backups', '备份存储路径', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'BackupPath', 'backups', '备份存储路径', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'BackupPath'
+    WHERE name = 'Backup' AND `key` = 'BackupPath'
 );
 
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'CompressBackups', 'true', '是否压缩备份文件', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'CompressBackups', 'true', '是否压缩备份文件', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'CompressBackups'
+    WHERE name = 'Backup' AND `key` = 'CompressBackups'
 );
 
-INSERT INTO system_configs (id, config_group, config_key, config_value, description, is_encrypted, created_at, updated_at)
-SELECT UUID(), 'Backup', 'AutoBackupIncludeLogs', 'false', '自动备份是否包含日志表', FALSE, NOW(), NOW()
+INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
+SELECT UUID(), 'Backup', 'AutoBackupIncludeLogs', 'false', '自动备份是否包含日志表', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
-    WHERE config_group = 'Backup' AND config_key = 'AutoBackupIncludeLogs'
+    WHERE name = 'Backup' AND `key` = 'AutoBackupIncludeLogs'
 );
 
 -- =====================================================
@@ -96,4 +96,4 @@ WHERE NOT EXISTS (
 DESCRIBE backup_records;
 
 -- 显示配置
-SELECT * FROM system_configs WHERE config_group = 'Backup';
+SELECT * FROM system_configs WHERE name = 'Backup';

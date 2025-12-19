@@ -130,15 +130,15 @@ SET @user_sessions_exists = (SELECT COUNT(*) FROM information_schema.tables
     WHERE table_schema = DATABASE() AND table_name = 'user_sessions');
 
 -- =====================================================
--- 12. 系统配置表索引优化
+-- 12. 系统元数据表索引优化
 -- =====================================================
 
 -- 配置查询优化
-CREATE INDEX IF NOT EXISTS idx_system_configs_group_key 
-ON system_configs(config_group, config_key);
+CREATE INDEX IF NOT EXISTS idx_system_configs_name_key 
+ON system_configs(name, `key`);
 
-CREATE INDEX IF NOT EXISTS idx_system_configs_is_active 
-ON system_configs(is_active);
+CREATE INDEX IF NOT EXISTS idx_system_configs_non_editable 
+ON system_configs(non_editable);
 
 -- =====================================================
 -- 验证索引创建结果

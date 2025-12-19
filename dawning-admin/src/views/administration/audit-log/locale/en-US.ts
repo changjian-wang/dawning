@@ -38,7 +38,7 @@ export default {
   'auditLog.entityType.Application': 'Application',
   'auditLog.entityType.Scope': 'Scope',
   'auditLog.entityType.ClaimType': 'Claim Type',
-  'auditLog.entityType.SystemMetadata': 'System Metadata',
+  'auditLog.entityType.SystemConfig': 'System Config',
 
   // Table columns
   'auditLog.columns.username': 'Username',

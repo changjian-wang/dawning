@@ -35,7 +35,7 @@ INSERT INTO `roles` (`id`, `name`, `display_name`, `description`, `is_system`, `
    'application:*:*',
    'scope:*:*',
    'claim-type:*:*',
-   'system-metadata:*:*'
+   'system-config:*:*'
  ), NOW()),
  
 (UUID(), 'user_manager', '用户管理员', '负责用户账号管理', 1, 1, 

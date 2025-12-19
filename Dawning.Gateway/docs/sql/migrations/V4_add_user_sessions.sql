@@ -25,19 +25,19 @@ CREATE TABLE IF NOT EXISTS `user_sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户会话表';
 
 -- =============================================
--- 登录策略配置 - 添加到系统配置表
+-- 登录策略配置 - 添加到系统元数据表
 -- =============================================
 
-INSERT INTO `system_configs` (`id`, `config_group`, `config_key`, `config_value`, `description`, `created_at`) VALUES
-(UUID(), 'Security', 'AllowMultipleDevices', 'true', '是否允许多设备同时登录', NOW()),
-(UUID(), 'Security', 'MaxDevices', '5', '最大允许设备数(0表示不限制)', NOW()),
-(UUID(), 'Security', 'NewDevicePolicy', 'allow', '新设备登录策略(allow/deny/kick_oldest)', NOW()),
-(UUID(), 'Security', 'RefreshTokenLifetimeDays', '30', '刷新令牌有效期(天)', NOW()),
-(UUID(), 'Security', 'AccessTokenLifetimeMinutes', '60', '访问令牌有效期(分钟)', NOW())
-ON DUPLICATE KEY UPDATE `config_value` = VALUES(`config_value`);
+INSERT INTO `system_configs` (`id`, `name`, `key`, `value`, `description`, `non_editable`, `timestamp`, `created_at`) VALUES
+(UUID(), 'Security', 'AllowMultipleDevices', 'true', '是否允许多设备同时登录', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
+(UUID(), 'Security', 'MaxDevices', '5', '最大允许设备数(0表示不限制)', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
+(UUID(), 'Security', 'NewDevicePolicy', 'allow', '新设备登录策略(allow/deny/kick_oldest)', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
+(UUID(), 'Security', 'RefreshTokenLifetimeDays', '30', '刷新令牌有效期(天)', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()),
+(UUID(), 'Security', 'AccessTokenLifetimeMinutes', '60', '访问令牌有效期(分钟)', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW())
+ON DUPLICATE KEY UPDATE `value` = VALUES(`value`);
 
 -- =============================================
 -- 回滚脚本（如需回滚请手动执行）
 -- =============================================
 -- DROP TABLE IF EXISTS `user_sessions`;
--- DELETE FROM `system_configs` WHERE `config_key` IN ('AllowMultipleDevices', 'MaxDevices', 'NewDevicePolicy', 'RefreshTokenLifetimeDays', 'AccessTokenLifetimeMinutes');
+-- DELETE FROM `system_configs` WHERE `key` IN ('AllowMultipleDevices', 'MaxDevices', 'NewDevicePolicy', 'RefreshTokenLifetimeDays', 'AccessTokenLifetimeMinutes');

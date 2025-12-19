@@ -199,23 +199,6 @@
     return configsByGroup.value[group]?.length || 0;
   };
 
-  // 加载分组
-  const loadGroups = async () => {
-    try {
-      const res = await getConfigGroups();
-      if (res.data.success) {
-        groups.value = res.data.data;
-        // 自动选择第一个分组
-        if (groups.value.length > 0 && !selectedGroup.value) {
-          selectedGroupKeys.value = [groups.value[0]];
-          await loadGroupConfigs(groups.value[0]);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load groups:', error);
-    }
-  };
-
   // 加载分组配置
   const loadGroupConfigs = async (group: string) => {
     loading.value = true;
@@ -224,10 +207,26 @@
       if (res.data.success) {
         configsByGroup.value[group] = res.data.data;
       }
-    } catch (error) {
-      console.error('Failed to load configs:', error);
     } finally {
       loading.value = false;
+    }
+  };
+
+  // 加载分组
+  const loadGroups = async () => {
+    try {
+      const res = await getConfigGroups();
+      if (res.data.success) {
+        groups.value = res.data.data;
+        // 预加载所有分组的配置数据以显示正确的数量
+        await Promise.all(groups.value.map((group) => loadGroupConfigs(group)));
+        // 自动选择第一个分组
+        if (groups.value.length > 0 && !selectedGroup.value) {
+          selectedGroupKeys.value = [groups.value[0]];
+        }
+      }
+    } catch {
+      // Failed to load groups
     }
   };
 
@@ -338,11 +337,10 @@
           await initDefaultConfigs();
           await loadGroups();
           // 重新加载所有已加载的分组
-          for (const group of Object.keys(configsByGroup.value)) {
-            await loadGroupConfigs(group);
-          }
+          const loadedGroups = Object.keys(configsByGroup.value);
+          await Promise.all(loadedGroups.map((group) => loadGroupConfigs(group)));
           Message.success(t('systemConfig.initDefaultsSuccess'));
-        } catch (error) {
+        } catch {
           Message.error(t('systemConfig.initDefaultsFailed'));
         }
       },
