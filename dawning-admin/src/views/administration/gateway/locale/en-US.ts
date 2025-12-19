@@ -47,6 +47,10 @@ export default {
   'gateway.cluster.httpClient': 'HTTP Client Settings',
   'gateway.cluster.httpRequestTimeout': 'Request Timeout (seconds)',
   'gateway.cluster.httpMaxConnectionsPerServer': 'Max Connections Per Server',
+  'gateway.cluster.healthCheckTimeout': 'Health Check Timeout (seconds)',
+  'gateway.cluster.maxConnections': 'Max Connections',
+  'gateway.cluster.requestTimeout': 'Request Timeout (seconds)',
+  'gateway.cluster.skipCertValidation': 'Skip Certificate Validation',
 
   // Session Affinity
   'gateway.cluster.sessionAffinity': 'Session Affinity',

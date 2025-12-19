@@ -147,6 +147,17 @@
       <li>
         <a-dropdown trigger="click">
           <a-avatar
+            v-if="avatar"
+            :size="32"
+            :style="{
+              marginRight: '8px',
+              cursor: 'pointer',
+            }"
+          >
+            <img alt="avatar" :src="avatar" />
+          </a-avatar>
+          <a-avatar
+            v-else
             :size="32"
             :style="{
               marginRight: '8px',
@@ -154,12 +165,7 @@
               backgroundColor: '#165dff',
             }"
           >
-            <template v-if="!avatar">
-              <span style="font-size: 14px; font-weight: 500; color: #fff">
-                {{ userInitial }}
-              </span>
-            </template>
-            <img v-else alt="avatar" :src="avatar" />
+            {{ userInitial }}
           </a-avatar>
           <template #content>
             <a-doption>
@@ -219,7 +225,9 @@
   const { isFullscreen, toggle: toggleFullScreen } = useFullscreen();
   const locales = [...LOCALE_OPTIONS];
   const avatar = computed(() => {
-    return userStore.avatar;
+    // 确保只有有效的 URL 才返回
+    const avatarUrl = userStore.avatar;
+    return avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : undefined;
   });
   const userInitial = computed(() => {
     const name = userStore.name || 'U';

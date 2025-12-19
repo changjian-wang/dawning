@@ -36,4 +36,5 @@ export default {
   'role.message.updateSuccess': '更新成功',
   'role.message.updateFailed': '更新失败',
   'role.message.systemRoleCannotModify': '系统角色不能修改或删除',
+  'role.message.superAdminRoleCannotModify': 'super_admin 角色只能由超级管理员修改',
 };

@@ -157,34 +157,40 @@
           </template>
           <template #optional="{ record }">
             <a-space>
-              <a-button type="text" size="medium" @click="handleView(record)">
-                <template #icon><icon-eye :size="18" /></template>
+              <a-button type="text" size="small" @click="handleView(record)">
+                <template #icon><icon-eye /></template>
+                查看
               </a-button>
               <a-button
                 type="text"
-                size="medium"
+                size="small"
                 status="warning"
                 @click="handleEdit(record)"
               >
-                <template #icon><icon-edit :size="18" /></template>
+                <template #icon><icon-edit /></template>
+                编辑
               </a-button>
               <a-button
                 type="text"
-                size="medium"
+                size="small"
                 status="success"
                 @click="handleAssignRoles(record)"
               >
-                <template #icon><icon-user-group :size="18" /></template>
+                <template #icon><icon-user-group /></template>
+                角色
               </a-button>
               <a-dropdown>
-                <a-button type="text" size="medium">
-                  <template #icon><icon-more :size="18" /></template>
+                <a-button type="text" size="small">
+                  <template #icon><icon-more /></template>
                 </a-button>
                 <template #content>
                   <a-doption @click="handleResetPassword(record)">
                     <icon-refresh /> 重置密码
                   </a-doption>
-                  <a-doption @click="handleDelete(record)">
+                  <a-doption
+                    style="color: rgb(var(--red-6))"
+                    @click="handleDelete(record)"
+                  >
                     <icon-delete /> 删除
                   </a-doption>
                 </template>
@@ -572,7 +578,8 @@
     {
       title: '操作',
       slotName: 'optional',
-      width: 180,
+      width: 200,
+      align: 'center',
       fixed: 'right',
     },
   ]);

@@ -120,6 +120,7 @@
             <a-button
               type="text"
               size="small"
+              status="warning"
               @click="handleEdit(record)"
             >
               <template #icon><icon-edit /></template>
@@ -256,8 +257,8 @@
     { title: '显示名', dataIndex: 'displayName', width: 160 },
     { title: '声明', slotName: 'userClaims' },
     { title: '启用', slotName: 'enabled', width: 70, align: 'center' },
-    { title: '必须同意', slotName: 'required', width: 80, align: 'center' },
-    { title: '操作', slotName: 'optional', width: 150, align: 'center' },
+    { title: '必须同意', slotName: 'required', width: 100, align: 'center' },
+    { title: '操作', slotName: 'optional', width: 140, align: 'center' },
   ];
 
   // 加载数据

@@ -119,7 +119,7 @@
         </template>
         <template #operations="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleEdit(record)">
+            <a-button type="text" size="small" status="warning" @click="handleEdit(record)">
               <template #icon><icon-edit /></template>
               {{ $t('common.edit') }}
             </a-button>
@@ -402,7 +402,7 @@
     { title: t('gateway.route.policies'), slotName: 'policies', width: 180 },
     { title: t('gateway.route.order'), slotName: 'order', width: 60 },
     { title: t('gateway.status'), slotName: 'isEnabled', width: 80 },
-    { title: t('common.operations'), slotName: 'operations', width: 160 },
+    { title: t('common.operations'), slotName: 'operations', width: 140, align: 'center' },
   ];
 
   // 弹窗相关

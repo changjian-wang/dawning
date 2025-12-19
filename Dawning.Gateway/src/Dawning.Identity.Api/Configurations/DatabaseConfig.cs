@@ -1,6 +1,4 @@
-﻿using System.Data;
-using Dawning.Identity.Infra.Data.Context;
-using MySql.Data.MySqlClient;
+﻿using Dawning.Identity.Infra.Data.Context;
 
 namespace Dawning.Identity.Api.Configurations
 {
@@ -28,14 +26,6 @@ namespace Dawning.Identity.Api.Configurations
 
             // 注册 DbContext（Scoped 生命周期）
             services.AddScoped(provider => new DbContext(connectionString));
-
-            // 注册 IDbConnection（Scoped 生命周期）- 供 RequestLoggingService 和 BackupService 使用
-            services.AddScoped<IDbConnection>(provider =>
-            {
-                var connection = new MySqlConnection(connectionString);
-                connection.Open();
-                return connection;
-            });
         }
     }
 }

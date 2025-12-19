@@ -37,4 +37,6 @@ export default {
   'role.message.updateFailed': 'Update failed',
   'role.message.systemRoleCannotModify':
     'System roles cannot be modified or deleted',
+  'role.message.superAdminRoleCannotModify':
+    'super_admin role can only be modified by super administrator',
 };

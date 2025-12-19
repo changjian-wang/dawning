@@ -44,6 +44,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         // Monitoring
         IAlertRuleRepository AlertRule { get; }
         IAlertHistoryRepository AlertHistory { get; }
+        IRequestLogRepository RequestLog { get; }
 
         // 添加事务管理方法
         void BeginTransaction();

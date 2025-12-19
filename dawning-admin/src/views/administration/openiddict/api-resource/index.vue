@@ -101,6 +101,7 @@
             <a-button
               type="text"
               size="small"
+              status="warning"
               @click="handleEdit(record)"
             >
               <template #icon><icon-edit /></template>
@@ -195,7 +196,7 @@
     { title: '名称', dataIndex: 'name' },
     { title: '显示名', dataIndex: 'displayName' },
     { title: '启用', slotName: 'enabled', width: 80, align: 'center' },
-    { title: '操作', slotName: 'optional', width: 150, align: 'center' },
+    { title: '操作', slotName: 'optional', width: 140, align: 'center' },
   ];
 
   // 加载数据

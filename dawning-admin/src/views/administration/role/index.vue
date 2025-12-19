@@ -159,6 +159,8 @@
               <a-button
                 type="text"
                 size="small"
+                status="success"
+                :disabled="!canEditRole(record)"
                 @click="handleAssignPermissions(record)"
               >
                 <template #icon><icon-safe /></template>
@@ -167,7 +169,8 @@
               <a-button
                 type="text"
                 size="small"
-                :disabled="record.isSystem"
+                status="warning"
+                :disabled="!canEditRole(record)"
                 @click="handleEdit(record)"
               >
                 <template #icon><icon-edit /></template>
@@ -181,7 +184,7 @@
                   type="text"
                   size="small"
                   status="danger"
-                  :disabled="record.isSystem"
+                  :disabled="!canEditRole(record)"
                 >
                   <template #icon><icon-delete /></template>
                   {{ $t('common.delete') }}
@@ -360,6 +363,7 @@
     type RoleModel,
     type RoleQueryParams,
   } from '@/api/administration/role';
+  import { useUserStore } from '@/store';
   import {
     getAllActivePermissions,
     getRolePermissions,
@@ -369,6 +373,18 @@
 
   const { t } = useI18n();
   const { loading, setLoading } = useLoading(true);
+  const userStore = useUserStore();
+
+  // 判断当前用户是否可以编辑/删除指定角色
+  // 规则：super_admin 角色只能被 super_admin 用户编辑/删除
+  const canEditRole = (record: RoleModel) => {
+    // 如果是 super_admin 角色，只有 super_admin 用户可以编辑
+    if (record.name === 'super_admin') {
+      return userStore.role === 'super_admin';
+    }
+    // 其他角色，admin 和 super_admin 都可以编辑
+    return true;
+  };
 
   // 表格数据
   const tableData = ref<RoleModel[]>([]);
@@ -436,7 +452,8 @@
     {
       title: t('role.columns.operations'),
       slotName: 'operations',
-      width: 220,
+      width: 200,
+      align: 'center',
       fixed: 'right',
     },
   ]);
@@ -537,8 +554,8 @@
 
   // 编辑角色
   const handleEdit = (record: RoleModel) => {
-    if (record.isSystem) {
-      Message.warning(t('role.message.systemRoleCannotModify'));
+    if (!canEditRole(record)) {
+      Message.warning(t('role.message.superAdminRoleCannotModify'));
       return;
     }
     isEdit.value = true;
@@ -551,8 +568,8 @@
 
   // 删除角色
   const handleDelete = (record: RoleModel) => {
-    if (record.isSystem) {
-      Message.warning(t('role.message.systemRoleCannotModify'));
+    if (!canEditRole(record)) {
+      Message.warning(t('role.message.superAdminRoleCannotModify'));
       return;
     }
 
@@ -635,6 +652,10 @@
 
   // 分配权限
   const handleAssignPermissions = async (record: RoleModel) => {
+    if (!canEditRole(record)) {
+      Message.warning(t('role.message.superAdminRoleCannotModify'));
+      return;
+    }
     currentRole.value = record;
     permissionModalVisible.value = true;
     permissionLoading.value = true;

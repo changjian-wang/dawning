@@ -39,6 +39,7 @@
                 <a-button
                   type="text"
                   size="small"
+                  status="warning"
                   @click="handleEditPolicy(record)"
                 >
                   <template #icon><icon-edit /></template>
@@ -119,6 +120,7 @@
                 <a-button
                   type="text"
                   size="small"
+                  status="warning"
                   @click="handleEditIpRule(record)"
                 >
                   <template #icon><icon-edit /></template>
@@ -321,7 +323,7 @@
     { title: t('rateLimit.policyType'), slotName: 'policyType' },
     { title: t('rateLimit.limit'), slotName: 'permitLimit' },
     { title: t('rateLimit.enabled'), slotName: 'isEnabled', width: 100 },
-    { title: t('rateLimit.operations'), slotName: 'operations', width: 160 },
+    { title: t('rateLimit.operations'), slotName: 'operations', width: 140, align: 'center' },
   ]);
 
   const loadPolicies = async () => {
@@ -471,7 +473,7 @@
     },
     { title: t('rateLimit.expiresAt'), slotName: 'expiresAt', width: 160 },
     { title: t('rateLimit.enabled'), slotName: 'isEnabled', width: 80 },
-    { title: t('rateLimit.operations'), slotName: 'operations', width: 160 },
+    { title: t('rateLimit.operations'), slotName: 'operations', width: 140, align: 'center' },
   ]);
 
   const loadIpRules = async () => {

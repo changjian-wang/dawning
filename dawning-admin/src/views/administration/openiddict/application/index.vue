@@ -141,6 +141,7 @@
             <a-button
               type="text"
               size="small"
+              status="warning"
               @click="handleEdit(record)"
             >
               <template #icon><icon-edit /></template>
@@ -402,7 +403,7 @@
       slotName: 'createdAt',
       width: 180,
     },
-    { title: '操作', slotName: 'operations', width: 220, fixed: 'right' },
+    { title: '操作', slotName: 'operations', width: 180, align: 'center', fixed: 'right' },
   ];
 
   // 对话框状态

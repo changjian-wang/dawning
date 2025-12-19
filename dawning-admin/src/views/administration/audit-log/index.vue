@@ -406,7 +406,8 @@
     {
       title: t('auditLog.columns.operations'),
       slotName: 'operations',
-      width: 100,
+      width: 80,
+      align: 'center',
       fixed: 'right',
     },
   ]);

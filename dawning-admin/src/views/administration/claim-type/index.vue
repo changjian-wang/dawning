@@ -93,23 +93,26 @@
           </template>
           <template #optional="{ record }">
             <a-space>
-              <a-button type="text" size="medium" @click="handleView(record)">
-                <template #icon><icon-eye :size="18" /></template>
+              <a-button type="text" size="small" @click="handleView(record)">
+                <template #icon><icon-eye /></template>
+                查看
               </a-button>
               <a-button
                 type="text"
-                size="medium"
+                size="small"
                 status="warning"
                 @click="handleEdit(record)"
               >
-                <template #icon><icon-edit :size="18" /></template>
+                <template #icon><icon-edit /></template>
+                编辑
               </a-button>
               <a-popconfirm
                 content="确定要删除此声明类型吗？"
                 @ok="handleDel(record.id)"
               >
-                <a-button type="text" size="medium" status="danger">
-                  <template #icon><icon-delete :size="18" /></template>
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                  删除
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -291,6 +294,8 @@
     {
       title: '操作',
       slotName: 'optional',
+      width: 180,
+      align: 'center',
     },
   ]);
   const data = ref<IClaimType[]>([]);

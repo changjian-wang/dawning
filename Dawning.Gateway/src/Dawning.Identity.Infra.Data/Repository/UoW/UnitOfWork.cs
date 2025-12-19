@@ -56,6 +56,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             // Monitoring
             AlertRule = new AlertRuleRepository(_context);
             AlertHistory = new AlertHistoryRepository(_context);
+            RequestLog = new RequestLogRepository(_context);
         }
 
         /// <summary>
@@ -92,6 +93,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         // Monitoring
         public IAlertRuleRepository AlertRule { get; }
         public IAlertHistoryRepository AlertHistory { get; }
+        public IRequestLogRepository RequestLog { get; }
 
         public void BeginTransaction()
         {

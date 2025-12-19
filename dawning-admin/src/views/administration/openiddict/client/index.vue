@@ -57,23 +57,28 @@
         <a-table :columns="columns" :data="data" :bordered="false">
           <template #optional="{ record }">
             <a-space>
-              <a-button type="primary" @click="() => {}">
-                <template #icon>
-                  <icon-edit />
-                </template>
+              <a-button type="text" size="small" @click="() => {}">
+                <template #icon><icon-eye /></template>
+                查看
               </a-button>
               <a-button
-                @click="
-                  $modal.info({
-                    title: 'Name',
-                    content: `${record.clientId} ${record.clientName}`,
-                  })
-                "
+                type="text"
+                size="small"
+                status="warning"
+                @click="() => {}"
               >
-                <template #icon>
-                  <icon-eye />
-                </template>
+                <template #icon><icon-edit /></template>
+                编辑
               </a-button>
+              <a-popconfirm
+                content="确定要删除此客户端吗？"
+                @ok="() => {}"
+              >
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                  删除
+                </a-button>
+              </a-popconfirm>
             </a-space>
           </template>
         </a-table>

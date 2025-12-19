@@ -171,6 +171,7 @@
               <a-button
                 type="text"
                 size="small"
+                status="warning"
                 @click="handleEdit(record)"
               >
                 <template #icon><icon-edit /></template>
@@ -439,7 +440,8 @@
     {
       title: '操作',
       slotName: 'operations',
-      width: 120,
+      width: 140,
+      align: 'center',
       fixed: 'right',
     },
   ];

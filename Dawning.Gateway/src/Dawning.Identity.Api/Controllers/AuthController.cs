@@ -186,12 +186,16 @@ namespace Dawning.Identity.Api.Controllers
 
         /// <summary>
         /// 登出端点
+        /// 对于纯 API OAuth 2.0 服务器（无服务端 session），登出只需要客户端清除本地 token
+        /// 如果需要服务端撤销 token，应使用 /connect/revoke 端点
         /// </summary>
         [HttpGet("~/connect/logout")]
         [HttpPost("~/connect/logout")]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            await HttpContext.SignOutAsync();
+            // OAuth 2.0 API 服务器是无状态的，没有服务端 session 需要清除
+            // 客户端登出只需清除本地存储的 access_token、refresh_token 等
+            // 如果需要撤销 token 使其立即失效，应调用 /connect/revoke 端点
             return Ok(ApiResponse.Success("Logged out successfully"));
         }
 

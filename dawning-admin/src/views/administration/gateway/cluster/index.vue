@@ -103,7 +103,7 @@
         </template>
         <template #operations="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleEdit(record)">
+            <a-button type="text" size="small" status="warning" @click="handleEdit(record)">
               <template #icon><icon-edit /></template>
               {{ $t('common.edit') }}
             </a-button>
@@ -374,7 +374,7 @@
       width: 100,
     },
     { title: t('gateway.status'), slotName: 'isEnabled', width: 80 },
-    { title: t('common.operations'), slotName: 'operations', width: 160 },
+    { title: t('common.operations'), slotName: 'operations', width: 140, align: 'center' },
   ];
 
   // 弹窗相关
@@ -424,8 +424,16 @@
   // 获取目标服务器数量
   const getDestinationCount = (destinations: string) => {
     try {
-      const arr = JSON.parse(destinations);
-      return Array.isArray(arr) ? arr.length : 0;
+      const parsed = JSON.parse(destinations);
+      // 如果是数组，返回数组长度
+      if (Array.isArray(parsed)) {
+        return parsed.length;
+      }
+      // 如果是对象（YARP格式），返回对象键的数量
+      if (typeof parsed === 'object' && parsed !== null) {
+        return Object.keys(parsed).length;
+      }
+      return 0;
     } catch {
       return 0;
     }

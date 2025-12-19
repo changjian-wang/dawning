@@ -99,69 +99,91 @@ namespace Dawning.Identity.Api.Middleware
             }
             finally
             {
-                // 记录到数据库
-                await LogToDatabaseAsync(
-                    context,
-                    requestId,
-                    requestTime,
-                    stopwatch.ElapsedMilliseconds,
-                    exception
-                );
-            }
-        }
-
-        private async Task LogToDatabaseAsync(
-            HttpContext context,
-            string requestId,
-            DateTime requestTime,
-            long responseTimeMs,
-            string? exception
-        )
-        {
-            try
-            {
-                var loggingService = context.RequestServices.GetService<IRequestLoggingService>();
-                if (loggingService == null)
-                    return;
-
-                // 获取用户信息
-                Guid? userId = null;
-                string? userName = null;
-                if (context.User?.Identity?.IsAuthenticated == true)
-                {
-                    var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (Guid.TryParse(userIdClaim, out var parsedUserId))
-                    {
-                        userId = parsedUserId;
-                    }
-                    userName = context.User.FindFirst(ClaimTypes.Name)?.Value;
-                }
-
-                var entry = new RequestLogEntry
+                // 使用 Fire-and-forget 模式记录到数据库，不阻塞响应
+                // 捕获必要的值避免闭包问题
+                var logContext = new LogContext
                 {
                     RequestId = requestId,
                     Method = context.Request.Method,
                     Path = context.Request.Path.Value ?? "/",
                     QueryString = context.Request.QueryString.Value,
                     StatusCode = context.Response.StatusCode,
-                    ResponseTimeMs = responseTimeMs,
+                    ResponseTimeMs = stopwatch.ElapsedMilliseconds,
                     ClientIp = GetClientIp(context),
                     UserAgent = context.Request.Headers.UserAgent.ToString(),
-                    UserId = userId,
-                    UserName = userName,
+                    UserId = GetUserId(context),
+                    UserName = GetUserName(context),
                     RequestTime = requestTime,
-                    RequestBodySize = context.Request.ContentLength,
-                    ResponseBodySize = context.Response.ContentLength,
-                    Exception = exception,
+                    Exception = exception
                 };
+                var serviceProvider = context.RequestServices;
+                
+                // Fire-and-forget，不阻塞响应
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var scope = serviceProvider.CreateScope();
+                        var loggingService = scope.ServiceProvider.GetService<IRequestLoggingService>();
+                        if (loggingService == null) return;
 
-                // 异步写入数据库（fire and forget）
-                _ = Task.Run(() => loggingService.LogRequestAsync(entry));
+                        var entry = new RequestLogEntry
+                        {
+                            RequestId = logContext.RequestId,
+                            Method = logContext.Method,
+                            Path = logContext.Path,
+                            QueryString = logContext.QueryString,
+                            StatusCode = logContext.StatusCode,
+                            ResponseTimeMs = logContext.ResponseTimeMs,
+                            ClientIp = logContext.ClientIp,
+                            UserAgent = logContext.UserAgent,
+                            UserId = logContext.UserId,
+                            UserName = logContext.UserName,
+                            RequestTime = logContext.RequestTime,
+                            Exception = logContext.Exception
+                        };
+
+                        await loggingService.LogRequestAsync(entry);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 日志写入失败不应影响主流程，只记录到文件日志
+                        _logger.LogError(ex, "Failed to log request to database (async)");
+                    }
+                });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to log request to database");
-            }
+        }
+
+        private Guid? GetUserId(HttpContext context)
+        {
+            if (context.User?.Identity?.IsAuthenticated != true) return null;
+            var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return Guid.TryParse(userIdClaim, out var parsedUserId) ? parsedUserId : null;
+        }
+
+        private string? GetUserName(HttpContext context)
+        {
+            if (context.User?.Identity?.IsAuthenticated != true) return null;
+            return context.User.FindFirst(ClaimTypes.Name)?.Value;
+        }
+
+        /// <summary>
+        /// 日志上下文，用于异步记录
+        /// </summary>
+        private class LogContext
+        {
+            public string RequestId { get; set; } = string.Empty;
+            public string Method { get; set; } = string.Empty;
+            public string Path { get; set; } = string.Empty;
+            public string? QueryString { get; set; }
+            public int StatusCode { get; set; }
+            public long ResponseTimeMs { get; set; }
+            public string? ClientIp { get; set; }
+            public string? UserAgent { get; set; }
+            public Guid? UserId { get; set; }
+            public string? UserName { get; set; }
+            public DateTime RequestTime { get; set; }
+            public string? Exception { get; set; }
         }
 
         private static string? GetClientIp(HttpContext context)

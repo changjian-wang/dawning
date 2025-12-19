@@ -255,7 +255,7 @@
     { title: '类型', slotName: 'type', width: 100 },
     { title: '作用域', slotName: 'scopes', width: 200 },
     { title: '创建时间', slotName: 'createdAt', width: 160 },
-    { title: '操作', slotName: 'optional', width: 160, align: 'center' },
+    { title: '操作', slotName: 'optional', width: 140, align: 'center' },
   ];
 
   function formatDate(dateStr?: string) {

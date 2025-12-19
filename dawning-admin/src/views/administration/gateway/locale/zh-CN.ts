@@ -46,8 +46,10 @@ export default {
   // HTTP客户端设置
   'gateway.cluster.httpClient': 'HTTP客户端设置',
   'gateway.cluster.httpRequestTimeout': '请求超时(秒)',
-  'gateway.cluster.httpMaxConnectionsPerServer': '最大连接数',
-
+  'gateway.cluster.httpMaxConnectionsPerServer': '最大连接数',  'gateway.cluster.healthCheckTimeout': '健康检查超时(秒)',
+  'gateway.cluster.maxConnections': '最大连接数',
+  'gateway.cluster.requestTimeout': '请求超时(秒)',
+  'gateway.cluster.skipCertValidation': '跳过证书验证',
   // Session亲和性
   'gateway.cluster.sessionAffinity': 'Session亲和性',
   'gateway.cluster.sessionAffinityEnabled': '启用Session亲和性',
