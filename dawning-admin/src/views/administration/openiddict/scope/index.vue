@@ -138,6 +138,9 @@
       v-model:visible="modalVisible"
       :title="modalTitle"
       width="700px"
+      :confirm-loading="submitting"
+      :ok-button-props="{ disabled: submitting }"
+      :cancel-button-props="{ disabled: submitting }"
       @ok="handleSubmit"
       @cancel="handleCancel"
     >
@@ -295,6 +298,7 @@
   const isEdit = ref(false);
   const detailVisible = ref(false);
   const currentRecord = ref<IScope | null>(null);
+  const submitting = ref(false);
 
   // 表单数据
   const formData = reactive<ICreateScopeDto>({
@@ -407,6 +411,8 @@
 
   // 提交表单
   const handleSubmit = async () => {
+    if (submitting.value) return;
+    submitting.value = true;
     try {
       if (isEdit.value && currentRecord.value?.id) {
         await scope.update({
@@ -424,6 +430,8 @@
     } catch (error) {
       Message.error(isEdit.value ? '更新失败' : '创建失败');
       console.error(error);
+    } finally {
+      submitting.value = false;
     }
   };
 

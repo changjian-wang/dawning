@@ -273,6 +273,9 @@
         v-model:visible="modalVisible"
         :title="isEdit ? $t('role.button.edit') : $t('role.button.create')"
         width="600px"
+        :confirm-loading="roleSubmitting"
+        :ok-button-props="{ disabled: roleSubmitting }"
+        :cancel-button-props="{ disabled: roleSubmitting }"
         @cancel="handleCancel"
         @before-ok="handleBeforeOk"
       >
@@ -454,6 +457,7 @@
   // 权限分配
   const permissionModalVisible = ref(false);
   const permissionLoading = ref(false);
+  const roleSubmitting = ref(false);
   const currentRole = ref<RoleModel | null>(null);
   const allPermissions = ref<
     Array<{ key: string; value: string; label: string; code: string }>
@@ -569,6 +573,8 @@
 
   // 提交表单
   const handleSubmit = async () => {
+    if (roleSubmitting.value) return false;
+    roleSubmitting.value = true;
     try {
       if (isEdit.value) {
         await updateRole(formData.id, {
@@ -598,6 +604,8 @@
           : t('role.message.createFailed')
       );
       return false;
+    } finally {
+      roleSubmitting.value = false;
     }
   };
 

@@ -838,8 +838,9 @@
           <a-row :gutter="80">
             <a-col :span="24">
               <a-space style="width: 100%; justify-content: center">
-                <a-button html-type="submit" type="primary">提交</a-button>
+                <a-button html-type="submit" type="primary" :loading="submitting" :disabled="submitting">提交</a-button>
                 <a-button
+                  :disabled="submitting"
                   @click="() => ($refs.formRef as FormInstance).resetFields()"
                   >重置</a-button
                 >
@@ -975,6 +976,7 @@
   const activeKey = ref(1);
   const visibleWithAddURI = ref(false);
   const visibleWithAddClaim = ref(false);
+  const submitting = ref(false);
   const corsOrigins = ref<string[]>([
     'https://oa.aluneth.com',
     'https://m.oa.aluneth.com',
@@ -1171,6 +1173,8 @@
   };
 
   const handleSubmit = async () => {
+    if (submitting.value) return;
+    submitting.value = true;
     try {
       const result = await formRef.value?.validate();
 
@@ -1194,6 +1198,7 @@
         });
 
         console.log('form data: ', form);
+        // TODO: 调用 API 创建客户端
       } else {
         activeKey.value = 1;
         console.log('验证失败');
@@ -1201,6 +1206,8 @@
     } catch (errors) {
       activeKey.value = 1;
       console.error('验证失败:', errors);
+    } finally {
+      submitting.value = false;
     }
   };
 

@@ -112,6 +112,9 @@
       v-model:visible="modalVisible"
       :title="modalTitle"
       :width="600"
+      :confirm-loading="submitting"
+      :ok-button-props="{ disabled: submitting }"
+      :cancel-button-props="{ disabled: submitting }"
       @cancel="handleModalCancel"
       @before-ok="handleModalOk"
     >
@@ -173,6 +176,7 @@
     enabled: true,
     showInDiscoveryDocument: true,
   });
+  const submitting = ref(false);
 
   const columns = [
     { title: '名称', dataIndex: 'name' },
@@ -253,11 +257,16 @@
   }
 
   async function handleModalOk(done: (close: boolean) => void) {
+    if (submitting.value) {
+      done(false);
+      return;
+    }
     if (!formData.name || !formData.displayName) {
       Message.warning('请填写必填项');
       done(false);
       return;
     }
+    submitting.value = true;
     try {
       if (isEdit.value && formData.id) {
         await apiResourceApi.update(formData.id, formData);
@@ -271,6 +280,8 @@
     } catch (e: any) {
       Message.error(e?.message || '操作失败');
       done(false);
+    } finally {
+      submitting.value = false;
     }
   }
 
