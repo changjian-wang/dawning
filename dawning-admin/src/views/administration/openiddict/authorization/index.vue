@@ -1,57 +1,78 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['认证授权', '授权管理']" />
-    <a-card class="general-card" title="授权管理">
-      <!-- 搜索区 -->
-      <a-row style="margin-bottom: 16px">
-        <a-col :span="24">
-          <a-form :model="searchForm" layout="inline">
-            <a-form-item field="subject" label="用户标识">
+    <Breadcrumb
+      :items="[
+        'menu.administration',
+        'menu.administration.openiddict',
+        'menu.administration.openiddict.authorization',
+      ]"
+    />
+    <a-card class="general-card search-card">
+      <a-form :model="searchForm" layout="inline" class="search-form">
+        <a-row :gutter="[16, 16]" style="width: 100%">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item
+              field="subject"
+              label="用户标识"
+              class="form-item-block"
+            >
               <a-input
                 v-model="searchForm.subject"
                 placeholder="请输入用户ID"
                 allow-clear
-                style="width: 200px"
-              />
+              >
+                <template #prefix>
+                  <icon-user />
+                </template>
+              </a-input>
             </a-form-item>
-            <a-form-item field="status" label="状态">
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="status" label="状态" class="form-item-block">
               <a-select
                 v-model="searchForm.status"
                 placeholder="请选择"
                 allow-clear
-                style="width: 120px"
               >
+                <template #prefix>
+                  <icon-check-circle />
+                </template>
                 <a-option value="valid">有效</a-option>
                 <a-option value="revoked">已撤销</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item field="type" label="类型">
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="type" label="类型" class="form-item-block">
               <a-select
                 v-model="searchForm.type"
                 placeholder="请选择"
                 allow-clear
-                style="width: 140px"
               >
+                <template #prefix>
+                  <icon-safe />
+                </template>
                 <a-option value="permanent">永久授权</a-option>
                 <a-option value="ad-hoc">临时授权</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item>
-              <a-space>
-                <a-button type="primary" @click="handleSearch">
-                  <template #icon><icon-search /></template>
-                  查询
-                </a-button>
-                <a-button @click="handleReset">
-                  <template #icon><icon-refresh /></template>
-                  重置
-                </a-button>
-              </a-space>
-            </a-form-item>
-          </a-form>
-        </a-col>
-      </a-row>
-
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="24" :lg="6" :xl="6" class="action-col">
+            <a-space :size="12">
+              <a-button type="primary" @click="handleSearch">
+                <template #icon><icon-search /></template>
+                查询
+              </a-button>
+              <a-button @click="handleReset">
+                <template #icon><icon-refresh /></template>
+                重置
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-card>
+    <a-card class="general-card table-card">
       <!-- 数据表格 -->
       <a-table
         :columns="columns"
@@ -97,7 +118,11 @@
         </template>
         <template #optional="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">
+            <a-button
+              type="text"
+              size="small"
+              @click="handleView(record)"
+            >
               <template #icon><icon-eye /></template>
               详情
             </a-button>
@@ -230,7 +255,7 @@
     { title: '类型', slotName: 'type', width: 100 },
     { title: '作用域', slotName: 'scopes', width: 200 },
     { title: '创建时间', slotName: 'createdAt', width: 160 },
-    { title: '操作', slotName: 'optional', width: 160 },
+    { title: '操作', slotName: 'optional', width: 160, align: 'center' },
   ];
 
   function formatDate(dateStr?: string) {

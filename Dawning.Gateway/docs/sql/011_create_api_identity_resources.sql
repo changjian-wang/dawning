@@ -34,9 +34,7 @@ CREATE TABLE IF NOT EXISTS `api_resource_scopes` (
     `created_at` DATETIME NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_api_resource_scopes` (`api_resource_id`, `scope`),
-    KEY `idx_api_resource_scopes_resource_id` (`api_resource_id`),
-    CONSTRAINT `fk_api_resource_scopes_resource` FOREIGN KEY (`api_resource_id`) 
-        REFERENCES `api_resources` (`id`) ON DELETE CASCADE
+    KEY `idx_api_resource_scopes_resource_id` (`api_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API资源作用域关联表';
 
 -- ==================== API Resource Claims Table ====================
@@ -48,9 +46,7 @@ CREATE TABLE IF NOT EXISTS `api_resource_claims` (
     `created_at` DATETIME NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_api_resource_claims` (`api_resource_id`, `type`),
-    KEY `idx_api_resource_claims_resource_id` (`api_resource_id`),
-    CONSTRAINT `fk_api_resource_claims_resource` FOREIGN KEY (`api_resource_id`) 
-        REFERENCES `api_resources` (`id`) ON DELETE CASCADE
+    KEY `idx_api_resource_claims_resource_id` (`api_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API资源声明表';
 
 -- ==================== Identity Resources Table ====================
@@ -83,9 +79,7 @@ CREATE TABLE IF NOT EXISTS `identity_resource_claims` (
     `created_at` DATETIME NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_identity_resource_claims` (`identity_resource_id`, `type`),
-    KEY `idx_identity_resource_claims_resource_id` (`identity_resource_id`),
-    CONSTRAINT `fk_identity_resource_claims_resource` FOREIGN KEY (`identity_resource_id`) 
-        REFERENCES `identity_resources` (`id`) ON DELETE CASCADE
+    KEY `idx_identity_resource_claims_resource_id` (`identity_resource_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='身份资源声明表';
 
 -- ==================== Verification ====================

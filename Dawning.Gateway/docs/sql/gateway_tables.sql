@@ -56,9 +56,7 @@ CREATE TABLE IF NOT EXISTS gateway_routes (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_by VARCHAR(100),
-    CONSTRAINT fk_gateway_routes_cluster FOREIGN KEY (cluster_id) 
-        REFERENCES gateway_clusters(cluster_id) ON DELETE RESTRICT
+    updated_by VARCHAR(100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='网关路由配置表';
 
 -- 创建索引

@@ -1,64 +1,80 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['认证授权', 'API资源管理']" />
-    <a-card class="general-card" title="API资源管理">
-      <!-- 搜索区 -->
-      <a-row style="margin-bottom: 16px">
-        <a-col :span="24">
-          <a-form :model="searchForm" layout="inline">
-            <a-form-item field="name" label="名称">
+    <Breadcrumb
+      :items="[
+        'menu.administration',
+        'menu.administration.openiddict',
+        'menu.administration.openiddict.api-resource',
+      ]"
+    />
+    <a-card class="general-card search-card">
+      <a-form :model="searchForm" layout="inline" class="search-form">
+        <a-row :gutter="[16, 16]" style="width: 100%">
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="name" label="名称" class="form-item-block">
               <a-input
                 v-model="searchForm.name"
                 placeholder="请输入资源名称"
                 allow-clear
-                style="width: 180px"
-              />
+              >
+                <template #prefix>
+                  <icon-apps />
+                </template>
+              </a-input>
             </a-form-item>
-            <a-form-item field="displayName" label="显示名">
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item
+              field="displayName"
+              label="显示名称"
+              class="form-item-block"
+            >
               <a-input
                 v-model="searchForm.displayName"
-                placeholder="请输入显示名"
+                placeholder="请输入显示名称"
                 allow-clear
-                style="width: 180px"
-              />
+              >
+                <template #prefix>
+                  <icon-tag />
+                </template>
+              </a-input>
             </a-form-item>
-            <a-form-item field="enabled" label="启用">
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
+            <a-form-item field="enabled" label="启用" class="form-item-block">
               <a-select
                 v-model="searchForm.enabled"
                 placeholder="请选择"
                 allow-clear
-                style="width: 100px"
               >
+                <template #prefix>
+                  <icon-check-circle />
+                </template>
                 <a-option :value="true">是</a-option>
                 <a-option :value="false">否</a-option>
               </a-select>
             </a-form-item>
-            <a-form-item>
-              <a-space>
-                <a-button type="primary" @click="handleSearch">
-                  <template #icon><icon-search /></template>
-                  查询
-                </a-button>
-                <a-button @click="handleReset">
-                  <template #icon><icon-refresh /></template>
-                  重置
-                </a-button>
-              </a-space>
-            </a-form-item>
-          </a-form>
-        </a-col>
-      </a-row>
-
-      <!-- 操作按钮 -->
-      <a-row style="margin-bottom: 16px">
-        <a-col :span="24">
-          <a-button type="primary" @click="handleCreate">
-            <template #icon><icon-plus /></template>
-            新增
-          </a-button>
-        </a-col>
-      </a-row>
-
+          </a-col>
+          <a-col :xs="24" :sm="12" :md="24" :lg="6" :xl="6" class="action-col">
+            <a-space :size="12">
+              <a-button type="primary" @click="handleSearch">
+                <template #icon><icon-search /></template>
+                查询
+              </a-button>
+              <a-button @click="handleReset">
+                <template #icon><icon-refresh /></template>
+                重置
+              </a-button>
+              <a-button type="primary" status="success" @click="handleCreate">
+                <template #icon><icon-plus /></template>
+                新增
+              </a-button>
+            </a-space>
+          </a-col>
+        </a-row>
+      </a-form>
+    </a-card>
+    <a-card class="general-card table-card">
       <!-- 数据表格 -->
       <a-table
         :columns="columns"
@@ -82,25 +98,22 @@
         </template>
         <template #optional="{ record }">
           <a-space>
-            <a-tooltip content="编辑">
-              <a-button
-                type="text"
-                size="medium"
-                status="warning"
-                @click="handleEdit(record)"
-              >
-                <template #icon><icon-edit :size="18" /></template>
-              </a-button>
-            </a-tooltip>
+            <a-button
+              type="text"
+              size="small"
+              @click="handleEdit(record)"
+            >
+              <template #icon><icon-edit /></template>
+              编辑
+            </a-button>
             <a-popconfirm
               content="确定删除该资源吗？"
               @ok="handleDelete(record)"
             >
-              <a-tooltip content="删除">
-                <a-button type="text" size="medium" status="danger">
-                  <template #icon><icon-delete :size="18" /></template>
-                </a-button>
-              </a-tooltip>
+              <a-button type="text" size="small" status="danger">
+                <template #icon><icon-delete /></template>
+                删除
+              </a-button>
             </a-popconfirm>
           </a-space>
         </template>
@@ -182,7 +195,7 @@
     { title: '名称', dataIndex: 'name' },
     { title: '显示名', dataIndex: 'displayName' },
     { title: '启用', slotName: 'enabled', width: 80, align: 'center' },
-    { title: '操作', slotName: 'optional', width: 100, align: 'center' },
+    { title: '操作', slotName: 'optional', width: 150, align: 'center' },
   ];
 
   // 加载数据

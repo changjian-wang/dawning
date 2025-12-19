@@ -89,11 +89,7 @@ CREATE TABLE `openiddict_authorizations` (
     INDEX `idx_subject` (`subject`),
     INDEX `idx_status` (`status`),
     INDEX `idx_timestamp` (`timestamp`),
-    INDEX `idx_created_at` (`created_at`),
-    CONSTRAINT `fk_authorization_application` 
-        FOREIGN KEY (`application_id`) 
-        REFERENCES `openiddict_applications` (`id`) 
-        ON DELETE CASCADE
+    INDEX `idx_created_at` (`created_at`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OpenIddict授权表';
 
 -- 4. 令牌表 (Tokens)
@@ -119,15 +115,7 @@ CREATE TABLE `openiddict_tokens` (
     INDEX `idx_status` (`status`),
     INDEX `idx_expires_at` (`expires_at`),
     INDEX `idx_timestamp` (`timestamp`),
-    INDEX `idx_created_at` (`created_at`),
-    CONSTRAINT `fk_token_application` 
-        FOREIGN KEY (`application_id`) 
-        REFERENCES `openiddict_applications` (`id`) 
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_token_authorization` 
-        FOREIGN KEY (`authorization_id`) 
-        REFERENCES `openiddict_authorizations` (`id`) 
-        ON DELETE CASCADE
+    INDEX `idx_created_at` (`created_at`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='OpenIddict令牌表';
 
 -- ====================================================
