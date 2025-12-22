@@ -181,6 +181,9 @@ namespace Dawning.Identity.Api
             // ===== Health Checks =====
             builder.Services.AddHealthChecks();
 
+            // ===== OpenTelemetry =====
+            builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
+
             // ===== Database Seeder =====
             builder.Services.AddScoped<Dawning.Identity.Api.Data.DatabaseSeeder>();
 
@@ -224,6 +227,9 @@ namespace Dawning.Identity.Api
             // ===== Map Endpoints =====
             app.MapControllers();
             app.MapHealthChecks("/health");
+
+            // ===== OpenTelemetry Prometheus Endpoint =====
+            app.UseOpenTelemetryConfiguration();
 
             // Error handling endpoint
             app.Map(
