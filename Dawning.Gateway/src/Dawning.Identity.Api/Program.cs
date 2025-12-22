@@ -180,6 +180,9 @@ namespace Dawning.Identity.Api
             // ===== Swagger =====
             builder.Services.AddSwaggerConfiguration();
 
+            // ===== API Versioning =====
+            builder.Services.AddApiVersioningConfiguration();
+
             // ===== Permission Authorization =====
             builder.Services.AddPermissionAuthorization();
 

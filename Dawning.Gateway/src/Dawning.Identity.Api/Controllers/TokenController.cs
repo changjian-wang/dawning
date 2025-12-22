@@ -13,7 +13,9 @@ namespace Dawning.Identity.Api.Controllers
     /// Token 管理控制器 - 处理令牌撤销和会话管理
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0")]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize(AuthenticationSchemes = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme)]
     public class TokenController : ControllerBase
     {

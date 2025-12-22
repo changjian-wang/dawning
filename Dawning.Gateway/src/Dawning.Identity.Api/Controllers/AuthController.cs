@@ -16,6 +16,7 @@ namespace Dawning.Identity.Api.Controllers
     /// 认证控制器 - 处理 OAuth 2.0 / OpenID Connect 认证流程
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0")]
     public class AuthController : ControllerBase
     {
         private readonly IUserAuthenticationService _userAuthenticationService;

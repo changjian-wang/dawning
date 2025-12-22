@@ -10,7 +10,9 @@ namespace Dawning.Identity.Api.Controllers
     /// 数据库备份管理控制器
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0")]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize(Roles = "admin")]
     public class BackupController : ControllerBase
     {

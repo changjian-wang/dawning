@@ -18,7 +18,9 @@ namespace Dawning.Identity.Api.Controllers
     /// 用户管理控制器
     /// </summary>
     [ApiController]
+    [ApiVersion("1.0")]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize]
     public class UserController : ControllerBase
     {
