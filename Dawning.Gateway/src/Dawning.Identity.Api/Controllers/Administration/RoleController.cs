@@ -15,8 +15,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
     /// <summary>
     /// 角色管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/role")]
+    [Route("api/v{version:apiVersion}/role")]
     [Authorize(Roles = "admin,super_admin")]
     public class RoleController : ControllerBase
     {

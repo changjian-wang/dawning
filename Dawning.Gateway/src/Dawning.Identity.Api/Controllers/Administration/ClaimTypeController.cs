@@ -10,8 +10,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
     /// <summary>
     /// ClaimType 管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/claim-type")]
+    [Route("api/v{version:apiVersion}/claim-type")]
     [Authorize(Roles = "admin,super_admin")]
     public class ClaimTypeController : ControllerBase
     {

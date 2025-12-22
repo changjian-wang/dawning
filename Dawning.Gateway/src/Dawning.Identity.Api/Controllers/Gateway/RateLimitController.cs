@@ -8,7 +8,9 @@ namespace Dawning.Identity.Api.Controllers.Gateway
     /// <summary>
     /// 限流策略管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [Route("api/rate-limit")]
+    [Route("api/v{version:apiVersion}/rate-limit")]
     [ApiController]
     [Authorize]
     public class RateLimitController : ControllerBase

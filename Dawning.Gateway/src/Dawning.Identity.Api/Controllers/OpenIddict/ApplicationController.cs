@@ -11,8 +11,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
     /// <summary>
     /// Controller for managing OpenIddict applications, providing endpoints to perform CRUD operations and paging.
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/openiddict/application")]
+    [Route("api/v{version:apiVersion}/openiddict/application")]
     [Authorize]
     public class ApplicationController : ControllerBase
     {

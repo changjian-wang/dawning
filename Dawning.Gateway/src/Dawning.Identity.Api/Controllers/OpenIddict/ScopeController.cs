@@ -11,8 +11,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
     /// <summary>
     /// Controller for managing OpenIddict scopes, providing endpoints to perform CRUD operations and paging.
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/openiddict/scope")]
+    [Route("api/v{version:apiVersion}/openiddict/scope")]
     [Authorize(Roles = "admin,super_admin")]
     public class ScopeController : ControllerBase
     {

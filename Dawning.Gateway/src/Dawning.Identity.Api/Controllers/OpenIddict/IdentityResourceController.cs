@@ -15,8 +15,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
     /// <summary>
     /// 身份资源管理Controller
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/openiddict/identity-resource")]
+    [Route("api/v{version:apiVersion}/openiddict/identity-resource")]
     [Authorize(Roles = "admin,super_admin")]
     public class IdentityResourceController : ControllerBase
     {

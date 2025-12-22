@@ -11,8 +11,10 @@ namespace Dawning.Identity.Api.Controllers.Gateway
     /// <summary>
     /// 网关路由管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/gateway/route")]
+    [Route("api/v{version:apiVersion}/gateway/route")]
     [Authorize(Roles = "admin,super_admin")]
     public class GatewayRouteController : ControllerBase
     {

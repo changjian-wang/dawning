@@ -13,8 +13,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
     /// <summary>
     /// 审计日志管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/audit-log")]
+    [Route("api/v{version:apiVersion}/audit-log")]
     [Authorize(Roles = "admin,super_admin,auditor")]
     public class AuditLogController : ControllerBase
     {

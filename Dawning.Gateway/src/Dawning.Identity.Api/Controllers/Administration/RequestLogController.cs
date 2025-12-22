@@ -12,8 +12,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
     /// <summary>
     /// 请求日志管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/request-logs")]
+    [Route("api/v{version:apiVersion}/request-logs")]
     [Authorize(Roles = "admin,super_admin,auditor")]
     public class RequestLogController : ControllerBase
     {

@@ -11,8 +11,10 @@ namespace Dawning.Identity.Api.Controllers.Gateway
     /// <summary>
     /// 网关集群管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/gateway/cluster")]
+    [Route("api/v{version:apiVersion}/gateway/cluster")]
     [Authorize(Roles = "admin,super_admin")]
     public class GatewayClusterController : ControllerBase
     {

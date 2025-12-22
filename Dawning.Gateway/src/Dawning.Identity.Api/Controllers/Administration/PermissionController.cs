@@ -14,8 +14,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
     /// <summary>
     /// 权限管理控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [ApiController]
     [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize]
     public class PermissionController : ControllerBase
     {

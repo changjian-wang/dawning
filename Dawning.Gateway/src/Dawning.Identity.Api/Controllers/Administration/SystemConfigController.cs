@@ -7,7 +7,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
     /// <summary>
     /// 系统配置控制器
     /// </summary>
+    [ApiVersion("1.0")]
     [Route("api/system-config")]
+    [Route("api/v{version:apiVersion}/system-config")]
     [ApiController]
     [Authorize]
     public class SystemConfigController : ControllerBase
