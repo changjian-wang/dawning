@@ -158,9 +158,12 @@ public class AlertNotificationService : IAlertNotificationService
             // 构建邮件消息
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(fromName, fromEmail));
-            
+
             // 解析收件人邮箱（逗号分隔）
-            var emailAddresses = context.NotifyEmails.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var emailAddresses = context.NotifyEmails.Split(
+                ',',
+                StringSplitOptions.RemoveEmptyEntries
+            );
             foreach (var email in emailAddresses)
             {
                 var trimmedEmail = email.Trim();
@@ -171,12 +174,12 @@ public class AlertNotificationService : IAlertNotificationService
             }
 
             message.Subject = subject;
-            
+
             // 创建 HTML 正文
             var bodyBuilder = new BodyBuilder
             {
                 HtmlBody = body,
-                TextBody = BuildPlainTextBody(context)
+                TextBody = BuildPlainTextBody(context),
             };
             message.Body = bodyBuilder.ToMessageBody();
 
@@ -188,22 +191,21 @@ public class AlertNotificationService : IAlertNotificationService
 
             // 发送邮件
             using var client = new SmtpClient();
-            
-            var secureSocketOptions = useSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.None;
+
+            var secureSocketOptions = useSsl
+                ? SecureSocketOptions.StartTls
+                : SecureSocketOptions.None;
             await client.ConnectAsync(smtpHost, smtpPort, secureSocketOptions);
-            
+
             if (!string.IsNullOrEmpty(smtpUsername) && !string.IsNullOrEmpty(smtpPassword))
             {
                 await client.AuthenticateAsync(smtpUsername, smtpPassword);
             }
-            
+
             var messageId = await client.SendAsync(message);
             await client.DisconnectAsync(true);
 
-            _logger.LogInformation(
-                "Email sent successfully. MessageId: {MessageId}",
-                messageId
-            );
+            _logger.LogInformation("Email sent successfully. MessageId: {MessageId}", messageId);
 
             return new NotificationResult
             {
@@ -280,7 +282,11 @@ public class AlertNotificationService : IAlertNotificationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send webhook notification to {Url}", context.WebhookUrl);
+            _logger.LogError(
+                ex,
+                "Failed to send webhook notification to {Url}",
+                context.WebhookUrl
+            );
             return new NotificationResult { Success = false, ErrorMessage = ex.Message };
         }
     }
@@ -318,13 +324,21 @@ public class AlertNotificationService : IAlertNotificationService
                         <p style="margin:10px 0 0 0;">{{context.RuleName}}</p>
                     </div>
                     <div class="content">
-                        <p class="metric">{{GetMetricTypeDisplay(context.MetricType)}}: {{context.MetricValue:F2}}</p>
+                        <p class="metric">{{GetMetricTypeDisplay(
+                context.MetricType
+            )}}: {{context.MetricValue:F2}}</p>
                         <p>{{context.Message}}</p>
                         <table>
-                            <tr><td class="label">告警级别:</td><td>{{GetSeverityDisplay(context.Severity)}}</td></tr>
-                            <tr><td class="label">指标类型:</td><td>{{GetMetricTypeDisplay(context.MetricType)}}</td></tr>
+                            <tr><td class="label">告警级别:</td><td>{{GetSeverityDisplay(
+                context.Severity
+            )}}</td></tr>
+                            <tr><td class="label">指标类型:</td><td>{{GetMetricTypeDisplay(
+                context.MetricType
+            )}}</td></tr>
                             <tr><td class="label">当前值:</td><td>{{context.MetricValue:F2}}</td></tr>
-                            <tr><td class="label">阈值:</td><td>{{GetOperatorDisplay(context.Operator)}} {{context.Threshold}}</td></tr>
+                            <tr><td class="label">阈值:</td><td>{{GetOperatorDisplay(
+                context.Operator
+            )}} {{context.Threshold}}</td></tr>
                             <tr><td class="label">触发时间:</td><td>{{context.TriggeredAt:yyyy-MM-dd HH:mm:ss}} UTC</td></tr>
                         </table>
                     </div>
@@ -374,17 +388,17 @@ public class AlertNotificationService : IAlertNotificationService
         return $"""
             ⚠️ 系统告警通知
             ================
-            
+
             规则名称: {context.RuleName}
             {context.Message}
-            
+
             详细信息:
             - 告警级别: {GetSeverityDisplay(context.Severity)}
             - 指标类型: {GetMetricTypeDisplay(context.MetricType)}
             - 当前值: {context.MetricValue:F2}
             - 阈值: {GetOperatorDisplay(context.Operator)} {context.Threshold}
             - 触发时间: {context.TriggeredAt:yyyy-MM-dd HH:mm:ss} UTC
-            
+
             ---
             此邮件由 Dawning Gateway 系统自动发送，请勿直接回复。
             """;
