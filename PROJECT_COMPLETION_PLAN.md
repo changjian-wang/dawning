@@ -1,8 +1,59 @@
 # Dawning 网关管理系统 - 完成计划
 
 **制定日期**: 2025-12-08  
-**最后更新**: 2025-12-18  
+**最后更新**: 2025-12-22  
 **当前状态**: 核心功能已实现，安全加固已完成，生产化准备完毕
+
+---
+
+## 📋 2025-12-22 会话完成记录
+
+### 本次会话完成的功能
+
+#### 1. 请求日志功能修复 ✅
+**问题修复**:
+- `RequestLoggingMiddleware.cs` - 使用 `IServiceScopeFactory` 替代 `context.RequestServices`
+  - 解决 fire-and-forget 任务中服务作用域过早释放问题
+- `RequestLoggingService.cs` - 修复空引用警告 (`RequestId ?? string.Empty`)
+- `RequestLogEntity.cs` - 使用正确的 Dapper.Contrib 属性
+  - `[ExplicitKey]` 替代 `[Key]`
+  - 使用 `Dawning.Shared.Dapper.Contrib` 命名空间
+
+**验证结果**:
+- 请求日志正常记录到数据库
+- Fire-and-forget 模式不阻塞响应
+
+#### 2. 请求日志管理 API ✅
+**新增文件**:
+- `RequestLogController.cs` - 请求日志管理控制器
+
+**API 端点**:
+- `GET /api/request-logs` - 分页查询请求日志（支持多种过滤条件）
+- `GET /api/request-logs/statistics` - 请求统计信息（状态码分布、Top路径、P95/P99）
+- `GET /api/request-logs/errors` - 错误请求列表（状态码>=400）
+- `GET /api/request-logs/slow` - 慢请求列表（可配置阈值）
+- `DELETE /api/request-logs/cleanup` - 清理过期日志（仅super_admin）
+
+**权限控制**:
+- 所有端点需要 admin/super_admin/auditor 角色认证
+
+#### 3. 单元测试增强 ✅
+**新增文件**:
+- `RequestLoggingServiceTests.cs` - 请求日志服务测试
+
+**测试用例** (9个):
+- `LogRequestAsync_Should_Insert_Log_Entry` - 正常插入日志
+- `LogRequestAsync_Should_Handle_Null_RequestId` - 空 RequestId 处理
+- `LogRequestAsync_Should_Not_Throw_On_Repository_Exception` - 异常不抛出
+- `GetLogsAsync_Should_Return_Paged_Results` - 分页查询
+- `GetLogsAsync_Should_Pass_Filter_Parameters` - 过滤参数传递
+- `GetStatisticsAsync_Should_Return_Statistics` - 统计信息返回
+- `GetStatisticsAsync_Should_Use_Default_Time_Range_When_Null` - 默认时间范围
+- `CleanupOldLogsAsync_Should_Delete_Old_Logs` - 清理旧日志
+- `CleanupOldLogsAsync_Should_Return_Zero_When_No_Old_Logs` - 无日志时返回0
+
+**测试覆盖率**:
+- 总测试数：61 个（全部通过）
 
 ---
 
