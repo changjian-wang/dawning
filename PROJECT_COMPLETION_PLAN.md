@@ -93,13 +93,41 @@
 - 请求头: `X-Api-Version: 1.0`
 - Media Type: `Accept: application/json;v=1.0`
 
-**已启用版本控制的控制器**:
-- HealthController
-- UserController
-- AuthController
-- TokenController
-- BackupController
-- MonitoringController
+**已启用版本控制的控制器** (22个):
+- HealthController, UserController, AuthController, TokenController
+- BackupController, MonitoringController, RequestLogController
+- AlertController, ClaimTypeController, PermissionController
+- RoleController, AuditLogController, SystemConfigController
+- SystemLogController, GatewayClusterController, GatewayRouteController
+- RateLimitController, ApiResourceController, ApplicationController
+- AuthorizationController, IdentityResourceController, ScopeController
+
+**向后兼容**:
+- 双路由支持: `/api/xxx` 和 `/api/v1/xxx` 均可访问
+
+#### 9. SignalR 实时通知 ✅
+**新增文件**:
+- `Hubs/NotificationHub.cs` - SignalR 通知 Hub
+- `Services/NotificationService.cs` - 通知服务
+- `Configurations/SignalRConfiguration.cs` - SignalR 配置
+- `dawning-admin/src/utils/notification-hub.ts` - 前端客户端
+
+**功能特性**:
+- **实时推送**: WebSocket / SSE / Long Polling 自动降级
+- **用户组**: 按用户ID、角色自动分组
+- **频道订阅**: alerts, system, monitoring, audit
+- **Redis 背板**: 支持分布式部署
+
+**通知类型**:
+- `Notification` - 基础通知
+- `AlertNotification` - 告警通知 (severity, ruleId, value, threshold)
+- `SystemMessage` - 系统消息 (priority, expiresAt)
+
+**NuGet 包**:
+- Microsoft.AspNetCore.SignalR.StackExchangeRedis
+
+**NPM 包**:
+- @microsoft/signalr
 
 ---
 
