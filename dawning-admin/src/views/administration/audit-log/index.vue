@@ -49,6 +49,18 @@
                     <a-option value="ResetPassword">{{
                       $t('auditLog.action.ResetPassword')
                     }}</a-option>
+                    <a-option value="CreateAlertRule">创建告警规则</a-option>
+                    <a-option value="UpdateAlertRule">更新告警规则</a-option>
+                    <a-option value="DeleteAlertRule">删除告警规则</a-option>
+                    <a-option value="SetAlertRuleEnabled">启停告警规则</a-option>
+                    <a-option value="CreatePermission">创建权限</a-option>
+                    <a-option value="UpdatePermission">更新权限</a-option>
+                    <a-option value="DeletePermission">删除权限</a-option>
+                    <a-option value="AssignPermissions">分配权限</a-option>
+                    <a-option value="RemovePermissions">移除权限</a-option>
+                    <a-option value="SetConfig">设置配置</a-option>
+                    <a-option value="BatchUpdateConfig">批量更新配置</a-option>
+                    <a-option value="DeleteConfig">删除配置</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -75,6 +87,10 @@
                     <a-option value="Scope">{{
                       $t('auditLog.entityType.Scope')
                     }}</a-option>
+                    <a-option value="AlertRule">告警规则</a-option>
+                    <a-option value="Permission">权限</a-option>
+                    <a-option value="ClaimType">声明类型</a-option>
+                    <a-option value="SystemConfig">系统配置</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>

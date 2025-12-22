@@ -206,7 +206,6 @@
 
     profileLoading.value = true;
     try {
-      // TODO: 实现更新用户信息的 API
       await userApi.api.update({
         id: userStore.accountId || '',
         username: profileForm.username,

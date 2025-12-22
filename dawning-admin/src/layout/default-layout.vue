@@ -41,17 +41,20 @@
         </a-layout>
       </a-layout>
     </a-layout>
+    <!-- 快捷键帮助弹窗 -->
+    <KeyboardShortcutsHelp v-model="showKeyboardHelp" />
   </a-layout>
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, watch, provide, onMounted } from 'vue';
+  import { ref, computed, watch, provide, onMounted, onUnmounted } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useAppStore, useUserStore } from '@/store';
   import NavBar from '@/components/navbar/index.vue';
   import Menu from '@/components/menu/index.vue';
   import Footer from '@/components/footer/index.vue';
   import TabBar from '@/components/tab-bar/index.vue';
+  import KeyboardShortcutsHelp from '@/components/keyboard-shortcuts-help/index.vue';
   import usePermission from '@/hooks/permission';
   import useResponsive from '@/hooks/responsive';
   import PageLayout from './page-layout.vue';
@@ -68,6 +71,60 @@
   const renderMenu = computed(() => appStore.menu && !appStore.topMenu);
   const hideMenu = computed(() => appStore.hideMenu);
   const footer = computed(() => appStore.footer);
+  
+  // 快捷键帮助弹窗
+  const showKeyboardHelp = ref(false);
+
+  // 全局快捷键处理
+  const handleGlobalKeydown = (event: KeyboardEvent) => {
+    // 忽略输入框中的快捷键（除了 Escape）
+    const target = event.target as HTMLElement;
+    const isInputElement =
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable;
+
+    if (isInputElement && event.key !== 'Escape') {
+      return;
+    }
+
+    // Shift + ? 显示快捷键帮助
+    if (event.shiftKey && event.key === '?') {
+      event.preventDefault();
+      showKeyboardHelp.value = true;
+      return;
+    }
+
+    // Alt + 字母导航
+    if (event.altKey && !event.ctrlKey && !event.shiftKey) {
+      const key = event.key.toLowerCase();
+      const routes: Record<string, string> = {
+        h: '/dashboard/workplace',
+        u: '/administration/user',
+        r: '/administration/role',
+        p: '/administration/permission',
+        l: '/administration/audit-log',
+        s: '/administration/system-config',
+        a: '/administration/alert',
+        m: '/administration/system-monitor',
+      };
+      
+      if (routes[key]) {
+        event.preventDefault();
+        router.push(routes[key]);
+      }
+    }
+  };
+
+  onMounted(() => {
+    isInit.value = true;
+    window.addEventListener('keydown', handleGlobalKeydown);
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener('keydown', handleGlobalKeydown);
+  });
+
   const menuWidth = computed(() => {
     return appStore.menuCollapse ? 48 : appStore.menuWidth;
   });
@@ -99,9 +156,6 @@
   };
   provide('toggleDrawerMenu', () => {
     drawerVisible.value = !drawerVisible.value;
-  });
-  onMounted(() => {
-    isInit.value = true;
   });
 </script>
 

@@ -1,3 +1,4 @@
+using Dawning.Identity.Api.Helpers;
 using Dawning.Identity.Api.Models;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
@@ -18,10 +19,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
     public class ClaimTypeController : ControllerBase
     {
         private readonly IClaimTypeService _service;
+        private readonly AuditLogHelper _auditLogHelper;
 
-        public ClaimTypeController(IClaimTypeService service)
+        public ClaimTypeController(IClaimTypeService service, AuditLogHelper auditLogHelper)
         {
             _service = service;
+            _auditLogHelper = auditLogHelper;
         }
 
         /// <summary>
@@ -79,6 +82,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
 
             var result = await _service.InsertAsync(dto);
+            
+            await _auditLogHelper.LogAsync(
+                "CreateClaimType",
+                "ClaimType",
+                dto.Id ?? Guid.Empty,
+                $"创建声明类型: {dto.Name}",
+                null,
+                dto
+            );
+            
             return Ok(ApiResponse<int>.Success(result, "ClaimType created successfully"));
         }
 
@@ -94,6 +107,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
 
             var result = await _service.UpdateAsync(dto);
+            
+            await _auditLogHelper.LogAsync(
+                "UpdateClaimType",
+                "ClaimType",
+                dto.Id.Value,
+                $"更新声明类型: {dto.Name}",
+                null,
+                dto
+            );
+            
             return Ok(ApiResponse<bool>.Success(result, "ClaimType updated successfully"));
         }
 
@@ -109,6 +132,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
 
             var result = await _service.DeleteAsync(new ClaimTypeDto { Id = id });
+            
+            await _auditLogHelper.LogAsync(
+                "DeleteClaimType",
+                "ClaimType",
+                id,
+                $"删除声明类型: {id}"
+            );
+            
             return Ok(ApiResponse<bool>.Success(result, "ClaimType deleted successfully"));
         }
     }

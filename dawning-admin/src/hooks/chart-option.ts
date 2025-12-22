@@ -16,8 +16,8 @@ export default function useChartOption(sourceOption: optionsFn) {
     return appStore.theme === 'dark';
   });
   // echarts support https://echarts.apache.org/zh/theme-builder.html
-  // It's not used here
-  // TODO echarts themes
+  // Optional enhancement: integrate echarts themes for custom styling
+  // Currently using default themes with dark mode support
   const chartOption = computed<EChartsOption>(() => {
     return sourceOption(isDark.value);
   });

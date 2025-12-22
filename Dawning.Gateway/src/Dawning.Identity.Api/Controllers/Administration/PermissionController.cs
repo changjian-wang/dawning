@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dawning.Identity.Api.Helpers;
 using Dawning.Identity.Api.Models;
 using Dawning.Identity.Api.Security;
 using Dawning.Identity.Application.Dtos.Administration;
@@ -22,10 +23,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
     public class PermissionController : ControllerBase
     {
         private readonly IPermissionService _permissionService;
+        private readonly AuditLogHelper _auditLogHelper;
 
-        public PermissionController(IPermissionService permissionService)
+        public PermissionController(
+            IPermissionService permissionService,
+            AuditLogHelper auditLogHelper)
         {
             _permissionService = permissionService;
+            _auditLogHelper = auditLogHelper;
         }
 
         /// <summary>
@@ -151,6 +156,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var operatorId = GetOperatorId();
                 var permission = await _permissionService.CreateAsync(dto, operatorId);
+                
+                await _auditLogHelper.LogAsync(
+                    "CreatePermission",
+                    "Permission",
+                    permission.Id,
+                    $"创建权限: {dto.Code}",
+                    null,
+                    dto
+                );
+                
                 return Ok(ApiResponse<object>.Success(permission, "权限创建成功"));
             }
             catch (InvalidOperationException ex)
@@ -175,6 +190,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var operatorId = GetOperatorId();
                 var permission = await _permissionService.UpdateAsync(dto, operatorId);
+                
+                await _auditLogHelper.LogAsync(
+                    "UpdatePermission",
+                    "Permission",
+                    id,
+                    $"更新权限: {dto.Name}",
+                    null,
+                    dto
+                );
+                
                 return Ok(ApiResponse<object>.Success(permission, "权限更新成功"));
             }
             catch (InvalidOperationException ex)
@@ -193,6 +218,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 await _permissionService.DeleteAsync(id);
+                
+                await _auditLogHelper.LogAsync(
+                    "DeletePermission",
+                    "Permission",
+                    id,
+                    $"删除权限: {id}"
+                );
+                
                 return Ok(ApiResponse.Success("权限删除成功"));
             }
             catch (InvalidOperationException ex)
@@ -219,6 +252,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     permissionIds,
                     operatorId
                 );
+                
+                await _auditLogHelper.LogAsync(
+                    "AssignPermissions",
+                    "Role",
+                    roleId,
+                    $"为角色分配权限，权限数量: {permissionIds.Count}",
+                    null,
+                    new { PermissionIds = permissionIds }
+                );
+                
                 return Ok(ApiResponse.Success("权限分配成功"));
             }
             catch (InvalidOperationException ex)
@@ -239,6 +282,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 await _permissionService.RemovePermissionsFromRoleAsync(roleId, permissionIds);
+                
+                await _auditLogHelper.LogAsync(
+                    "RemovePermissions",
+                    "Role",
+                    roleId,
+                    $"从角色移除权限，权限数量: {permissionIds.Count}",
+                    new { PermissionIds = permissionIds },
+                    null
+                );
+                
                 return Ok(ApiResponse.Success("权限移除成功"));
             }
             catch (InvalidOperationException ex)

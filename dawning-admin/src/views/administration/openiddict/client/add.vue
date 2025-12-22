@@ -956,6 +956,8 @@
 
 <script lang="ts" setup>
   import { nextTick, onMounted, reactive, ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { Message } from '@arco-design/web-vue';
   import dayjs from 'dayjs';
   import { v7 as uuidv7 } from 'uuid';
   import { FormInstance } from '@arco-design/web-vue';
@@ -973,6 +975,7 @@
   import CryptoJS from 'crypto-js';
   import { RedirectType, RedirectTypes } from '@/api/constants';
 
+  const router = useRouter();
   const activeKey = ref(1);
   const visibleWithAddURI = ref(false);
   const visibleWithAddClaim = ref(false);
@@ -1197,8 +1200,10 @@
           form.redirectUris.push(redirectUri);
         });
 
-        console.log('form data: ', form);
-        // TODO: 调用 API 创建客户端
+        // 调用 API 创建客户端
+        await client.create(form);
+        Message.success('客户端创建成功');
+        router.push({ name: 'OpenIddictClient' });
       } else {
         activeKey.value = 1;
         console.log('验证失败');

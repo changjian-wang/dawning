@@ -1,5 +1,6 @@
 using Dawning.Identity.Application.Dtos.Monitoring;
 using Dawning.Identity.Application.Interfaces.Monitoring;
+using Dawning.Identity.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,11 +18,16 @@ public class AlertController : ControllerBase
 {
     private readonly IAlertService _alertService;
     private readonly ILogger<AlertController> _logger;
+    private readonly AuditLogHelper _auditLogHelper;
 
-    public AlertController(IAlertService alertService, ILogger<AlertController> logger)
+    public AlertController(
+        IAlertService alertService, 
+        ILogger<AlertController> logger,
+        AuditLogHelper auditLogHelper)
     {
         _alertService = alertService;
         _logger = logger;
+        _auditLogHelper = auditLogHelper;
     }
 
     #region 告警规则管理
@@ -74,6 +80,15 @@ public class AlertController : ControllerBase
         var rule = await _alertService.CreateRuleAsync(request);
         _logger.LogInformation("Created alert rule: {RuleName}", rule.Name);
         
+        await _auditLogHelper.LogAsync(
+            "CreateAlertRule",
+            "AlertRule",
+            null,
+            $"创建告警规则: {rule.Name}",
+            null,
+            request
+        );
+        
         return CreatedAtAction(nameof(GetRule), new { id = rule.Id }, rule);
     }
 
@@ -98,6 +113,16 @@ public class AlertController : ControllerBase
         }
 
         _logger.LogInformation("Updated alert rule: {RuleName}", rule.Name);
+        
+        await _auditLogHelper.LogAsync(
+            "UpdateAlertRule",
+            "AlertRule",
+            null,
+            $"更新告警规则: {rule.Name}",
+            null,
+            request
+        );
+        
         return Ok(rule);
     }
 
@@ -114,6 +139,14 @@ public class AlertController : ControllerBase
         }
 
         _logger.LogInformation("Deleted alert rule: {Id}", id);
+        
+        await _auditLogHelper.LogAsync(
+            "DeleteAlertRule",
+            "AlertRule",
+            null,
+            $"删除告警规则 ID: {id}"
+        );
+        
         return NoContent();
     }
 
@@ -134,6 +167,14 @@ public class AlertController : ControllerBase
             id,
             request.IsEnabled
         );
+        
+        await _auditLogHelper.LogAsync(
+            request.IsEnabled ? "EnableAlertRule" : "DisableAlertRule",
+            "AlertRule",
+            null,
+            $"{(request.IsEnabled ? "启用" : "禁用")}告警规则 ID: {id}"
+        );
+        
         return Ok(new { message = request.IsEnabled ? "规则已启用" : "规则已禁用" });
     }
 

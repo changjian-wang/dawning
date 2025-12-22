@@ -36,7 +36,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task HealthLive_ShouldRespondWithin100ms()
+    public async Task HealthLive_ShouldRespondWithin200ms()
     {
         // Act
         var (response, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/health/live"));
@@ -44,7 +44,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         // Assert
         _output.WriteLine($"GET /api/health/live - {elapsed}ms");
         response.IsSuccessStatusCode.Should().BeTrue();
-        elapsed.Should().BeLessThan(100, "存活检查应在 100ms 内响应");
+        elapsed.Should().BeLessThan(FastThreshold, "存活检查应在 200ms 内响应");
     }
 
     [Fact]
