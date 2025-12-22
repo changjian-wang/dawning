@@ -35,6 +35,38 @@
 - gzip + brotli 预压缩生成
 - 图片自动压缩 (login-banner -70%)
 
+#### 6. OpenTelemetry 可观测性集成 ✅
+**新增文件**:
+- `Configurations/OpenTelemetryConfiguration.cs` - 可观测性配置
+
+**功能特性**:
+- **分布式追踪**: ASP.NET Core + HTTP Client 自动追踪
+- **Prometheus 指标**: `/metrics` 端点，支持 Grafana 集成
+- **运行时指标**: GC、线程池、进程级别指标
+- **自定义业务指标**:
+  - `dawning_http_requests_total` - HTTP 请求计数
+  - `dawning_http_request_duration_seconds` - 请求耗时直方图
+  - `dawning_auth_success_total` - 认证成功计数
+  - `dawning_auth_failure_total` - 认证失败计数
+  - `dawning_db_queries_total` - 数据库查询计数
+
+**NuGet 包**:
+- OpenTelemetry.Extensions.Hosting
+- OpenTelemetry.Instrumentation.AspNetCore
+- OpenTelemetry.Instrumentation.Http
+- OpenTelemetry.Instrumentation.Runtime
+- OpenTelemetry.Exporter.Prometheus.AspNetCore
+
+**配置项** (appsettings.json):
+```json
+"OpenTelemetry": {
+  "ServiceName": "Dawning.Identity.Api",
+  "EnableTracing": true,
+  "EnableMetrics": true,
+  "OtlpEndpoint": ""
+}
+```
+
 ---
 
 ## 📋 2025-12-22 会话完成记录 (上午)
