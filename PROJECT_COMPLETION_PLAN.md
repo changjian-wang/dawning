@@ -141,6 +141,22 @@
 - **多渠道通知**: 广播 + 用户/角色定向推送
 - **告警数据**: 包含 severity, ruleId, metricType, value, threshold
 
+#### 11. 实时日志查看 ✅
+**新增文件**:
+- `Api/Logging/SignalRLoggerProvider.cs` - SignalR 日志提供器
+- `Api/Services/LogStreamService.cs` - 日志流服务
+
+**功能特性**:
+- **日志频道**: logs_all, logs_error, logs_warning, logs_info
+- **权限控制**: 仅管理员可订阅日志频道
+- **实时推送**: SystemLogService 记录日志时自动推送
+- **多级别过滤**: 按 Error/Warning/Info 分频道订阅
+
+**前端更新**:
+- `notification-hub.ts`: 添加日志订阅和监听支持
+- `subscribeToLogs()`: 订阅日志频道
+- `onLogEntry()`: 日志条目监听器
+
 ---
 
 ## 📋 2025-12-22 会话完成记录 (上午)
@@ -652,7 +668,7 @@
 - [x] **系统监控** ✅
   - ✅ 服务健康状态监控（API、数据库、内存检查）
   - ✅ 性能指标监控（CPU、内存、GC、线程数）
-  - 实时日志查看 (待实现)
+  - ✅ 实时日志查看（SignalR 日志流推送）
 
 - [x] **备份恢复** ✅
   - ✅ 数据库备份策略（IBackupService）
@@ -800,8 +816,8 @@
 **可选功能**:
 - [ ] 多租户支持
 - [ ] 服务网格集成
-- [ ] WebSocket 实时通信
-- [ ] 微服务追踪（OpenTelemetry）
+- [x] ~~WebSocket 实时通信~~ → **已通过 SignalR 实现**
+- [x] ~~微服务追踪（OpenTelemetry）~~ → **已实现**
 - [ ] 消息队列集成
 - [ ] 工作流引擎
 - [ ] 报表系统
