@@ -70,6 +70,8 @@
             :data="rules"
             :loading="rulesLoading"
             :pagination="false"
+            :bordered="false"
+            :stripe="true"
             row-key="id"
           >
             <template #metricType="{ record }">
@@ -168,6 +170,8 @@
             :data="historyList"
             :loading="historyLoading"
             :pagination="historyPagination"
+            :bordered="false"
+            :stripe="true"
             row-key="id"
             @page-change="handleHistoryPageChange"
           >

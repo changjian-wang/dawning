@@ -70,6 +70,7 @@
           :data="data"
           :pagination="{ ...pagination, onChange: handlePaginationChange }"
           :bordered="false"
+          :stripe="true"
         >
           <template #required="{ record }">
             <a-tag v-if="record.required" color="green" size="small">

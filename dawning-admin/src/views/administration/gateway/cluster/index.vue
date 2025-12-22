@@ -66,6 +66,8 @@
         :data="tableData"
         :loading="loading"
         :pagination="pagination"
+        :bordered="false"
+        :stripe="true"
         row-key="id"
         @page-change="handlePageChange"
         @page-size-change="handlePageSizeChange"

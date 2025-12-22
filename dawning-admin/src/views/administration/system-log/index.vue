@@ -115,6 +115,8 @@
         :data="data"
         :pagination="pagination"
         :loading="loading"
+        :bordered="false"
+        :stripe="true"
         @page-change="handlePageChange"
         @page-size-change="handlePageSizeChange"
       >

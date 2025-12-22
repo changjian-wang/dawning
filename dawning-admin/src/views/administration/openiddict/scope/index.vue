@@ -75,6 +75,8 @@
         :columns="columns"
         :data="tableData"
         :loading="loading"
+        :bordered="false"
+        :stripe="true"
         :pagination="{
           current: pagination.current,
           pageSize: pagination.pageSize,

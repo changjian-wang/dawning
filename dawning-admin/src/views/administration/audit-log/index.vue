@@ -163,6 +163,8 @@
         :columns="columns"
         :data="tableData"
         :pagination="pagination"
+        :bordered="false"
+        :stripe="true"
         @page-change="handlePageChange"
         @page-size-change="handlePageSizeChange"
       >

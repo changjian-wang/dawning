@@ -16,6 +16,8 @@
             :data="policies"
             :loading="policyLoading"
             :pagination="false"
+            :bordered="false"
+            :stripe="true"
             row-key="id"
           >
             <template #policyType="{ record }">
@@ -89,6 +91,8 @@
             :data="ipRules"
             :loading="ipLoading"
             :pagination="ipPagination"
+            :bordered="false"
+            :stripe="true"
             row-key="id"
             @page-change="handleIpPageChange"
           >

@@ -33,6 +33,11 @@ export default {
   'common.save': 'Save',
   'common.detail': 'Detail',
   'common.deleteConfirm': 'Are you sure you want to delete?',
+  'common.all': 'All',
+  'common.advancedSearch': 'Advanced Search',
+  'common.createdAt': 'Created At',
+  'common.actions': 'Actions',
+  'common.system': 'System',
 
   'menu.dashboard': 'Dashboard',
   'menu.server.dashboard': 'Dashboard-Server',

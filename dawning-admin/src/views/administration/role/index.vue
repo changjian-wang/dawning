@@ -83,6 +83,7 @@
           :columns="columns"
           :data="tableData"
           :bordered="false"
+          :stripe="true"
           @page-change="onPageChange"
           @page-size-change="onPageSizeChange"
         >

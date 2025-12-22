@@ -33,6 +33,11 @@ export default {
   'common.save': '保存',
   'common.detail': '详情',
   'common.deleteConfirm': '确定要删除吗？',
+  'common.all': '全部',
+  'common.advancedSearch': '高级搜索',
+  'common.createdAt': '创建时间',
+  'common.actions': '操作',
+  'common.system': '系统',
 
   'menu.dashboard': '仪表盘',
   'menu.server.dashboard': '仪表盘-服务端',

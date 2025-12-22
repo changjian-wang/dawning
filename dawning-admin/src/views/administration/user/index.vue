@@ -138,6 +138,7 @@
           :data="data"
           :pagination="pagination"
           :bordered="false"
+          :stripe="true"
           :loading="loading"
           :row-selection="rowSelection"
           :selected-keys="selectedRowKeys"

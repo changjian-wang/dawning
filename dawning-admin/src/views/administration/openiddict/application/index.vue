@@ -84,6 +84,8 @@
         :columns="columns"
         :data="tableData"
         :loading="loading"
+        :stripe="true"
+        :bordered="false"
         :pagination="{
           current: pagination.current,
           pageSize: pagination.pageSize,
@@ -387,23 +389,34 @@
 
   // 表格列定义
   const columns = [
-    { title: '客户端ID', dataIndex: 'clientId', width: 180 },
-    { title: '显示名称', dataIndex: 'displayName', width: 150 },
-    { title: '类型', dataIndex: 'type', slotName: 'type', width: 100 },
+    { title: '客户端ID', dataIndex: 'clientId', width: 90, ellipsis: true, tooltip: true },
+    {
+      title: '显示名称',
+      dataIndex: 'displayName',
+      width: 90,
+      ellipsis: true,
+      tooltip: true,
+    },
+    { title: '类型', dataIndex: 'type', slotName: 'type', width: 60 },
     {
       title: '同意类型',
       dataIndex: 'consentType',
       slotName: 'consentType',
-      width: 100,
+      width: 70,
     },
-    { title: '权限', dataIndex: 'permissions', slotName: 'permissions' },
+    {
+      title: '权限',
+      dataIndex: 'permissions',
+      slotName: 'permissions',
+      width: 260,
+    },
     {
       title: '创建时间',
       dataIndex: 'createdAt',
       slotName: 'createdAt',
-      width: 180,
+      width: 150,
     },
-    { title: '操作', slotName: 'operations', width: 180, align: 'center', fixed: 'right' },
+    { title: '操作', slotName: 'operations', width: 140, align: 'center', fixed: 'right' },
   ];
 
   // 对话框状态
