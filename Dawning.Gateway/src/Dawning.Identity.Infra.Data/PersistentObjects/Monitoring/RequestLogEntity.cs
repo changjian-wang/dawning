@@ -1,6 +1,5 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using Dawning.Shared.Dapper.Contrib;
 
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Monitoring;
 
@@ -10,7 +9,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Monitoring;
 [Table("request_logs")]
 public class RequestLogEntity
 {
-    [Key]
+    [ExplicitKey]
     [Column("id")]
     public Guid Id { get; set; }
 

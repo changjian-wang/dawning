@@ -38,7 +38,11 @@ public class RequestLogRepository : IRequestLogRepository
     /// <summary>
     /// 分页查询请求日志
     /// </summary>
-    public async Task<PagedData<RequestLog>> GetPagedListAsync(RequestLogQueryModel query, int page, int pageSize)
+    public async Task<PagedData<RequestLog>> GetPagedListAsync(
+        RequestLogQueryModel query,
+        int page,
+        int pageSize
+    )
     {
         var builder = _context.Connection.Builder<RequestLogEntity>(_context.Transaction);
 
@@ -54,7 +58,10 @@ public class RequestLogRepository : IRequestLogRepository
             .WhereIf(query.UserId.HasValue, x => x.UserId == query.UserId!.Value)
             .WhereIf(!string.IsNullOrEmpty(query.ClientIp), x => x.ClientIp == query.ClientIp)
             .WhereIf(query.OnlyErrors == true, x => x.StatusCode >= 400)
-            .WhereIf(query.SlowRequestThresholdMs.HasValue, x => x.ResponseTimeMs >= query.SlowRequestThresholdMs!.Value);
+            .WhereIf(
+                query.SlowRequestThresholdMs.HasValue,
+                x => x.ResponseTimeMs >= query.SlowRequestThresholdMs!.Value
+            );
 
         // 按请求时间降序排序
         var result = await builder
@@ -66,7 +73,7 @@ public class RequestLogRepository : IRequestLogRepository
             PageIndex = page,
             PageSize = pageSize,
             TotalCount = result.TotalItems,
-            Items = result.Values.ToModels()
+            Items = result.Values.ToModels(),
         };
     }
 
@@ -75,14 +82,11 @@ public class RequestLogRepository : IRequestLogRepository
     /// </summary>
     public async Task<RequestLogStatistics> GetStatisticsAsync(DateTime startTime, DateTime endTime)
     {
-        var statistics = new RequestLogStatistics
-        {
-            StartTime = startTime,
-            EndTime = endTime
-        };
+        var statistics = new RequestLogStatistics { StartTime = startTime, EndTime = endTime };
 
         // 获取基础统计
-        var builder = _context.Connection.Builder<RequestLogEntity>(_context.Transaction)
+        var builder = _context
+            .Connection.Builder<RequestLogEntity>(_context.Transaction)
             .Where(x => x.RequestTime >= startTime)
             .Where(x => x.RequestTime <= endTime);
 
@@ -114,7 +118,7 @@ public class RequestLogRepository : IRequestLogRepository
                 Path = g.Key,
                 RequestCount = g.Count(),
                 AverageResponseTimeMs = g.Average(x => x.ResponseTimeMs),
-                ErrorCount = g.Count(x => x.StatusCode >= 400)
+                ErrorCount = g.Count(x => x.StatusCode >= 400),
             })
             .OrderByDescending(x => x.RequestCount)
             .Take(10)
@@ -132,8 +136,12 @@ public class RequestLogRepository : IRequestLogRepository
             var p95Index = (int)Math.Ceiling(sortedResponseTimes.Count * 0.95) - 1;
             var p99Index = (int)Math.Ceiling(sortedResponseTimes.Count * 0.99) - 1;
 
-            statistics.P95ResponseTimeMs = sortedResponseTimes[Math.Max(0, Math.Min(p95Index, sortedResponseTimes.Count - 1))];
-            statistics.P99ResponseTimeMs = sortedResponseTimes[Math.Max(0, Math.Min(p99Index, sortedResponseTimes.Count - 1))];
+            statistics.P95ResponseTimeMs = sortedResponseTimes[
+                Math.Max(0, Math.Min(p95Index, sortedResponseTimes.Count - 1))
+            ];
+            statistics.P99ResponseTimeMs = sortedResponseTimes[
+                Math.Max(0, Math.Min(p99Index, sortedResponseTimes.Count - 1))
+            ];
         }
 
         return statistics;
@@ -144,7 +152,8 @@ public class RequestLogRepository : IRequestLogRepository
     /// </summary>
     public async Task<int> CleanupOldLogsAsync(DateTime cutoffDate)
     {
-        var logsToDelete = await _context.Connection.Builder<RequestLogEntity>(_context.Transaction)
+        var logsToDelete = await _context
+            .Connection.Builder<RequestLogEntity>(_context.Transaction)
             .Where(x => x.RequestTime < cutoffDate)
             .AsListAsync();
 
@@ -152,7 +161,8 @@ public class RequestLogRepository : IRequestLogRepository
         foreach (var log in logsToDelete)
         {
             var deleted = await _context.Connection.DeleteAsync(log, _context.Transaction);
-            if (deleted) count++;
+            if (deleted)
+                count++;
         }
 
         return count;

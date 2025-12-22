@@ -19,6 +19,7 @@ namespace Dawning.Identity.Api.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<RequestLoggingMiddleware> _logger;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         // 要忽略的路径前缀
         private static readonly string[] IgnorePaths = new[]
@@ -32,11 +33,13 @@ namespace Dawning.Identity.Api.Middleware
 
         public RequestLoggingMiddleware(
             RequestDelegate next,
-            ILogger<RequestLoggingMiddleware> logger
+            ILogger<RequestLoggingMiddleware> logger,
+            IServiceScopeFactory serviceScopeFactory
         )
         {
             _next = next;
             _logger = logger;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -116,14 +119,13 @@ namespace Dawning.Identity.Api.Middleware
                     RequestTime = requestTime,
                     Exception = exception
                 };
-                var serviceProvider = context.RequestServices;
                 
-                // Fire-and-forget，不阻塞响应
+                // Fire-and-forget，使用应用级别的 IServiceScopeFactory 不阻塞响应
                 _ = Task.Run(async () =>
                 {
                     try
                     {
-                        using var scope = serviceProvider.CreateScope();
+                        using var scope = _serviceScopeFactory.CreateScope();
                         var loggingService = scope.ServiceProvider.GetService<IRequestLoggingService>();
                         if (loggingService == null) return;
 

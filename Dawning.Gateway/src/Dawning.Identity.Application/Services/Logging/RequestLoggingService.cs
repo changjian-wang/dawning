@@ -31,7 +31,7 @@ namespace Dawning.Identity.Application.Services.Logging
                 var log = new RequestLog
                 {
                     Id = entry.Id,
-                    RequestId = entry.RequestId,
+                    RequestId = entry.RequestId ?? string.Empty,
                     Method = entry.Method,
                     Path = entry.Path,
                     QueryString = entry.QueryString,
