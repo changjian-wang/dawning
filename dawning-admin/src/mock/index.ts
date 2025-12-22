@@ -4,8 +4,8 @@ import Mock from 'mockjs';
 // import './user';
 import './message-box';
 
-// 禁用 dashboard mock，如果需要真实数据
-// import '@/views/dashboard/workplace/mock';
+// Dashboard mock - 用于工作台展示数据
+import '@/views/dashboard/workplace/mock';
 
 Mock.setup({
   timeout: '600-1000',
