@@ -389,34 +389,28 @@
 
   // 表格列定义
   const columns = [
-    { title: '客户端ID', dataIndex: 'clientId', width: 90, ellipsis: true, tooltip: true },
-    {
-      title: '显示名称',
-      dataIndex: 'displayName',
-      width: 90,
-      ellipsis: true,
-      tooltip: true,
-    },
-    { title: '类型', dataIndex: 'type', slotName: 'type', width: 60 },
+    { title: '客户端ID', dataIndex: 'clientId', width: 100, ellipsis: true, tooltip: true },
+    { title: '显示名称', dataIndex: 'displayName', width: 110, ellipsis: true, tooltip: true },
+    { title: '类型', dataIndex: 'type', slotName: 'type', width: 55 },
     {
       title: '同意类型',
       dataIndex: 'consentType',
       slotName: 'consentType',
-      width: 70,
+      width: 65,
     },
     {
       title: '权限',
       dataIndex: 'permissions',
       slotName: 'permissions',
-      width: 260,
+      width: 200,
     },
     {
       title: '创建时间',
       dataIndex: 'createdAt',
       slotName: 'createdAt',
-      width: 150,
+      width: 145,
     },
-    { title: '操作', slotName: 'operations', width: 140, align: 'center', fixed: 'right' },
+    { title: '操作', slotName: 'operations', width: 145, align: 'center' },
   ];
 
   // 对话框状态
