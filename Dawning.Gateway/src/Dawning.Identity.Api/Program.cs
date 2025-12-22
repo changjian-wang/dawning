@@ -165,14 +165,18 @@ namespace Dawning.Identity.Api
                 options.LowercaseQueryStrings = false; // Query strings not lowercase
             });
 
-            // CORS
+            // CORS (支持 SignalR)
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(
                     "AllowAll",
                     policy =>
                     {
-                        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                        policy
+                            .SetIsOriginAllowed(_ => true) // 允许任何源（生产环境应限制）
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials(); // SignalR 需要凭据支持
                     }
                 );
             });
@@ -188,6 +192,9 @@ namespace Dawning.Identity.Api
 
             // ===== Health Checks =====
             builder.Services.AddHealthChecks();
+
+            // ===== SignalR (实时通信) =====
+            builder.Services.AddSignalRConfiguration(builder.Configuration);
 
             // ===== OpenTelemetry =====
             builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
@@ -235,6 +242,9 @@ namespace Dawning.Identity.Api
             // ===== Map Endpoints =====
             app.MapControllers();
             app.MapHealthChecks("/health");
+
+            // ===== SignalR Hubs =====
+            app.MapSignalRHubs();
 
             // ===== OpenTelemetry Prometheus Endpoint =====
             app.UseOpenTelemetryConfiguration();

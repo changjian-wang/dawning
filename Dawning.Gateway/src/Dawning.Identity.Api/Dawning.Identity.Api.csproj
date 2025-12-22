@@ -22,6 +22,8 @@
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <!-- Redis 缓存 -->
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
+    <!-- SignalR Redis 背板 -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="8.0.11" />
     <!-- OpenIddict -->
     <PackageReference Include="OpenIddict.AspNetCore" Version="5.8.0" />
     <PackageReference Include="OpenIddict.Core" Version="5.8.0" />
