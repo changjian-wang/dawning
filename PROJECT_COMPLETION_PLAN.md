@@ -67,6 +67,40 @@
 }
 ```
 
+#### 7. 缓存预热服务 ✅
+**新增文件**:
+- `Services/Caching/CacheWarmupService.cs` - 缓存预热后台服务
+
+**预热内容**:
+- 系统配置（前1000条）
+- 角色数据（全部）
+- 权限数据（全部）
+- 限流策略（全部）
+- IP 访问规则（黑白名单）
+
+**功能特性**:
+- 应用启动5秒后自动执行
+- 并行预热多个数据源
+- 失败不影响应用启动
+
+#### 8. API 版本控制 ✅
+**新增文件**:
+- `Configurations/ApiVersioningConfiguration.cs` - 版本控制配置
+
+**版本指定方式**:
+- URL 路径: `/api/v1/users`
+- 查询字符串: `/api/users?api-version=1.0`
+- 请求头: `X-Api-Version: 1.0`
+- Media Type: `Accept: application/json;v=1.0`
+
+**已启用版本控制的控制器**:
+- HealthController
+- UserController
+- AuthController
+- TokenController
+- BackupController
+- MonitoringController
+
 ---
 
 ## 📋 2025-12-22 会话完成记录 (上午)
