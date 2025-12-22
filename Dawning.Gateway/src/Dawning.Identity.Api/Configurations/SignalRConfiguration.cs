@@ -1,5 +1,7 @@
+using Dawning.Identity.Api.Adapters;
 using Dawning.Identity.Api.Hubs;
 using Dawning.Identity.Api.Services;
+using Dawning.Identity.Application.Interfaces.Notification;
 
 namespace Dawning.Identity.Api.Configurations
 {
@@ -59,6 +61,9 @@ namespace Dawning.Identity.Api.Configurations
 
             // 注册通知服务
             services.AddScoped<INotificationService, NotificationService>();
+
+            // 注册实时通知适配器（供 Application 层使用）
+            services.AddScoped<IRealTimeNotificationService, SignalRNotificationAdapter>();
 
             return services;
         }

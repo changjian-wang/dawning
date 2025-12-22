@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using Dawning.Identity.Application.Interfaces.Monitoring;
+using Dawning.Identity.Application.Interfaces.Notification;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
@@ -16,16 +17,19 @@ public class AlertNotificationService : IAlertNotificationService
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
+    private readonly IRealTimeNotificationService _realTimeNotificationService;
     private readonly ILogger<AlertNotificationService> _logger;
 
     public AlertNotificationService(
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
+        IRealTimeNotificationService realTimeNotificationService,
         ILogger<AlertNotificationService> logger
     )
     {
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
+        _realTimeNotificationService = realTimeNotificationService;
         _logger = logger;
     }
 
@@ -33,6 +37,35 @@ public class AlertNotificationService : IAlertNotificationService
     {
         var results = new List<NotificationResult>();
         var errors = new List<string>();
+
+        // 首先发送实时推送通知（SignalR）
+        try
+        {
+            await _realTimeNotificationService.SendAlertNotificationAsync(
+                new RealTimeAlertNotification
+                {
+                    Title = $"告警: {context.RuleName}",
+                    Message = context.Message,
+                    Severity = context.Severity,
+                    RuleId = context.AlertId,
+                    RuleName = context.RuleName,
+                    MetricType = context.MetricType,
+                    Value = context.MetricValue,
+                    Threshold = context.Threshold,
+                    CreatedAt = context.TriggeredAt,
+                    Type = "alert",
+                    Data = new Dictionary<string, object>
+                    {
+                        ["operator"] = context.Operator,
+                        ["alertId"] = context.AlertId,
+                    },
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "实时推送告警失败，继续其他通知渠道");
+        }
 
         foreach (var channel in context.NotifyChannels)
         {
