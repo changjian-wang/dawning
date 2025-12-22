@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Interfaces.Notification;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Dawning.Identity.Application.Services.Administration
 {
@@ -20,11 +22,19 @@ namespace Dawning.Identity.Application.Services.Administration
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
+        private readonly IRealTimeNotificationService _realTimeNotification;
+        private readonly ILogger<SystemLogService> _logger;
 
-        public SystemLogService(IUnitOfWork uow, IMapper mapper)
+        public SystemLogService(
+            IUnitOfWork uow,
+            IMapper mapper,
+            IRealTimeNotificationService realTimeNotification,
+            ILogger<SystemLogService> logger)
         {
             _uow = uow;
             _mapper = mapper;
+            _realTimeNotification = realTimeNotification;
+            _logger = logger;
         }
 
         /// <summary>
@@ -39,6 +49,9 @@ namespace Dawning.Identity.Application.Services.Administration
             var log = CreateLogFromException(exception, httpContext, statusCode, "Error");
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
+
+            // 实时推送错误日志
+            await PushLogToClientsAsync(log);
         }
 
         /// <summary>
@@ -49,6 +62,9 @@ namespace Dawning.Identity.Application.Services.Administration
             var log = CreateLogFromMessage(message, httpContext, "Warning");
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
+
+            // 实时推送警告日志
+            await PushLogToClientsAsync(log);
         }
 
         /// <summary>
@@ -59,6 +75,9 @@ namespace Dawning.Identity.Application.Services.Administration
             var log = CreateLogFromMessage(message, httpContext, "Information");
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
+
+            // 仅推送重要的信息日志（避免日志洪水）
+            // 信息日志暂不推送，可通过配置开启
         }
 
         /// <summary>
@@ -208,6 +227,37 @@ namespace Dawning.Identity.Application.Services.Administration
 
             // HTTP状态码
             log.StatusCode = statusCode ?? httpContext.Response.StatusCode;
+        }
+
+        /// <summary>
+        /// 推送日志到实时订阅的客户端
+        /// </summary>
+        private async Task PushLogToClientsAsync(SystemLog log)
+        {
+            try
+            {
+                var logEntry = new RealTimeLogEntry
+                {
+                    Id = log.Id.ToString(),
+                    Timestamp = log.CreatedAt,
+                    Level = log.Level ?? "Information",
+                    Message = log.Message ?? string.Empty,
+                    Exception = log.Exception,
+                    RequestPath = log.RequestPath,
+                    RequestMethod = log.RequestMethod,
+                    StatusCode = log.StatusCode,
+                    UserId = log.UserId?.ToString(),
+                    Username = log.Username,
+                    IpAddress = log.IpAddress
+                };
+
+                await _realTimeNotification.SendLogEntryAsync(logEntry);
+            }
+            catch (Exception ex)
+            {
+                // 推送失败不应影响日志记录
+                _logger.LogDebug(ex, "实时推送日志失败");
+            }
         }
 
         #endregion

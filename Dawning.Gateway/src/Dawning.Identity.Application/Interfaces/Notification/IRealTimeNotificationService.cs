@@ -17,6 +17,11 @@ public interface IRealTimeNotificationService
     Task SendSystemMessageAsync(RealTimeSystemMessage message);
 
     /// <summary>
+    /// 推送日志条目（实时日志流）
+    /// </summary>
+    Task SendLogEntryAsync(RealTimeLogEntry logEntry);
+
+    /// <summary>
     /// 推送通知给指定用户
     /// </summary>
     Task SendToUserAsync(Guid userId, RealTimeNotification notification);
@@ -61,4 +66,22 @@ public class RealTimeSystemMessage : RealTimeNotification
     public bool RequireAcknowledge { get; set; }
     public string Priority { get; set; } = "normal";
     public DateTime? ExpiresAt { get; set; }
+}
+
+/// <summary>
+/// 实时日志条目
+/// </summary>
+public class RealTimeLogEntry
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public string Level { get; set; } = "Information";
+    public string Message { get; set; } = string.Empty;
+    public string? Exception { get; set; }
+    public string? RequestPath { get; set; }
+    public string? RequestMethod { get; set; }
+    public int? StatusCode { get; set; }
+    public string? UserId { get; set; }
+    public string? Username { get; set; }
+    public string? IpAddress { get; set; }
 }

@@ -129,6 +129,18 @@
 **NPM 包**:
 - @microsoft/signalr
 
+#### 10. SignalR 告警服务集成 ✅
+**新增文件**:
+- `Application/Interfaces/Notification/IRealTimeNotificationService.cs` - Application 层接口
+- `Application/Services/Notification/NullRealTimeNotificationService.cs` - 空实现
+- `Api/Adapters/SignalRNotificationAdapter.cs` - SignalR 适配器
+
+**功能特性**:
+- **Application 层解耦**: 通过接口隔离 SignalR 依赖
+- **自动推送**: AlertNotificationService 触发时自动推送到客户端
+- **多渠道通知**: 广播 + 用户/角色定向推送
+- **告警数据**: 包含 severity, ruleId, metricType, value, threshold
+
 ---
 
 ## 📋 2025-12-22 会话完成记录 (上午)

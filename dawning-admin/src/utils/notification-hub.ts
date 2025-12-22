@@ -28,13 +28,35 @@ export interface SystemMessage extends Notification {
   expiresAt?: string;
 }
 
+// 日志条目
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  level: 'Information' | 'Warning' | 'Error' | 'Debug' | 'Trace' | 'Critical';
+  message: string;
+  exception?: string;
+  requestPath?: string;
+  requestMethod?: string;
+  statusCode?: number;
+  userId?: string;
+  username?: string;
+  ipAddress?: string;
+}
+
 // 连接状态
 export type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting';
+
+// 日志频道类型
+export type LogChannel = 'logs_all' | 'logs_error' | 'logs_warning' | 'logs_info';
+
+// 通知频道类型
+export type NotificationChannel = 'alerts' | 'system' | 'monitoring' | 'audit';
 
 // 事件回调类型
 type NotificationCallback = (notification: Notification) => void;
 type AlertCallback = (alert: AlertNotification) => void;
 type SystemMessageCallback = (message: SystemMessage) => void;
+type LogEntryCallback = (log: LogEntry) => void;
 type ConnectionStateCallback = (state: ConnectionState) => void;
 
 class NotificationHubService {
@@ -47,6 +69,7 @@ class NotificationHubService {
   private notificationListeners: Set<NotificationCallback> = new Set();
   private alertListeners: Set<AlertCallback> = new Set();
   private systemMessageListeners: Set<SystemMessageCallback> = new Set();
+  private logEntryListeners: Set<LogEntryCallback> = new Set();
   private connectionStateListeners: Set<ConnectionStateCallback> = new Set();
 
   /**
@@ -129,11 +152,19 @@ class NotificationHubService {
   /**
    * 订阅频道
    */
-  async subscribe(channel: 'alerts' | 'system' | 'monitoring' | 'audit'): Promise<void> {
+  async subscribe(channel: NotificationChannel | LogChannel): Promise<void> {
     if (this.connection?.state === signalR.HubConnectionState.Connected) {
       await this.connection.invoke('Subscribe', channel);
       console.log(`[SignalR] Subscribed to channel: ${channel}`);
     }
+  }
+
+  /**
+   * 订阅日志频道 (仅管理员)
+   */
+  async subscribeToLogs(level: 'all' | 'error' | 'warning' | 'info' = 'all'): Promise<void> {
+    const channel = `logs_${level}` as LogChannel;
+    await this.subscribe(channel);
   }
 
   /**
@@ -144,6 +175,14 @@ class NotificationHubService {
       await this.connection.invoke('Unsubscribe', channel);
       console.log(`[SignalR] Unsubscribed from channel: ${channel}`);
     }
+  }
+
+  /**
+   * 取消订阅日志频道
+   */
+  async unsubscribeFromLogs(level: 'all' | 'error' | 'warning' | 'info' = 'all'): Promise<void> {
+    const channel = `logs_${level}`;
+    await this.unsubscribe(channel);
   }
 
   /**
@@ -178,6 +217,21 @@ class NotificationHubService {
       this.systemMessageListeners.forEach((callback) => callback(message));
       // 同时触发普通通知
       this.notificationListeners.forEach((callback) => callback(message));
+    });
+
+    // 接收日志条目
+    this.connection.on('LogEntry', (log: LogEntry) => {
+      this.logEntryListeners.forEach((callback) => callback(log));
+    });
+
+    // 订阅成功回调
+    this.connection.on('Subscribed', (channel: string) => {
+      console.log(`[SignalR] Successfully subscribed to: ${channel}`);
+    });
+
+    // 取消订阅回调
+    this.connection.on('Unsubscribed', (channel: string) => {
+      console.log(`[SignalR] Successfully unsubscribed from: ${channel}`);
     });
 
     // 通知确认回调
@@ -223,6 +277,14 @@ class NotificationHubService {
   onSystemMessage(callback: SystemMessageCallback): () => void {
     this.systemMessageListeners.add(callback);
     return () => this.systemMessageListeners.delete(callback);
+  }
+
+  /**
+   * 添加日志条目监听器
+   */
+  onLogEntry(callback: LogEntryCallback): () => void {
+    this.logEntryListeners.add(callback);
+    return () => this.logEntryListeners.delete(callback);
   }
 
   /**

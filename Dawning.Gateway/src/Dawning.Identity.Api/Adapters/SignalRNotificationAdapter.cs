@@ -156,4 +156,48 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
             _logger.LogError(ex, "推送通知给角色 {Role} 失败", role);
         }
     }
+
+    public async Task SendLogEntryAsync(RealTimeLogEntry logEntry)
+    {
+        try
+        {
+            // 推送到所有订阅了日志频道的客户端
+            await _hubContext.Clients
+                .Group("channel_logs_all")
+                .SendAsync("LogEntry", logEntry);
+
+            // 根据日志级别推送到特定频道
+            var levelChannel = GetLevelChannel(logEntry.Level);
+            if (!string.IsNullOrEmpty(levelChannel))
+            {
+                await _hubContext.Clients
+                    .Group($"channel_{levelChannel}")
+                    .SendAsync("LogEntry", logEntry);
+            }
+
+            _logger.LogDebug(
+                "日志已推送: [{Level}] {Message}",
+                logEntry.Level,
+                logEntry.Message.Length > 50 ? logEntry.Message[..50] + "..." : logEntry.Message
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "推送日志失败");
+        }
+    }
+
+    /// <summary>
+    /// 获取日志级别对应的频道名
+    /// </summary>
+    private static string? GetLevelChannel(string level)
+    {
+        return level.ToLower() switch
+        {
+            "error" or "critical" or "fatal" => "logs_error",
+            "warning" or "warn" => "logs_warning",
+            "information" or "info" => "logs_info",
+            _ => null
+        };
+    }
 }

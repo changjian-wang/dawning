@@ -12,6 +12,24 @@ namespace Dawning.Identity.Api.Hubs
     {
         private readonly ILogger<NotificationHub> _logger;
 
+        // 支持的日志频道（需要管理员权限）
+        private static readonly string[] LogChannels =
+        [
+            "logs_all",
+            "logs_error",
+            "logs_warning",
+            "logs_info",
+        ];
+
+        // 支持的通知频道
+        private static readonly string[] NotificationChannels =
+        [
+            "alerts",
+            "system",
+            "monitoring",
+            "audit",
+        ];
+
         public NotificationHub(ILogger<NotificationHub> logger)
         {
             _logger = logger;
@@ -80,7 +98,7 @@ namespace Dawning.Identity.Api.Hubs
         /// <summary>
         /// 订阅特定频道
         /// </summary>
-        /// <param name="channel">频道名称 (如: alerts, system, monitoring)</param>
+        /// <param name="channel">频道名称 (如: alerts, system, monitoring, logs_all, logs_error)</param>
         public async Task Subscribe(string channel)
         {
             if (string.IsNullOrWhiteSpace(channel))
@@ -88,18 +106,30 @@ namespace Dawning.Identity.Api.Hubs
                 throw new HubException("频道名称不能为空");
             }
 
-            var allowedChannels = new[] { "alerts", "system", "monitoring", "audit" };
-            if (!allowedChannels.Contains(channel.ToLower()))
+            var channelLower = channel.ToLower();
+
+            // 检查日志频道权限
+            if (LogChannels.Contains(channelLower))
+            {
+                if (!IsAdmin())
+                {
+                    throw new HubException("只有管理员才能订阅日志频道");
+                }
+            }
+            else if (!NotificationChannels.Contains(channelLower))
             {
                 throw new HubException($"无效的频道名称: {channel}");
             }
 
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"channel_{channel}");
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"channel_{channelLower}");
             _logger.LogDebug(
                 "用户 {Username} 订阅了频道 {Channel}",
                 Context.User?.Identity?.Name,
                 channel
             );
+
+            // 通知客户端订阅成功
+            await Clients.Caller.SendAsync("Subscribed", channelLower);
         }
 
         /// <summary>
@@ -110,12 +140,16 @@ namespace Dawning.Identity.Api.Hubs
         {
             if (!string.IsNullOrWhiteSpace(channel))
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"channel_{channel}");
+                var channelLower = channel.ToLower();
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"channel_{channelLower}");
                 _logger.LogDebug(
                     "用户 {Username} 取消订阅了频道 {Channel}",
                     Context.User?.Identity?.Name,
                     channel
                 );
+
+                // 通知客户端取消订阅成功
+                await Clients.Caller.SendAsync("Unsubscribed", channelLower);
             }
         }
 
@@ -134,6 +168,28 @@ namespace Dawning.Identity.Api.Hubs
 
             // 可以在这里记录确认状态到数据库
             await Clients.Caller.SendAsync("NotificationAcknowledged", notificationId);
+        }
+
+        /// <summary>
+        /// 获取当前连接的订阅状态
+        /// </summary>
+        public async Task GetSubscriptions()
+        {
+            // 这个方法让客户端可以查询当前连接订阅了哪些频道
+            // 服务端暂时无法直接获取，客户端需自己维护状态
+            await Clients.Caller.SendAsync(
+                "SubscriptionStatus",
+                new { ConnectionId = Context.ConnectionId, Message = "请在客户端维护订阅状态" }
+            );
+        }
+
+        /// <summary>
+        /// 检查当前用户是否是管理员
+        /// </summary>
+        private bool IsAdmin()
+        {
+            var roles = Context.User?.FindAll("role")?.Select(c => c.Value.ToLower()) ?? [];
+            return roles.Any(r => r is "admin" or "super_admin" or "auditor");
         }
     }
 }

@@ -34,6 +34,16 @@ public class NullRealTimeNotificationService : IRealTimeNotificationService
         return Task.CompletedTask;
     }
 
+    public Task SendLogEntryAsync(RealTimeLogEntry logEntry)
+    {
+        _logger.LogDebug(
+            "实时通知服务未配置，跳过日志推送: {Level} - {Message}",
+            logEntry.Level,
+            logEntry.Message
+        );
+        return Task.CompletedTask;
+    }
+
     public Task SendToUserAsync(Guid userId, RealTimeNotification notification)
     {
         _logger.LogDebug(

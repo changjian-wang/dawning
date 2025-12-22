@@ -65,6 +65,9 @@ namespace Dawning.Identity.Api.Configurations
             // 注册实时通知适配器（供 Application 层使用）
             services.AddScoped<IRealTimeNotificationService, SignalRNotificationAdapter>();
 
+            // 注册日志流服务（实时日志推送）
+            services.AddSingleton<ILogStreamService, LogStreamService>();
+
             return services;
         }
 
