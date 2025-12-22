@@ -326,13 +326,13 @@
               <a-input
                 v-for="(perm, idx) in formData.permissions"
                 :key="idx"
-                v-model="formData.permissions[idx]"
+                v-model="formData.permissions[idx as number]"
                 :placeholder="$t('role.form.permissions.placeholder')"
               >
                 <template #suffix>
                   <icon-delete
                     style="cursor: pointer"
-                    @click="removePermission(idx)"
+                    @click="removePermission(idx as number)"
                   />
                 </template>
               </a-input>
