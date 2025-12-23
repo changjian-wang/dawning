@@ -4,12 +4,14 @@ using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.Gateway;
 using Dawning.Identity.Domain.Interfaces.Monitoring;
+using Dawning.Identity.Domain.Interfaces.MultiTenancy;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Repository.Administration;
 using Dawning.Identity.Infra.Data.Repository.Gateway;
 using Dawning.Identity.Infra.Data.Repository.Monitoring;
+using Dawning.Identity.Infra.Data.Repository.MultiTenancy;
 using Dawning.Identity.Infra.Data.Repository.OpenIddict;
 
 namespace Dawning.Identity.Infra.Data.Repository.UoW
@@ -57,6 +59,9 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
             AlertRule = new AlertRuleRepository(_context);
             AlertHistory = new AlertHistoryRepository(_context);
             RequestLog = new RequestLogRepository(_context);
+
+            // MultiTenancy
+            Tenant = new TenantRepository(_context);
         }
 
         /// <summary>
@@ -94,6 +99,9 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         public IAlertRuleRepository AlertRule { get; }
         public IAlertHistoryRepository AlertHistory { get; }
         public IRequestLogRepository RequestLog { get; }
+
+        // MultiTenancy
+        public ITenantRepository Tenant { get; }
 
         public void BeginTransaction()
         {

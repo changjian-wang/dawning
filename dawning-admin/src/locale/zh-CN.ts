@@ -17,6 +17,7 @@ import localeGateway from '@/views/administration/gateway/locale/zh-CN';
 import localeSystemConfig from '@/views/administration/system-config/locale/zh-CN';
 import localeSystemMonitor from '@/views/administration/system-monitor/locale/zh-CN';
 import localeAlert from '@/views/administration/alert/locale/zh-CN';
+import localeTenant from '@/views/administration/tenant/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
 
@@ -58,6 +59,7 @@ export default {
   'navbar.action.locale': '切换为中文',
   // --begin--
   'menu.administration': '系统管理',
+  'menu.administration.tenant': '租户管理',
   'menu.administration.userPermission': '用户权限',
   'menu.administration.openiddict': '认证授权',
   'menu.administration.monitoring': '监控告警',
@@ -83,6 +85,7 @@ export default {
   ...localeSystemConfig,
   ...localeSystemMonitor,
   ...localeAlert,
+  ...localeTenant,
   ...localeOpenIddict,
 
   ...localeSettings,

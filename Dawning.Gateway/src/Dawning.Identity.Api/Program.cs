@@ -237,6 +237,10 @@ namespace Dawning.Identity.Api
 
             // 启用认证和授权
             app.UseAuthentication();
+
+            // ===== Tenant Resolution Middleware =====
+            app.UseMiddleware<Dawning.Identity.Api.Middleware.TenantMiddleware>();
+
             app.UseAuthorization();
 
             // ===== Map Endpoints =====

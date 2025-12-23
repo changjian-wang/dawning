@@ -1032,6 +1032,11 @@ namespace Dawning.Shared.Dapper.Contrib
             /// </summary>
             public QueryBuilder<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
             {
+                // 如果已有条件，添加 AND 连接符
+                if (_conditions.Count > 0)
+                {
+                    _conditions.Add("AND");
+                }
                 Visit(predicate, _conditions);
                 return this;
             }
@@ -1046,6 +1051,11 @@ namespace Dawning.Shared.Dapper.Contrib
             {
                 if (exists)
                 {
+                    // 如果已有条件，添加 AND 连接符
+                    if (_conditions.Count > 0)
+                    {
+                        _conditions.Add("AND");
+                    }
                     Visit(predicate, _conditions);
                 }
 

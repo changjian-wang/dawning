@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.Gateway;
 using Dawning.Identity.Domain.Interfaces.Monitoring;
+using Dawning.Identity.Domain.Interfaces.MultiTenancy;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
 
 namespace Dawning.Identity.Domain.Interfaces.UoW
@@ -45,6 +46,9 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         IAlertRuleRepository AlertRule { get; }
         IAlertHistoryRepository AlertHistory { get; }
         IRequestLogRepository RequestLog { get; }
+
+        // MultiTenancy
+        ITenantRepository Tenant { get; }
 
         // 添加事务管理方法
         void BeginTransaction();

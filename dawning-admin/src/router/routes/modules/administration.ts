@@ -232,6 +232,19 @@ const ADMINISTRATION: AppRouteRecordRaw = {
       ],
     },
 
+    // ========== 多租户管理 ==========
+    {
+      path: 'tenant',
+      name: 'Tenant',
+      component: () => import('@/views/administration/tenant/index.vue'),
+      meta: {
+        locale: 'menu.administration.tenant',
+        requiresAuth: true,
+        icon: 'icon-apps',
+        roles: ['super_admin'],
+      },
+    },
+
     // ========== 系统设置 ==========
     {
       path: 'settings',

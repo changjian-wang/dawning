@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Dawning.Identity.Application.Services.Monitoring;
+using Dawning.Identity.Application.Services.MultiTenancy;
+using Dawning.Identity.Domain.Interfaces.MultiTenancy;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Infra.Data.Repository.UoW;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +29,9 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
 
             // 注册告警检查后台服务
             services.AddHostedService<AlertCheckBackgroundService>();
+
+            // 注册多租户上下文（Scoped，每个请求一个实例）
+            services.AddScoped<ITenantContext, TenantContext>();
 
             // 扫描并注册程序集中的服务和仓储
             foreach (var assembly in LoadAssemblies())

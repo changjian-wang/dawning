@@ -17,6 +17,7 @@ import localeGateway from '@/views/administration/gateway/locale/en-US';
 import localeSystemConfig from '@/views/administration/system-config/locale/en-US';
 import localeSystemMonitor from '@/views/administration/system-monitor/locale/en-US';
 import localeAlert from '@/views/administration/alert/locale/en-US';
+import localeTenant from '@/views/administration/tenant/locale/en-US';
 
 import localeSettings from './en-US/settings';
 
@@ -58,6 +59,7 @@ export default {
   'navbar.action.locale': 'Switch to English',
   // --begin--
   'menu.administration': 'Administration',
+  'menu.administration.tenant': 'Tenant Management',
   'menu.administration.userPermission': 'User & Permission',
   'menu.administration.openiddict': 'Authentication',
   'menu.administration.monitoring': 'Monitoring',
@@ -83,6 +85,7 @@ export default {
   ...localeSystemConfig,
   ...localeSystemMonitor,
   ...localeAlert,
+  ...localeTenant,
   ...localeOpenIddict,
 
   ...localeSettings,

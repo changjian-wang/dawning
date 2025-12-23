@@ -48,14 +48,12 @@ namespace Dawning.Identity.Application.Services.Caching
 
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-                // 并行预热多个缓存
-                await Task.WhenAll(
-                    WarmupSystemConfigAsync(cacheService, unitOfWork, stoppingToken),
-                    WarmupRolesAsync(cacheService, unitOfWork, stoppingToken),
-                    WarmupPermissionsAsync(cacheService, unitOfWork, stoppingToken),
-                    WarmupRateLimitPoliciesAsync(cacheService, unitOfWork, stoppingToken),
-                    WarmupIpRulesAsync(cacheService, unitOfWork, stoppingToken)
-                );
+                // 顺序预热缓存（MySQL 不支持在同一连接上并行执行多个查询）
+                await WarmupSystemConfigAsync(cacheService, unitOfWork, stoppingToken);
+                await WarmupRolesAsync(cacheService, unitOfWork, stoppingToken);
+                await WarmupPermissionsAsync(cacheService, unitOfWork, stoppingToken);
+                await WarmupRateLimitPoliciesAsync(cacheService, unitOfWork, stoppingToken);
+                await WarmupIpRulesAsync(cacheService, unitOfWork, stoppingToken);
 
                 stopwatch.Stop();
                 _logger.LogInformation(
