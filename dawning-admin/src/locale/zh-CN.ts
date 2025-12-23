@@ -38,6 +38,8 @@ export default {
   'common.createdAt': '创建时间',
   'common.actions': '操作',
   'common.system': '系统',
+  'common.operationFailed': '操作失败',
+  'common.operationSuccess': '操作成功',
 
   'menu.dashboard': '仪表盘',
   'menu.server.dashboard': '仪表盘-服务端',

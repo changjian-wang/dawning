@@ -38,6 +38,8 @@ export default {
   'common.createdAt': 'Created At',
   'common.actions': 'Actions',
   'common.system': 'System',
+  'common.operationFailed': 'Operation Failed',
+  'common.operationSuccess': 'Operation Success',
 
   'menu.dashboard': 'Dashboard',
   'menu.server.dashboard': 'Dashboard-Server',

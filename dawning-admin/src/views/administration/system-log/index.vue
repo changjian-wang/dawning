@@ -95,7 +95,7 @@
       </a-collapse>
 
       <!-- 操作按钮 -->
-      <a-row style="margin-bottom: 16px">
+      <a-row v-if="isSuperAdmin" style="margin-bottom: 16px">
         <a-col :span="12">
           <a-space>
             <a-button type="primary" status="danger" @click="handleCleanup">
@@ -293,6 +293,7 @@
   import { useI18n } from 'vue-i18n';
   import { Message } from '@arco-design/web-vue';
   import dayjs from 'dayjs';
+  import { useUserStore } from '@/store';
   import {
     getSystemLogList,
     cleanupSystemLogs,
@@ -301,6 +302,15 @@
   } from '@/api/system-log';
 
   const { t } = useI18n();
+  const userStore = useUserStore();
+
+  // 检查是否是超级管理员
+  const isSuperAdmin = computed(() => {
+    return (
+      userStore.role === 'super_admin' ||
+      userStore.roles.includes('super_admin')
+    );
+  });
 
   // 查询参数
   const queryParams = reactive<SystemLogQueryParams>({

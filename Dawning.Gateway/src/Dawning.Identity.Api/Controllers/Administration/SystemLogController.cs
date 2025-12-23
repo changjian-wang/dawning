@@ -138,11 +138,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除指定日期之前的日志（管理员功能）
+        /// 删除指定日期之前的日志（超级管理员功能）
         /// </summary>
         /// <param name="beforeDate">截止日期</param>
         [HttpDelete("cleanup")]
-        [Authorize(Roles = "admin")]
+        [Authorize(Roles = "super_admin")]
         public async Task<IActionResult> Cleanup([FromQuery] DateTime beforeDate)
         {
             try

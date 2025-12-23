@@ -125,9 +125,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime beforeDate)
         {
-            var count = await _uow.SystemLog.DeleteOlderThanAsync(beforeDate);
-            await _uow.CommitAsync();
-            return count;
+            return await _uow.SystemLog.DeleteOlderThanAsync(beforeDate);
         }
 
         #region Private Methods
