@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# 保留数据库备份文件夹
+!**/docs/sql/backup/
