@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 
-var password = "admin";
+// 测试密码验证
+var password = "Admin@123456";
 var storedHash = "100000;UnarlhDVb+eAaojgf5zYpw==;Q4x7xrmCqQVXiJfDPYQ0wpgRtMFjbNe8Mk3iv7QENac=";
 
 var parts = storedHash.Split(';');
@@ -11,7 +12,14 @@ var hash = Convert.FromBase64String(parts[2]);
 var computedHash = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, hash.Length);
 var isValid = CryptographicOperations.FixedTimeEquals(hash, computedHash);
 
-Console.WriteLine("===================");
+Console.WriteLine("=== Verify password ===");
 Console.WriteLine($"Password: {password}");
 Console.WriteLine($"Verification: {isValid}");
-Console.WriteLine("===================");
+
+// 生成新哈希
+Console.WriteLine("\n=== Generate new hash ===");
+var newSalt = RandomNumberGenerator.GetBytes(16);
+var newHash = Rfc2898DeriveBytes.Pbkdf2("Admin@123456", newSalt, 100000, HashAlgorithmName.SHA256, 32);
+var newHashStr = $"100000;{Convert.ToBase64String(newSalt)};{Convert.ToBase64String(newHash)}";
+Console.WriteLine($"New hash for Admin@123456:");
+Console.WriteLine(newHashStr);
