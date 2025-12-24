@@ -1,6 +1,5 @@
 using Dawning.Identity.Api.Configurations;
 using Dawning.Identity.Api.Middleware;
-using Dawning.Identity.Application.Extensions;
 using Dawning.Identity.Infra.Messaging;
 using Serilog;
 
@@ -213,9 +212,6 @@ namespace Dawning.Identity.Api
 
             // 启动 Kafka 集成事件消费者（后台服务）
             builder.Services.AddKafkaIntegrationEventConsumers();
-
-            // 仍保留旧的 Kafka 生产者以保持向后兼容（可选，逐步迁移后删除）
-            builder.Services.AddKafkaMessaging(builder.Configuration);
 
             // ===== Distributed Lock (分布式锁) =====
             // 使用 Infrastructure 层的 Redis 实现
