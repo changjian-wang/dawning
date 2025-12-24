@@ -36,13 +36,13 @@ builder.Services.AddDawningResilience(options =>
     options.Retry.MaxRetryAttempts = 3;
     options.Retry.BaseDelayMs = 200;
     options.Retry.UseExponentialBackoff = true;
-    
+
     // 熔断器配置
     options.CircuitBreaker.Enabled = true;
     options.CircuitBreaker.FailureRatioThreshold = 0.5;
     options.CircuitBreaker.SamplingDurationSeconds = 30;
     options.CircuitBreaker.BreakDurationSeconds = 30;
-    
+
     // 超时配置
     options.Timeout.TimeoutSeconds = 30;
 });
@@ -50,16 +50,10 @@ builder.Services.AddDawningResilience(options =>
 // ========================================
 // 4. 添加弹性 HttpClient
 // ========================================
-builder.Services.AddResilientHttpClient<ExternalApiClient>(
-    client =>
-    {
-        client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com");
-    },
-    options =>
-    {
-        options.Retry.MaxRetryAttempts = 5;
-    });
-builder.Services.AddScoped<IExternalApiClient>(sp => sp.GetRequiredService<ExternalApiClient>());
+builder.Services.AddHttpClient<IExternalApiClient, ExternalApiClient>(client =>
+{
+    client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com");
+});
 
 // 添加服务
 builder.Services.AddControllers();
