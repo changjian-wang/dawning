@@ -35,7 +35,7 @@ dotnet add package Dawning.Extensions --version 1.0.0
 | Dawning.Logging | Serilog 集成、结构化日志、请求日志中间件 |
 | Dawning.ORM.Dapper | Dapper CRUD 扩展方法 |
 | Dawning.Resilience | 重试策略、熔断器、超时处理 (基于 Polly) |
-| Dawning.Extensions | 通用扩展方法（时间戳等） |
+| Dawning.Extensions | 通用扩展方法（字符串、集合、日期、JSON、对象） |
 
 ---
 
@@ -245,18 +245,45 @@ public class MyService
 
 ### 6. Dawning.Extensions
 
-通用扩展方法。
+通用扩展方法库。
 
 ```csharp
 using Dawning.Extensions;
 
-// 时间戳转换
-long timestamp = TimestampUtil.ToTimestamp(DateTime.UtcNow);
-DateTime dateTime = TimestampUtil.FromTimestamp(timestamp);
+// 字符串扩展
+"hello_world".ToPascalCase();     // "HelloWorld"
+"HelloWorld".ToCamelCase();       // "helloWorld"
+"HelloWorld".ToSnakeCase();       // "hello_world"
+"test@example.com".IsValidEmail(); // true
+"13812345678".Mask();              // "138****5678"
+"长字符串".Truncate(5);            // "长字..."
 
-// 毫秒时间戳
-long ms = TimestampUtil.ToMilliseconds(DateTime.UtcNow);
-DateTime dt = TimestampUtil.FromMilliseconds(ms);
+// 集合扩展
+list.IsNullOrEmpty();
+items.Batch(100);                  // 分批处理
+users.DistinctBy(u => u.Email);   // 去重
+dict1.Merge(dict2);               // 合并字典
+list.JoinToString(", ");          // 连接字符串
+
+// 日期时间扩展
+DateTime.Now.StartOfDay();         // 00:00:00
+DateTime.Now.EndOfMonth();         // 月末最后一天
+dateTime.IsWeekend();             // 是否周末
+birthDate.CalculateAge();          // 计算年龄
+dateTime.ToRelativeTime();         // "3分钟前"
+date.AddWorkdays(5);              // 添加工作日
+
+// JSON 扩展
+var json = obj.ToJson();           // 序列化
+var obj = json.FromJson<User>();   // 反序列化
+obj.DeepClone();                  // 深克隆
+json.PrettyPrint();               // 格式化
+
+// 对象扩展
+obj.IfNull(defaultValue);
+value.IsIn(1, 2, 3);
+value.Clamp(0, 100);
+MyEnum.Value.GetDescription();
 ```
 
 ---

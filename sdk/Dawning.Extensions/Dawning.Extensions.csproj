@@ -4,4 +4,8 @@
     <Description>Dawning 扩展库 - 通用扩展方法、帮助类</Description>
     <PackageTags>dawning;extensions;helpers;utilities</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
 </Project>
