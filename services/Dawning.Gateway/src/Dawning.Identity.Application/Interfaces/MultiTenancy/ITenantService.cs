@@ -43,7 +43,8 @@ namespace Dawning.Identity.Application.Interfaces.MultiTenancy
             string? keyword,
             bool? isActive,
             int page,
-            int pageSize);
+            int pageSize
+        );
 
         /// <summary>
         /// 创建租户

@@ -9,39 +9,44 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class AuthControllerTests : IntegrationTestBase
 {
-    public AuthControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public AuthControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task Token_WithInvalidCredentials_ReturnsUnauthorized()
     {
         // Arrange
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "grant_type", "password" },
-            { "username", "invalid@test.com" },
-            { "password", "wrongpassword" },
-            { "client_id", "dawning-admin" },
-            { "scope", "openid profile" }
-        });
+        var content = new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                { "grant_type", "password" },
+                { "username", "invalid@test.com" },
+                { "password", "wrongpassword" },
+                { "client_id", "dawning-admin" },
+                { "scope", "openid profile" },
+            }
+        );
 
         // Act
         var response = await Client.PostAsync("/connect/token", content);
 
         // Assert - OpenIddict 在测试环境中返回 401 （客户端未注册）
-        response.StatusCode.Should().BeOneOf(HttpStatusCode.BadRequest, HttpStatusCode.Unauthorized);
+        response
+            .StatusCode.Should()
+            .BeOneOf(HttpStatusCode.BadRequest, HttpStatusCode.Unauthorized);
     }
 
     [Fact]
     public async Task Token_WithMissingGrantType_ReturnsBadRequest()
     {
         // Arrange
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "username", "test@test.com" },
-            { "password", "password" }
-        });
+        var content = new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                { "username", "test@test.com" },
+                { "password", "password" },
+            }
+        );
 
         // Act
         var response = await Client.PostAsync("/connect/token", content);
@@ -54,12 +59,14 @@ public class AuthControllerTests : IntegrationTestBase
     public async Task Token_WithInvalidGrantType_ReturnsBadRequest()
     {
         // Arrange
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "grant_type", "invalid_grant" },
-            { "username", "test@test.com" },
-            { "password", "password" }
-        });
+        var content = new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                { "grant_type", "invalid_grant" },
+                { "username", "test@test.com" },
+                { "password", "password" },
+            }
+        );
 
         // Act
         var response = await Client.PostAsync("/connect/token", content);

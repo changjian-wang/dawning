@@ -39,30 +39,37 @@ public class NullRequestLoggingService : IRequestLoggingService
 
     public Task<PagedRequestLogs> GetLogsAsync(RequestLogQuery query)
     {
-        return Task.FromResult(new PagedRequestLogs
-        {
-            Items = new List<RequestLogEntry>(),
-            TotalCount = 0,
-            Page = query.Page,
-            PageSize = query.PageSize
-        });
+        return Task.FromResult(
+            new PagedRequestLogs
+            {
+                Items = new List<RequestLogEntry>(),
+                TotalCount = 0,
+                Page = query.Page,
+                PageSize = query.PageSize,
+            }
+        );
     }
 
-    public Task<RequestStatistics> GetStatisticsAsync(DateTime? startTime = null, DateTime? endTime = null)
+    public Task<RequestStatistics> GetStatisticsAsync(
+        DateTime? startTime = null,
+        DateTime? endTime = null
+    )
     {
-        return Task.FromResult(new RequestStatistics
-        {
-            TotalRequests = 0,
-            SuccessRequests = 0,
-            ClientErrors = 0,
-            ServerErrors = 0,
-            AverageResponseTimeMs = 0,
-            StartTime = startTime ?? DateTime.UtcNow.AddDays(-1),
-            EndTime = endTime ?? DateTime.UtcNow,
-            StatusCodeDistribution = new Dictionary<int, long>(),
-            TopPaths = new List<PathStatistic>(),
-            HourlyRequests = new Dictionary<string, long>()
-        });
+        return Task.FromResult(
+            new RequestStatistics
+            {
+                TotalRequests = 0,
+                SuccessRequests = 0,
+                ClientErrors = 0,
+                ServerErrors = 0,
+                AverageResponseTimeMs = 0,
+                StartTime = startTime ?? DateTime.UtcNow.AddDays(-1),
+                EndTime = endTime ?? DateTime.UtcNow,
+                StatusCodeDistribution = new Dictionary<int, long>(),
+                TopPaths = new List<PathStatistic>(),
+                HourlyRequests = new Dictionary<string, long>(),
+            }
+        );
     }
 
     public Task<int> CleanupOldLogsAsync(int retentionDays) => Task.FromResult(0);

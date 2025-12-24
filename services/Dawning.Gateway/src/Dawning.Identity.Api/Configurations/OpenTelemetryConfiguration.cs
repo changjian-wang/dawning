@@ -120,13 +120,22 @@ namespace Dawning.Identity.Api.Configurations
                             // 丰富 Span 信息
                             options.EnrichWithHttpRequest = (activity, request) =>
                             {
-                                activity.SetTag("http.client_ip", request.HttpContext.Connection.RemoteIpAddress?.ToString());
-                                activity.SetTag("http.user_agent", request.Headers.UserAgent.ToString());
+                                activity.SetTag(
+                                    "http.client_ip",
+                                    request.HttpContext.Connection.RemoteIpAddress?.ToString()
+                                );
+                                activity.SetTag(
+                                    "http.user_agent",
+                                    request.Headers.UserAgent.ToString()
+                                );
                             };
 
                             options.EnrichWithHttpResponse = (activity, response) =>
                             {
-                                activity.SetTag("http.response_content_length", response.ContentLength);
+                                activity.SetTag(
+                                    "http.response_content_length",
+                                    response.ContentLength
+                                );
                             };
 
                             options.RecordException = true;
@@ -216,16 +225,16 @@ namespace Dawning.Identity.Api.Configurations
         /// </summary>
         public static void RecordAuthSuccess(string authType = "password")
         {
-            _authSuccessCounter.Add(
-                1,
-                new KeyValuePair<string, object?>("auth_type", authType)
-            );
+            _authSuccessCounter.Add(1, new KeyValuePair<string, object?>("auth_type", authType));
         }
 
         /// <summary>
         /// 记录认证失败
         /// </summary>
-        public static void RecordAuthFailure(string authType = "password", string reason = "invalid_credentials")
+        public static void RecordAuthFailure(
+            string authType = "password",
+            string reason = "invalid_credentials"
+        )
         {
             _authFailureCounter.Add(
                 1,
@@ -249,7 +258,10 @@ namespace Dawning.Identity.Api.Configurations
         /// <summary>
         /// 创建追踪 Span
         /// </summary>
-        public static Activity? StartActivity(string name, ActivityKind kind = ActivityKind.Internal)
+        public static Activity? StartActivity(
+            string name,
+            ActivityKind kind = ActivityKind.Internal
+        )
         {
             return ActivitySource.StartActivity(name, kind);
         }

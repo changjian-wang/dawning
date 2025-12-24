@@ -9,9 +9,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class RoleControllerTests : IntegrationTestBase
 {
-    public RoleControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public RoleControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     #region 未认证测试
 
@@ -63,7 +62,7 @@ public class RoleControllerTests : IntegrationTestBase
         {
             name = "test_role",
             displayName = "Test Role",
-            description = "A test role"
+            description = "A test role",
         };
 
         // Act
@@ -81,11 +80,14 @@ public class RoleControllerTests : IntegrationTestBase
         {
             id = "00000000-0000-0000-0000-000000000001",
             name = "updated_role",
-            displayName = "Updated Role"
+            displayName = "Updated Role",
         };
 
         // Act
-        var response = await Client.PutAsJsonAsync("/api/role/00000000-0000-0000-0000-000000000001", updateData);
+        var response = await Client.PutAsJsonAsync(
+            "/api/role/00000000-0000-0000-0000-000000000001",
+            updateData
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -112,7 +114,13 @@ public class RoleControllerTests : IntegrationTestBase
         var response = await Client.GetAsync("/api/role/invalid-guid");
 
         // Assert - 路由约束会拒绝无效的 GUID
-        response.StatusCode.Should().BeOneOf(HttpStatusCode.BadRequest, HttpStatusCode.NotFound, HttpStatusCode.Unauthorized);
+        response
+            .StatusCode.Should()
+            .BeOneOf(
+                HttpStatusCode.BadRequest,
+                HttpStatusCode.NotFound,
+                HttpStatusCode.Unauthorized
+            );
     }
 
     [Fact]

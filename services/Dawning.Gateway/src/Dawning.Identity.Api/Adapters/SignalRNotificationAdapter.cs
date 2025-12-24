@@ -45,24 +45,18 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
             };
 
             // 发送给订阅了 alerts 频道的用户
-            await _hubContext.Clients
-                .Group("channel_alerts")
+            await _hubContext
+                .Clients.Group("channel_alerts")
                 .SendAsync("AlertReceived", notification);
 
             // 同时发送给管理员
-            await _hubContext.Clients
-                .Group("role_admin")
+            await _hubContext.Clients.Group("role_admin").SendAsync("AlertReceived", notification);
+
+            await _hubContext
+                .Clients.Group("role_super_admin")
                 .SendAsync("AlertReceived", notification);
 
-            await _hubContext.Clients
-                .Group("role_super_admin")
-                .SendAsync("AlertReceived", notification);
-
-            _logger.LogInformation(
-                "告警已推送: {Title} ({Severity})",
-                alert.Title,
-                alert.Severity
-            );
+            _logger.LogInformation("告警已推送: {Title} ({Severity})", alert.Title, alert.Severity);
         }
         catch (Exception ex)
         {
@@ -111,15 +105,11 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 Data = notification.Data,
             };
 
-            await _hubContext.Clients
-                .Group($"user_{userId}")
+            await _hubContext
+                .Clients.Group($"user_{userId}")
                 .SendAsync("NotificationReceived", msg);
 
-            _logger.LogDebug(
-                "通知已推送给用户 {UserId}: {Title}",
-                userId,
-                notification.Title
-            );
+            _logger.LogDebug("通知已推送给用户 {UserId}: {Title}", userId, notification.Title);
         }
         catch (Exception ex)
         {
@@ -141,15 +131,9 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 Data = notification.Data,
             };
 
-            await _hubContext.Clients
-                .Group($"role_{role}")
-                .SendAsync("NotificationReceived", msg);
+            await _hubContext.Clients.Group($"role_{role}").SendAsync("NotificationReceived", msg);
 
-            _logger.LogDebug(
-                "通知已推送给角色 {Role}: {Title}",
-                role,
-                notification.Title
-            );
+            _logger.LogDebug("通知已推送给角色 {Role}: {Title}", role, notification.Title);
         }
         catch (Exception ex)
         {
@@ -162,16 +146,14 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
         try
         {
             // 推送到所有订阅了日志频道的客户端
-            await _hubContext.Clients
-                .Group("channel_logs_all")
-                .SendAsync("LogEntry", logEntry);
+            await _hubContext.Clients.Group("channel_logs_all").SendAsync("LogEntry", logEntry);
 
             // 根据日志级别推送到特定频道
             var levelChannel = GetLevelChannel(logEntry.Level);
             if (!string.IsNullOrEmpty(levelChannel))
             {
-                await _hubContext.Clients
-                    .Group($"channel_{levelChannel}")
+                await _hubContext
+                    .Clients.Group($"channel_{levelChannel}")
                     .SendAsync("LogEntry", logEntry);
             }
 
@@ -197,7 +179,7 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
             "error" or "critical" or "fatal" => "logs_error",
             "warning" or "warn" => "logs_warning",
             "information" or "info" => "logs_info",
-            _ => null
+            _ => null,
         };
     }
 }

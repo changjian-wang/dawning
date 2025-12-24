@@ -27,10 +27,7 @@ public class RequestLoggingServiceTests
 
         _uowMock.Setup(x => x.RequestLog).Returns(_requestLogRepositoryMock.Object);
 
-        _requestLoggingService = new RequestLoggingService(
-            _uowMock.Object,
-            _loggerMock.Object
-        );
+        _requestLoggingService = new RequestLoggingService(_uowMock.Object, _loggerMock.Object);
     }
 
     #region LogRequestAsync Tests
@@ -48,7 +45,7 @@ public class RequestLoggingServiceTests
             StatusCode = 200,
             ResponseTimeMs = 50,
             ClientIp = "127.0.0.1",
-            RequestTime = DateTime.UtcNow
+            RequestTime = DateTime.UtcNow,
         };
 
         _requestLogRepositoryMock
@@ -60,12 +57,15 @@ public class RequestLoggingServiceTests
 
         // Assert
         _requestLogRepositoryMock.Verify(
-            x => x.InsertAsync(It.Is<RequestLog>(log =>
-                log.RequestId == entry.RequestId &&
-                log.Method == entry.Method &&
-                log.Path == entry.Path &&
-                log.StatusCode == entry.StatusCode
-            )),
+            x =>
+                x.InsertAsync(
+                    It.Is<RequestLog>(log =>
+                        log.RequestId == entry.RequestId
+                        && log.Method == entry.Method
+                        && log.Path == entry.Path
+                        && log.StatusCode == entry.StatusCode
+                    )
+                ),
             Times.Once
         );
     }
@@ -82,7 +82,7 @@ public class RequestLoggingServiceTests
             Path = "/api/create",
             StatusCode = 201,
             ResponseTimeMs = 100,
-            RequestTime = DateTime.UtcNow
+            RequestTime = DateTime.UtcNow,
         };
 
         _requestLogRepositoryMock
@@ -94,9 +94,12 @@ public class RequestLoggingServiceTests
 
         // Assert
         _requestLogRepositoryMock.Verify(
-            x => x.InsertAsync(It.Is<RequestLog>(log =>
-                log.RequestId == string.Empty // Should be empty string, not null
-            )),
+            x =>
+                x.InsertAsync(
+                    It.Is<RequestLog>(log =>
+                        log.RequestId == string.Empty // Should be empty string, not null
+                    )
+                ),
             Times.Once
         );
     }
@@ -112,7 +115,7 @@ public class RequestLoggingServiceTests
             Path = "/api/test",
             StatusCode = 200,
             ResponseTimeMs = 50,
-            RequestTime = DateTime.UtcNow
+            RequestTime = DateTime.UtcNow,
         };
 
         _requestLogRepositoryMock
@@ -135,11 +138,7 @@ public class RequestLoggingServiceTests
     public async Task GetLogsAsync_Should_Return_Paged_Results()
     {
         // Arrange
-        var query = new RequestLogQuery
-        {
-            Page = 1,
-            PageSize = 10
-        };
+        var query = new RequestLogQuery { Page = 1, PageSize = 10 };
 
         var logs = new List<RequestLog>
         {
@@ -151,7 +150,7 @@ public class RequestLoggingServiceTests
                 Path = "/api/test1",
                 StatusCode = 200,
                 ResponseTimeMs = 50,
-                RequestTime = DateTime.UtcNow
+                RequestTime = DateTime.UtcNow,
             },
             new RequestLog
             {
@@ -161,8 +160,8 @@ public class RequestLoggingServiceTests
                 Path = "/api/test2",
                 StatusCode = 201,
                 ResponseTimeMs = 100,
-                RequestTime = DateTime.UtcNow
-            }
+                RequestTime = DateTime.UtcNow,
+            },
         };
 
         var pagedData = new PagedData<RequestLog>
@@ -170,7 +169,7 @@ public class RequestLoggingServiceTests
             Items = logs,
             TotalCount = 2,
             PageIndex = 1,
-            PageSize = 10
+            PageSize = 10,
         };
 
         _requestLogRepositoryMock
@@ -201,7 +200,7 @@ public class RequestLoggingServiceTests
             StatusCode = 200,
             OnlyErrors = false,
             Page = 1,
-            PageSize = 20
+            PageSize = 20,
         };
 
         var pagedData = new PagedData<RequestLog>
@@ -209,19 +208,19 @@ public class RequestLoggingServiceTests
             Items = new List<RequestLog>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 20
+            PageSize = 20,
         };
 
         _requestLogRepositoryMock
-            .Setup(x => x.GetPagedListAsync(
-                It.Is<RequestLogQueryModel>(q =>
-                    q.Method == "GET" &&
-                    q.Path == "/api" &&
-                    q.StatusCode == 200
-                ),
-                1,
-                20
-            ))
+            .Setup(x =>
+                x.GetPagedListAsync(
+                    It.Is<RequestLogQueryModel>(q =>
+                        q.Method == "GET" && q.Path == "/api" && q.StatusCode == 200
+                    ),
+                    1,
+                    20
+                )
+            )
             .ReturnsAsync(pagedData);
 
         // Act
@@ -229,11 +228,7 @@ public class RequestLoggingServiceTests
 
         // Assert
         _requestLogRepositoryMock.Verify(
-            x => x.GetPagedListAsync(
-                It.Is<RequestLogQueryModel>(q => q.Method == "GET"),
-                1,
-                20
-            ),
+            x => x.GetPagedListAsync(It.Is<RequestLogQueryModel>(q => q.Method == "GET"), 1, 20),
             Times.Once
         );
     }
@@ -268,7 +263,7 @@ public class RequestLoggingServiceTests
                 { 201, 10 },
                 { 400, 3 },
                 { 404, 2 },
-                { 500, 5 }
+                { 500, 5 },
             },
             TopPaths = new List<PathStatisticModel>
             {
@@ -277,14 +272,14 @@ public class RequestLoggingServiceTests
                     Path = "/api/user",
                     RequestCount = 50,
                     AverageResponseTimeMs = 30,
-                    ErrorCount = 2
-                }
+                    ErrorCount = 2,
+                },
             },
             HourlyRequests = new Dictionary<string, long>
             {
                 { "2025-12-22 10:00", 20 },
-                { "2025-12-22 11:00", 30 }
-            }
+                { "2025-12-22 11:00", 30 },
+            },
         };
 
         _requestLogRepositoryMock
@@ -313,7 +308,7 @@ public class RequestLoggingServiceTests
         {
             TotalRequests = 0,
             StartTime = DateTime.UtcNow.AddDays(-1),
-            EndTime = DateTime.UtcNow
+            EndTime = DateTime.UtcNow,
         };
 
         _requestLogRepositoryMock
@@ -352,9 +347,12 @@ public class RequestLoggingServiceTests
         // Assert
         result.Should().Be(expectedDeletedCount);
         _requestLogRepositoryMock.Verify(
-            x => x.CleanupOldLogsAsync(It.Is<DateTime>(d =>
-                d < DateTime.UtcNow.AddDays(-retentionDays + 1) // Cutoff should be roughly 30 days ago
-            )),
+            x =>
+                x.CleanupOldLogsAsync(
+                    It.Is<DateTime>(d =>
+                        d < DateTime.UtcNow.AddDays(-retentionDays + 1) // Cutoff should be roughly 30 days ago
+                    )
+                ),
             Times.Once
         );
     }

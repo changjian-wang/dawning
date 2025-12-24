@@ -11,9 +11,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class SystemConfigControllerTests : IntegrationTestBase
 {
-    public SystemConfigControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public SystemConfigControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     #region 未认证测试
 
@@ -44,13 +43,19 @@ public class SystemConfigControllerTests : IntegrationTestBase
         var configValue = new { value = "test-value" };
 
         // Act
-        var response = await Client.PostAsJsonAsync("/api/system-config/System/TestKey", configValue);
+        var response = await Client.PostAsJsonAsync(
+            "/api/system-config/System/TestKey",
+            configValue
+        );
 
         // Assert - 由于策略配置问题，可能返回 409 或 401
-        response.StatusCode.Should().BeOneOf(
-            HttpStatusCode.Unauthorized, 
-            HttpStatusCode.Conflict, 
-            HttpStatusCode.InternalServerError);
+        response
+            .StatusCode.Should()
+            .BeOneOf(
+                HttpStatusCode.Unauthorized,
+                HttpStatusCode.Conflict,
+                HttpStatusCode.InternalServerError
+            );
     }
 
     [Fact]
@@ -60,10 +65,13 @@ public class SystemConfigControllerTests : IntegrationTestBase
         var response = await Client.PostAsync("/api/system-config/init-defaults", null);
 
         // Assert - 由于策略配置问题，可能返回 409 或 401
-        response.StatusCode.Should().BeOneOf(
-            HttpStatusCode.Unauthorized, 
-            HttpStatusCode.Conflict, 
-            HttpStatusCode.InternalServerError);
+        response
+            .StatusCode.Should()
+            .BeOneOf(
+                HttpStatusCode.Unauthorized,
+                HttpStatusCode.Conflict,
+                HttpStatusCode.InternalServerError
+            );
     }
 
     #endregion

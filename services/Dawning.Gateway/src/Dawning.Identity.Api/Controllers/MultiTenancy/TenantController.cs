@@ -27,7 +27,8 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         public TenantController(
             ITenantService tenantService,
             ITenantContext tenantContext,
-            ILogger<TenantController> logger)
+            ILogger<TenantController> logger
+        )
         {
             _tenantService = tenantService;
             _tenantContext = tenantContext;
@@ -41,16 +42,18 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         [AllowAnonymous]
         public IActionResult GetCurrentTenant()
         {
-            return Ok(new
-            {
-                code = 20000,
-                data = new
+            return Ok(
+                new
                 {
-                    tenantId = _tenantContext.TenantId,
-                    tenantName = _tenantContext.TenantName,
-                    isHost = _tenantContext.IsHost
+                    code = 20000,
+                    data = new
+                    {
+                        tenantId = _tenantContext.TenantId,
+                        tenantName = _tenantContext.TenantName,
+                        isHost = _tenantContext.IsHost,
+                    },
                 }
-            });
+            );
         }
 
         /// <summary>
@@ -61,12 +64,13 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
             [FromQuery] string? keyword = null,
             [FromQuery] bool? isActive = null,
             [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 20)
+            [FromQuery] int pageSize = 20
+        )
         {
             try
             {
                 var result = await _tenantService.GetPagedAsync(keyword, isActive, page, pageSize);
-                
+
                 return Ok(
                     ApiResponse<object>.SuccessPaged(
                         result.Items,
@@ -163,13 +167,24 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                     MaxUsers = request.MaxUsers,
                     MaxStorageMB = request.MaxStorageMB,
                     SubscriptionExpiresAt = request.SubscriptionExpiresAt,
-                    IsActive = request.IsActive ?? true
+                    IsActive = request.IsActive ?? true,
                 };
 
                 var created = await _tenantService.CreateAsync(tenant);
-                _logger.LogInformation("创建租户: {TenantCode} ({TenantId})", created.Code, created.Id);
+                _logger.LogInformation(
+                    "创建租户: {TenantCode} ({TenantId})",
+                    created.Code,
+                    created.Id
+                );
 
-                return Ok(new { code = 20000, data = created, message = "租户创建成功" });
+                return Ok(
+                    new
+                    {
+                        code = 20000,
+                        data = created,
+                        message = "租户创建成功",
+                    }
+                );
             }
             catch (InvalidOperationException ex)
             {
@@ -208,16 +223,27 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                 existing.MaxStorageMB = request.MaxStorageMB;
                 existing.SubscriptionExpiresAt = request.SubscriptionExpiresAt;
                 existing.Settings = request.Settings;
-                
+
                 if (request.IsActive.HasValue)
                 {
                     existing.IsActive = request.IsActive.Value;
                 }
 
                 var updated = await _tenantService.UpdateAsync(existing);
-                _logger.LogInformation("更新租户: {TenantCode} ({TenantId})", updated.Code, updated.Id);
+                _logger.LogInformation(
+                    "更新租户: {TenantCode} ({TenantId})",
+                    updated.Code,
+                    updated.Id
+                );
 
-                return Ok(new { code = 20000, data = updated, message = "租户更新成功" });
+                return Ok(
+                    new
+                    {
+                        code = 20000,
+                        data = updated,
+                        message = "租户更新成功",
+                    }
+                );
             }
             catch (InvalidOperationException ex)
             {
@@ -283,7 +309,10 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         /// 检查租户代码是否可用
         /// </summary>
         [HttpGet("check-code")]
-        public async Task<IActionResult> CheckCode([FromQuery] string code, [FromQuery] Guid? excludeId = null)
+        public async Task<IActionResult> CheckCode(
+            [FromQuery] string code,
+            [FromQuery] Guid? excludeId = null
+        )
         {
             var isAvailable = await _tenantService.IsCodeAvailableAsync(code, excludeId);
             return Ok(new { code = 20000, data = new { available = isAvailable } });
@@ -293,7 +322,10 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         /// 检查域名是否可用
         /// </summary>
         [HttpGet("check-domain")]
-        public async Task<IActionResult> CheckDomain([FromQuery] string domain, [FromQuery] Guid? excludeId = null)
+        public async Task<IActionResult> CheckDomain(
+            [FromQuery] string domain,
+            [FromQuery] Guid? excludeId = null
+        )
         {
             var isAvailable = await _tenantService.IsDomainAvailableAsync(domain, excludeId);
             return Ok(new { code = 20000, data = new { available = isAvailable } });

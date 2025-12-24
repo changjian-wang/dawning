@@ -13,9 +13,7 @@ public class RedisDistributedLock : IDistributedLock
     private readonly ILogger<RedisDistributedLock> _logger;
     private readonly string _instanceId;
 
-    public RedisDistributedLock(
-        IConnectionMultiplexer? redis,
-        ILogger<RedisDistributedLock> logger)
+    public RedisDistributedLock(IConnectionMultiplexer? redis, ILogger<RedisDistributedLock> logger)
     {
         _redis = redis;
         _logger = logger;
@@ -25,11 +23,15 @@ public class RedisDistributedLock : IDistributedLock
     public async Task<IDistributedLockHandle?> TryAcquireAsync(
         string lockKey,
         TimeSpan expiry,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (_redis == null || !_redis.IsConnected)
         {
-            _logger.LogWarning("Redis not available, returning null lock for resource: {Resource}", lockKey);
+            _logger.LogWarning(
+                "Redis not available, returning null lock for resource: {Resource}",
+                lockKey
+            );
             return null;
         }
 
@@ -42,7 +44,8 @@ public class RedisDistributedLock : IDistributedLock
                 fullLockKey,
                 _instanceId,
                 expiry,
-                When.NotExists);
+                When.NotExists
+            );
 
             if (acquired)
             {
@@ -64,7 +67,8 @@ public class RedisDistributedLock : IDistributedLock
         string lockKey,
         TimeSpan expiry,
         TimeSpan timeout,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var startTime = DateTime.UtcNow;
 
@@ -79,7 +83,9 @@ public class RedisDistributedLock : IDistributedLock
             await Task.Delay(100, cancellationToken);
         }
 
-        throw new TimeoutException($"Failed to acquire lock for resource '{lockKey}' within {timeout}");
+        throw new TimeoutException(
+            $"Failed to acquire lock for resource '{lockKey}' within {timeout}"
+        );
     }
 
     /// <summary>
@@ -101,7 +107,8 @@ public class RedisDistributedLock : IDistributedLock
             string fullLockKey,
             string lockKey,
             string instanceId,
-            ILogger logger)
+            ILogger logger
+        )
         {
             _db = db;
             _fullLockKey = fullLockKey;
@@ -110,14 +117,19 @@ public class RedisDistributedLock : IDistributedLock
             _logger = logger;
         }
 
-        public async Task<bool> ExtendAsync(TimeSpan extension, CancellationToken cancellationToken = default)
+        public async Task<bool> ExtendAsync(
+            TimeSpan extension,
+            CancellationToken cancellationToken = default
+        )
         {
-            if (_released) return false;
+            if (_released)
+                return false;
 
             try
             {
                 // 只有持有锁的实例才能延长锁
-                var script = @"
+                var script =
+                    @"
                     if redis.call('get', KEYS[1]) == ARGV[1] then
                         return redis.call('pexpire', KEYS[1], ARGV[2])
                     else
@@ -128,7 +140,8 @@ public class RedisDistributedLock : IDistributedLock
                 var result = await _db.ScriptEvaluateAsync(
                     script,
                     new RedisKey[] { _fullLockKey },
-                    new RedisValue[] { _instanceId, (long)extension.TotalMilliseconds });
+                    new RedisValue[] { _instanceId, (long)extension.TotalMilliseconds }
+                );
 
                 var extended = (long)result! == 1;
                 if (extended)
@@ -146,12 +159,14 @@ public class RedisDistributedLock : IDistributedLock
 
         public async Task ReleaseAsync(CancellationToken cancellationToken = default)
         {
-            if (_released) return;
+            if (_released)
+                return;
 
             try
             {
                 // 只有持有锁的实例才能释放锁
-                var script = @"
+                var script =
+                    @"
                     if redis.call('get', KEYS[1]) == ARGV[1] then
                         return redis.call('del', KEYS[1])
                     else
@@ -162,7 +177,8 @@ public class RedisDistributedLock : IDistributedLock
                 await _db.ScriptEvaluateAsync(
                     script,
                     new RedisKey[] { _fullLockKey },
-                    new RedisValue[] { _instanceId });
+                    new RedisValue[] { _instanceId }
+                );
 
                 _released = true;
                 _logger.LogDebug("Lock released: {LockKey}", LockKey);

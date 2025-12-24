@@ -15,7 +15,8 @@ public interface IDistributedLock
     Task<IDistributedLockHandle?> TryAcquireAsync(
         string lockKey,
         TimeSpan expiry,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// 获取锁（阻塞直到获取成功或超时）
@@ -29,7 +30,8 @@ public interface IDistributedLock
         string lockKey,
         TimeSpan expiry,
         TimeSpan timeout,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default
+    );
 }
 
 /// <summary>

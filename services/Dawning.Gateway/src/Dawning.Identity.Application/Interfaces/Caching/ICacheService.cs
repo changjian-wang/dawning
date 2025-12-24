@@ -71,7 +71,8 @@ namespace Dawning.Identity.Application.Interfaces.Caching
             CacheEntryOptions? options = null,
             TimeSpan? nullValueTtl = null,
             CancellationToken cancellationToken = default
-        ) where T : class;
+        )
+            where T : class;
     }
 
     /// <summary>
@@ -97,50 +98,38 @@ namespace Dawning.Identity.Application.Interfaces.Caching
         /// <summary>
         /// 默认5分钟过期
         /// </summary>
-        public static CacheEntryOptions Default => new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-        };
+        public static CacheEntryOptions Default =>
+            new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) };
 
         /// <summary>
         /// 短期缓存（1分钟）
         /// </summary>
-        public static CacheEntryOptions Short => new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
-        };
+        public static CacheEntryOptions Short =>
+            new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1) };
 
         /// <summary>
         /// 中期缓存（15分钟）
         /// </summary>
-        public static CacheEntryOptions Medium => new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15)
-        };
+        public static CacheEntryOptions Medium =>
+            new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15) };
 
         /// <summary>
         /// 长期缓存（1小时）
         /// </summary>
-        public static CacheEntryOptions Long => new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
-        };
+        public static CacheEntryOptions Long =>
+            new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) };
 
         /// <summary>
         /// 创建自定义过期时间选项
         /// </summary>
-        public static CacheEntryOptions FromMinutes(int minutes) => new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(minutes)
-        };
+        public static CacheEntryOptions FromMinutes(int minutes) =>
+            new() { AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(minutes) };
 
         /// <summary>
         /// 创建滑动过期选项
         /// </summary>
-        public static CacheEntryOptions Sliding(TimeSpan slidingExpiration) => new()
-        {
-            SlidingExpiration = slidingExpiration
-        };
+        public static CacheEntryOptions Sliding(TimeSpan slidingExpiration) =>
+            new() { SlidingExpiration = slidingExpiration };
     }
 
     /// <summary>
@@ -151,28 +140,39 @@ namespace Dawning.Identity.Application.Interfaces.Caching
         private const string Prefix = "dawning:";
 
         // 系统配置
-        public static string SystemConfig(string group, string key) => $"{Prefix}config:{group}:{key}";
+        public static string SystemConfig(string group, string key) =>
+            $"{Prefix}config:{group}:{key}";
+
         public static string SystemConfigGroup(string group) => $"{Prefix}config:{group}:*";
+
         public static string SystemConfigAll => $"{Prefix}config:*";
 
         // 用户
         public static string User(Guid id) => $"{Prefix}user:{id}";
+
         public static string UserByUsername(string username) => $"{Prefix}user:name:{username}";
+
         public static string UserPermissions(Guid userId) => $"{Prefix}user:{userId}:permissions";
+
         public static string UserRoles(Guid userId) => $"{Prefix}user:{userId}:roles";
 
         // 角色
         public static string Role(Guid id) => $"{Prefix}role:{id}";
+
         public static string RoleByName(string name) => $"{Prefix}role:name:{name}";
+
         public static string AllRoles => $"{Prefix}roles:all";
 
         // 权限
         public static string Permission(Guid id) => $"{Prefix}permission:{id}";
+
         public static string AllPermissions => $"{Prefix}permissions:all";
 
         // 网关配置
         public static string GatewayCluster(Guid id) => $"{Prefix}gateway:cluster:{id}";
+
         public static string GatewayRoute(Guid id) => $"{Prefix}gateway:route:{id}";
+
         public static string AllGatewayClusters => $"{Prefix}gateway:clusters:all";
         public static string AllGatewayRoutes => $"{Prefix}gateway:routes:all";
 

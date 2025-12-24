@@ -22,7 +22,8 @@ public static class MessagingServiceExtensions
     /// </summary>
     public static IServiceCollection AddMessagingServices(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration
+    )
     {
         // 配置 Kafka 选项
         services.Configure<KafkaOptions>(configuration.GetSection("Kafka"));
@@ -42,7 +43,9 @@ public static class MessagingServiceExtensions
     /// <summary>
     /// 添加 MediatR 领域事件分发器
     /// </summary>
-    public static IServiceCollection AddMediatRDomainEventDispatcher(this IServiceCollection services)
+    public static IServiceCollection AddMediatRDomainEventDispatcher(
+        this IServiceCollection services
+    )
     {
         services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
         return services;
@@ -70,7 +73,10 @@ public static class MessagingServiceExtensions
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Failed to create Kafka integration event bus, using null bus");
+                logger.LogWarning(
+                    ex,
+                    "Failed to create Kafka integration event bus, using null bus"
+                );
                 return new NullIntegrationEventBus(nullLogger);
             }
         });
@@ -81,7 +87,9 @@ public static class MessagingServiceExtensions
     /// <summary>
     /// 添加 Kafka 集成事件消费者
     /// </summary>
-    public static IServiceCollection AddKafkaIntegrationEventConsumers(this IServiceCollection services)
+    public static IServiceCollection AddKafkaIntegrationEventConsumers(
+        this IServiceCollection services
+    )
     {
         services.AddHostedService<AuditLogIntegrationEventConsumer>();
         services.AddHostedService<AlertNotificationIntegrationEventConsumer>();

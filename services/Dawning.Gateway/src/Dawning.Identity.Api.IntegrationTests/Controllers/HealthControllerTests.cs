@@ -8,9 +8,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class HealthControllerTests : IntegrationTestBase
 {
-    public HealthControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public HealthControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task Get_HealthEndpoint_ReturnsHealthyStatus()
@@ -35,7 +34,9 @@ public class HealthControllerTests : IntegrationTestBase
 
         // Assert
         // 可能是 200 (Healthy) 或 503 (Unhealthy，如果数据库不可用)
-        response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
+        response
+            .StatusCode.Should()
+            .BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
 
         var content = await response.Content.ReadAsStringAsync();
         content.Should().Contain("checks");
@@ -49,7 +50,9 @@ public class HealthControllerTests : IntegrationTestBase
 
         // Assert
         // 取决于数据库是否可用
-        response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
+        response
+            .StatusCode.Should()
+            .BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
     }
 
     [Fact]

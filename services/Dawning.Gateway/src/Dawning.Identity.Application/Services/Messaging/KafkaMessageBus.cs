@@ -17,9 +17,7 @@ public class KafkaMessageBus : IMessageBus, IDisposable
     private readonly string _serviceName;
     private bool _disposed;
 
-    public KafkaMessageBus(
-        IOptions<KafkaOptions> options,
-        ILogger<KafkaMessageBus> logger)
+    public KafkaMessageBus(IOptions<KafkaOptions> options, ILogger<KafkaMessageBus> logger)
     {
         _options = options.Value;
         _logger = logger;
@@ -41,23 +39,40 @@ public class KafkaMessageBus : IMessageBus, IDisposable
         };
 
         _producer = new ProducerBuilder<string, string>(config)
-            .SetErrorHandler((_, error) =>
-            {
-                _logger.LogError("Kafka Producer Error: {Reason} (Code: {Code})", error.Reason, error.Code);
-            })
-            .SetLogHandler((_, log) =>
-            {
-                _logger.LogDebug("Kafka Producer: {Message}", log.Message);
-            })
+            .SetErrorHandler(
+                (_, error) =>
+                {
+                    _logger.LogError(
+                        "Kafka Producer Error: {Reason} (Code: {Code})",
+                        error.Reason,
+                        error.Code
+                    );
+                }
+            )
+            .SetLogHandler(
+                (_, log) =>
+                {
+                    _logger.LogDebug("Kafka Producer: {Message}", log.Message);
+                }
+            )
             .Build();
 
-        _logger.LogInformation("Kafka Producer initialized. Brokers: {Brokers}", _options.BootstrapServers);
+        _logger.LogInformation(
+            "Kafka Producer initialized. Brokers: {Brokers}",
+            _options.BootstrapServers
+        );
     }
 
     /// <summary>
     /// 发布消息到指定主题
     /// </summary>
-    public async Task PublishAsync<T>(string topic, T message, string? key = null, CancellationToken cancellationToken = default) where T : class
+    public async Task PublishAsync<T>(
+        string topic,
+        T message,
+        string? key = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
         if (!_options.Enabled)
         {
@@ -73,24 +88,30 @@ public class KafkaMessageBus : IMessageBus, IDisposable
                 baseMessage.SourceService ??= _serviceName;
             }
 
-            var json = JsonSerializer.Serialize(message, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = false
-            });
+            var json = JsonSerializer.Serialize(
+                message,
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    WriteIndented = false,
+                }
+            );
 
             var kafkaMessage = new Message<string, string>
             {
                 Key = key ?? Guid.NewGuid().ToString(),
                 Value = json,
-                Timestamp = new Timestamp(DateTime.UtcNow)
+                Timestamp = new Timestamp(DateTime.UtcNow),
             };
 
             var result = await _producer.ProduceAsync(topic, kafkaMessage, cancellationToken);
 
             _logger.LogDebug(
                 "Message published to {Topic}. Partition: {Partition}, Offset: {Offset}",
-                topic, result.Partition.Value, result.Offset.Value);
+                topic,
+                result.Partition.Value,
+                result.Offset.Value
+            );
         }
         catch (ProduceException<string, string> ex)
         {
@@ -102,7 +123,12 @@ public class KafkaMessageBus : IMessageBus, IDisposable
     /// <summary>
     /// 发布消息（使用消息类型名作为主题）
     /// </summary>
-    public Task PublishAsync<T>(T message, string? key = null, CancellationToken cancellationToken = default) where T : class
+    public Task PublishAsync<T>(
+        T message,
+        string? key = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
         var topic = GetTopicForMessageType<T>();
         return PublishAsync(topic, message, key, cancellationToken);
@@ -111,7 +137,8 @@ public class KafkaMessageBus : IMessageBus, IDisposable
     /// <summary>
     /// 根据消息类型获取主题名
     /// </summary>
-    private string GetTopicForMessageType<T>() where T : class
+    private string GetTopicForMessageType<T>()
+        where T : class
     {
         return typeof(T).Name switch
         {
@@ -122,13 +149,14 @@ public class KafkaMessageBus : IMessageBus, IDisposable
             nameof(SystemEventMessage) => _options.Topics.SystemEvent,
             nameof(ConfigChangedMessage) => _options.Topics.ConfigChanged,
             nameof(CacheInvalidationMessage) => _options.Topics.CacheInvalidation,
-            _ => $"dawning.{typeof(T).Name.ToLowerInvariant()}"
+            _ => $"dawning.{typeof(T).Name.ToLowerInvariant()}",
         };
     }
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         _disposed = true;
 
         try
@@ -156,15 +184,32 @@ public class NullMessageBus : IMessageBus
         _logger = logger;
     }
 
-    public Task PublishAsync<T>(string topic, T message, string? key = null, CancellationToken cancellationToken = default) where T : class
+    public Task PublishAsync<T>(
+        string topic,
+        T message,
+        string? key = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
-        _logger.LogDebug("NullMessageBus: Message to topic {Topic} was not sent (Kafka disabled)", topic);
+        _logger.LogDebug(
+            "NullMessageBus: Message to topic {Topic} was not sent (Kafka disabled)",
+            topic
+        );
         return Task.CompletedTask;
     }
 
-    public Task PublishAsync<T>(T message, string? key = null, CancellationToken cancellationToken = default) where T : class
+    public Task PublishAsync<T>(
+        T message,
+        string? key = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
-        _logger.LogDebug("NullMessageBus: Message of type {Type} was not sent (Kafka disabled)", typeof(T).Name);
+        _logger.LogDebug(
+            "NullMessageBus: Message of type {Type} was not sent (Kafka disabled)",
+            typeof(T).Name
+        );
         return Task.CompletedTask;
     }
 }

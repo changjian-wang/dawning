@@ -27,7 +27,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             {
                 TenantId = tenantId,
                 TenantName = tenantName,
-                IsHost = isHost
+                IsHost = isHost,
             };
         }
 

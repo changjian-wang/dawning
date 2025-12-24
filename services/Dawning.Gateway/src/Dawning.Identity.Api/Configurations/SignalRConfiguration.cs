@@ -44,18 +44,24 @@ namespace Dawning.Identity.Api.Configurations
             var redisConnection = configuration.GetConnectionString("Redis");
             if (!string.IsNullOrEmpty(redisConnection))
             {
-                signalRBuilder.AddStackExchangeRedis(redisConnection, options =>
-                {
-                    options.Configuration.ChannelPrefix =
-                        StackExchange.Redis.RedisChannel.Literal("Dawning:SignalR:");
-                });
+                signalRBuilder.AddStackExchangeRedis(
+                    redisConnection,
+                    options =>
+                    {
+                        options.Configuration.ChannelPrefix =
+                            StackExchange.Redis.RedisChannel.Literal("Dawning:SignalR:");
+                    }
+                );
             }
 
             // 添加消息包序列化选项
             signalRBuilder.AddJsonProtocol(options =>
             {
-                options.PayloadSerializerOptions.PropertyNamingPolicy =
-                    System.Text.Json.JsonNamingPolicy.CamelCase;
+                options.PayloadSerializerOptions.PropertyNamingPolicy = System
+                    .Text
+                    .Json
+                    .JsonNamingPolicy
+                    .CamelCase;
                 options.PayloadSerializerOptions.WriteIndented = false;
             });
 
@@ -85,23 +91,26 @@ namespace Dawning.Identity.Api.Configurations
         public static IEndpointRouteBuilder MapSignalRHubs(this IEndpointRouteBuilder endpoints)
         {
             // 主通知 Hub
-            endpoints.MapHub<NotificationHub>("/hubs/notification", options =>
-            {
-                // 传输方式配置
-                options.Transports =
-                    Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets
-                    | Microsoft.AspNetCore.Http.Connections.HttpTransportType.ServerSentEvents
-                    | Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
+            endpoints.MapHub<NotificationHub>(
+                "/hubs/notification",
+                options =>
+                {
+                    // 传输方式配置
+                    options.Transports =
+                        Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets
+                        | Microsoft.AspNetCore.Http.Connections.HttpTransportType.ServerSentEvents
+                        | Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
 
-                // WebSocket 配置
-                options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(5);
+                    // WebSocket 配置
+                    options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(5);
 
-                // 长轮询配置
-                options.LongPolling.PollTimeout = TimeSpan.FromSeconds(90);
+                    // 长轮询配置
+                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(90);
 
-                // 授权要求
-                options.AllowStatefulReconnects = true;
-            });
+                    // 授权要求
+                    options.AllowStatefulReconnects = true;
+                }
+            );
 
             return endpoints;
         }

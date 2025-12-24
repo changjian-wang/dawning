@@ -57,17 +57,13 @@ namespace Dawning.Identity.Api.Services
             try
             {
                 // 发送给订阅了 alerts 频道的用户
-                await _hubContext.Clients
-                    .Group("channel_alerts")
-                    .SendAsync("AlertReceived", alert);
+                await _hubContext.Clients.Group("channel_alerts").SendAsync("AlertReceived", alert);
 
                 // 同时发送给管理员
-                await _hubContext.Clients
-                    .Group("role_admin")
-                    .SendAsync("AlertReceived", alert);
+                await _hubContext.Clients.Group("role_admin").SendAsync("AlertReceived", alert);
 
-                await _hubContext.Clients
-                    .Group("role_super_admin")
+                await _hubContext
+                    .Clients.Group("role_super_admin")
                     .SendAsync("AlertReceived", alert);
 
                 _logger.LogInformation(
@@ -101,15 +97,11 @@ namespace Dawning.Identity.Api.Services
         {
             try
             {
-                await _hubContext.Clients
-                    .Group($"user_{userId}")
+                await _hubContext
+                    .Clients.Group($"user_{userId}")
                     .SendAsync("NotificationReceived", notification);
 
-                _logger.LogDebug(
-                    "通知已发送给用户 {UserId}: {Type}",
-                    userId,
-                    notification.Type
-                );
+                _logger.LogDebug("通知已发送给用户 {UserId}: {Type}", userId, notification.Type);
             }
             catch (Exception ex)
             {
@@ -122,15 +114,11 @@ namespace Dawning.Identity.Api.Services
         {
             try
             {
-                await _hubContext.Clients
-                    .Group($"role_{role}")
+                await _hubContext
+                    .Clients.Group($"role_{role}")
                     .SendAsync("NotificationReceived", notification);
 
-                _logger.LogDebug(
-                    "通知已发送给角色 {Role}: {Type}",
-                    role,
-                    notification.Type
-                );
+                _logger.LogDebug("通知已发送给角色 {Role}: {Type}", role, notification.Type);
             }
             catch (Exception ex)
             {
@@ -143,15 +131,11 @@ namespace Dawning.Identity.Api.Services
         {
             try
             {
-                await _hubContext.Clients
-                    .Group($"channel_{channel}")
+                await _hubContext
+                    .Clients.Group($"channel_{channel}")
                     .SendAsync("NotificationReceived", notification);
 
-                _logger.LogDebug(
-                    "通知已发送到频道 {Channel}: {Type}",
-                    channel,
-                    notification.Type
-                );
+                _logger.LogDebug("通知已发送到频道 {Channel}: {Type}", channel, notification.Type);
             }
             catch (Exception ex)
             {

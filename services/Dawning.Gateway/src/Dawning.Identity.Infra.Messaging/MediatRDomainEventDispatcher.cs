@@ -16,7 +16,8 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
 
     public MediatRDomainEventDispatcher(
         IMediator mediator,
-        ILogger<MediatRDomainEventDispatcher> logger)
+        ILogger<MediatRDomainEventDispatcher> logger
+    )
     {
         _mediator = mediator;
         _logger = logger;
@@ -25,11 +26,16 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
     /// <summary>
     /// 发布单个领域事件
     /// </summary>
-    public async Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default)
+    public async Task DispatchAsync(
+        IDomainEvent domainEvent,
+        CancellationToken cancellationToken = default
+    )
     {
         _logger.LogDebug(
             "Dispatching domain event: {EventType}, EventId: {EventId}",
-            domainEvent.EventType, domainEvent.EventId);
+            domainEvent.EventType,
+            domainEvent.EventId
+        );
 
         try
         {
@@ -37,13 +43,17 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
 
             _logger.LogDebug(
                 "Domain event dispatched successfully: {EventType}",
-                domainEvent.EventType);
+                domainEvent.EventType
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex,
+            _logger.LogError(
+                ex,
                 "Error dispatching domain event: {EventType}, EventId: {EventId}",
-                domainEvent.EventType, domainEvent.EventId);
+                domainEvent.EventType,
+                domainEvent.EventId
+            );
             throw;
         }
     }
@@ -51,7 +61,10 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
     /// <summary>
     /// 发布多个领域事件（按顺序）
     /// </summary>
-    public async Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default)
+    public async Task DispatchAsync(
+        IEnumerable<IDomainEvent> domainEvents,
+        CancellationToken cancellationToken = default
+    )
     {
         foreach (var domainEvent in domainEvents)
         {

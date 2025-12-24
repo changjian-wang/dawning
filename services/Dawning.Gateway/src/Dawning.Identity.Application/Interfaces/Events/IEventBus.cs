@@ -16,7 +16,10 @@ public interface IDomainEventDispatcher
     /// <summary>
     /// 发布多个领域事件
     /// </summary>
-    Task DispatchAsync(IEnumerable<IDomainEvent> domainEvents, CancellationToken cancellationToken = default);
+    Task DispatchAsync(
+        IEnumerable<IDomainEvent> domainEvents,
+        CancellationToken cancellationToken = default
+    );
 }
 
 /// <summary>
@@ -35,7 +38,8 @@ public interface IIntegrationEventBus
     Task PublishAsync<TEvent>(
         TEvent @event,
         string? topic = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEvent : IIntegrationEvent;
 
     /// <summary>
@@ -44,7 +48,8 @@ public interface IIntegrationEventBus
     Task PublishManyAsync<TEvent>(
         IEnumerable<TEvent> events,
         string? topic = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEvent : IIntegrationEvent;
 }
 
@@ -71,5 +76,5 @@ public enum EventHandleResult
     /// <summary>
     /// 处理失败，发送到死信队列
     /// </summary>
-    DeadLetter
+    DeadLetter,
 }

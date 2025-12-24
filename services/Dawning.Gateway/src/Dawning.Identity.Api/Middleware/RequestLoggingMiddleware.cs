@@ -117,17 +117,19 @@ namespace Dawning.Identity.Api.Middleware
                     UserId = GetUserId(context),
                     UserName = GetUserName(context),
                     RequestTime = requestTime,
-                    Exception = exception
+                    Exception = exception,
                 };
-                
+
                 // Fire-and-forget，使用应用级别的 IServiceScopeFactory 不阻塞响应
                 _ = Task.Run(async () =>
                 {
                     try
                     {
                         using var scope = _serviceScopeFactory.CreateScope();
-                        var loggingService = scope.ServiceProvider.GetService<IRequestLoggingService>();
-                        if (loggingService == null) return;
+                        var loggingService =
+                            scope.ServiceProvider.GetService<IRequestLoggingService>();
+                        if (loggingService == null)
+                            return;
 
                         var entry = new RequestLogEntry
                         {
@@ -142,7 +144,7 @@ namespace Dawning.Identity.Api.Middleware
                             UserId = logContext.UserId,
                             UserName = logContext.UserName,
                             RequestTime = logContext.RequestTime,
-                            Exception = logContext.Exception
+                            Exception = logContext.Exception,
                         };
 
                         await loggingService.LogRequestAsync(entry);
@@ -158,14 +160,16 @@ namespace Dawning.Identity.Api.Middleware
 
         private Guid? GetUserId(HttpContext context)
         {
-            if (context.User?.Identity?.IsAuthenticated != true) return null;
+            if (context.User?.Identity?.IsAuthenticated != true)
+                return null;
             var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Guid.TryParse(userIdClaim, out var parsedUserId) ? parsedUserId : null;
         }
 
         private string? GetUserName(HttpContext context)
         {
-            if (context.User?.Identity?.IsAuthenticated != true) return null;
+            if (context.User?.Identity?.IsAuthenticated != true)
+                return null;
             return context.User.FindFirst(ClaimTypes.Name)?.Value;
         }
 

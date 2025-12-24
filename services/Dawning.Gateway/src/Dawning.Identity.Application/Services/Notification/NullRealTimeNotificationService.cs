@@ -18,19 +18,13 @@ public class NullRealTimeNotificationService : IRealTimeNotificationService
 
     public Task SendAlertNotificationAsync(RealTimeAlertNotification alert)
     {
-        _logger.LogDebug(
-            "实时通知服务未配置，跳过告警推送: {Title}",
-            alert.Title
-        );
+        _logger.LogDebug("实时通知服务未配置，跳过告警推送: {Title}", alert.Title);
         return Task.CompletedTask;
     }
 
     public Task SendSystemMessageAsync(RealTimeSystemMessage message)
     {
-        _logger.LogDebug(
-            "实时通知服务未配置，跳过系统消息推送: {Title}",
-            message.Title
-        );
+        _logger.LogDebug("实时通知服务未配置，跳过系统消息推送: {Title}", message.Title);
         return Task.CompletedTask;
     }
 

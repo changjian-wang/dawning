@@ -12,7 +12,8 @@ namespace Dawning.Identity.Application.Services.Messaging;
 /// Kafka 消费者后台服务基类
 /// </summary>
 /// <typeparam name="TMessage">消息类型</typeparam>
-public abstract class KafkaConsumerService<TMessage> : BackgroundService where TMessage : class
+public abstract class KafkaConsumerService<TMessage> : BackgroundService
+    where TMessage : class
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly KafkaOptions _options;
@@ -24,7 +25,8 @@ public abstract class KafkaConsumerService<TMessage> : BackgroundService where T
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
         ILogger logger,
-        string topic)
+        string topic
+    )
     {
         _scopeFactory = scopeFactory;
         _options = options.Value;
@@ -36,7 +38,10 @@ public abstract class KafkaConsumerService<TMessage> : BackgroundService where T
     {
         if (!_options.Enabled)
         {
-            _logger.LogInformation("Kafka is disabled. Consumer for topic {Topic} will not start.", _topic);
+            _logger.LogInformation(
+                "Kafka is disabled. Consumer for topic {Topic} will not start.",
+                _topic
+            );
             return;
         }
 
@@ -60,25 +65,42 @@ public abstract class KafkaConsumerService<TMessage> : BackgroundService where T
         };
 
         _consumer = new ConsumerBuilder<string, string>(config)
-            .SetErrorHandler((_, error) =>
-            {
-                _logger.LogError("Kafka Consumer Error: {Reason} (Code: {Code})", error.Reason, error.Code);
-            })
-            .SetPartitionsAssignedHandler((_, partitions) =>
-            {
-                _logger.LogInformation("Assigned partitions: [{Partitions}]",
-                    string.Join(", ", partitions.Select(p => $"{p.Topic}:{p.Partition}")));
-            })
-            .SetPartitionsRevokedHandler((_, partitions) =>
-            {
-                _logger.LogInformation("Revoked partitions: [{Partitions}]",
-                    string.Join(", ", partitions.Select(p => $"{p.Topic}:{p.Partition}")));
-            })
+            .SetErrorHandler(
+                (_, error) =>
+                {
+                    _logger.LogError(
+                        "Kafka Consumer Error: {Reason} (Code: {Code})",
+                        error.Reason,
+                        error.Code
+                    );
+                }
+            )
+            .SetPartitionsAssignedHandler(
+                (_, partitions) =>
+                {
+                    _logger.LogInformation(
+                        "Assigned partitions: [{Partitions}]",
+                        string.Join(", ", partitions.Select(p => $"{p.Topic}:{p.Partition}"))
+                    );
+                }
+            )
+            .SetPartitionsRevokedHandler(
+                (_, partitions) =>
+                {
+                    _logger.LogInformation(
+                        "Revoked partitions: [{Partitions}]",
+                        string.Join(", ", partitions.Select(p => $"{p.Topic}:{p.Partition}"))
+                    );
+                }
+            )
             .Build();
 
         _consumer.Subscribe(_topic);
-        _logger.LogInformation("Kafka Consumer started. Topic: {Topic}, Group: {Group}",
-            _topic, _options.ConsumerGroupId);
+        _logger.LogInformation(
+            "Kafka Consumer started. Topic: {Topic}, Group: {Group}",
+            _topic,
+            _options.ConsumerGroupId
+        );
 
         try
         {
@@ -109,7 +131,11 @@ public abstract class KafkaConsumerService<TMessage> : BackgroundService where T
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Unexpected error processing message from topic {Topic}", _topic);
+                    _logger.LogError(
+                        ex,
+                        "Unexpected error processing message from topic {Topic}",
+                        _topic
+                    );
                     await Task.Delay(1000, stoppingToken); // 错误后等待
                 }
             }
@@ -122,15 +148,21 @@ public abstract class KafkaConsumerService<TMessage> : BackgroundService where T
         }
     }
 
-    private async Task ProcessMessageAsync(ConsumeResult<string, string> result, CancellationToken cancellationToken)
+    private async Task ProcessMessageAsync(
+        ConsumeResult<string, string> result,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            var message = JsonSerializer.Deserialize<TMessage>(result.Message.Value, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = true
-            });
+            var message = JsonSerializer.Deserialize<TMessage>(
+                result.Message.Value,
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true,
+                }
+            );
 
             if (message == null)
             {
@@ -142,18 +174,31 @@ public abstract class KafkaConsumerService<TMessage> : BackgroundService where T
             using var scope = _scopeFactory.CreateScope();
             await HandleMessageAsync(scope.ServiceProvider, message, cancellationToken);
 
-            _logger.LogDebug("Message processed from topic {Topic}. Key: {Key}, Partition: {Partition}, Offset: {Offset}",
-                _topic, result.Message.Key, result.Partition.Value, result.Offset.Value);
+            _logger.LogDebug(
+                "Message processed from topic {Topic}. Key: {Key}, Partition: {Partition}, Offset: {Offset}",
+                _topic,
+                result.Message.Key,
+                result.Partition.Value,
+                result.Offset.Value
+            );
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Failed to deserialize message from topic {Topic}. Value: {Value}",
-                _topic, result.Message.Value.Substring(0, Math.Min(200, result.Message.Value.Length)));
+            _logger.LogError(
+                ex,
+                "Failed to deserialize message from topic {Topic}. Value: {Value}",
+                _topic,
+                result.Message.Value.Substring(0, Math.Min(200, result.Message.Value.Length))
+            );
         }
     }
 
     /// <summary>
     /// 处理消息（子类实现）
     /// </summary>
-    protected abstract Task HandleMessageAsync(IServiceProvider serviceProvider, TMessage message, CancellationToken cancellationToken);
+    protected abstract Task HandleMessageAsync(
+        IServiceProvider serviceProvider,
+        TMessage message,
+        CancellationToken cancellationToken
+    );
 }

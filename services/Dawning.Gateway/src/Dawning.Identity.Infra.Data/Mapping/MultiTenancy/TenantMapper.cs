@@ -33,7 +33,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.MultiTenancy
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt,
                 CreatedBy = entity.CreatedBy,
-                UpdatedBy = entity.UpdatedBy
+                UpdatedBy = entity.UpdatedBy,
             };
         }
 
@@ -62,7 +62,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.MultiTenancy
                 CreatedAt = model.CreatedAt,
                 UpdatedAt = model.UpdatedAt,
                 CreatedBy = model.CreatedBy,
-                UpdatedBy = model.UpdatedBy
+                UpdatedBy = model.UpdatedBy,
             };
         }
     }

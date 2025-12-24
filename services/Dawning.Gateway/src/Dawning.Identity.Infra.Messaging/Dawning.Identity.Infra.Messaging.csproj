@@ -7,7 +7,6 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="2.6.1" />
     <PackageReference Include="MediatR" Version="12.4.1" />
@@ -16,7 +15,6 @@
     <PackageReference Include="StackExchange.Redis" Version="2.8.22" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />
   </ItemGroup>

@@ -39,7 +39,7 @@ public class SystemConfigServiceTests
             Id = Guid.NewGuid(),
             Name = "System",
             Key = "SiteName",
-            Value = "Dawning Gateway"
+            Value = "Dawning Gateway",
         };
 
         var pagedResult = new PagedData<SystemConfigAggregate>
@@ -47,11 +47,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate> { config },
             TotalCount = 1,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(pagedResult);
 
         // Act
@@ -70,11 +70,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(emptyResult);
 
         // Act
@@ -93,11 +93,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(emptyResult);
 
         // Act
@@ -116,7 +116,7 @@ public class SystemConfigServiceTests
             Id = Guid.NewGuid(),
             Name = "System",
             Key = "MaxItems",
-            Value = "100"
+            Value = "100",
         };
 
         var pagedResult = new PagedData<SystemConfigAggregate>
@@ -124,11 +124,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate> { config },
             TotalCount = 1,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(pagedResult);
 
         // Act
@@ -147,7 +147,7 @@ public class SystemConfigServiceTests
             Id = Guid.NewGuid(),
             Name = "System",
             Key = "EnableFeature",
-            Value = "true"
+            Value = "true",
         };
 
         var pagedResult = new PagedData<SystemConfigAggregate>
@@ -155,11 +155,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate> { config },
             TotalCount = 1,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(pagedResult);
 
         // Act
@@ -178,18 +178,24 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(emptyResult);
 
-        _configRepoMock.Setup(x => x.InsertAsync(It.IsAny<SystemConfigAggregate>()))
+        _configRepoMock
+            .Setup(x => x.InsertAsync(It.IsAny<SystemConfigAggregate>()))
             .ReturnsAsync(1);
 
         // Act
-        var result = await _configService.SetValueAsync("System", "NewKey", "NewValue", "Description");
+        var result = await _configService.SetValueAsync(
+            "System",
+            "NewKey",
+            "NewValue",
+            "Description"
+        );
 
         // Assert
         result.Should().BeTrue();
@@ -205,7 +211,7 @@ public class SystemConfigServiceTests
             Id = Guid.NewGuid(),
             Name = "System",
             Key = "ExistingKey",
-            Value = "OldValue"
+            Value = "OldValue",
         };
 
         var existingResult = new PagedData<SystemConfigAggregate>
@@ -213,14 +219,15 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate> { existingConfig },
             TotalCount = 1,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(existingResult);
 
-        _configRepoMock.Setup(x => x.UpdateAsync(It.IsAny<SystemConfigAggregate>()))
+        _configRepoMock
+            .Setup(x => x.UpdateAsync(It.IsAny<SystemConfigAggregate>()))
             .ReturnsAsync(true);
 
         // Act
@@ -237,8 +244,20 @@ public class SystemConfigServiceTests
         // Arrange
         var configs = new List<SystemConfigAggregate>
         {
-            new() { Id = Guid.NewGuid(), Name = "System", Key = "Key1", Value = "Value1" },
-            new() { Id = Guid.NewGuid(), Name = "System", Key = "Key2", Value = "Value2" }
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "System",
+                Key = "Key1",
+                Value = "Value1",
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "System",
+                Key = "Key2",
+                Value = "Value2",
+            },
         };
 
         var pagedResult = new PagedData<SystemConfigAggregate>
@@ -246,11 +265,11 @@ public class SystemConfigServiceTests
             Items = configs,
             TotalCount = 2,
             PageIndex = 1,
-            PageSize = 1000
+            PageSize = 1000,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1000))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1000))
             .ReturnsAsync(pagedResult);
 
         // Act
@@ -269,7 +288,7 @@ public class SystemConfigServiceTests
             new() { Name = "System", Key = "Key1" },
             new() { Name = "System", Key = "Key2" },
             new() { Name = "Security", Key = "Key1" },
-            new() { Name = "Email", Key = "Key1" }
+            new() { Name = "Email", Key = "Key1" },
         };
 
         var pagedResult = new PagedData<SystemConfigAggregate>
@@ -277,11 +296,11 @@ public class SystemConfigServiceTests
             Items = configs,
             TotalCount = 4,
             PageIndex = 1,
-            PageSize = 10000
+            PageSize = 10000,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 10000))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 10000))
             .ReturnsAsync(pagedResult);
 
         // Act
@@ -300,7 +319,7 @@ public class SystemConfigServiceTests
         {
             Id = Guid.NewGuid(),
             Name = "System",
-            Key = "ToDelete"
+            Key = "ToDelete",
         };
 
         var existingResult = new PagedData<SystemConfigAggregate>
@@ -308,14 +327,15 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate> { config },
             TotalCount = 1,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(existingResult);
 
-        _configRepoMock.Setup(x => x.DeleteAsync(It.IsAny<SystemConfigAggregate>()))
+        _configRepoMock
+            .Setup(x => x.DeleteAsync(It.IsAny<SystemConfigAggregate>()))
             .ReturnsAsync(true);
 
         // Act
@@ -334,11 +354,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(emptyResult);
 
         // Act
@@ -354,8 +374,18 @@ public class SystemConfigServiceTests
         // Arrange
         var configs = new List<SystemConfigItemDto>
         {
-            new() { Group = "System", Key = "Key1", Value = "Value1" },
-            new() { Group = "System", Key = "Key2", Value = "Value2" }
+            new()
+            {
+                Group = "System",
+                Key = "Key1",
+                Value = "Value1",
+            },
+            new()
+            {
+                Group = "System",
+                Key = "Key2",
+                Value = "Value2",
+            },
         };
 
         var emptyResult = new PagedData<SystemConfigAggregate>
@@ -363,14 +393,15 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(emptyResult);
 
-        _configRepoMock.Setup(x => x.InsertAsync(It.IsAny<SystemConfigAggregate>()))
+        _configRepoMock
+            .Setup(x => x.InsertAsync(It.IsAny<SystemConfigAggregate>()))
             .ReturnsAsync(1);
 
         // Act
@@ -378,7 +409,10 @@ public class SystemConfigServiceTests
 
         // Assert
         result.Should().BeTrue();
-        _configRepoMock.Verify(x => x.InsertAsync(It.IsAny<SystemConfigAggregate>()), Times.Exactly(2));
+        _configRepoMock.Verify(
+            x => x.InsertAsync(It.IsAny<SystemConfigAggregate>()),
+            Times.Exactly(2)
+        );
     }
 
     [Fact]
@@ -391,7 +425,7 @@ public class SystemConfigServiceTests
             Id = Guid.NewGuid(),
             Name = "System",
             Key = "Key1",
-            Timestamp = expectedTimestamp
+            Timestamp = expectedTimestamp,
         };
 
         var pagedResult = new PagedData<SystemConfigAggregate>
@@ -399,11 +433,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate> { config },
             TotalCount = 1,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(pagedResult);
 
         // Act
@@ -422,11 +456,11 @@ public class SystemConfigServiceTests
             Items = new List<SystemConfigAggregate>(),
             TotalCount = 0,
             PageIndex = 1,
-            PageSize = 1
+            PageSize = 1,
         };
 
-        _configRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<SystemConfigModel>(), 1, 1))
+        _configRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<SystemConfigModel>(), 1, 1))
             .ReturnsAsync(emptyResult);
 
         // Act

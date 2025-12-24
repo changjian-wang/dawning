@@ -71,7 +71,8 @@ public class UserLoggedInEvent : DomainEvent
         bool success,
         string? ipAddress = null,
         string? userAgent = null,
-        string? failureReason = null)
+        string? failureReason = null
+    )
     {
         UserId = userId;
         UserName = userName;
@@ -172,7 +173,8 @@ public class PermissionChangedEvent : DomainEvent
         Guid roleId,
         string roleName,
         List<string>? addedPermissions = null,
-        List<string>? removedPermissions = null)
+        List<string>? removedPermissions = null
+    )
     {
         RoleId = roleId;
         RoleName = roleName;
@@ -201,7 +203,8 @@ public class ConfigurationChangedEvent : DomainEvent
         string configKey,
         string? oldValue,
         string? newValue,
-        Guid? changedBy = null)
+        Guid? changedBy = null
+    )
     {
         ConfigGroup = configGroup;
         ConfigKey = configKey;
@@ -233,7 +236,8 @@ public class AlertTriggeredEvent : DomainEvent
         string metricType,
         string severity,
         double currentValue,
-        double threshold)
+        double threshold
+    )
     {
         AlertRuleId = alertRuleId;
         RuleName = ruleName;
@@ -285,7 +289,8 @@ public class EntityChangedEvent : DomainEvent
         Guid? userId = null,
         string? userName = null,
         string? oldValues = null,
-        string? newValues = null)
+        string? newValues = null
+    )
     {
         EntityType = entityType;
         EntityId = entityId;

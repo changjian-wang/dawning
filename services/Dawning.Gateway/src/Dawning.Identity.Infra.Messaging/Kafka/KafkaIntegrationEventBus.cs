@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Confluent.Kafka;
+using Dawning.Identity.Application.IntegrationEvents;
 using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Interfaces.Messaging;
-using Dawning.Identity.Application.IntegrationEvents;
 using Dawning.Identity.Domain.Core.Events;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,14 +23,15 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
 
     public KafkaIntegrationEventBus(
         IOptions<KafkaOptions> options,
-        ILogger<KafkaIntegrationEventBus> logger)
+        ILogger<KafkaIntegrationEventBus> logger
+    )
     {
         _options = options.Value;
         _logger = logger;
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
         };
 
         var config = new ProducerConfig
@@ -43,19 +44,22 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
             BatchSize = _options.Producer.BatchSize,
             CompressionType = Enum.Parse<CompressionType>(_options.Producer.CompressionType, true),
             MessageTimeoutMs = 30000,
-            RequestTimeoutMs = 30000
+            RequestTimeoutMs = 30000,
         };
 
         _producer = new ProducerBuilder<string, string>(config)
-            .SetErrorHandler((_, e) =>
-            {
-                _logger.LogError("Kafka producer error: {Reason}", e.Reason);
-            })
+            .SetErrorHandler(
+                (_, e) =>
+                {
+                    _logger.LogError("Kafka producer error: {Reason}", e.Reason);
+                }
+            )
             .Build();
 
         _logger.LogInformation(
             "Kafka integration event bus initialized. BootstrapServers: {Servers}",
-            _options.BootstrapServers);
+            _options.BootstrapServers
+        );
     }
 
     /// <summary>
@@ -64,7 +68,8 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
     public async Task PublishAsync<TEvent>(
         TEvent @event,
         string? topic = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEvent : IIntegrationEvent
     {
         var topicName = topic ?? GetTopicForEvent<TEvent>();
@@ -82,21 +87,35 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
                     Headers = new Headers
                     {
                         { "event-type", System.Text.Encoding.UTF8.GetBytes(typeof(TEvent).Name) },
-                        { "correlation-id", System.Text.Encoding.UTF8.GetBytes(@event.CorrelationId ?? "") },
-                        { "occurred-on", System.Text.Encoding.UTF8.GetBytes(@event.OccurredOn.ToString("O")) }
-                    }
+                        {
+                            "correlation-id",
+                            System.Text.Encoding.UTF8.GetBytes(@event.CorrelationId ?? "")
+                        },
+                        {
+                            "occurred-on",
+                            System.Text.Encoding.UTF8.GetBytes(@event.OccurredOn.ToString("O"))
+                        },
+                    },
                 },
-                cancellationToken);
+                cancellationToken
+            );
 
             _logger.LogDebug(
                 "Integration event published - Topic: {Topic}, EventId: {EventId}, Partition: {Partition}, Offset: {Offset}",
-                topicName, @event.EventId, result.Partition.Value, result.Offset.Value);
+                topicName,
+                @event.EventId,
+                result.Partition.Value,
+                result.Offset.Value
+            );
         }
         catch (ProduceException<string, string> ex)
         {
-            _logger.LogError(ex,
+            _logger.LogError(
+                ex,
                 "Failed to publish integration event - Topic: {Topic}, EventId: {EventId}",
-                topicName, @event.EventId);
+                topicName,
+                @event.EventId
+            );
             throw;
         }
     }
@@ -107,7 +126,8 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
     public async Task PublishManyAsync<TEvent>(
         IEnumerable<TEvent> events,
         string? topic = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEvent : IIntegrationEvent
     {
         foreach (var @event in events)
@@ -122,7 +142,8 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
     /// <summary>
     /// 根据事件类型获取 Topic 名称
     /// </summary>
-    private string GetTopicForEvent<TEvent>() where TEvent : IIntegrationEvent
+    private string GetTopicForEvent<TEvent>()
+        where TEvent : IIntegrationEvent
     {
         var eventTypeName = typeof(TEvent).Name;
 
@@ -135,20 +156,22 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
             nameof(CacheInvalidationIntegrationEvent) => _options.Topics.CacheInvalidation,
             nameof(UserEventIntegrationEvent) => _options.Topics.UserEvent,
             nameof(SystemEventIntegrationEvent) => _options.Topics.SystemEvent,
-            _ => $"dawning.{ToKebabCase(eventTypeName.Replace("IntegrationEvent", ""))}"
+            _ => $"dawning.{ToKebabCase(eventTypeName.Replace("IntegrationEvent", ""))}",
         };
     }
 
     private static string ToKebabCase(string input)
     {
-        if (string.IsNullOrEmpty(input)) return input;
+        if (string.IsNullOrEmpty(input))
+            return input;
 
         var result = new System.Text.StringBuilder();
         for (int i = 0; i < input.Length; i++)
         {
             if (char.IsUpper(input[i]))
             {
-                if (i > 0) result.Append('-');
+                if (i > 0)
+                    result.Append('-');
                 result.Append(char.ToLower(input[i]));
             }
             else
@@ -161,7 +184,8 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
 
     public void Dispose()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         _producer?.Flush(TimeSpan.FromSeconds(5));
         _producer?.Dispose();
@@ -184,24 +208,30 @@ public class NullIntegrationEventBus : IIntegrationEventBus
     public Task PublishAsync<TEvent>(
         TEvent @event,
         string? topic = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEvent : IIntegrationEvent
     {
         _logger.LogDebug(
             "NullIntegrationEventBus: Event {EventType} would be published to {Topic}",
-            typeof(TEvent).Name, topic ?? "default");
+            typeof(TEvent).Name,
+            topic ?? "default"
+        );
         return Task.CompletedTask;
     }
 
     public Task PublishManyAsync<TEvent>(
         IEnumerable<TEvent> events,
         string? topic = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
         where TEvent : IIntegrationEvent
     {
         _logger.LogDebug(
             "NullIntegrationEventBus: {Count} events would be published to {Topic}",
-            events.Count(), topic ?? "default");
+            events.Count(),
+            topic ?? "default"
+        );
         return Task.CompletedTask;
     }
 }

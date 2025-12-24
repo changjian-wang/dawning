@@ -42,9 +42,7 @@ namespace Dawning.Identity.Application.Attributes
     /// 标记 API 端点不使用缓存
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
-    public class NoCacheAttribute : Attribute
-    {
-    }
+    public class NoCacheAttribute : Attribute { }
 
     /// <summary>
     /// 标记操作会使指定缓存失效

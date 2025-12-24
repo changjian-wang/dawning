@@ -10,9 +10,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class AuditLogControllerTests : IntegrationTestBase
 {
-    public AuditLogControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public AuditLogControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     #region 未认证测试
 

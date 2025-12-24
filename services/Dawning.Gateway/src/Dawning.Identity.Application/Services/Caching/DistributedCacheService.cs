@@ -24,7 +24,7 @@ namespace Dawning.Identity.Application.Services.Caching
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
         };
 
         public DistributedCacheService(
@@ -70,7 +70,12 @@ namespace Dawning.Identity.Application.Services.Caching
                 // 缓存结果
                 if (value != null)
                 {
-                    await SetAsync(key, value, options ?? CacheEntryOptions.Default, cancellationToken);
+                    await SetAsync(
+                        key,
+                        value,
+                        options ?? CacheEntryOptions.Default,
+                        cancellationToken
+                    );
                 }
 
                 return value;
@@ -94,7 +99,8 @@ namespace Dawning.Identity.Application.Services.Caching
             CacheEntryOptions? options = null,
             TimeSpan? nullValueTtl = null,
             CancellationToken cancellationToken = default
-        ) where T : class
+        )
+            where T : class
         {
             // 先尝试从缓存获取
             var cachedString = await _cache.GetStringAsync(key, cancellationToken);
@@ -148,7 +154,12 @@ namespace Dawning.Identity.Application.Services.Caching
 
                 if (value != null)
                 {
-                    await SetAsync(key, value, options ?? CacheEntryOptions.Default, cancellationToken);
+                    await SetAsync(
+                        key,
+                        value,
+                        options ?? CacheEntryOptions.Default,
+                        cancellationToken
+                    );
                 }
                 else
                 {
@@ -159,11 +170,15 @@ namespace Dawning.Identity.Application.Services.Caching
                         CacheKeys.NullMarker,
                         new DistributedCacheEntryOptions
                         {
-                            AbsoluteExpirationRelativeToNow = nullTtl
+                            AbsoluteExpirationRelativeToNow = nullTtl,
                         },
                         cancellationToken
                     );
-                    _logger.LogDebug("Cached null marker for key: {Key} with TTL: {Ttl}", key, nullTtl);
+                    _logger.LogDebug(
+                        "Cached null marker for key: {Key} with TTL: {Ttl}",
+                        key,
+                        nullTtl
+                    );
                 }
 
                 return value;
@@ -215,7 +230,9 @@ namespace Dawning.Identity.Application.Services.Caching
             try
             {
                 var serialized = JsonSerializer.Serialize(value, _jsonOptions);
-                var distributedOptions = ToDistributedCacheOptions(options ?? CacheEntryOptions.Default);
+                var distributedOptions = ToDistributedCacheOptions(
+                    options ?? CacheEntryOptions.Default
+                );
 
                 await _cache.SetStringAsync(key, serialized, distributedOptions, cancellationToken);
 
@@ -242,14 +259,17 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <inheritdoc />
-        public Task RemoveByPrefixAsync(string prefix, CancellationToken cancellationToken = default)
+        public Task RemoveByPrefixAsync(
+            string prefix,
+            CancellationToken cancellationToken = default
+        )
         {
             // 注意：IDistributedCache 不原生支持按前缀删除
             // 如果使用 Redis，可以通过 StackExchange.Redis 的 SCAN + DEL 实现
             // 这里记录警告，实际生产环境应考虑使用 Redis 直接连接
             _logger.LogWarning(
-                "RemoveByPrefixAsync is not fully supported with IDistributedCache. " +
-                "Consider using direct Redis connection for prefix deletion. Prefix: {Prefix}",
+                "RemoveByPrefixAsync is not fully supported with IDistributedCache. "
+                    + "Consider using direct Redis connection for prefix deletion. Prefix: {Prefix}",
                 prefix
             );
 
@@ -257,7 +277,10 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <inheritdoc />
-        public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsAsync(
+            string key,
+            CancellationToken cancellationToken = default
+        )
         {
             try
             {
@@ -285,13 +308,15 @@ namespace Dawning.Identity.Application.Services.Caching
             }
         }
 
-        private static DistributedCacheEntryOptions ToDistributedCacheOptions(CacheEntryOptions options)
+        private static DistributedCacheEntryOptions ToDistributedCacheOptions(
+            CacheEntryOptions options
+        )
         {
             return new DistributedCacheEntryOptions
             {
                 AbsoluteExpiration = options.AbsoluteExpiration,
                 AbsoluteExpirationRelativeToNow = options.AbsoluteExpirationRelativeToNow,
-                SlidingExpiration = options.SlidingExpiration
+                SlidingExpiration = options.SlidingExpiration,
             };
         }
     }

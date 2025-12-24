@@ -6,14 +6,13 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
 /// Token 控制器集成测试
-/// Token控制器端点: GET /api/token/sessions, DELETE /api/token/sessions/{deviceId}, 
+/// Token控制器端点: GET /api/token/sessions, DELETE /api/token/sessions/{deviceId},
 /// POST /api/token/sessions/revoke-others, POST /api/token/revoke-all
 /// </summary>
 public class TokenControllerTests : IntegrationTestBase
 {
-    public TokenControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public TokenControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     #region 未认证测试
 

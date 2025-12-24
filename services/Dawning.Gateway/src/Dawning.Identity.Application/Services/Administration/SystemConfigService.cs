@@ -102,7 +102,7 @@ namespace Dawning.Identity.Application.Services.Administration
                         return result.Items.FirstOrDefault()?.Value;
                     },
                     CacheEntryOptions.Medium, // 15分钟缓存
-                    TimeSpan.FromMinutes(2)   // 空值缓存2分钟
+                    TimeSpan.FromMinutes(2) // 空值缓存2分钟
                 );
             }
 
@@ -249,10 +249,7 @@ namespace Dawning.Identity.Application.Services.Administration
             if (existing != null)
             {
                 var success = await _unitOfWork.SystemConfig.DeleteAsync(
-                    new SystemConfigAggregate
-                    {
-                        Id = existing.Id,
-                    }
+                    new SystemConfigAggregate { Id = existing.Id }
                 );
 
                 // 删除后使缓存失效

@@ -14,13 +14,13 @@ namespace Dawning.Identity.Api.IntegrationTests;
 public class AdvancedPerformanceTests : IntegrationTestBase
 {
     private readonly ITestOutputHelper _output;
-    
+
     // 性能阈值（毫秒）
     private const int FastApiThreshold = 200;
     private const int StandardApiThreshold = 500;
     private const int HighLoadThreshold = 2000;
 
-    public AdvancedPerformanceTests(CustomWebApplicationFactory factory, ITestOutputHelper output) 
+    public AdvancedPerformanceTests(CustomWebApplicationFactory factory, ITestOutputHelper output)
         : base(factory)
     {
         _output = output;
@@ -51,7 +51,9 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var p99Time = times.OrderBy(t => t).ElementAt((int)(times.Count * 0.99));
 
         _output.WriteLine($"高并发测试 ({concurrentRequests} 请求):");
-        _output.WriteLine($"  成功率: {successCount}/{concurrentRequests} ({successCount * 100.0 / concurrentRequests:F1}%)");
+        _output.WriteLine(
+            $"  成功率: {successCount}/{concurrentRequests} ({successCount * 100.0 / concurrentRequests:F1}%)"
+        );
         _output.WriteLine($"  总耗时: {stopwatch.ElapsedMilliseconds}ms");
         _output.WriteLine($"  平均响应时间: {avgTime:F1}ms");
         _output.WriteLine($"  P95 响应时间: {p95Time}ms");
@@ -73,7 +75,8 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         // Act - 多次突发请求
         for (int burst = 0; burst < burstCount; burst++)
         {
-            var tasks = Enumerable.Range(0, burstSize)
+            var tasks = Enumerable
+                .Range(0, burstSize)
                 .Select(_ => MeasureRequestAsync(() => Client.GetAsync("/api/health")))
                 .ToList();
 
@@ -130,9 +133,9 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         // Assert
         var times = results.Select(r => r.Item2).ToList();
         // 统计有效响应（成功或需要认证都是正常的）
-        var validResponses = results.Count(r => 
-            r.Item1.IsSuccessStatusCode || 
-            r.Item1.StatusCode == HttpStatusCode.Unauthorized);
+        var validResponses = results.Count(r =>
+            r.Item1.IsSuccessStatusCode || r.Item1.StatusCode == HttpStatusCode.Unauthorized
+        );
 
         _output.WriteLine($"混合端点并发测试:");
         _output.WriteLine($"  端点数量: {endpoints.Length}");
@@ -154,7 +157,9 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         // Act - 连续请求并记录时间
         for (int i = 0; i < requestCount; i++)
         {
-            var (response, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/health"));
+            var (response, elapsed) = await MeasureRequestAsync(() =>
+                Client.GetAsync("/api/health")
+            );
             times.Add(elapsed);
             response.EnsureSuccessStatusCode();
         }
@@ -205,8 +210,12 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var measuredAvg = measuredTimes.Average();
 
         _output.WriteLine($"预热效应测试:");
-        _output.WriteLine($"  预热请求 ({warmupRequests}): [{string.Join(", ", warmupTimes)}]ms, 平均 {warmupAvg:F1}ms");
-        _output.WriteLine($"  测量请求 ({measuredRequests}): [{string.Join(", ", measuredTimes)}]ms, 平均 {measuredAvg:F1}ms");
+        _output.WriteLine(
+            $"  预热请求 ({warmupRequests}): [{string.Join(", ", warmupTimes)}]ms, 平均 {warmupAvg:F1}ms"
+        );
+        _output.WriteLine(
+            $"  测量请求 ({measuredRequests}): [{string.Join(", ", measuredTimes)}]ms, 平均 {measuredAvg:F1}ms"
+        );
 
         // 测量阶段的平均时间应该稳定
         measuredAvg.Should().BeLessThan(FastApiThreshold, "预热后请求应在 200ms 内响应");
@@ -216,14 +225,16 @@ public class AdvancedPerformanceTests : IntegrationTestBase
     public async Task LargePayload_TokenRequest_ShouldHandle()
     {
         // Arrange - 发送较大的请求
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            ["grant_type"] = "password",
-            ["username"] = "test@example.com",
-            ["password"] = "TestPassword123!",
-            ["client_id"] = "dawning-admin",
-            ["scope"] = "openid profile email offline_access api roles"
-        });
+        var content = new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["grant_type"] = "password",
+                ["username"] = "test@example.com",
+                ["password"] = "TestPassword123!",
+                ["client_id"] = "dawning-admin",
+                ["scope"] = "openid profile email offline_access api roles",
+            }
+        );
 
         // Act
         var stopwatch = Stopwatch.StartNew();
@@ -235,7 +246,9 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         _output.WriteLine($"  响应时间: {stopwatch.ElapsedMilliseconds}ms");
         _output.WriteLine($"  状态码: {response.StatusCode}");
 
-        stopwatch.ElapsedMilliseconds.Should().BeLessThan(HighLoadThreshold, "Token 请求应在 2000ms 内响应");
+        stopwatch
+            .ElapsedMilliseconds.Should()
+            .BeLessThan(HighLoadThreshold, "Token 请求应在 2000ms 内响应");
     }
 
     [Fact]
@@ -248,8 +261,9 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         // Act - 测试不同分页大小的性能
         foreach (var pageSize in pageSizes)
         {
-            var (_, elapsed) = await MeasureRequestAsync(() => 
-                Client.GetAsync($"/api/user?page=1&pageSize={pageSize}"));
+            var (_, elapsed) = await MeasureRequestAsync(() =>
+                Client.GetAsync($"/api/user?page=1&pageSize={pageSize}")
+            );
             results[pageSize] = elapsed;
         }
 
@@ -268,7 +282,8 @@ public class AdvancedPerformanceTests : IntegrationTestBase
     /// 测量请求响应时间
     /// </summary>
     private async Task<(HttpResponseMessage Response, long ElapsedMs)> MeasureRequestAsync(
-        Func<Task<HttpResponseMessage>> requestFunc)
+        Func<Task<HttpResponseMessage>> requestFunc
+    )
     {
         var stopwatch = Stopwatch.StartNew();
         var response = await requestFunc();

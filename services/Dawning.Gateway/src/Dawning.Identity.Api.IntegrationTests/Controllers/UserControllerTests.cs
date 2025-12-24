@@ -9,9 +9,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class UserControllerTests : IntegrationTestBase
 {
-    public UserControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public UserControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     [Fact]
     public async Task GetCurrentUserInfo_WithoutAuth_ReturnsUnauthorized()
@@ -51,7 +50,7 @@ public class UserControllerTests : IntegrationTestBase
         {
             username = "testuser",
             email = "test@test.com",
-            password = "Test@123456"
+            password = "Test@123456",
         };
 
         // Act
@@ -68,7 +67,10 @@ public class UserControllerTests : IntegrationTestBase
         var updateData = new { email = "updated@test.com" };
 
         // Act - 使用有效的 GUID 格式
-        var response = await Client.PutAsJsonAsync("/api/user/00000000-0000-0000-0000-000000000001", updateData);
+        var response = await Client.PutAsJsonAsync(
+            "/api/user/00000000-0000-0000-0000-000000000001",
+            updateData
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -88,11 +90,7 @@ public class UserControllerTests : IntegrationTestBase
     public async Task ChangePassword_WithoutAuth_ReturnsUnauthorized()
     {
         // Arrange
-        var passwordData = new
-        {
-            currentPassword = "oldpassword",
-            newPassword = "newpassword"
-        };
+        var passwordData = new { currentPassword = "oldpassword", newPassword = "newpassword" };
 
         // Act
         var response = await Client.PostAsJsonAsync("/api/user/change-password", passwordData);
@@ -105,7 +103,9 @@ public class UserControllerTests : IntegrationTestBase
     public async Task GetUserRoles_WithoutAuth_ReturnsUnauthorized()
     {
         // Act - 使用有效的 GUID 格式
-        var response = await Client.GetAsync("/api/user/00000000-0000-0000-0000-000000000001/roles");
+        var response = await Client.GetAsync(
+            "/api/user/00000000-0000-0000-0000-000000000001/roles"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

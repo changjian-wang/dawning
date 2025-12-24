@@ -29,7 +29,7 @@ public static class RequestLogMapping
             RequestBodySize = entity.RequestBodySize,
             ResponseBodySize = entity.ResponseBodySize,
             Exception = entity.Exception,
-            AdditionalInfo = entity.AdditionalInfo
+            AdditionalInfo = entity.AdditionalInfo,
         };
     }
 
@@ -52,7 +52,7 @@ public static class RequestLogMapping
             RequestBodySize = model.RequestBodySize,
             ResponseBodySize = model.ResponseBodySize,
             Exception = model.Exception,
-            AdditionalInfo = model.AdditionalInfo
+            AdditionalInfo = model.AdditionalInfo,
         };
     }
 

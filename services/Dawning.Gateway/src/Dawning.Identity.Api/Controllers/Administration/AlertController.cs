@@ -1,6 +1,6 @@
+using Dawning.Identity.Api.Helpers;
 using Dawning.Identity.Application.Dtos.Monitoring;
 using Dawning.Identity.Application.Interfaces.Monitoring;
-using Dawning.Identity.Api.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,9 +21,10 @@ public class AlertController : ControllerBase
     private readonly AuditLogHelper _auditLogHelper;
 
     public AlertController(
-        IAlertService alertService, 
+        IAlertService alertService,
         ILogger<AlertController> logger,
-        AuditLogHelper auditLogHelper)
+        AuditLogHelper auditLogHelper
+    )
     {
         _alertService = alertService;
         _logger = logger;
@@ -70,7 +71,9 @@ public class AlertController : ControllerBase
     /// 创建告警规则
     /// </summary>
     [HttpPost("rules")]
-    public async Task<ActionResult<AlertRuleDto>> CreateRule([FromBody] CreateAlertRuleRequest request)
+    public async Task<ActionResult<AlertRuleDto>> CreateRule(
+        [FromBody] CreateAlertRuleRequest request
+    )
     {
         if (!ModelState.IsValid)
         {
@@ -79,7 +82,7 @@ public class AlertController : ControllerBase
 
         var rule = await _alertService.CreateRuleAsync(request);
         _logger.LogInformation("Created alert rule: {RuleName}", rule.Name);
-        
+
         await _auditLogHelper.LogAsync(
             "CreateAlertRule",
             "AlertRule",
@@ -88,7 +91,7 @@ public class AlertController : ControllerBase
             null,
             request
         );
-        
+
         return CreatedAtAction(nameof(GetRule), new { id = rule.Id }, rule);
     }
 
@@ -113,7 +116,7 @@ public class AlertController : ControllerBase
         }
 
         _logger.LogInformation("Updated alert rule: {RuleName}", rule.Name);
-        
+
         await _auditLogHelper.LogAsync(
             "UpdateAlertRule",
             "AlertRule",
@@ -122,7 +125,7 @@ public class AlertController : ControllerBase
             null,
             request
         );
-        
+
         return Ok(rule);
     }
 
@@ -139,14 +142,14 @@ public class AlertController : ControllerBase
         }
 
         _logger.LogInformation("Deleted alert rule: {Id}", id);
-        
+
         await _auditLogHelper.LogAsync(
             "DeleteAlertRule",
             "AlertRule",
             null,
             $"删除告警规则 ID: {id}"
         );
-        
+
         return NoContent();
     }
 
@@ -154,7 +157,10 @@ public class AlertController : ControllerBase
     /// 启用/禁用告警规则
     /// </summary>
     [HttpPatch("rules/{id:long}/enabled")]
-    public async Task<IActionResult> SetRuleEnabled(long id, [FromBody] SetRuleEnabledRequest request)
+    public async Task<IActionResult> SetRuleEnabled(
+        long id,
+        [FromBody] SetRuleEnabledRequest request
+    )
     {
         var success = await _alertService.SetRuleEnabledAsync(id, request.IsEnabled);
         if (!success)
@@ -162,19 +168,15 @@ public class AlertController : ControllerBase
             return NotFound(new { message = "告警规则不存在" });
         }
 
-        _logger.LogInformation(
-            "Set alert rule {Id} enabled: {IsEnabled}",
-            id,
-            request.IsEnabled
-        );
-        
+        _logger.LogInformation("Set alert rule {Id} enabled: {IsEnabled}", id, request.IsEnabled);
+
         await _auditLogHelper.LogAsync(
             request.IsEnabled ? "EnableAlertRule" : "DisableAlertRule",
             "AlertRule",
             null,
             $"{(request.IsEnabled ? "启用" : "禁用")}告警规则 ID: {id}"
         );
-        
+
         return Ok(new { message = request.IsEnabled ? "规则已启用" : "规则已禁用" });
     }
 
@@ -190,14 +192,16 @@ public class AlertController : ControllerBase
     {
         var result = await _alertService.GetAlertHistoryAsync(queryParams);
         var totalPages = (int)Math.Ceiling((double)result.TotalCount / result.PageSize);
-        return Ok(new
-        {
-            items = result.Items,
-            total = result.TotalCount,
-            page = result.PageIndex,
-            pageSize = result.PageSize,
-            totalPages,
-        });
+        return Ok(
+            new
+            {
+                items = result.Items,
+                total = result.TotalCount,
+                page = result.PageIndex,
+                pageSize = result.PageSize,
+                totalPages,
+            }
+        );
     }
 
     /// <summary>
@@ -273,12 +277,14 @@ public class AlertController : ControllerBase
                 successCount++;
         }
 
-        return Ok(new
-        {
-            message = $"成功确认 {successCount}/{request.Ids.Count} 条告警",
-            successCount,
-            totalCount = request.Ids.Count,
-        });
+        return Ok(
+            new
+            {
+                message = $"成功确认 {successCount}/{request.Ids.Count} 条告警",
+                successCount,
+                totalCount = request.Ids.Count,
+            }
+        );
     }
 
     /// <summary>
@@ -300,12 +306,14 @@ public class AlertController : ControllerBase
                 successCount++;
         }
 
-        return Ok(new
-        {
-            message = $"成功解决 {successCount}/{request.Ids.Count} 条告警",
-            successCount,
-            totalCount = request.Ids.Count,
-        });
+        return Ok(
+            new
+            {
+                message = $"成功解决 {successCount}/{request.Ids.Count} 条告警",
+                successCount,
+                totalCount = request.Ids.Count,
+            }
+        );
     }
 
     #endregion

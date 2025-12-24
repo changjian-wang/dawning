@@ -160,7 +160,10 @@ public class AlertService : IAlertService
     {
         return request.Status switch
         {
-            "acknowledged" => await _unitOfWork.AlertHistory.AcknowledgeAsync(id, request.ResolvedBy ?? ""),
+            "acknowledged" => await _unitOfWork.AlertHistory.AcknowledgeAsync(
+                id,
+                request.ResolvedBy ?? ""
+            ),
             "resolved" => await _unitOfWork.AlertHistory.ResolveAsync(id, request.ResolvedBy ?? ""),
             _ => await _unitOfWork.AlertHistory.UpdateStatusAsync(id, request.Status),
         };
@@ -215,7 +218,14 @@ public class AlertService : IAlertService
                     if (ShouldTriggerAlert(rule, currentValue))
                     {
                         // 检查持续时间
-                        if (HasExceededDuration(rule.MetricType, rule.Threshold, rule.Operator, rule.DurationSeconds))
+                        if (
+                            HasExceededDuration(
+                                rule.MetricType,
+                                rule.Threshold,
+                                rule.Operator,
+                                rule.DurationSeconds
+                            )
+                        )
                         {
                             var alert = await CreateAlertHistoryAsync(rule, currentValue);
                             result.AlertsTriggered++;
@@ -228,7 +238,10 @@ public class AlertService : IAlertService
                             result.NotificationsSent++;
 
                             // 更新规则最后触发时间
-                            await _unitOfWork.AlertRule.UpdateLastTriggeredAsync(rule.Id, DateTime.UtcNow);
+                            await _unitOfWork.AlertRule.UpdateLastTriggeredAsync(
+                                rule.Id,
+                                DateTime.UtcNow
+                            );
                         }
                     }
                 }
@@ -376,11 +389,7 @@ public class AlertService : IAlertService
 
         history.Id = await _unitOfWork.AlertHistory.CreateAsync(history);
 
-        _logger.LogWarning(
-            "Alert triggered: {RuleName} - {Message}",
-            rule.Name,
-            message
-        );
+        _logger.LogWarning("Alert triggered: {RuleName} - {Message}", rule.Name, message);
 
         return history;
     }

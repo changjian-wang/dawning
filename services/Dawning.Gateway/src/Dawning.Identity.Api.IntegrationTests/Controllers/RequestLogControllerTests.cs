@@ -5,7 +5,7 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
 /// 请求日志控制器集成测试
-/// 端点: 
+/// 端点:
 ///   GET /api/request-logs
 ///   GET /api/request-logs/statistics
 ///   GET /api/request-logs/errors
@@ -14,9 +14,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class RequestLogControllerTests : IntegrationTestBase
 {
-    public RequestLogControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public RequestLogControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     #region 未认证测试
 
@@ -176,7 +175,9 @@ public class RequestLogControllerTests : IntegrationTestBase
         var endTime = DateTime.UtcNow.ToString("O");
 
         // Act
-        var response = await Client.GetAsync($"/api/request-logs?startTime={startTime}&endTime={endTime}");
+        var response = await Client.GetAsync(
+            $"/api/request-logs?startTime={startTime}&endTime={endTime}"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -210,7 +211,9 @@ public class RequestLogControllerTests : IntegrationTestBase
         var endTime = DateTime.UtcNow.ToString("O");
 
         // Act
-        var response = await Client.GetAsync($"/api/request-logs/statistics?startTime={startTime}&endTime={endTime}");
+        var response = await Client.GetAsync(
+            $"/api/request-logs/statistics?startTime={startTime}&endTime={endTime}"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

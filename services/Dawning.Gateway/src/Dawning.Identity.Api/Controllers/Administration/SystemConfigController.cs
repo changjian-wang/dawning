@@ -18,7 +18,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
         private readonly ISystemConfigService _systemConfigService;
         private readonly AuditLogHelper _auditLogHelper;
 
-        public SystemConfigController(ISystemConfigService systemConfigService, AuditLogHelper auditLogHelper)
+        public SystemConfigController(
+            ISystemConfigService systemConfigService,
+            AuditLogHelper auditLogHelper
+        )
         {
             _systemConfigService = systemConfigService;
             _auditLogHelper = auditLogHelper;
@@ -71,7 +74,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 request.Value,
                 request.Description
             );
-            
+
             if (result)
             {
                 await _auditLogHelper.LogAsync(
@@ -80,10 +83,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     Guid.Empty,
                     $"设置配置: {group}.{key}",
                     null,
-                    new { Group = group, Key = key, Value = request.Value }
+                    new
+                    {
+                        Group = group,
+                        Key = key,
+                        Value = request.Value,
+                    }
                 );
             }
-            
+
             return Ok(new { success = result });
         }
 
@@ -95,7 +103,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> BatchUpdate([FromBody] BatchConfigRequest request)
         {
             var result = await _systemConfigService.BatchUpdateAsync(request.Configs);
-            
+
             if (result)
             {
                 var configCount = request.Configs.Count();
@@ -108,7 +116,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     new { ConfigCount = configCount }
                 );
             }
-            
+
             return Ok(new { success = result });
         }
 
@@ -120,7 +128,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         public async Task<IActionResult> Delete(string group, string key)
         {
             var result = await _systemConfigService.DeleteAsync(group, key);
-            
+
             if (result)
             {
                 await _auditLogHelper.LogAsync(
@@ -130,7 +138,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     $"删除配置: {group}.{key}"
                 );
             }
-            
+
             return Ok(new { success = result });
         }
 

@@ -48,8 +48,20 @@ public class AlertServiceTests
         // Arrange
         var rules = new List<AlertRule>
         {
-            new() { Id = 1, Name = "Rule 1", MetricType = "cpu", IsEnabled = true },
-            new() { Id = 2, Name = "Rule 2", MetricType = "memory", IsEnabled = false }
+            new()
+            {
+                Id = 1,
+                Name = "Rule 1",
+                MetricType = "cpu",
+                IsEnabled = true,
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Rule 2",
+                MetricType = "memory",
+                IsEnabled = false,
+            },
         };
         _alertRuleRepoMock.Setup(x => x.GetAllAsync()).ReturnsAsync(rules);
 
@@ -67,7 +79,13 @@ public class AlertServiceTests
         // Arrange
         var rules = new List<AlertRule>
         {
-            new() { Id = 1, Name = "Rule 1", MetricType = "cpu", IsEnabled = true }
+            new()
+            {
+                Id = 1,
+                Name = "Rule 1",
+                MetricType = "cpu",
+                IsEnabled = true,
+            },
         };
         _alertRuleRepoMock.Setup(x => x.GetEnabledAsync()).ReturnsAsync(rules);
 
@@ -90,7 +108,7 @@ public class AlertServiceTests
             MetricType = "cpu",
             Operator = "gt",
             Threshold = 80,
-            Severity = "warning"
+            Severity = "warning",
         };
         _alertRuleRepoMock.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(rule);
 
@@ -129,11 +147,10 @@ public class AlertServiceTests
             Severity = "critical",
             IsEnabled = true,
             DurationSeconds = 60,
-            CooldownMinutes = 5
+            CooldownMinutes = 5,
         };
 
-        _alertRuleRepoMock.Setup(x => x.CreateAsync(It.IsAny<AlertRule>()))
-            .ReturnsAsync(1L);
+        _alertRuleRepoMock.Setup(x => x.CreateAsync(It.IsAny<AlertRule>())).ReturnsAsync(1L);
 
         // Act
         var result = await _alertService.CreateRuleAsync(request);
@@ -151,11 +168,7 @@ public class AlertServiceTests
         // Arrange
         _alertRuleRepoMock.Setup(x => x.GetByIdAsync(999)).ReturnsAsync((AlertRule?)null);
 
-        var request = new UpdateAlertRuleRequest
-        {
-            Name = "Updated Rule",
-            MetricType = "memory"
-        };
+        var request = new UpdateAlertRuleRequest { Name = "Updated Rule", MetricType = "memory" };
 
         // Act
         var result = await _alertService.UpdateRuleAsync(999, request);
@@ -175,7 +188,7 @@ public class AlertServiceTests
             MetricType = "cpu",
             Operator = "gt",
             Threshold = 80,
-            Severity = "warning"
+            Severity = "warning",
         };
 
         var updatedRule = new AlertRule
@@ -185,12 +198,13 @@ public class AlertServiceTests
             MetricType = "memory",
             Operator = "gt",
             Threshold = 90,
-            Severity = "critical"
+            Severity = "critical",
         };
 
         _alertRuleRepoMock.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(existingRule);
         _alertRuleRepoMock.Setup(x => x.UpdateAsync(It.IsAny<AlertRule>())).ReturnsAsync(true);
-        _alertRuleRepoMock.SetupSequence(x => x.GetByIdAsync(1))
+        _alertRuleRepoMock
+            .SetupSequence(x => x.GetByIdAsync(1))
             .ReturnsAsync(existingRule)
             .ReturnsAsync(updatedRule);
 
@@ -200,7 +214,7 @@ public class AlertServiceTests
             MetricType = "memory",
             Operator = "gt",
             Threshold = 90,
-            Severity = "critical"
+            Severity = "critical",
         };
 
         // Act
@@ -249,8 +263,18 @@ public class AlertServiceTests
         // Arrange
         var histories = new List<AlertHistory>
         {
-            new() { Id = 1, RuleName = "Rule 1", Status = "triggered" },
-            new() { Id = 2, RuleName = "Rule 2", Status = "resolved" }
+            new()
+            {
+                Id = 1,
+                RuleName = "Rule 1",
+                Status = "triggered",
+            },
+            new()
+            {
+                Id = 2,
+                RuleName = "Rule 2",
+                Status = "resolved",
+            },
         };
 
         var pagedResult = new PagedData<AlertHistory>
@@ -258,11 +282,11 @@ public class AlertServiceTests
             Items = histories,
             TotalCount = 2,
             PageIndex = 1,
-            PageSize = 10
+            PageSize = 10,
         };
 
-        _alertHistoryRepoMock.Setup(x => x.GetPagedListAsync(
-            It.IsAny<AlertHistoryQueryModel>(), 1, 10))
+        _alertHistoryRepoMock
+            .Setup(x => x.GetPagedListAsync(It.IsAny<AlertHistoryQueryModel>(), 1, 10))
             .ReturnsAsync(pagedResult);
 
         var queryParams = new AlertHistoryQueryParams { Page = 1, PageSize = 10 };
@@ -285,7 +309,7 @@ public class AlertServiceTests
             RuleId = 1,
             RuleName = "Test Rule",
             Status = "triggered",
-            Severity = "warning"
+            Severity = "warning",
         };
         _alertHistoryRepoMock.Setup(x => x.GetByIdAsync(1)).ReturnsAsync(history);
 
@@ -317,7 +341,7 @@ public class AlertServiceTests
         var request = new UpdateAlertStatusRequest
         {
             Status = "acknowledged",
-            ResolvedBy = "admin"
+            ResolvedBy = "admin",
         };
         _alertHistoryRepoMock.Setup(x => x.AcknowledgeAsync(1, "admin")).ReturnsAsync(true);
 
@@ -333,11 +357,7 @@ public class AlertServiceTests
     public async Task UpdateAlertStatusAsync_Should_Resolve_When_Status_Is_Resolved()
     {
         // Arrange
-        var request = new UpdateAlertStatusRequest
-        {
-            Status = "resolved",
-            ResolvedBy = "admin"
-        };
+        var request = new UpdateAlertStatusRequest { Status = "resolved", ResolvedBy = "admin" };
         _alertHistoryRepoMock.Setup(x => x.ResolveAsync(1, "admin")).ReturnsAsync(true);
 
         // Act
@@ -354,8 +374,18 @@ public class AlertServiceTests
         // Arrange
         var histories = new List<AlertHistory>
         {
-            new() { Id = 1, RuleName = "Rule 1", Status = "triggered" },
-            new() { Id = 2, RuleName = "Rule 2", Status = "acknowledged" }
+            new()
+            {
+                Id = 1,
+                RuleName = "Rule 1",
+                Status = "triggered",
+            },
+            new()
+            {
+                Id = 2,
+                RuleName = "Rule 2",
+                Status = "acknowledged",
+            },
         };
         _alertHistoryRepoMock.Setup(x => x.GetUnresolvedAsync()).ReturnsAsync(histories);
 
@@ -382,7 +412,7 @@ public class AlertServiceTests
             TotalAlertsToday = 5,
             UnresolvedAlerts = 2,
             CriticalAlerts = 1,
-            WarningAlerts = 3
+            WarningAlerts = 3,
         };
 
         _alertHistoryRepoMock.Setup(x => x.GetStatisticsAsync()).ReturnsAsync(statistics);

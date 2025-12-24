@@ -20,7 +20,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
         JsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
         };
     }
 

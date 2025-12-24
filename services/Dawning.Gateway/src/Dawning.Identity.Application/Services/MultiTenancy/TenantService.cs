@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Dawning.Identity.Application.Interfaces.MultiTenancy;
 using Dawning.Identity.Domain.Aggregates.MultiTenancy;
@@ -8,7 +9,6 @@ using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace Dawning.Identity.Application.Services.MultiTenancy
 {
@@ -26,7 +26,8 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         public TenantService(
             IUnitOfWork uow,
             IDistributedCache cache,
-            ILogger<TenantService> logger)
+            ILogger<TenantService> logger
+        )
         {
             _uow = uow;
             _cache = cache;
@@ -104,7 +105,8 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             string? keyword,
             bool? isActive,
             int page,
-            int pageSize)
+            int pageSize
+        )
         {
             return await _uow.Tenant.GetPagedAsync(keyword, isActive, page, pageSize);
         }
@@ -119,8 +121,10 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             }
 
             // 验证域名唯一性
-            if (!string.IsNullOrWhiteSpace(tenant.Domain) && 
-                await _uow.Tenant.ExistsDomainAsync(tenant.Domain))
+            if (
+                !string.IsNullOrWhiteSpace(tenant.Domain)
+                && await _uow.Tenant.ExistsDomainAsync(tenant.Domain)
+            )
             {
                 throw new InvalidOperationException($"域名 '{tenant.Domain}' 已被使用");
             }
@@ -150,18 +154,20 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             }
 
             // 验证域名唯一性
-            if (!string.IsNullOrWhiteSpace(tenant.Domain) && 
-                await _uow.Tenant.ExistsDomainAsync(tenant.Domain, tenant.Id))
+            if (
+                !string.IsNullOrWhiteSpace(tenant.Domain)
+                && await _uow.Tenant.ExistsDomainAsync(tenant.Domain, tenant.Id)
+            )
             {
                 throw new InvalidOperationException($"域名 '{tenant.Domain}' 已被使用");
             }
 
             tenant.UpdatedAt = DateTime.UtcNow;
             await _uow.Tenant.UpdateAsync(tenant);
-            
+
             // 清除缓存
             await InvalidateCacheAsync(existing);
-            
+
             _logger.LogInformation("更新租户: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
             return tenant;
         }
@@ -179,7 +185,11 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             if (result > 0)
             {
                 await InvalidateCacheAsync(tenant);
-                _logger.LogInformation("删除租户: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
+                _logger.LogInformation(
+                    "删除租户: {TenantCode} ({TenantId})",
+                    tenant.Code,
+                    tenant.Id
+                );
             }
             return result > 0;
         }
@@ -198,8 +208,12 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             await _uow.Tenant.UpdateAsync(tenant);
             await InvalidateCacheAsync(tenant);
 
-            _logger.LogInformation("设置租户状态: {TenantCode} ({TenantId}) -> {IsActive}", 
-                tenant.Code, tenant.Id, isActive);
+            _logger.LogInformation(
+                "设置租户状态: {TenantCode} ({TenantId}) -> {IsActive}",
+                tenant.Code,
+                tenant.Id,
+                isActive
+            );
             return true;
         }
 
@@ -212,7 +226,8 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<bool> IsDomainAvailableAsync(string domain, Guid? excludeId = null)
         {
-            if (string.IsNullOrWhiteSpace(domain)) return true;
+            if (string.IsNullOrWhiteSpace(domain))
+                return true;
             return !await _uow.Tenant.ExistsDomainAsync(domain, excludeId);
         }
 
@@ -234,7 +249,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             {
                 // 移除端口号
                 var domain = host.Split(':')[0];
-                
+
                 // 尝试完整域名匹配
                 var tenant = await GetByDomainAsync(domain);
                 if (tenant != null && tenant.IsActive)
@@ -263,7 +278,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             var json = JsonSerializer.Serialize(tenant);
             var options = new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = CacheExpiration
+                AbsoluteExpirationRelativeToNow = CacheExpiration,
             };
 
             await _cache.SetStringAsync($"{CachePrefix}id:{tenant.Id}", json, options);

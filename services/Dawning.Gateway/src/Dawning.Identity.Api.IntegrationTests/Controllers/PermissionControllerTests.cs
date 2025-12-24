@@ -9,9 +9,8 @@ namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 /// </summary>
 public class PermissionControllerTests : IntegrationTestBase
 {
-    public PermissionControllerTests(CustomWebApplicationFactory factory) : base(factory)
-    {
-    }
+    public PermissionControllerTests(CustomWebApplicationFactory factory)
+        : base(factory) { }
 
     #region 未认证测试
 
@@ -19,7 +18,9 @@ public class PermissionControllerTests : IntegrationTestBase
     public async Task GetPermissionById_WithoutAuth_ReturnsUnauthorized()
     {
         // Act
-        var response = await Client.GetAsync("/api/permission/00000000-0000-0000-0000-000000000001");
+        var response = await Client.GetAsync(
+            "/api/permission/00000000-0000-0000-0000-000000000001"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -69,7 +70,9 @@ public class PermissionControllerTests : IntegrationTestBase
     public async Task GetPermissionsByRoleId_WithoutAuth_ReturnsUnauthorized()
     {
         // Act
-        var response = await Client.GetAsync("/api/permission/role/00000000-0000-0000-0000-000000000001");
+        var response = await Client.GetAsync(
+            "/api/permission/role/00000000-0000-0000-0000-000000000001"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -85,7 +88,7 @@ public class PermissionControllerTests : IntegrationTestBase
             name = "Test Permission",
             resource = "test",
             action = "read",
-            description = "A test permission"
+            description = "A test permission",
         };
 
         // Act
@@ -103,11 +106,14 @@ public class PermissionControllerTests : IntegrationTestBase
         {
             id = "00000000-0000-0000-0000-000000000001",
             code = "updated.permission",
-            name = "Updated Permission"
+            name = "Updated Permission",
         };
 
         // Act
-        var response = await Client.PutAsJsonAsync("/api/permission/00000000-0000-0000-0000-000000000001", updateData);
+        var response = await Client.PutAsJsonAsync(
+            "/api/permission/00000000-0000-0000-0000-000000000001",
+            updateData
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -117,7 +123,9 @@ public class PermissionControllerTests : IntegrationTestBase
     public async Task DeletePermission_WithoutAuth_ReturnsUnauthorized()
     {
         // Act
-        var response = await Client.DeleteAsync("/api/permission/00000000-0000-0000-0000-000000000001");
+        var response = await Client.DeleteAsync(
+            "/api/permission/00000000-0000-0000-0000-000000000001"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -132,7 +140,8 @@ public class PermissionControllerTests : IntegrationTestBase
         // Act
         var response = await Client.PostAsJsonAsync(
             "/api/permission/role/00000000-0000-0000-0000-000000000001/assign",
-            permissionIds);
+            permissionIds
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -156,7 +165,9 @@ public class PermissionControllerTests : IntegrationTestBase
     public async Task GetPermissionList_WithFilters_ReturnsUnauthorized()
     {
         // Act
-        var response = await Client.GetAsync("/api/permission?code=user&resource=user&isActive=true");
+        var response = await Client.GetAsync(
+            "/api/permission?code=user&resource=user&isActive=true"
+        );
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);

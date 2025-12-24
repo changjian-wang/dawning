@@ -20,7 +20,11 @@ public interface IRequestLogRepository
     /// <summary>
     /// 分页查询请求日志
     /// </summary>
-    Task<PagedData<RequestLog>> GetPagedListAsync(RequestLogQueryModel query, int page, int pageSize);
+    Task<PagedData<RequestLog>> GetPagedListAsync(
+        RequestLogQueryModel query,
+        int page,
+        int pageSize
+    );
 
     /// <summary>
     /// 获取请求统计信息

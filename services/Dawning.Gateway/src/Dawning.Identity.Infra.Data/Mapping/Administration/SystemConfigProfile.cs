@@ -13,7 +13,8 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
     {
         public SystemConfigProfile()
         {
-            CreateMap<SystemConfigEntity, SystemConfigAggregate>(MemberList.Destination).ReverseMap();
+            CreateMap<SystemConfigEntity, SystemConfigAggregate>(MemberList.Destination)
+                .ReverseMap();
         }
     }
 }

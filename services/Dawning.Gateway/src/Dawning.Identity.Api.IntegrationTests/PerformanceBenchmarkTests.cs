@@ -11,13 +11,13 @@ namespace Dawning.Identity.Api.IntegrationTests;
 public class PerformanceBenchmarkTests : IntegrationTestBase
 {
     private readonly ITestOutputHelper _output;
-    
+
     // 响应时间阈值（毫秒）
     private const int StandardThreshold = 500; // 标准 API 响应时间
-    private const int FastThreshold = 200;     // 快速 API 响应时间
-    private const int SlowThreshold = 1000;    // 允许较慢的操作
+    private const int FastThreshold = 200; // 快速 API 响应时间
+    private const int SlowThreshold = 1000; // 允许较慢的操作
 
-    public PerformanceBenchmarkTests(CustomWebApplicationFactory factory, ITestOutputHelper output) 
+    public PerformanceBenchmarkTests(CustomWebApplicationFactory factory, ITestOutputHelper output)
         : base(factory)
     {
         _output = output;
@@ -39,7 +39,9 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     public async Task HealthLive_ShouldRespondWithin200ms()
     {
         // Act
-        var (response, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/health/live"));
+        var (response, elapsed) = await MeasureRequestAsync(() =>
+            Client.GetAsync("/api/health/live")
+        );
 
         // Assert
         _output.WriteLine($"GET /api/health/live - {elapsed}ms");
@@ -51,7 +53,9 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     public async Task UserList_Unauthorized_ShouldRespondWithin500ms()
     {
         // Act
-        var (response, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/user?page=1&pageSize=10"));
+        var (response, elapsed) = await MeasureRequestAsync(() =>
+            Client.GetAsync("/api/user?page=1&pageSize=10")
+        );
 
         // Assert
         _output.WriteLine($"GET /api/user - {elapsed}ms (401 Unauthorized)");
@@ -73,7 +77,9 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     public async Task PermissionList_Unauthorized_ShouldRespondWithin500ms()
     {
         // Act
-        var (response, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/permission"));
+        var (response, elapsed) = await MeasureRequestAsync(() =>
+            Client.GetAsync("/api/permission")
+        );
 
         // Assert
         _output.WriteLine($"GET /api/permission - {elapsed}ms");
@@ -84,8 +90,9 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     public async Task AuditLogList_Unauthorized_ShouldRespondWithin500ms()
     {
         // Act
-        var (response, elapsed) = await MeasureRequestAsync(() => 
-            Client.GetAsync("/api/audit-log?page=1&pageSize=20"));
+        var (response, elapsed) = await MeasureRequestAsync(() =>
+            Client.GetAsync("/api/audit-log?page=1&pageSize=20")
+        );
 
         // Assert
         _output.WriteLine($"GET /api/audit-log - {elapsed}ms");
@@ -96,8 +103,9 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     public async Task MonitoringLogs_Unauthorized_ShouldRespondWithin500ms()
     {
         // Act
-        var (response, elapsed) = await MeasureRequestAsync(() => 
-            Client.GetAsync("/api/monitoring/logs?page=1&pageSize=20"));
+        var (response, elapsed) = await MeasureRequestAsync(() =>
+            Client.GetAsync("/api/monitoring/logs?page=1&pageSize=20")
+        );
 
         // Assert
         _output.WriteLine($"GET /api/monitoring/logs - {elapsed}ms");
@@ -108,18 +116,21 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     public async Task TokenRequest_InvalidCredentials_ShouldRespondWithin1000ms()
     {
         // Arrange
-        var content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            ["grant_type"] = "password",
-            ["username"] = "test@example.com",
-            ["password"] = "wrongpassword",
-            ["client_id"] = "dawning-admin",
-            ["scope"] = "openid profile"
-        });
+        var content = new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["grant_type"] = "password",
+                ["username"] = "test@example.com",
+                ["password"] = "wrongpassword",
+                ["client_id"] = "dawning-admin",
+                ["scope"] = "openid profile",
+            }
+        );
 
         // Act
-        var (response, elapsed) = await MeasureRequestAsync(() => 
-            Client.PostAsync("/connect/token", content));
+        var (response, elapsed) = await MeasureRequestAsync(() =>
+            Client.PostAsync("/connect/token", content)
+        );
 
         // Assert
         _output.WriteLine($"POST /connect/token - {elapsed}ms");
@@ -186,7 +197,8 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     /// 测量请求响应时间
     /// </summary>
     private async Task<(HttpResponseMessage Response, long ElapsedMs)> MeasureRequestAsync(
-        Func<Task<HttpResponseMessage>> requestFunc)
+        Func<Task<HttpResponseMessage>> requestFunc
+    )
     {
         var stopwatch = Stopwatch.StartNew();
         var response = await requestFunc();

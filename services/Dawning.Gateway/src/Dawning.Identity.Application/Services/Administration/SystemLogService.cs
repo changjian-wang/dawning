@@ -29,7 +29,8 @@ namespace Dawning.Identity.Application.Services.Administration
             IUnitOfWork uow,
             IMapper mapper,
             IRealTimeNotificationService realTimeNotification,
-            ILogger<SystemLogService> logger)
+            ILogger<SystemLogService> logger
+        )
         {
             _uow = uow;
             _mapper = mapper;
@@ -246,7 +247,7 @@ namespace Dawning.Identity.Application.Services.Administration
                     StatusCode = log.StatusCode,
                     UserId = log.UserId?.ToString(),
                     Username = log.Username,
-                    IpAddress = log.IpAddress
+                    IpAddress = log.IpAddress,
                 };
 
                 await _realTimeNotification.SendLogEntryAsync(logEntry);

@@ -64,7 +64,10 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     /// </summary>
     public async Task<AlertHistory?> GetByIdAsync(long id)
     {
-        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(id, _context.Transaction);
+        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(
+            id,
+            _context.Transaction
+        );
         return entity?.ToModel();
     }
 
@@ -85,7 +88,10 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     /// </summary>
     public async Task<bool> AcknowledgeAsync(long id, string acknowledgedBy)
     {
-        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(id, _context.Transaction);
+        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(
+            id,
+            _context.Transaction
+        );
         if (entity == null)
             return false;
 
@@ -101,7 +107,10 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     /// </summary>
     public async Task<bool> ResolveAsync(long id, string resolvedBy)
     {
-        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(id, _context.Transaction);
+        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(
+            id,
+            _context.Transaction
+        );
         if (entity == null)
             return false;
 
@@ -117,7 +126,10 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     /// </summary>
     public async Task<bool> UpdateStatusAsync(long id, string status)
     {
-        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(id, _context.Transaction);
+        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(
+            id,
+            _context.Transaction
+        );
         if (entity == null)
             return false;
 
@@ -156,7 +168,10 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     /// </summary>
     public async Task<bool> UpdateNotifyResultAsync(long id, bool sent, string? result)
     {
-        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(id, _context.Transaction);
+        var entity = await _context.Connection.GetAsync<AlertHistoryEntity>(
+            id,
+            _context.Transaction
+        );
         if (entity == null)
             return false;
 

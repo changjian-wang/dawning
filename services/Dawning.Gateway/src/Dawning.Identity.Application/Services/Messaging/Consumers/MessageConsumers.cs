@@ -17,15 +17,15 @@ public class AuditLogConsumer : KafkaConsumerService<AuditLogMessage>
     public AuditLogConsumer(
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
-        ILogger<AuditLogConsumer> logger)
-        : base(scopeFactory, options, logger, options.Value.Topics.AuditLog)
-    {
-    }
+        ILogger<AuditLogConsumer> logger
+    )
+        : base(scopeFactory, options, logger, options.Value.Topics.AuditLog) { }
 
     protected override async Task HandleMessageAsync(
         IServiceProvider serviceProvider,
         AuditLogMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
 
@@ -37,14 +37,17 @@ public class AuditLogConsumer : KafkaConsumerService<AuditLogMessage>
             Username = message.UserName,
             Action = message.Action,
             EntityType = message.EntityType,
-            EntityId = string.IsNullOrEmpty(message.EntityId) ? null : Guid.TryParse(message.EntityId, out var eid) ? eid : null,
+            EntityId =
+                string.IsNullOrEmpty(message.EntityId) ? null
+                : Guid.TryParse(message.EntityId, out var eid) ? eid
+                : null,
             Description = message.Description,
             OldValues = message.OldValue,
             NewValues = message.NewValue,
             IpAddress = message.IpAddress,
             UserAgent = message.UserAgent,
             CreatedAt = DateTime.UtcNow,
-            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+            Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
         };
 
         await unitOfWork.AuditLog.InsertAsync(auditLog);
@@ -62,7 +65,8 @@ public class AlertNotificationConsumer : KafkaConsumerService<AlertNotificationM
     public AlertNotificationConsumer(
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
-        ILogger<AlertNotificationConsumer> logger)
+        ILogger<AlertNotificationConsumer> logger
+    )
         : base(scopeFactory, options, logger, options.Value.Topics.AlertNotification)
     {
         _logger = logger;
@@ -71,11 +75,12 @@ public class AlertNotificationConsumer : KafkaConsumerService<AlertNotificationM
     protected override async Task HandleMessageAsync(
         IServiceProvider serviceProvider,
         AlertNotificationMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // 获取实时通知服务（如果可用）
         var notificationService = serviceProvider.GetService<IRealTimeNotificationService>();
-        
+
         if (notificationService != null)
         {
             // 创建实时告警通知
@@ -88,7 +93,7 @@ public class AlertNotificationConsumer : KafkaConsumerService<AlertNotificationM
                 RuleName = message.RuleName,
                 MetricType = message.MetricType,
                 Value = (decimal)message.CurrentValue,
-                Threshold = (decimal)message.Threshold
+                Threshold = (decimal)message.Threshold,
             };
 
             // 推送实时通知
@@ -98,7 +103,11 @@ public class AlertNotificationConsumer : KafkaConsumerService<AlertNotificationM
         // 记录系统日志
         _logger.LogWarning(
             "Alert triggered - Rule: {RuleName}, Metric: {MetricType}, Value: {Value}, Threshold: {Threshold}",
-            message.RuleName, message.MetricType, message.CurrentValue, message.Threshold);
+            message.RuleName,
+            message.MetricType,
+            message.CurrentValue,
+            message.Threshold
+        );
 
         // TODO: 可以在这里添加其他通知渠道（邮件、短信、Webhook等）
     }
@@ -115,7 +124,8 @@ public class EmailConsumer : KafkaConsumerService<EmailMessage>
     public EmailConsumer(
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
-        ILogger<EmailConsumer> logger)
+        ILogger<EmailConsumer> logger
+    )
         : base(scopeFactory, options, logger, options.Value.Topics.Email)
     {
         _logger = logger;
@@ -124,7 +134,8 @@ public class EmailConsumer : KafkaConsumerService<EmailMessage>
     protected override async Task HandleMessageAsync(
         IServiceProvider serviceProvider,
         EmailMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
@@ -136,21 +147,32 @@ public class EmailConsumer : KafkaConsumerService<EmailMessage>
             //     return;
             // }
             // await emailService.SendEmailAsync(message.To, message.Subject, message.Body, message.IsHtml);
-            
-            _logger.LogInformation("Email queued for {To}. Subject: {Subject} (Email service not implemented yet)", 
-                message.To, message.Subject);
+
+            _logger.LogInformation(
+                "Email queued for {To}. Subject: {Subject} (Email service not implemented yet)",
+                message.To,
+                message.Subject
+            );
             await Task.CompletedTask;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send email to {To}. Retry count: {RetryCount}", message.To, message.RetryCount);
-            
+            _logger.LogError(
+                ex,
+                "Failed to send email to {To}. Retry count: {RetryCount}",
+                message.To,
+                message.RetryCount
+            );
+
             // 如果还有重试次数，重新发布消息
             if (message.RetryCount < 3)
             {
                 var messageBus = serviceProvider.GetRequiredService<IMessageBus>();
                 message.RetryCount++;
-                await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, message.RetryCount)), cancellationToken);
+                await Task.Delay(
+                    TimeSpan.FromSeconds(Math.Pow(2, message.RetryCount)),
+                    cancellationToken
+                );
                 await messageBus.PublishAsync(message, cancellationToken: cancellationToken);
             }
         }
@@ -167,7 +189,8 @@ public class ConfigChangedConsumer : KafkaConsumerService<ConfigChangedMessage>
     public ConfigChangedConsumer(
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
-        ILogger<ConfigChangedConsumer> logger)
+        ILogger<ConfigChangedConsumer> logger
+    )
         : base(scopeFactory, options, logger, options.Value.Topics.ConfigChanged)
     {
         _logger = logger;
@@ -176,19 +199,23 @@ public class ConfigChangedConsumer : KafkaConsumerService<ConfigChangedMessage>
     protected override async Task HandleMessageAsync(
         IServiceProvider serviceProvider,
         ConfigChangedMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         // 获取缓存服务，失效相关缓存
         var cacheService = serviceProvider.GetService<ICacheService>();
-        
+
         if (cacheService != null)
         {
             var cacheKey = $"config:{message.ConfigGroup}:{message.ConfigKey}";
             await cacheService.RemoveAsync(cacheKey);
-            
+
             _logger.LogInformation(
                 "Configuration cache invalidated. Group: {Group}, Key: {Key}, ChangedBy: {ChangedBy}",
-                message.ConfigGroup, message.ConfigKey, message.ChangedBy);
+                message.ConfigGroup,
+                message.ConfigKey,
+                message.ChangedBy
+            );
         }
     }
 }
@@ -203,7 +230,8 @@ public class CacheInvalidationConsumer : KafkaConsumerService<CacheInvalidationM
     public CacheInvalidationConsumer(
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
-        ILogger<CacheInvalidationConsumer> logger)
+        ILogger<CacheInvalidationConsumer> logger
+    )
         : base(scopeFactory, options, logger, options.Value.Topics.CacheInvalidation)
     {
         _logger = logger;
@@ -212,10 +240,11 @@ public class CacheInvalidationConsumer : KafkaConsumerService<CacheInvalidationM
     protected override async Task HandleMessageAsync(
         IServiceProvider serviceProvider,
         CacheInvalidationMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         var cacheService = serviceProvider.GetService<ICacheService>();
-        
+
         if (cacheService == null)
         {
             return;
@@ -245,7 +274,8 @@ public class UserEventConsumer : KafkaConsumerService<UserEventMessage>
     public UserEventConsumer(
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
-        ILogger<UserEventConsumer> logger)
+        ILogger<UserEventConsumer> logger
+    )
         : base(scopeFactory, options, logger, options.Value.Topics.UserEvent)
     {
         _logger = logger;
@@ -254,11 +284,15 @@ public class UserEventConsumer : KafkaConsumerService<UserEventMessage>
     protected override async Task HandleMessageAsync(
         IServiceProvider serviceProvider,
         UserEventMessage message,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation(
             "User event received - Type: {EventType}, UserId: {UserId}, UserName: {UserName}",
-            message.EventType, message.UserId, message.UserName);
+            message.EventType,
+            message.UserId,
+            message.UserName
+        );
 
         // 根据事件类型处理
         switch (message.EventType)

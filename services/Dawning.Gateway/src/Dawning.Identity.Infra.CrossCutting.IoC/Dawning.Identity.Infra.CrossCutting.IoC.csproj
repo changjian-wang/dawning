@@ -9,10 +9,7 @@
       Include="Microsoft.Extensions.DependencyInjection.Abstractions"
       Version="8.0.2"
     />
-    <PackageReference
-      Include="Microsoft.Extensions.Hosting.Abstractions"
-      Version="8.0.1"
-    />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />

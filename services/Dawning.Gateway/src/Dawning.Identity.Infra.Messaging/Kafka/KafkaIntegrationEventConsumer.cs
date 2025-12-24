@@ -27,7 +27,8 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
         IServiceScopeFactory scopeFactory,
         IOptions<KafkaOptions> options,
         ILogger logger,
-        string topic)
+        string topic
+    )
     {
         _scopeFactory = scopeFactory;
         _options = options.Value;
@@ -36,7 +37,7 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            PropertyNameCaseInsensitive = true
+            PropertyNameCaseInsensitive = true,
         };
     }
 
@@ -44,9 +45,7 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
     {
         if (!_options.Enabled)
         {
-            _logger.LogInformation(
-                "Kafka consumer for {Topic} is disabled.",
-                _topic);
+            _logger.LogInformation("Kafka consumer for {Topic} is disabled.", _topic);
             return;
         }
 
@@ -60,33 +59,49 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
             EnableAutoCommit = _options.EnableAutoCommit,
             SessionTimeoutMs = _options.SessionTimeoutMs,
             HeartbeatIntervalMs = _options.HeartbeatIntervalMs,
-            MaxPollIntervalMs = _options.MaxPollIntervalMs
+            MaxPollIntervalMs = _options.MaxPollIntervalMs,
         };
 
         _consumer = new ConsumerBuilder<string, string>(config)
-            .SetErrorHandler((_, e) =>
-            {
-                _logger.LogError("Kafka consumer error for {Topic}: {Reason}", _topic, e.Reason);
-            })
-            .SetPartitionsAssignedHandler((c, partitions) =>
-            {
-                _logger.LogInformation(
-                    "Kafka consumer for {Topic} assigned partitions: {Partitions}",
-                    _topic, string.Join(", ", partitions.Select(p => p.Partition.Value)));
-            })
-            .SetPartitionsRevokedHandler((c, partitions) =>
-            {
-                _logger.LogInformation(
-                    "Kafka consumer for {Topic} revoked partitions: {Partitions}",
-                    _topic, string.Join(", ", partitions.Select(p => p.Partition.Value)));
-            })
+            .SetErrorHandler(
+                (_, e) =>
+                {
+                    _logger.LogError(
+                        "Kafka consumer error for {Topic}: {Reason}",
+                        _topic,
+                        e.Reason
+                    );
+                }
+            )
+            .SetPartitionsAssignedHandler(
+                (c, partitions) =>
+                {
+                    _logger.LogInformation(
+                        "Kafka consumer for {Topic} assigned partitions: {Partitions}",
+                        _topic,
+                        string.Join(", ", partitions.Select(p => p.Partition.Value))
+                    );
+                }
+            )
+            .SetPartitionsRevokedHandler(
+                (c, partitions) =>
+                {
+                    _logger.LogInformation(
+                        "Kafka consumer for {Topic} revoked partitions: {Partitions}",
+                        _topic,
+                        string.Join(", ", partitions.Select(p => p.Partition.Value))
+                    );
+                }
+            )
             .Build();
 
         _consumer.Subscribe(_topic);
 
         _logger.LogInformation(
             "Kafka consumer started for topic: {Topic}, GroupId: {GroupId}",
-            _topic, _options.ConsumerGroupId);
+            _topic,
+            _options.ConsumerGroupId
+        );
 
         try
         {
@@ -111,21 +126,30 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
         try
         {
             var consumeResult = _consumer?.Consume(TimeSpan.FromSeconds(1));
-            if (consumeResult == null) return;
+            if (consumeResult == null)
+                return;
 
-            var @event = JsonSerializer.Deserialize<TEvent>(consumeResult.Message.Value, _jsonOptions);
+            var @event = JsonSerializer.Deserialize<TEvent>(
+                consumeResult.Message.Value,
+                _jsonOptions
+            );
             if (@event == null)
             {
                 _logger.LogWarning(
                     "Failed to deserialize message from {Topic}, Partition: {Partition}, Offset: {Offset}",
-                    _topic, consumeResult.Partition.Value, consumeResult.Offset.Value);
+                    _topic,
+                    consumeResult.Partition.Value,
+                    consumeResult.Offset.Value
+                );
                 _consumer?.Commit(consumeResult);
                 return;
             }
 
             _logger.LogDebug(
                 "Consuming message from {Topic}, EventId: {EventId}",
-                _topic, @event.EventId);
+                _topic,
+                @event.EventId
+            );
 
             using var scope = _scopeFactory.CreateScope();
             await HandleEventAsync(scope.ServiceProvider, @event, cancellationToken);
@@ -135,7 +159,9 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
 
             _logger.LogDebug(
                 "Message processed successfully from {Topic}, EventId: {EventId}",
-                _topic, @event.EventId);
+                _topic,
+                @event.EventId
+            );
         }
         catch (ConsumeException ex)
         {
@@ -154,7 +180,8 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
     protected abstract Task HandleEventAsync(
         IServiceProvider serviceProvider,
         TEvent @event,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken
+    );
 
     public override void Dispose()
     {

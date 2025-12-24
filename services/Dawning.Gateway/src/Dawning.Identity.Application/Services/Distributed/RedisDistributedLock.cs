@@ -12,9 +12,7 @@ public class RedisDistributedLock : IDistributedLock
     private readonly IDistributedCache _cache;
     private readonly ILogger<RedisDistributedLock> _logger;
 
-    public RedisDistributedLock(
-        IDistributedCache cache,
-        ILogger<RedisDistributedLock> logger)
+    public RedisDistributedLock(IDistributedCache cache, ILogger<RedisDistributedLock> logger)
     {
         _cache = cache;
         _logger = logger;
@@ -23,7 +21,8 @@ public class RedisDistributedLock : IDistributedLock
     public async Task<IDistributedLockHandle?> TryAcquireAsync(
         string lockKey,
         TimeSpan expiry,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var lockValue = GenerateLockValue();
         var fullKey = $"lock:{lockKey}";
@@ -43,11 +42,9 @@ public class RedisDistributedLock : IDistributedLock
             await _cache.SetStringAsync(
                 fullKey,
                 lockValue,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = expiry
-                },
-                cancellationToken);
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = expiry },
+                cancellationToken
+            );
 
             // 验证是否真的获取到锁（防止竞态）
             var verify = await _cache.GetStringAsync(fullKey, cancellationToken);
@@ -70,7 +67,8 @@ public class RedisDistributedLock : IDistributedLock
         string lockKey,
         TimeSpan expiry,
         TimeSpan timeout,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var startTime = DateTime.UtcNow;
         var retryDelay = TimeSpan.FromMilliseconds(50);
@@ -89,13 +87,17 @@ public class RedisDistributedLock : IDistributedLock
             var elapsed = DateTime.UtcNow - startTime;
             if (elapsed >= timeout)
             {
-                throw new TimeoutException($"Failed to acquire distributed lock '{lockKey}' within {timeout}");
+                throw new TimeoutException(
+                    $"Failed to acquire distributed lock '{lockKey}' within {timeout}"
+                );
             }
 
             await Task.Delay(retryDelay, cancellationToken);
 
             // 指数退避
-            retryDelay = TimeSpan.FromMilliseconds(Math.Min(retryDelay.TotalMilliseconds * 2, maxRetryDelay.TotalMilliseconds));
+            retryDelay = TimeSpan.FromMilliseconds(
+                Math.Min(retryDelay.TotalMilliseconds * 2, maxRetryDelay.TotalMilliseconds)
+            );
         }
     }
 
@@ -123,7 +125,8 @@ internal class RedisDistributedLockHandle : IDistributedLockHandle
         IDistributedCache cache,
         string fullKey,
         string lockValue,
-        ILogger logger)
+        ILogger logger
+    )
     {
         _cache = cache;
         _fullKey = fullKey;
@@ -131,9 +134,13 @@ internal class RedisDistributedLockHandle : IDistributedLockHandle
         _logger = logger;
     }
 
-    public async Task<bool> ExtendAsync(TimeSpan extension, CancellationToken cancellationToken = default)
+    public async Task<bool> ExtendAsync(
+        TimeSpan extension,
+        CancellationToken cancellationToken = default
+    )
     {
-        if (_released) return false;
+        if (_released)
+            return false;
 
         try
         {
@@ -147,11 +154,9 @@ internal class RedisDistributedLockHandle : IDistributedLockHandle
             await _cache.SetStringAsync(
                 _fullKey,
                 _lockValue,
-                new DistributedCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = extension
-                },
-                cancellationToken);
+                new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = extension },
+                cancellationToken
+            );
 
             return true;
         }
@@ -164,7 +169,8 @@ internal class RedisDistributedLockHandle : IDistributedLockHandle
 
     public async Task ReleaseAsync(CancellationToken cancellationToken = default)
     {
-        if (_released) return;
+        if (_released)
+            return;
 
         try
         {

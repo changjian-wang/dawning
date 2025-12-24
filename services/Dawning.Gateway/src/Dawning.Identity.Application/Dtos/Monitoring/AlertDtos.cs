@@ -31,7 +31,7 @@ public class AlertRuleDto
             "response_time" => "响应时间",
             "error_rate" => "错误率",
             "request_count" => "请求数量",
-            _ => metricType
+            _ => metricType,
         };
 
     private static string GetOperatorDisplay(string op) =>
@@ -42,7 +42,7 @@ public class AlertRuleDto
             "lt" => "<",
             "lte" => "<=",
             "eq" => "=",
-            _ => op
+            _ => op,
         };
 }
 
@@ -115,7 +115,7 @@ public class AlertHistoryDto
             "response_time" => "响应时间",
             "error_rate" => "错误率",
             "request_count" => "请求数量",
-            _ => metricType
+            _ => metricType,
         };
 
     private static string GetStatusDisplay(string status) =>
@@ -124,7 +124,7 @@ public class AlertHistoryDto
             "triggered" => "已触发",
             "acknowledged" => "已确认",
             "resolved" => "已解决",
-            _ => status
+            _ => status,
         };
 }
 

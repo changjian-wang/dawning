@@ -93,7 +93,7 @@ namespace Dawning.Identity.Api.Middleware
                         StatusCode = context.Response.StatusCode,
                         ContentType = context.Response.ContentType ?? "application/json",
                         Body = responseBody,
-                        CachedAt = DateTimeOffset.UtcNow
+                        CachedAt = DateTimeOffset.UtcNow,
                     };
 
                     await cacheService.SetAsync(
@@ -140,8 +140,8 @@ namespace Dawning.Identity.Api.Middleware
             // 按用户区分
             if (cacheAttribute.VaryByUser && context.User.Identity?.IsAuthenticated == true)
             {
-                var userId = context.User.FindFirst("sub")?.Value
-                    ?? context.User.FindFirst("id")?.Value
+                var userId =
+                    context.User.FindFirst("sub")?.Value ?? context.User.FindFirst("id")?.Value
                     ?? "anonymous";
                 keyBuilder.Append(":user:");
                 keyBuilder.Append(userId);
@@ -150,7 +150,10 @@ namespace Dawning.Identity.Api.Middleware
             // 按查询参数区分
             if (!string.IsNullOrEmpty(cacheAttribute.VaryByQueryKeys))
             {
-                var queryKeys = cacheAttribute.VaryByQueryKeys.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var queryKeys = cacheAttribute.VaryByQueryKeys.Split(
+                    ',',
+                    StringSplitOptions.RemoveEmptyEntries
+                );
                 foreach (var key in queryKeys)
                 {
                     var trimmedKey = key.Trim();
@@ -165,10 +168,15 @@ namespace Dawning.Identity.Api.Middleware
             }
 
             // 对完整查询字符串进行哈希（如果没有指定特定查询键）
-            if (string.IsNullOrEmpty(cacheAttribute.VaryByQueryKeys) && context.Request.QueryString.HasValue)
+            if (
+                string.IsNullOrEmpty(cacheAttribute.VaryByQueryKeys)
+                && context.Request.QueryString.HasValue
+            )
             {
                 using var sha256 = SHA256.Create();
-                var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(context.Request.QueryString.Value ?? ""));
+                var hash = sha256.ComputeHash(
+                    Encoding.UTF8.GetBytes(context.Request.QueryString.Value ?? "")
+                );
                 keyBuilder.Append(":q:");
                 keyBuilder.Append(Convert.ToBase64String(hash)[..8]);
             }

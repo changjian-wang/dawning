@@ -82,7 +82,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
 
             var result = await _service.InsertAsync(dto);
-            
+
             await _auditLogHelper.LogAsync(
                 "CreateClaimType",
                 "ClaimType",
@@ -91,7 +91,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 null,
                 dto
             );
-            
+
             return Ok(ApiResponse<int>.Success(result, "ClaimType created successfully"));
         }
 
@@ -107,7 +107,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
 
             var result = await _service.UpdateAsync(dto);
-            
+
             await _auditLogHelper.LogAsync(
                 "UpdateClaimType",
                 "ClaimType",
@@ -116,7 +116,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 null,
                 dto
             );
-            
+
             return Ok(ApiResponse<bool>.Success(result, "ClaimType updated successfully"));
         }
 
@@ -132,14 +132,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
             }
 
             var result = await _service.DeleteAsync(new ClaimTypeDto { Id = id });
-            
+
             await _auditLogHelper.LogAsync(
                 "DeleteClaimType",
                 "ClaimType",
                 id,
                 $"删除声明类型: {id}"
             );
-            
+
             return Ok(ApiResponse<bool>.Success(result, "ClaimType deleted successfully"));
         }
     }

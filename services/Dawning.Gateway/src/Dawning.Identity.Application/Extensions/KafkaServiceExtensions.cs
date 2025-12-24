@@ -16,7 +16,8 @@ public static class KafkaServiceExtensions
     /// </summary>
     public static IServiceCollection AddKafkaMessaging(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration
+    )
     {
         // 绑定配置
         var kafkaSection = configuration.GetSection(KafkaOptions.SectionName);
@@ -51,7 +52,8 @@ public static class KafkaServiceExtensions
     /// </summary>
     public static IServiceCollection AddKafkaProducer(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration
+    )
     {
         var kafkaSection = configuration.GetSection(KafkaOptions.SectionName);
         services.Configure<KafkaOptions>(kafkaSection);

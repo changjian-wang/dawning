@@ -21,7 +21,7 @@ namespace Dawning.Identity.Api.Middleware
         /// 租户标识的请求头名称
         /// </summary>
         public const string TenantHeader = "X-Tenant-Id";
-        
+
         /// <summary>
         /// 租户代码的请求头名称
         /// </summary>
@@ -41,13 +41,17 @@ namespace Dawning.Identity.Api.Middleware
         public async Task InvokeAsync(
             HttpContext context,
             ITenantContext tenantContext,
-            ITenantService tenantService)
+            ITenantService tenantService
+        )
         {
             try
             {
                 // 解析租户信息
-                var (tenantId, tenantName, isHost) = await ResolveTenantAsync(context, tenantService);
-                
+                var (tenantId, tenantName, isHost) = await ResolveTenantAsync(
+                    context,
+                    tenantService
+                );
+
                 // 设置租户上下文
                 tenantContext.SetTenant(tenantId, tenantName, isHost);
 
@@ -70,14 +74,15 @@ namespace Dawning.Identity.Api.Middleware
         /// </summary>
         private async Task<(Guid? TenantId, string? TenantName, bool IsHost)> ResolveTenantAsync(
             HttpContext context,
-            ITenantService tenantService)
+            ITenantService tenantService
+        )
         {
             // 1. 从 JWT Token 中获取租户ID
             if (context.User.Identity?.IsAuthenticated == true)
             {
                 // 检查是否是主机用户（超级管理员）
                 var isHost = context.User.IsInRole("super_admin");
-                
+
                 var tenantClaim = context.User.FindFirst(TenantClaimType);
                 if (tenantClaim != null && Guid.TryParse(tenantClaim.Value, out var jwtTenantId))
                 {
@@ -120,9 +125,11 @@ namespace Dawning.Identity.Api.Middleware
             return (null, null, false);
         }
 
-        private async Task<(Guid? TenantId, string? TenantName, bool IsHost)> ResolveTenantFromHeaderAsync(
-            HttpContext context,
-            ITenantService tenantService)
+        private async Task<(
+            Guid? TenantId,
+            string? TenantName,
+            bool IsHost
+        )> ResolveTenantFromHeaderAsync(HttpContext context, ITenantService tenantService)
         {
             // 尝试从请求头获取租户ID
             if (context.Request.Headers.TryGetValue(TenantHeader, out var tenantIdHeader))

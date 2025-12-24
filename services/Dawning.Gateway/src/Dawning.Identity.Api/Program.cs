@@ -90,9 +90,7 @@ namespace Dawning.Identity.Api
             >();
 
             // ===== Cache Warmup Service (缓存预热) =====
-            builder.Services.AddHostedService<
-                Dawning.Identity.Application.Services.Caching.CacheWarmupService
-            >();
+            builder.Services.AddHostedService<Dawning.Identity.Application.Services.Caching.CacheWarmupService>();
 
             builder.Services.AddScoped<
                 Dawning.Identity.Application.Interfaces.Token.ITokenManagementService,

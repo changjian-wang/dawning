@@ -68,9 +68,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
             try
             {
                 // 验证参数
-                if (page < 1) page = 1;
-                if (pageSize < 1) pageSize = 20;
-                if (pageSize > 100) pageSize = 100;
+                if (page < 1)
+                    page = 1;
+                if (pageSize < 1)
+                    pageSize = 20;
+                if (pageSize > 100)
+                    pageSize = 100;
 
                 var query = new RequestLogQuery
                 {
@@ -86,7 +89,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     OnlyErrors = onlyErrors,
                     SlowRequestThresholdMs = slowRequestThresholdMs,
                     Page = page,
-                    PageSize = pageSize
+                    PageSize = pageSize,
                 };
 
                 var result = await _requestLoggingService.GetLogsAsync(query);
@@ -137,7 +140,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 if (retentionDays < 1)
                 {
-                    return BadRequest(ApiResponse.Error(40000, "Retention days must be at least 1"));
+                    return BadRequest(
+                        ApiResponse.Error(40000, "Retention days must be at least 1")
+                    );
                 }
 
                 var deletedCount = await _requestLoggingService.CleanupOldLogsAsync(retentionDays);
@@ -148,12 +153,16 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     retentionDays
                 );
 
-                return Ok(ApiResponse<object>.Success(new
-                {
-                    DeletedCount = deletedCount,
-                    RetentionDays = retentionDays,
-                    Message = $"Deleted {deletedCount} request logs older than {retentionDays} days"
-                }));
+                return Ok(
+                    ApiResponse<object>.Success(
+                        new
+                        {
+                            DeletedCount = deletedCount,
+                            RetentionDays = retentionDays,
+                            Message = $"Deleted {deletedCount} request logs older than {retentionDays} days",
+                        }
+                    )
+                );
             }
             catch (Exception ex)
             {
@@ -180,9 +189,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
         {
             try
             {
-                if (page < 1) page = 1;
-                if (pageSize < 1) pageSize = 20;
-                if (pageSize > 100) pageSize = 100;
+                if (page < 1)
+                    page = 1;
+                if (pageSize < 1)
+                    pageSize = 20;
+                if (pageSize > 100)
+                    pageSize = 100;
 
                 var query = new RequestLogQuery
                 {
@@ -190,7 +202,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     EndTime = endTime ?? DateTime.UtcNow,
                     OnlyErrors = true,
                     Page = page,
-                    PageSize = pageSize
+                    PageSize = pageSize,
                 };
 
                 var result = await _requestLoggingService.GetLogsAsync(query);
@@ -223,10 +235,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
         {
             try
             {
-                if (page < 1) page = 1;
-                if (pageSize < 1) pageSize = 20;
-                if (pageSize > 100) pageSize = 100;
-                if (thresholdMs < 1) thresholdMs = 1000;
+                if (page < 1)
+                    page = 1;
+                if (pageSize < 1)
+                    pageSize = 20;
+                if (pageSize > 100)
+                    pageSize = 100;
+                if (thresholdMs < 1)
+                    thresholdMs = 1000;
 
                 var query = new RequestLogQuery
                 {
@@ -234,7 +250,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     EndTime = endTime ?? DateTime.UtcNow,
                     SlowRequestThresholdMs = thresholdMs,
                     Page = page,
-                    PageSize = pageSize
+                    PageSize = pageSize,
                 };
 
                 var result = await _requestLoggingService.GetLogsAsync(query);

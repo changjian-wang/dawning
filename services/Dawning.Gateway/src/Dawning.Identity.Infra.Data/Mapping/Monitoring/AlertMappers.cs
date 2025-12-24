@@ -131,7 +131,9 @@ namespace Dawning.Identity.Infra.Data.Mapping.Monitoring
         /// <summary>
         /// 批量转换实体到模型
         /// </summary>
-        public static IEnumerable<AlertHistory> ToModels(this IEnumerable<AlertHistoryEntity> entities)
+        public static IEnumerable<AlertHistory> ToModels(
+            this IEnumerable<AlertHistoryEntity> entities
+        )
         {
             return entities.Select(e => e.ToModel());
         }

@@ -12,7 +12,11 @@ public interface IAlertHistoryRepository
     /// <summary>
     /// 分页查询告警历史
     /// </summary>
-    Task<PagedData<AlertHistory>> GetPagedListAsync(AlertHistoryQueryModel model, int page, int pageSize);
+    Task<PagedData<AlertHistory>> GetPagedListAsync(
+        AlertHistoryQueryModel model,
+        int page,
+        int pageSize
+    );
 
     /// <summary>
     /// 根据ID获取告警历史

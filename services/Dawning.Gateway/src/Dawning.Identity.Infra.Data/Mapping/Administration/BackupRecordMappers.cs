@@ -24,7 +24,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 Description = entity.Description,
                 IsManual = entity.IsManual,
                 Status = entity.Status,
-                ErrorMessage = entity.ErrorMessage
+                ErrorMessage = entity.ErrorMessage,
             };
         }
 
@@ -44,14 +44,16 @@ namespace Dawning.Identity.Infra.Data.Mapping.Administration
                 Description = model.Description,
                 IsManual = model.IsManual,
                 Status = model.Status,
-                ErrorMessage = model.ErrorMessage
+                ErrorMessage = model.ErrorMessage,
             };
         }
 
         /// <summary>
         /// 实体列表转模型列表
         /// </summary>
-        public static IEnumerable<BackupRecord> ToModels(this IEnumerable<BackupRecordEntity> entities)
+        public static IEnumerable<BackupRecord> ToModels(
+            this IEnumerable<BackupRecordEntity> entities
+        )
         {
             return entities.Select(e => e.ToModel());
         }
