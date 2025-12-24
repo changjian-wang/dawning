@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <PackageId>Dawning.Shared.Dapper.Contrib.Attributes</PackageId>
+    <Description>Dawning Dapper 属性库 - Table、Key、Column 等数据映射属性</Description>
+    <PackageTags>dawning;dapper;attributes;mapping</PackageTags>
   </PropertyGroup>
 </Project>

@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <PackageId>Dawning.Shared.Dapper.Contrib</PackageId>
+    <Description>Dawning Dapper 扩展 - 基于 Dapper.Contrib 的增强版，支持更多数据库特性</Description>
+    <PackageTags>dawning;dapper;orm;database;contrib</PackageTags>
     <!-- 禁用 nullable 警告，因为这是从 Dapper.Contrib 改编的代码 -->
     <NoWarn>$(NoWarn);CS8600;CS8602;CS8603;CS8604;CS8625</NoWarn>
   </PropertyGroup>

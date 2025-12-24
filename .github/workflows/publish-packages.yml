@@ -1,0 +1,105 @@
+name: Publish NuGet Packages
+
+on:
+  push:
+    tags:
+      - 'sdk-v*'  # 触发条件: 推送 sdk-v1.0.0 格式的 tag
+  workflow_dispatch:  # 允许手动触发
+    inputs:
+      version:
+        description: 'Package version (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NUGET_SOURCE: 'https://nuget.pkg.github.com/changjian-wang/index.json'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            # Extract version from tag (sdk-v1.0.0 -> 1.0.0)
+            VERSION=${GITHUB_REF#refs/tags/sdk-v}
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Restore dependencies
+        working-directory: ./Dawning.Gateway/src/Shared
+        run: |
+          dotnet restore Dawning.Shared.Dapper.Contrib.Attributes/Dawning.Shared.Dapper.Contrib.Attributes.csproj
+          dotnet restore Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj
+          dotnet restore Dawning.Shared.Utils/Dawning.Shared.Utils.csproj
+          dotnet restore Dawning.Shared.Core/Dawning.Shared.Core.csproj
+          dotnet restore Dawning.Shared.Resilience/Dawning.Shared.Resilience.csproj
+          dotnet restore Dawning.Shared.Logging/Dawning.Shared.Logging.csproj
+          dotnet restore Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj
+
+      - name: Build packages
+        working-directory: ./Dawning.Gateway/src/Shared
+        run: |
+          dotnet build Dawning.Shared.Dapper.Contrib.Attributes/Dawning.Shared.Dapper.Contrib.Attributes.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Shared.Core/Dawning.Shared.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Shared.Resilience/Dawning.Shared.Resilience.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Shared.Logging/Dawning.Shared.Logging.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+
+      - name: Pack NuGet packages
+        working-directory: ./Dawning.Gateway/src/Shared
+        run: |
+          dotnet pack Dawning.Shared.Dapper.Contrib.Attributes/Dawning.Shared.Dapper.Contrib.Attributes.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Shared.Core/Dawning.Shared.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Shared.Resilience/Dawning.Shared.Resilience.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Shared.Logging/Dawning.Shared.Logging.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+
+      - name: List generated packages
+        working-directory: ./Dawning.Gateway/src/Shared
+        run: ls -la ./nupkgs
+
+      - name: Publish to GitHub Packages
+        working-directory: ./Dawning.Gateway/src/Shared
+        run: |
+          dotnet nuget add source --username changjian-wang --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "${{ env.NUGET_SOURCE }}"
+          for package in ./nupkgs/*.nupkg; do
+            echo "Publishing $package..."
+            dotnet nuget push "$package" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
+          done
+
+      - name: Summary
+        run: |
+          echo "## 📦 Published NuGet Packages" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Version: **${{ steps.version.outputs.VERSION }}**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Authentication | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Core | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Logging | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Dapper.Contrib | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Dapper.Contrib.Attributes | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Resilience | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Shared.Utils | ✅ Published |" >> $GITHUB_STEP_SUMMARY

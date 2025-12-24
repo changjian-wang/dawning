@@ -1,8 +1,8 @@
+using System.Text.Json;
 using Dawning.Shared.Core.Exceptions;
 using Dawning.Shared.Core.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace Dawning.Shared.Core.Middleware;
 
@@ -17,15 +17,16 @@ public class ExceptionHandlingMiddleware
     private readonly JsonSerializerOptions _jsonOptions;
 
     public ExceptionHandlingMiddleware(
-        RequestDelegate next, 
-        ILogger<ExceptionHandlingMiddleware> logger)
+        RequestDelegate next,
+        ILogger<ExceptionHandlingMiddleware> logger
+    )
     {
         _next = next;
         _logger = logger;
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
         };
     }
 
@@ -47,41 +48,50 @@ public class ExceptionHandlingMiddleware
         {
             ValidationException validationEx => (
                 StatusCodes.Status400BadRequest,
-                (ApiResult)ApiResults.ValidationError(validationEx.Errors, validationEx.Message)),
+                ApiResults.ValidationError(validationEx.Errors, validationEx.Message)
+            ),
 
             NotFoundException notFoundEx => (
                 StatusCodes.Status404NotFound,
-                (ApiResult)ApiResults.NotFound(notFoundEx.Message)),
+                ApiResults.NotFound(notFoundEx.Message)
+            ),
 
             UnauthorizedException unauthorizedEx => (
                 StatusCodes.Status401Unauthorized,
-                (ApiResult)ApiResults.Unauthorized(unauthorizedEx.Message)),
+                ApiResults.Unauthorized(unauthorizedEx.Message)
+            ),
 
             ForbiddenException forbiddenEx => (
                 StatusCodes.Status403Forbidden,
-                (ApiResult)ApiResults.Forbidden(forbiddenEx.Message)),
+                ApiResults.Forbidden(forbiddenEx.Message)
+            ),
 
             ConflictException conflictEx => (
                 StatusCodes.Status409Conflict,
-                (ApiResult)ApiResults.Fail(conflictEx.ErrorCode, conflictEx.Message)),
+                ApiResults.Fail(conflictEx.ErrorCode, conflictEx.Message)
+            ),
 
             TooManyRequestsException rateLimitEx => (
                 StatusCodes.Status429TooManyRequests,
-                (ApiResult)CreateRateLimitResult(rateLimitEx)),
+                CreateRateLimitResult(rateLimitEx)
+            ),
 
             ServiceUnavailableException serviceEx => (
                 StatusCodes.Status503ServiceUnavailable,
-                (ApiResult)ApiResults.Fail(serviceEx.ErrorCode, serviceEx.Message)),
+                ApiResults.Fail(serviceEx.ErrorCode, serviceEx.Message)
+            ),
 
             BusinessException businessEx => (
                 StatusCodes.Status400BadRequest,
-                (ApiResult)ApiResults.Fail(businessEx.ErrorCode, businessEx.Message)),
+                ApiResults.Fail(businessEx.ErrorCode, businessEx.Message)
+            ),
 
             OperationCanceledException => (
                 499, // Client Closed Request
-                (ApiResult)ApiResults.Fail("REQUEST_CANCELLED", "请求已取消")),
+                ApiResults.Fail("REQUEST_CANCELLED", "请求已取消")
+            ),
 
-            _ => HandleUnexpectedException(exception)
+            _ => HandleUnexpectedException(exception),
         };
 
         // 记录日志
@@ -91,8 +101,7 @@ public class ExceptionHandlingMiddleware
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json; charset=utf-8";
 
-        await context.Response.WriteAsync(
-            JsonSerializer.Serialize(result, _jsonOptions));
+        await context.Response.WriteAsync(JsonSerializer.Serialize(result, _jsonOptions));
     }
 
     private static ApiResult CreateRateLimitResult(TooManyRequestsException ex)
@@ -107,7 +116,8 @@ public class ExceptionHandlingMiddleware
         // 未预期的异常，返回 500
         return (
             StatusCodes.Status500InternalServerError,
-            ApiResults.Error("服务器内部错误，请稍后重试"));
+            ApiResults.Error("服务器内部错误，请稍后重试")
+        );
     }
 
     private void LogException(Exception exception, int statusCode, HttpContext context)
@@ -122,14 +132,22 @@ public class ExceptionHandlingMiddleware
             _logger.LogWarning(
                 exception,
                 "[{TraceId}] 业务异常 - {Method} {Path} - Code: {ErrorCode}, Message: {Message}",
-                traceId, method, requestPath, businessEx.ErrorCode, businessEx.Message);
+                traceId,
+                method,
+                requestPath,
+                businessEx.ErrorCode,
+                businessEx.Message
+            );
         }
         else if (exception is OperationCanceledException)
         {
             // 请求取消使用 Information 级别
             _logger.LogInformation(
                 "[{TraceId}] 请求取消 - {Method} {Path}",
-                traceId, method, requestPath);
+                traceId,
+                method,
+                requestPath
+            );
         }
         else
         {
@@ -137,7 +155,10 @@ public class ExceptionHandlingMiddleware
             _logger.LogError(
                 exception,
                 "[{TraceId}] 未处理异常 - {Method} {Path}",
-                traceId, method, requestPath);
+                traceId,
+                method,
+                requestPath
+            );
         }
     }
 }

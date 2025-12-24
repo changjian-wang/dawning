@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Description>Dawning 统一认证中间件 - 用于新业务系统接入认证中心</Description>
-    <Authors>Dawning Team</Authors>
     <PackageId>Dawning.Shared.Authentication</PackageId>
-    <Version>1.0.0</Version>
+    <Description>Dawning 统一认证库 - JWT Bearer 认证集成、权限验证、用户上下文</Description>
+    <PackageTags>dawning;authentication;jwt;authorization</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

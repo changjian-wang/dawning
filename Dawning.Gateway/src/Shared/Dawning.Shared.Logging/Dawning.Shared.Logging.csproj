@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Description>统一日志配置库，提供结构化日志、日志富化和 Serilog 集成</Description>
-    <Authors>Dawning Team</Authors>
+    <PackageId>Dawning.Shared.Logging</PackageId>
+    <Description>Dawning 日志库 - Serilog 集成、结构化日志、请求上下文富化</Description>
+    <PackageTags>dawning;logging;serilog;structured-logging</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
