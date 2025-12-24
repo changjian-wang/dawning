@@ -9,6 +9,7 @@
     <RepositoryUrl>https://github.com/changjian-wang/dawning</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     
     <!-- 启用生成 NuGet 包 -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -26,6 +27,11 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <!-- 包含 README 文件 -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+  </ItemGroup>
 
   <!-- SourceLink 支持 -->
   <ItemGroup>
