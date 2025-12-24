@@ -214,11 +214,8 @@ namespace Dawning.Identity.Api
             builder.Services.AddKafkaIntegrationEventConsumers();
 
             // ===== Distributed Lock (分布式锁) =====
-            // 使用 Infrastructure 层的 Redis 实现
-            builder.Services.AddSingleton<
-                Application.Interfaces.Distributed.IDistributedLock,
-                Infra.Messaging.Distributed.RedisDistributedLock
-            >();
+            // 使用 Infra.Messaging 层的扩展方法（支持 Redis 不可用时的优雅降级）
+            builder.Services.AddDistributedLock();
 
             // ===== Database Seeder =====
             builder.Services.AddScoped<Data.DatabaseSeeder>();
