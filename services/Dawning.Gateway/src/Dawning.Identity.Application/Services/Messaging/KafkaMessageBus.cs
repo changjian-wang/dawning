@@ -28,7 +28,7 @@ public class KafkaMessageBus : IMessageBus, IDisposable
         var config = new ProducerConfig
         {
             BootstrapServers = _options.BootstrapServers,
-            Acks = (Acks)_options.Producer.Acks,
+            Acks = Enum.Parse<Acks>(_options.Producer.Acks, true),
             EnableIdempotence = _options.Producer.EnableIdempotence,
             MessageMaxBytes = _options.Producer.MaxMessageBytes,
             MessageTimeoutMs = _options.Producer.MessageTimeoutMs,

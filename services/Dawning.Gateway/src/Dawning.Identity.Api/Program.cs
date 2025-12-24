@@ -1,6 +1,7 @@
 using Dawning.Identity.Api.Configurations;
 using Dawning.Identity.Api.Middleware;
 using Dawning.Identity.Application.Extensions;
+using Dawning.Identity.Infra.Messaging;
 using Serilog;
 
 namespace Dawning.Identity.Api
@@ -200,13 +201,19 @@ namespace Dawning.Identity.Api
             // ===== OpenTelemetry =====
             builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
 
-            // ===== Kafka Messaging (分布式消息队列) =====
+            // ===== Messaging Services (DDD Event-Driven Architecture) =====
+            // MediatR 用于进程内领域事件
+            // Kafka 用于进程间集成事件
+            builder.Services.AddMessagingServices(builder.Configuration);
+
+            // 仍保留旧的 Kafka 生产者以保持向后兼容（可选，逐步迁移后删除）
             builder.Services.AddKafkaMessaging(builder.Configuration);
 
             // ===== Distributed Lock (分布式锁) =====
+            // 使用 Infrastructure 层的 Redis 实现
             builder.Services.AddSingleton<
                 Dawning.Identity.Application.Interfaces.Distributed.IDistributedLock,
-                Dawning.Identity.Application.Services.Distributed.RedisDistributedLock
+                Dawning.Identity.Infra.Messaging.Distributed.RedisDistributedLock
             >();
 
             // ===== Database Seeder =====

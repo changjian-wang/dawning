@@ -36,6 +36,33 @@ public class KafkaOptions
     /// 主题配置
     /// </summary>
     public KafkaTopicOptions Topics { get; set; } = new();
+
+    // 根级别的消费者配置属性（便于直接访问）
+
+    /// <summary>
+    /// 自动偏移量重置策略: Earliest, Latest
+    /// </summary>
+    public string AutoOffsetReset { get; set; } = "Earliest";
+
+    /// <summary>
+    /// 自动提交偏移量
+    /// </summary>
+    public bool EnableAutoCommit { get; set; } = false;
+
+    /// <summary>
+    /// 会话超时（毫秒）
+    /// </summary>
+    public int SessionTimeoutMs { get; set; } = 45000;
+
+    /// <summary>
+    /// 心跳间隔（毫秒）
+    /// </summary>
+    public int HeartbeatIntervalMs { get; set; } = 15000;
+
+    /// <summary>
+    /// 最大轮询间隔（毫秒）
+    /// </summary>
+    public int MaxPollIntervalMs { get; set; } = 300000;
 }
 
 /// <summary>
@@ -44,14 +71,19 @@ public class KafkaOptions
 public class KafkaProducerOptions
 {
     /// <summary>
-    /// 消息确认模式: 0=不等待, 1=Leader确认, -1=所有副本确认
+    /// 消息确认模式: None=不等待, Leader=Leader确认, All=所有副本确认
     /// </summary>
-    public int Acks { get; set; } = -1;
+    public string Acks { get; set; } = "All";
 
     /// <summary>
     /// 启用幂等性
     /// </summary>
     public bool EnableIdempotence { get; set; } = true;
+
+    /// <summary>
+    /// 最大飞行请求数
+    /// </summary>
+    public int MaxInFlight { get; set; } = 5;
 
     /// <summary>
     /// 消息最大大小（字节）
@@ -79,7 +111,7 @@ public class KafkaProducerOptions
     public int BatchSize { get; set; } = 16384;
 
     /// <summary>
-    /// 启用压缩
+    /// 启用压缩类型: none, gzip, snappy, lz4, zstd
     /// </summary>
     public string CompressionType { get; set; } = "snappy";
 }
