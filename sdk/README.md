@@ -16,12 +16,12 @@ dotnet nuget add source "https://nuget.pkg.github.com/changjian-wang/index.json"
 ### 安装包
 
 ```bash
-dotnet add package Dawning.Core --version 1.0.0
-dotnet add package Dawning.Identity --version 1.0.0
-dotnet add package Dawning.Logging --version 1.0.0
-dotnet add package Dawning.ORM.Dapper --version 1.0.0
-dotnet add package Dawning.Resilience --version 1.0.0
-dotnet add package Dawning.Extensions --version 1.0.0
+dotnet add package Dawning.Core --version 1.1.0
+dotnet add package Dawning.Identity --version 1.1.0
+dotnet add package Dawning.Logging --version 1.1.0
+dotnet add package Dawning.ORM.Dapper --version 1.1.0
+dotnet add package Dawning.Resilience --version 1.1.0
+dotnet add package Dawning.Extensions --version 1.1.0
 ```
 
 ---
@@ -320,6 +320,15 @@ dotnet nuget push ./nupkgs/*.nupkg --source "github"
 ```
 
 ## 版本历史
+
+### v1.1.0 (2024-12-24)
+- **Dawning.Extensions 增强**
+  - 新增 StringExtensions: 命名转换、验证、掩码、截断
+  - 新增 CollectionExtensions: 批处理、去重、合并、遍历
+  - 新增 DateTimeExtensions: 时间边界、周末判断、年龄计算
+  - 新增 JsonExtensions: 序列化、深克隆、验证、合并
+  - 新增 ObjectExtensions: 空值处理、反射、范围检查
+- 新增 149 个单元测试
 
 ### v1.0.0 (2024-12-24)
 - 初始版本
