@@ -45,16 +45,16 @@ namespace Dawning.Identity.Api
 
             // ===== Security Services =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Security.ILoginLockoutService,
-                Dawning.Identity.Application.Services.Security.LoginLockoutService
+                Application.Interfaces.Security.ILoginLockoutService,
+                Application.Services.Security.LoginLockoutService
             >();
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Security.IPasswordPolicyService,
-                Dawning.Identity.Application.Services.Security.PasswordPolicyService
+                Application.Interfaces.Security.IPasswordPolicyService,
+                Application.Services.Security.PasswordPolicyService
             >();
             builder.Services.AddSingleton<
-                Dawning.Identity.Domain.Core.Security.IDataEncryptionService,
-                Dawning.Identity.Domain.Core.Security.AesDataEncryptionService
+                Domain.Core.Security.IDataEncryptionService,
+                Domain.Core.Security.AesDataEncryptionService
             >();
 
             // ===== Token Management Services =====
@@ -68,8 +68,8 @@ namespace Dawning.Identity.Api
                     options.InstanceName = "DawningIdentity:";
                 });
                 builder.Services.AddScoped<
-                    Dawning.Identity.Application.Interfaces.Token.ITokenBlacklistService,
-                    Dawning.Identity.Application.Services.Token.TokenBlacklistService
+                    Application.Interfaces.Token.ITokenBlacklistService,
+                    Application.Services.Token.TokenBlacklistService
                 >();
             }
             else
@@ -77,57 +77,57 @@ namespace Dawning.Identity.Api
                 // 使用内存分布式缓存作为回退
                 builder.Services.AddDistributedMemoryCache();
                 builder.Services.AddScoped<
-                    Dawning.Identity.Application.Interfaces.Token.ITokenBlacklistService,
-                    Dawning.Identity.Application.Services.Token.InMemoryTokenBlacklistService
+                    Application.Interfaces.Token.ITokenBlacklistService,
+                    Application.Services.Token.InMemoryTokenBlacklistService
                 >();
             }
 
             // ===== Cache Service (统一缓存服务) =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Caching.ICacheService,
-                Dawning.Identity.Application.Services.Caching.DistributedCacheService
+                Application.Interfaces.Caching.ICacheService,
+                Application.Services.Caching.DistributedCacheService
             >();
 
             // ===== Cache Warmup Service (缓存预热) =====
-            builder.Services.AddHostedService<Dawning.Identity.Application.Services.Caching.CacheWarmupService>();
+            builder.Services.AddHostedService<Application.Services.Caching.CacheWarmupService>();
 
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Token.ITokenManagementService,
-                Dawning.Identity.Application.Services.Token.TokenManagementService
+                Application.Interfaces.Token.ITokenManagementService,
+                Application.Services.Token.TokenManagementService
             >();
 
             // ===== User Authentication Service =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Authentication.IUserAuthenticationService,
-                Dawning.Identity.Application.Services.Authentication.UserAuthenticationService
+                Application.Interfaces.Authentication.IUserAuthenticationService,
+                Application.Services.Authentication.UserAuthenticationService
             >();
 
             // ===== Rate Limit Service =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.IRateLimitService,
-                Dawning.Identity.Application.Services.RateLimit.RateLimitService
+                Application.Interfaces.IRateLimitService,
+                Application.Services.RateLimit.RateLimitService
             >();
 
             // ===== Current User Service =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.ICurrentUserService,
-                Dawning.Identity.Application.Services.CurrentUserService
+                Application.Interfaces.ICurrentUserService,
+                Application.Services.CurrentUserService
             >();
 
             // ===== Request Logging Service =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Logging.IRequestLoggingService,
-                Dawning.Identity.Application.Services.Logging.RequestLoggingService
+                Application.Interfaces.Logging.IRequestLoggingService,
+                Application.Services.Logging.RequestLoggingService
             >();
 
             // ===== Backup Service =====
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Services.Administration.IDatabaseExportService,
-                Dawning.Identity.Application.Services.Administration.DatabaseExportService
+                Application.Services.Administration.IDatabaseExportService,
+                Application.Services.Administration.DatabaseExportService
             >();
             builder.Services.AddScoped<
-                Dawning.Identity.Application.Interfaces.Administration.IBackupService,
-                Dawning.Identity.Application.Services.Administration.BackupService
+                Application.Interfaces.Administration.IBackupService,
+                Application.Services.Administration.BackupService
             >();
 
             // ===== CSRF Protection =====
@@ -135,7 +135,7 @@ namespace Dawning.Identity.Api
 
             // ===== Audit Log Helper =====
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddScoped<Dawning.Identity.Api.Helpers.AuditLogHelper>();
+            builder.Services.AddScoped<Helpers.AuditLogHelper>();
 
             // ===== Database Configuration =====
             builder.Services.AddDatabaseConfiguration(builder.Configuration);
@@ -201,7 +201,7 @@ namespace Dawning.Identity.Api
             // ===== MediatR (进程内领域事件) =====
             builder.Services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(
-                    typeof(Dawning.Identity.Application.EventHandlers.UserCreatedEventHandler).Assembly
+                    typeof(Application.EventHandlers.UserCreatedEventHandler).Assembly
                 )
             );
 
@@ -216,12 +216,12 @@ namespace Dawning.Identity.Api
             // ===== Distributed Lock (分布式锁) =====
             // 使用 Infrastructure 层的 Redis 实现
             builder.Services.AddSingleton<
-                Dawning.Identity.Application.Interfaces.Distributed.IDistributedLock,
-                Dawning.Identity.Infra.Messaging.Distributed.RedisDistributedLock
+                Application.Interfaces.Distributed.IDistributedLock,
+                Infra.Messaging.Distributed.RedisDistributedLock
             >();
 
             // ===== Database Seeder =====
-            builder.Services.AddScoped<Dawning.Identity.Api.Data.DatabaseSeeder>();
+            builder.Services.AddScoped<Data.DatabaseSeeder>();
 
             // Build the app
             var app = builder.Build();
@@ -247,10 +247,10 @@ namespace Dawning.Identity.Api
 
             // ===== Middleware Configuration =====
             // 所有中间件已测试
-            app.UseMiddleware<Dawning.Identity.Api.Middleware.ExceptionHandlingMiddleware>();
-            app.UseMiddleware<Dawning.Identity.Api.Middleware.RequestLoggingMiddleware>();
-            app.UseMiddleware<Dawning.Identity.Api.Middleware.PerformanceMonitoringMiddleware>();
-            app.UseMiddleware<Dawning.Identity.Api.Middleware.ResponseCacheMiddleware>();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseMiddleware<RequestLoggingMiddleware>();
+            app.UseMiddleware<PerformanceMonitoringMiddleware>();
+            app.UseMiddleware<ResponseCacheMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseRouting();
@@ -260,7 +260,7 @@ namespace Dawning.Identity.Api
             app.UseAuthentication();
 
             // ===== Tenant Resolution Middleware =====
-            app.UseMiddleware<Dawning.Identity.Api.Middleware.TenantMiddleware>();
+            app.UseMiddleware<TenantMiddleware>();
 
             app.UseAuthorization();
 
@@ -290,8 +290,7 @@ namespace Dawning.Identity.Api
             {
                 using (var scope = app.Services.CreateScope())
                 {
-                    var seeder =
-                        scope.ServiceProvider.GetRequiredService<Dawning.Identity.Api.Data.DatabaseSeeder>();
+                    var seeder = scope.ServiceProvider.GetRequiredService<Data.DatabaseSeeder>();
                     try
                     {
                         await seeder.SeedAsync();
