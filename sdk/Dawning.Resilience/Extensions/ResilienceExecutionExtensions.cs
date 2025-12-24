@@ -13,11 +13,10 @@ public static class ResilienceExecutionExtensions
     public static async Task<TResult> ExecuteAsync<TResult>(
         this ResiliencePipeline<TResult> pipeline,
         Func<Task<TResult>> operation,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
-        return await pipeline.ExecuteAsync(
-            async token => await operation(),
-            cancellationToken);
+        return await pipeline.ExecuteAsync(async token => await operation(), cancellationToken);
     }
 
     /// <summary>
@@ -26,14 +25,16 @@ public static class ResilienceExecutionExtensions
     public static async Task ExecuteAsync(
         this ResiliencePipeline pipeline,
         Func<Task> operation,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         await pipeline.ExecuteAsync(
             async token =>
             {
                 await operation();
             },
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -43,11 +44,13 @@ public static class ResilienceExecutionExtensions
         this ResiliencePipeline<TResult> pipeline,
         TState state,
         Func<TState, Task<TResult>> operation,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         return await pipeline.ExecuteAsync(
             async token => await operation(state),
-            cancellationToken);
+            cancellationToken
+        );
     }
 
     /// <summary>
@@ -55,7 +58,8 @@ public static class ResilienceExecutionExtensions
     /// </summary>
     public static TResult Execute<TResult>(
         this ResiliencePipeline<TResult> pipeline,
-        Func<TResult> operation)
+        Func<TResult> operation
+    )
     {
         return pipeline.Execute(_ => operation());
     }
@@ -63,9 +67,7 @@ public static class ResilienceExecutionExtensions
     /// <summary>
     /// 使用弹性策略执行同步操作
     /// </summary>
-    public static void Execute(
-        this ResiliencePipeline pipeline,
-        Action operation)
+    public static void Execute(this ResiliencePipeline pipeline, Action operation)
     {
         pipeline.Execute(_ => operation());
     }
