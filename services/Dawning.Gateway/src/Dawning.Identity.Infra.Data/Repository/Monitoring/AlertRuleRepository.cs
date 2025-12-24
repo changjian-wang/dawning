@@ -7,7 +7,7 @@ using Dawning.Identity.Domain.Interfaces.Monitoring;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Monitoring;
 using Dawning.Identity.Infra.Data.PersistentObjects.Monitoring;
-using Dawning.Shared.Dapper.Contrib;
+using Dawning.ORM.Dapper;
 
 namespace Dawning.Identity.Infra.Data.Repository.Monitoring;
 

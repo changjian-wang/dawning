@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Dawning.Extensions</PackageId>
+    <Description>Dawning 扩展库 - 通用扩展方法、帮助类</Description>
+    <PackageTags>dawning;extensions;helpers;utilities</PackageTags>
+  </PropertyGroup>
+</Project>

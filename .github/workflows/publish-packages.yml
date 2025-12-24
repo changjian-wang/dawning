@@ -45,32 +45,32 @@ jobs:
       - name: Restore dependencies
         working-directory: ./sdk
         run: |
-          dotnet restore Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj
-          dotnet restore Dawning.Shared.Utils/Dawning.Shared.Utils.csproj
-          dotnet restore Dawning.Shared.Core/Dawning.Shared.Core.csproj
-          dotnet restore Dawning.Shared.Resilience/Dawning.Shared.Resilience.csproj
-          dotnet restore Dawning.Shared.Logging/Dawning.Shared.Logging.csproj
-          dotnet restore Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj
+          dotnet restore Dawning.ORM.Dapper/Dawning.ORM.Dapper.csproj
+          dotnet restore Dawning.Extensions/Dawning.Extensions.csproj
+          dotnet restore Dawning.Core/Dawning.Core.csproj
+          dotnet restore Dawning.Resilience/Dawning.Resilience.csproj
+          dotnet restore Dawning.Logging/Dawning.Logging.csproj
+          dotnet restore Dawning.Identity/Dawning.Identity.csproj
 
       - name: Build packages
         working-directory: ./sdk
         run: |
-          dotnet build Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
-          dotnet build Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
-          dotnet build Dawning.Shared.Core/Dawning.Shared.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
-          dotnet build Dawning.Shared.Resilience/Dawning.Shared.Resilience.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
-          dotnet build Dawning.Shared.Logging/Dawning.Shared.Logging.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
-          dotnet build Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.ORM.Dapper/Dawning.ORM.Dapper.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Extensions/Dawning.Extensions.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Core/Dawning.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Resilience/Dawning.Resilience.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Logging/Dawning.Logging.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
+          dotnet build Dawning.Identity/Dawning.Identity.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
 
       - name: Pack NuGet packages
         working-directory: ./sdk
         run: |
-          dotnet pack Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
-          dotnet pack Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
-          dotnet pack Dawning.Shared.Core/Dawning.Shared.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
-          dotnet pack Dawning.Shared.Resilience/Dawning.Shared.Resilience.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
-          dotnet pack Dawning.Shared.Logging/Dawning.Shared.Logging.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
-          dotnet pack Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.ORM.Dapper/Dawning.ORM.Dapper.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Extensions/Dawning.Extensions.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Core/Dawning.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Resilience/Dawning.Resilience.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Logging/Dawning.Logging.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
+          dotnet pack Dawning.Identity/Dawning.Identity.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
 
       - name: List generated packages
         working-directory: ./sdk
@@ -97,9 +97,9 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Package | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Authentication | ✅ Published |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Core | ✅ Published |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Logging | ✅ Published |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Dapper.Contrib | ✅ Published |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Resilience | ✅ Published |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Utils | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Identity | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Core | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Logging | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.ORM.Dapper | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Resilience | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dawning.Extensions | ✅ Published |" >> $GITHUB_STEP_SUMMARY

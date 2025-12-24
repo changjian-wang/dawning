@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <PackageId>Dawning.Shared.Utils</PackageId>
-    <Description>Dawning 工具库 - 通用扩展方法、帮助类</Description>
-    <PackageTags>dawning;utils;extensions;helpers</PackageTags>
-  </PropertyGroup>
-</Project>

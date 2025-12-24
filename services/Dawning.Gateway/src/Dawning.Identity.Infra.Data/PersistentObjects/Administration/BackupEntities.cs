@@ -1,4 +1,4 @@
-using Dawning.Shared.Dapper.Contrib;
+using Dawning.ORM.Dapper;
 
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {

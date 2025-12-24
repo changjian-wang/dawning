@@ -1,5 +1,5 @@
-﻿using System;
-using Dawning.Shared.Dapper.Contrib;
+using System;
+using Dawning.ORM.Dapper;
 
 namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
 {

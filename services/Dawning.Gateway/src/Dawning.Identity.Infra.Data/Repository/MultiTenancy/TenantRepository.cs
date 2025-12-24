@@ -9,8 +9,8 @@ using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.MultiTenancy;
 using Dawning.Identity.Infra.Data.PersistentObjects.MultiTenancy;
-using Dawning.Shared.Dapper.Contrib;
-using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
+using Dawning.ORM.Dapper;
+using static Dawning.ORM.Dapper.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.MultiTenancy
 {

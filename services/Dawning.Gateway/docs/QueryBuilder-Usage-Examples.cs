@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dapper;
-using Dawning.Shared.Dapper.Contrib;
+using Dawning.ORM.Dapper;
 using MySql.Data.MySqlClient;
 
 namespace Dawning.Examples

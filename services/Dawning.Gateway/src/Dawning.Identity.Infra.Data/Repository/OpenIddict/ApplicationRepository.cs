@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Dapper;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Domain.Interfaces.OpenIddict;
@@ -7,8 +7,8 @@ using Dawning.Identity.Domain.Models.OpenIddict;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.OpenIddict;
 using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
-using Dawning.Shared.Dapper.Contrib;
-using static Dawning.Shared.Dapper.Contrib.SqlMapperExtensions;
+using Dawning.ORM.Dapper;
+using static Dawning.ORM.Dapper.SqlMapperExtensions;
 
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {

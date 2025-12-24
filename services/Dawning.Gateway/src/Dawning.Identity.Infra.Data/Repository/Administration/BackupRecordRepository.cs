@@ -7,7 +7,7 @@ using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Administration;
 using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
-using Dawning.Shared.Dapper.Contrib;
+using Dawning.ORM.Dapper;
 
 namespace Dawning.Identity.Infra.Data.Repository.Administration;
 

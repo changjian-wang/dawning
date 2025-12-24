@@ -41,11 +41,11 @@
   </ItemGroup>
   <!-- Dawning SDK: NuGet 包引用 (CI/CD) -->
   <ItemGroup Condition="'$(UseNuGetPackages)' == 'true'">
-    <PackageReference Include="Dawning.Shared.Authentication" Version="$(DawningSdkVersion)" />
+    <PackageReference Include="Dawning.Identity" Version="$(DawningSdkVersion)" />
   </ItemGroup>
   <!-- Dawning SDK: 项目引用 (本地开发) -->
   <ItemGroup Condition="'$(UseNuGetPackages)' != 'true'">
-    <ProjectReference Include="..\..\..\..\sdk\Dawning.Shared.Authentication\Dawning.Shared.Authentication.csproj" />
+    <ProjectReference Include="..\..\..\..\sdk\Dawning.Identity\Dawning.Identity.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />

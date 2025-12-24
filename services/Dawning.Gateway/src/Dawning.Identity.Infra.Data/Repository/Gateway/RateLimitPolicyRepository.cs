@@ -7,7 +7,7 @@ using Dawning.Identity.Domain.Interfaces.Gateway;
 using Dawning.Identity.Infra.Data.Context;
 using Dawning.Identity.Infra.Data.Mapping.Gateway;
 using Dawning.Identity.Infra.Data.PersistentObjects.Gateway;
-using Dawning.Shared.Dapper.Contrib;
+using Dawning.ORM.Dapper;
 
 namespace Dawning.Identity.Infra.Data.Repository.Gateway
 {

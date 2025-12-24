@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>Dawning.Resilience</PackageId>
+    <Description>Dawning 弹性库 - 重试策略、熔断器、超时处理</Description>
+    <PackageTags>dawning;resilience;retry;circuit-breaker;polly</PackageTags>
+  </PropertyGroup>
+</Project>
