@@ -1,0 +1,58 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "..",
+          "files": [
+            "Dawning.Core/*.csproj",
+            "Dawning.Extensions/*.csproj",
+            "Dawning.Identity/*.csproj",
+            "Dawning.Logging/*.csproj",
+            "Dawning.ORM.Dapper/*.csproj",
+            "Dawning.Resilience/*.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "Dawning SDK",
+      "_appTitle": "Dawning SDK Documentation",
+      "_appFooter": "© 2024-2025 Dawning SDK. All rights reserved.",
+      "_enableSearch": true,
+      "_enableNewTab": true,
+      "pdf": false
+    },
+    "sitemap": {
+      "baseUrl": "https://changjian-wang.github.io/dawning"
+    }
+  }
+}
