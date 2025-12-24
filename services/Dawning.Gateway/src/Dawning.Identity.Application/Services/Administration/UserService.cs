@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
+using Dawning.Identity.Application.IntegrationEvents;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Interfaces.Security;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Core.Security;
@@ -14,6 +16,7 @@ using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
+using Microsoft.Extensions.Logging;
 
 namespace Dawning.Identity.Application.Services.Administration
 {
@@ -26,17 +29,23 @@ namespace Dawning.Identity.Application.Services.Administration
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
         private readonly IPasswordPolicyService? _passwordPolicyService;
+        private readonly IIntegrationEventBus _integrationEventBus;
+        private readonly ILogger<UserService> _logger;
 
         public UserService(
             IUserRepository userRepository,
             IUnitOfWork uow,
             IMapper mapper,
+            IIntegrationEventBus integrationEventBus,
+            ILogger<UserService> logger,
             IPasswordPolicyService? passwordPolicyService = null
         )
         {
             _userRepository = userRepository;
             _uow = uow;
             _mapper = mapper;
+            _integrationEventBus = integrationEventBus;
+            _logger = logger;
             _passwordPolicyService = passwordPolicyService;
         }
 
@@ -144,6 +153,38 @@ namespace Dawning.Identity.Application.Services.Administration
 
             await _userRepository.InsertAsync(user);
 
+            // 发布用户创建集成事件
+            try
+            {
+                await _integrationEventBus.PublishAsync(
+                    new UserEventIntegrationEvent
+                    {
+                        EventType = "UserCreated",
+                        UserId = user.Id,
+                        Username = user.Username,
+                        Email = user.Email,
+                        Metadata = new Dictionary<string, object>
+                        {
+                            ["displayName"] = user.DisplayName ?? "",
+                            ["role"] = user.Role ?? "",
+                            ["createdBy"] = operatorId?.ToString() ?? "",
+                        },
+                    }
+                );
+                _logger.LogInformation(
+                    "Published UserCreated integration event for user {UserId}",
+                    user.Id
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Failed to publish UserCreated integration event for user {UserId}",
+                    user.Id
+                );
+            }
+
             return _mapper.Map<UserDto>(user);
         }
 
@@ -204,6 +245,35 @@ namespace Dawning.Identity.Application.Services.Administration
 
             user.UpdatedBy = operatorId;
             var result = await _userRepository.DeleteAsync(user);
+
+            // 发布用户删除集成事件
+            if (result)
+            {
+                try
+                {
+                    await _integrationEventBus.PublishAsync(
+                        new UserEventIntegrationEvent
+                        {
+                            EventType = "UserDeleted",
+                            UserId = user.Id,
+                            Username = user.Username,
+                            Email = user.Email,
+                            Metadata = new Dictionary<string, object>
+                            {
+                                ["deletedBy"] = operatorId?.ToString() ?? "",
+                            },
+                        }
+                    );
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(
+                        ex,
+                        "Failed to publish UserDeleted integration event for user {UserId}",
+                        user.Id
+                    );
+                }
+            }
 
             return result;
         }

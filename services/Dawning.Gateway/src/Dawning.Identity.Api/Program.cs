@@ -199,10 +199,20 @@ namespace Dawning.Identity.Api
             // ===== OpenTelemetry =====
             builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
 
+            // ===== MediatR (进程内领域事件) =====
+            builder.Services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssembly(
+                    typeof(Dawning.Identity.Application.EventHandlers.UserCreatedEventHandler).Assembly
+                )
+            );
+
             // ===== Messaging Services (DDD Event-Driven Architecture) =====
             // MediatR 用于进程内领域事件
             // Kafka 用于进程间集成事件
             builder.Services.AddMessagingServices(builder.Configuration);
+
+            // 启动 Kafka 集成事件消费者（后台服务）
+            builder.Services.AddKafkaIntegrationEventConsumers();
 
             // 仍保留旧的 Kafka 生产者以保持向后兼容（可选，逐步迁移后删除）
             builder.Services.AddKafkaMessaging(builder.Configuration);

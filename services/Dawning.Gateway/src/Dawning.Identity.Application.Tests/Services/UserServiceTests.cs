@@ -1,6 +1,7 @@
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Services.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.Administration;
@@ -8,6 +9,7 @@ using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -18,6 +20,8 @@ public class UserServiceTests
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IUnitOfWork> _uowMock;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IIntegrationEventBus> _integrationEventBusMock;
+    private readonly Mock<ILogger<UserService>> _loggerMock;
     private readonly IUserService _userService;
 
     public UserServiceTests()
@@ -25,11 +29,15 @@ public class UserServiceTests
         _userRepositoryMock = new Mock<IUserRepository>();
         _uowMock = new Mock<IUnitOfWork>();
         _mapperMock = new Mock<IMapper>();
+        _integrationEventBusMock = new Mock<IIntegrationEventBus>();
+        _loggerMock = new Mock<ILogger<UserService>>();
 
         _userService = new UserService(
             _userRepositoryMock.Object,
             _uowMock.Object,
-            _mapperMock.Object
+            _mapperMock.Object,
+            _integrationEventBusMock.Object,
+            _loggerMock.Object
         );
     }
 

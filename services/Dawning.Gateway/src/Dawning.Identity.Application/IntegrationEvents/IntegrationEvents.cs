@@ -81,8 +81,11 @@ public class UserEventIntegrationEvent : IntegrationEvent
 {
     public Guid UserId { get; set; }
     public string? UserName { get; set; }
+    public string? Username { get; set; }
+    public string? Email { get; set; }
     public string EventType { get; set; } = string.Empty;
     public Dictionary<string, object>? EventData { get; set; }
+    public Dictionary<string, object>? Metadata { get; set; }
 }
 
 /// <summary>
