@@ -88,9 +88,10 @@ public class ResiliencePolicyBuilder
                     "重试第 {AttemptNumber} 次，延迟 {Delay}ms，异常: {Exception}",
                     args.AttemptNumber,
                     args.RetryDelay.TotalMilliseconds,
-                    args.Outcome.Exception?.Message ?? "无");
+                    args.Outcome.Exception?.Message ?? "无"
+                );
                 return default;
-            }
+            },
         };
     }
 
@@ -111,9 +112,10 @@ public class ResiliencePolicyBuilder
                     "重试第 {AttemptNumber} 次，延迟 {Delay}ms，异常: {Exception}",
                     args.AttemptNumber,
                     args.RetryDelay.TotalMilliseconds,
-                    args.Outcome.Exception?.Message ?? "无");
+                    args.Outcome.Exception?.Message ?? "无"
+                );
                 return default;
-            }
+            },
         };
     }
 
@@ -122,7 +124,9 @@ public class ResiliencePolicyBuilder
         return new CircuitBreakerStrategyOptions
         {
             FailureRatio = _options.CircuitBreaker.FailureRatioThreshold,
-            SamplingDuration = TimeSpan.FromSeconds(_options.CircuitBreaker.SamplingDurationSeconds),
+            SamplingDuration = TimeSpan.FromSeconds(
+                _options.CircuitBreaker.SamplingDurationSeconds
+            ),
             MinimumThroughput = _options.CircuitBreaker.MinimumThroughput,
             BreakDuration = TimeSpan.FromSeconds(_options.CircuitBreaker.BreakDurationSeconds),
             OnOpened = args =>
@@ -130,7 +134,8 @@ public class ResiliencePolicyBuilder
                 _logger?.LogError(
                     "熔断器已打开，持续 {BreakDuration} 秒，原因: {Exception}",
                     _options.CircuitBreaker.BreakDurationSeconds,
-                    args.Outcome.Exception?.Message ?? "失败率过高");
+                    args.Outcome.Exception?.Message ?? "失败率过高"
+                );
                 return default;
             },
             OnClosed = _ =>
@@ -142,7 +147,7 @@ public class ResiliencePolicyBuilder
             {
                 _logger?.LogInformation("熔断器半开状态，尝试恢复");
                 return default;
-            }
+            },
         };
     }
 
@@ -151,7 +156,9 @@ public class ResiliencePolicyBuilder
         return new CircuitBreakerStrategyOptions<TResult>
         {
             FailureRatio = _options.CircuitBreaker.FailureRatioThreshold,
-            SamplingDuration = TimeSpan.FromSeconds(_options.CircuitBreaker.SamplingDurationSeconds),
+            SamplingDuration = TimeSpan.FromSeconds(
+                _options.CircuitBreaker.SamplingDurationSeconds
+            ),
             MinimumThroughput = _options.CircuitBreaker.MinimumThroughput,
             BreakDuration = TimeSpan.FromSeconds(_options.CircuitBreaker.BreakDurationSeconds),
             OnOpened = args =>
@@ -159,7 +166,8 @@ public class ResiliencePolicyBuilder
                 _logger?.LogError(
                     "熔断器已打开，持续 {BreakDuration} 秒，原因: {Exception}",
                     _options.CircuitBreaker.BreakDurationSeconds,
-                    args.Outcome.Exception?.Message ?? "失败率过高");
+                    args.Outcome.Exception?.Message ?? "失败率过高"
+                );
                 return default;
             },
             OnClosed = _ =>
@@ -171,7 +179,7 @@ public class ResiliencePolicyBuilder
             {
                 _logger?.LogInformation("熔断器半开状态，尝试恢复");
                 return default;
-            }
+            },
         };
     }
 
@@ -184,7 +192,7 @@ public class ResiliencePolicyBuilder
             {
                 _logger?.LogWarning("操作超时，超时时间: {Timeout} 秒", args.Timeout.TotalSeconds);
                 return default;
-            }
+            },
         };
     }
 }
