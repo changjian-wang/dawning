@@ -1,5 +1,5 @@
-using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.IntegrationEvents;
+using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -17,7 +17,8 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 
     public UserCreatedEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<UserCreatedEventHandler> logger)
+        ILogger<UserCreatedEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
@@ -27,42 +28,51 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
     {
         _logger.LogInformation(
             "Handling UserCreatedEvent - UserId: {UserId}, UserName: {UserName}",
-            notification.UserId, notification.UserName);
+            notification.UserId,
+            notification.UserName
+        );
 
         // 1. 发布审计日志到 Kafka
-        await _integrationEventBus.PublishAsync(new AuditLogIntegrationEvent
-        {
-            UserId = notification.UserId,
-            UserName = notification.UserName,
-            Action = "UserCreated",
-            EntityType = "User",
-            EntityId = notification.UserId.ToString(),
-            Description = $"User '{notification.UserName}' was created"
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new AuditLogIntegrationEvent
+            {
+                UserId = notification.UserId,
+                UserName = notification.UserName,
+                Action = "UserCreated",
+                EntityType = "User",
+                EntityId = notification.UserId.ToString(),
+                Description = $"User '{notification.UserName}' was created",
+            },
+            cancellationToken: cancellationToken
+        );
 
         // 2. 如果有邮箱，发送欢迎邮件
         if (!string.IsNullOrEmpty(notification.Email))
         {
-            await _integrationEventBus.PublishAsync(new EmailIntegrationEvent
-            {
-                To = notification.Email,
-                Subject = "Welcome to Dawning Gateway",
-                Body = $"<h1>Welcome, {notification.UserName}!</h1><p>Your account has been created successfully.</p>",
-                IsHtml = true
-            }, cancellationToken: cancellationToken);
+            await _integrationEventBus.PublishAsync(
+                new EmailIntegrationEvent
+                {
+                    To = notification.Email,
+                    Subject = "Welcome to Dawning Gateway",
+                    Body =
+                        $"<h1>Welcome, {notification.UserName}!</h1><p>Your account has been created successfully.</p>",
+                    IsHtml = true,
+                },
+                cancellationToken: cancellationToken
+            );
         }
 
         // 3. 发布用户事件供其他服务订阅
-        await _integrationEventBus.PublishAsync(new UserEventIntegrationEvent
-        {
-            UserId = notification.UserId,
-            UserName = notification.UserName,
-            EventType = "UserCreated",
-            EventData = new Dictionary<string, object>
+        await _integrationEventBus.PublishAsync(
+            new UserEventIntegrationEvent
             {
-                ["Email"] = notification.Email ?? ""
-            }
-        }, cancellationToken: cancellationToken);
+                UserId = notification.UserId,
+                UserName = notification.UserName,
+                EventType = "UserCreated",
+                EventData = new Dictionary<string, object> { ["Email"] = notification.Email ?? "" },
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -76,7 +86,8 @@ public class UserLoggedInEventHandler : INotificationHandler<UserLoggedInEvent>
 
     public UserLoggedInEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<UserLoggedInEventHandler> logger)
+        ILogger<UserLoggedInEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
@@ -88,22 +99,27 @@ public class UserLoggedInEventHandler : INotificationHandler<UserLoggedInEvent>
 
         _logger.LogInformation(
             "Handling UserLoggedInEvent - UserId: {UserId}, Success: {Success}",
-            notification.UserId, notification.Success);
+            notification.UserId,
+            notification.Success
+        );
 
         // 发布审计日志
-        await _integrationEventBus.PublishAsync(new AuditLogIntegrationEvent
-        {
-            UserId = notification.UserId,
-            UserName = notification.UserName,
-            Action = action,
-            EntityType = "User",
-            EntityId = notification.UserId.ToString(),
-            Description = notification.Success
-                ? $"User '{notification.UserName}' logged in successfully"
-                : $"Login failed for user '{notification.UserName}': {notification.FailureReason}",
-            IpAddress = notification.IpAddress,
-            UserAgent = notification.UserAgent
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new AuditLogIntegrationEvent
+            {
+                UserId = notification.UserId,
+                UserName = notification.UserName,
+                Action = action,
+                EntityType = "User",
+                EntityId = notification.UserId.ToString(),
+                Description = notification.Success
+                    ? $"User '{notification.UserName}' logged in successfully"
+                    : $"Login failed for user '{notification.UserName}': {notification.FailureReason}",
+                IpAddress = notification.IpAddress,
+                UserAgent = notification.UserAgent,
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -117,36 +133,47 @@ public class UserPasswordChangedEventHandler : INotificationHandler<UserPassword
 
     public UserPasswordChangedEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<UserPasswordChangedEventHandler> logger)
+        ILogger<UserPasswordChangedEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
     }
 
-    public async Task Handle(UserPasswordChangedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(
+        UserPasswordChangedEvent notification,
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation(
             "Handling UserPasswordChangedEvent - UserId: {UserId}",
-            notification.UserId);
+            notification.UserId
+        );
 
         // 发布审计日志
-        await _integrationEventBus.PublishAsync(new AuditLogIntegrationEvent
-        {
-            UserId = notification.UserId,
-            UserName = notification.UserName,
-            Action = "PasswordChanged",
-            EntityType = "User",
-            EntityId = notification.UserId.ToString(),
-            Description = $"Password changed for user '{notification.UserName}'",
-            IpAddress = notification.IpAddress
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new AuditLogIntegrationEvent
+            {
+                UserId = notification.UserId,
+                UserName = notification.UserName,
+                Action = "PasswordChanged",
+                EntityType = "User",
+                EntityId = notification.UserId.ToString(),
+                Description = $"Password changed for user '{notification.UserName}'",
+                IpAddress = notification.IpAddress,
+            },
+            cancellationToken: cancellationToken
+        );
 
         // 失效用户会话缓存
-        await _integrationEventBus.PublishAsync(new CacheInvalidationIntegrationEvent
-        {
-            Pattern = $"user:session:{notification.UserId}:*",
-            Reason = "Password changed"
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new CacheInvalidationIntegrationEvent
+            {
+                Pattern = $"user:session:{notification.UserId}:*",
+                Reason = "Password changed",
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -160,7 +187,8 @@ public class RoleAssignedEventHandler : INotificationHandler<RoleAssignedEvent>
 
     public RoleAssignedEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<RoleAssignedEventHandler> logger)
+        ILogger<RoleAssignedEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
@@ -170,25 +198,34 @@ public class RoleAssignedEventHandler : INotificationHandler<RoleAssignedEvent>
     {
         _logger.LogInformation(
             "Handling RoleAssignedEvent - UserId: {UserId}, Role: {RoleName}",
-            notification.UserId, notification.RoleName);
+            notification.UserId,
+            notification.RoleName
+        );
 
         // 发布审计日志
-        await _integrationEventBus.PublishAsync(new AuditLogIntegrationEvent
-        {
-            UserId = notification.UserId,
-            UserName = notification.UserName,
-            Action = "RoleAssigned",
-            EntityType = "UserRole",
-            EntityId = notification.UserId.ToString(),
-            Description = $"Role '{notification.RoleName}' assigned to user '{notification.UserName}'"
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new AuditLogIntegrationEvent
+            {
+                UserId = notification.UserId,
+                UserName = notification.UserName,
+                Action = "RoleAssigned",
+                EntityType = "UserRole",
+                EntityId = notification.UserId.ToString(),
+                Description =
+                    $"Role '{notification.RoleName}' assigned to user '{notification.UserName}'",
+            },
+            cancellationToken: cancellationToken
+        );
 
         // 失效权限缓存
-        await _integrationEventBus.PublishAsync(new CacheInvalidationIntegrationEvent
-        {
-            Pattern = $"user:permissions:{notification.UserId}:*",
-            Reason = "Role assigned"
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new CacheInvalidationIntegrationEvent
+            {
+                Pattern = $"user:permissions:{notification.UserId}:*",
+                Reason = "Role assigned",
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -202,27 +239,36 @@ public class ConfigurationChangedEventHandler : INotificationHandler<Configurati
 
     public ConfigurationChangedEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<ConfigurationChangedEventHandler> logger)
+        ILogger<ConfigurationChangedEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
     }
 
-    public async Task Handle(ConfigurationChangedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(
+        ConfigurationChangedEvent notification,
+        CancellationToken cancellationToken
+    )
     {
         _logger.LogInformation(
             "Handling ConfigurationChangedEvent - Group: {Group}, Key: {Key}",
-            notification.ConfigGroup, notification.ConfigKey);
+            notification.ConfigGroup,
+            notification.ConfigKey
+        );
 
         // 通知所有实例配置变更
-        await _integrationEventBus.PublishAsync(new ConfigChangedIntegrationEvent
-        {
-            ConfigGroup = notification.ConfigGroup,
-            ConfigKey = notification.ConfigKey,
-            OldValue = notification.OldValue,
-            NewValue = notification.NewValue,
-            ChangedBy = notification.ChangedBy?.ToString()
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new ConfigChangedIntegrationEvent
+            {
+                ConfigGroup = notification.ConfigGroup,
+                ConfigKey = notification.ConfigKey,
+                OldValue = notification.OldValue,
+                NewValue = notification.NewValue,
+                ChangedBy = notification.ChangedBy?.ToString(),
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -236,7 +282,8 @@ public class AlertTriggeredEventHandler : INotificationHandler<AlertTriggeredEve
 
     public AlertTriggeredEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<AlertTriggeredEventHandler> logger)
+        ILogger<AlertTriggeredEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
@@ -246,19 +293,27 @@ public class AlertTriggeredEventHandler : INotificationHandler<AlertTriggeredEve
     {
         _logger.LogWarning(
             "Alert triggered - Rule: {RuleName}, Metric: {MetricType}, Value: {Value}, Threshold: {Threshold}",
-            notification.RuleName, notification.MetricType, notification.CurrentValue, notification.Threshold);
+            notification.RuleName,
+            notification.MetricType,
+            notification.CurrentValue,
+            notification.Threshold
+        );
 
         // 发布告警通知
-        await _integrationEventBus.PublishAsync(new AlertNotificationIntegrationEvent
-        {
-            AlertRuleId = notification.AlertRuleId,
-            RuleName = notification.RuleName,
-            MetricType = notification.MetricType,
-            Severity = notification.Severity,
-            CurrentValue = notification.CurrentValue,
-            Threshold = notification.Threshold,
-            Description = $"{notification.MetricType} exceeded threshold: {notification.CurrentValue} > {notification.Threshold}"
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new AlertNotificationIntegrationEvent
+            {
+                AlertRuleId = notification.AlertRuleId,
+                RuleName = notification.RuleName,
+                MetricType = notification.MetricType,
+                Severity = notification.Severity,
+                CurrentValue = notification.CurrentValue,
+                Threshold = notification.Threshold,
+                Description =
+                    $"{notification.MetricType} exceeded threshold: {notification.CurrentValue} > {notification.Threshold}",
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }
 
@@ -272,7 +327,8 @@ public class EntityChangedEventHandler : INotificationHandler<EntityChangedEvent
 
     public EntityChangedEventHandler(
         IIntegrationEventBus integrationEventBus,
-        ILogger<EntityChangedEventHandler> logger)
+        ILogger<EntityChangedEventHandler> logger
+    )
     {
         _integrationEventBus = integrationEventBus;
         _logger = logger;
@@ -282,18 +338,24 @@ public class EntityChangedEventHandler : INotificationHandler<EntityChangedEvent
     {
         _logger.LogDebug(
             "Entity changed - Type: {EntityType}, Id: {EntityId}, Action: {Action}",
-            notification.EntityType, notification.EntityId, notification.Action);
+            notification.EntityType,
+            notification.EntityId,
+            notification.Action
+        );
 
         // 发布审计日志
-        await _integrationEventBus.PublishAsync(new AuditLogIntegrationEvent
-        {
-            UserId = notification.UserId,
-            UserName = notification.UserName,
-            Action = notification.Action,
-            EntityType = notification.EntityType,
-            EntityId = notification.EntityId.ToString(),
-            OldValues = notification.OldValues,
-            NewValues = notification.NewValues
-        }, cancellationToken: cancellationToken);
+        await _integrationEventBus.PublishAsync(
+            new AuditLogIntegrationEvent
+            {
+                UserId = notification.UserId,
+                UserName = notification.UserName,
+                Action = notification.Action,
+                EntityType = notification.EntityType,
+                EntityId = notification.EntityId.ToString(),
+                OldValues = notification.OldValues,
+                NewValues = notification.NewValues,
+            },
+            cancellationToken: cancellationToken
+        );
     }
 }

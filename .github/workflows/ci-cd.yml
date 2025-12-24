@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./Dawning.Gateway
+        working-directory: ./services/Dawning.Gateway
 
     steps:
       - name: Checkout code
@@ -56,7 +56,7 @@ jobs:
         uses: codecov/codecov-action@v4
         if: github.event_name != 'pull_request'
         with:
-          directory: ./Dawning.Gateway/coverage
+          directory: ./services/Dawning.Gateway/coverage
           flags: backend
           name: backend-coverage
         env:
@@ -151,8 +151,8 @@ jobs:
       - name: Build and push Identity API
         uses: docker/build-push-action@v5
         with:
-          context: ./Dawning.Gateway
-          file: ./Dawning.Gateway/src/Dawning.Identity.Api/Dockerfile
+          context: ./services/Dawning.Gateway
+          file: ./services/Dawning.Gateway/src/Dawning.Identity.Api/Dockerfile
           push: true
           tags: ${{ steps.meta-identity.outputs.tags }}
           labels: ${{ steps.meta-identity.outputs.labels }}
@@ -172,8 +172,8 @@ jobs:
       - name: Build and push Gateway API
         uses: docker/build-push-action@v5
         with:
-          context: ./Dawning.Gateway
-          file: ./Dawning.Gateway/src/Dawning.Gateway.Api/Dockerfile
+          context: ./services/Dawning.Gateway
+          file: ./services/Dawning.Gateway/src/Dawning.Gateway.Api/Dockerfile
           push: true
           tags: ${{ steps.meta-gateway.outputs.tags }}
           labels: ${{ steps.meta-gateway.outputs.labels }}
