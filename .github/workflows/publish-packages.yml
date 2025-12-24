@@ -82,7 +82,11 @@ jobs:
       - name: Publish to GitHub Packages
         working-directory: ./Dawning.Gateway/src/Shared
         run: |
+          # 移除已存在的源（如果有）
+          dotnet nuget remove source github 2>/dev/null || true
+          # 添加 GitHub Packages 源
           dotnet nuget add source --username changjian-wang --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "${{ env.NUGET_SOURCE }}"
+          # 发布所有包
           for package in ./nupkgs/*.nupkg; do
             echo "Publishing $package..."
             dotnet nuget push "$package" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
