@@ -1,7 +1,7 @@
 <Project>
   <!-- 统一版本和包元数据 -->
   <PropertyGroup>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Dawning Team</Authors>
     <Company>Dawning</Company>
     <Copyright>Copyright © 2024-2025 Dawning Team</Copyright>

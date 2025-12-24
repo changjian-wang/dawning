@@ -16,12 +16,14 @@ dotnet nuget add source "https://nuget.pkg.github.com/changjian-wang/index.json"
 ### 安装包
 
 ```bash
-dotnet add package Dawning.Core --version 1.1.0
-dotnet add package Dawning.Identity --version 1.1.0
-dotnet add package Dawning.Logging --version 1.1.0
-dotnet add package Dawning.ORM.Dapper --version 1.1.0
-dotnet add package Dawning.Resilience --version 1.1.0
-dotnet add package Dawning.Extensions --version 1.1.0
+dotnet add package Dawning.Core --version 1.2.0
+dotnet add package Dawning.Identity --version 1.2.0
+dotnet add package Dawning.Logging --version 1.2.0
+dotnet add package Dawning.ORM.Dapper --version 1.2.0
+dotnet add package Dawning.Resilience --version 1.2.0
+dotnet add package Dawning.Extensions --version 1.2.0
+dotnet add package Dawning.Caching --version 1.2.0
+dotnet add package Dawning.Messaging --version 1.2.0
 ```
 
 ---
@@ -36,6 +38,8 @@ dotnet add package Dawning.Extensions --version 1.1.0
 | Dawning.ORM.Dapper | Dapper CRUD 扩展方法 |
 | Dawning.Resilience | 重试策略、熔断器、超时处理 (基于 Polly) |
 | Dawning.Extensions | 通用扩展方法（字符串、集合、日期、JSON、对象） |
+| Dawning.Caching | 缓存服务（内存缓存、Redis 分布式缓存） |
+| Dawning.Messaging | 消息队列（RabbitMQ、Azure Service Bus） |
 
 ---
 
