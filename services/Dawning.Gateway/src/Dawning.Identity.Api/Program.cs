@@ -1,5 +1,6 @@
 using Dawning.Identity.Api.Configurations;
 using Dawning.Identity.Api.Middleware;
+using Dawning.Identity.Application.Extensions;
 using Serilog;
 
 namespace Dawning.Identity.Api
@@ -198,6 +199,15 @@ namespace Dawning.Identity.Api
 
             // ===== OpenTelemetry =====
             builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
+
+            // ===== Kafka Messaging (分布式消息队列) =====
+            builder.Services.AddKafkaMessaging(builder.Configuration);
+
+            // ===== Distributed Lock (分布式锁) =====
+            builder.Services.AddSingleton<
+                Dawning.Identity.Application.Interfaces.Distributed.IDistributedLock,
+                Dawning.Identity.Application.Services.Distributed.RedisDistributedLock
+            >();
 
             // ===== Database Seeder =====
             builder.Services.AddScoped<Dawning.Identity.Api.Data.DatabaseSeeder>();
