@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  <ItemGroup>
+    <!-- YARP 反向代理 -->
+    <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="2.1.0" />
+    <!-- JWT 认证 -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <!-- 限流 -->
+    <!-- 日志 -->
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <!-- 健康检查 -->
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.0" />
+    <!-- Redis 缓存 -->
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
+    <!-- Polly 弹性处理 -->
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.11" />
+    <!-- Database -->
+    <PackageReference Include="MySqlConnector" Version="2.4.0" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+  </ItemGroup>
+  <!-- Dawning SDK: NuGet 包引用 (CI/CD) -->
+  <ItemGroup Condition="'$(UseNuGetPackages)' == 'true'">
+    <PackageReference Include="Dawning.Shared.Authentication" Version="$(DawningSdkVersion)" />
+    <PackageReference Include="Dawning.Shared.Core" Version="$(DawningSdkVersion)" />
+    <PackageReference Include="Dawning.Shared.Logging" Version="$(DawningSdkVersion)" />
+  </ItemGroup>
+  <!-- Dawning SDK: 项目引用 (本地开发) -->
+  <ItemGroup Condition="'$(UseNuGetPackages)' != 'true'">
+    <ProjectReference Include="..\..\..\..\sdk\Dawning.Shared.Authentication\Dawning.Shared.Authentication.csproj" />
+    <ProjectReference Include="..\..\..\..\sdk\Dawning.Shared.Core\Dawning.Shared.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\sdk\Dawning.Shared.Logging\Dawning.Shared.Logging.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Logs\" />
+  </ItemGroup>
+</Project>

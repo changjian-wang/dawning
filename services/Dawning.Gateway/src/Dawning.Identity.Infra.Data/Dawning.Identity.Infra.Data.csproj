@@ -28,8 +28,15 @@
     />
     <PackageReference Include="OpenIddict.Core" Version="5.8.0" />
   </ItemGroup>
+  <!-- Dawning SDK: NuGet 包引用 (CI/CD) -->
+  <ItemGroup Condition="'$(UseNuGetPackages)' == 'true'">
+    <PackageReference Include="Dawning.Shared.Dapper.Contrib" Version="$(DawningSdkVersion)" />
+  </ItemGroup>
+  <!-- Dawning SDK: 项目引用 (本地开发) -->
+  <ItemGroup Condition="'$(UseNuGetPackages)' != 'true'">
+    <ProjectReference Include="..\..\..\..\sdk\Dawning.Shared.Dapper.Contrib\Dawning.Shared.Dapper.Contrib.csproj" />
+  </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shared\Dawning.Shared.Dapper.Contrib\Dawning.Shared.Dapper.Contrib.csproj" />
     <ProjectReference Include="..\Dawning.Identity.Domain\Dawning.Identity.Domain.csproj" />
   </ItemGroup>
 </Project>

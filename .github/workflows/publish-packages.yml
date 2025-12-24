@@ -43,7 +43,7 @@ jobs:
           fi
 
       - name: Restore dependencies
-        working-directory: ./Dawning.Gateway/src/Shared
+        working-directory: ./sdk
         run: |
           dotnet restore Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj
           dotnet restore Dawning.Shared.Utils/Dawning.Shared.Utils.csproj
@@ -53,7 +53,7 @@ jobs:
           dotnet restore Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj
 
       - name: Build packages
-        working-directory: ./Dawning.Gateway/src/Shared
+        working-directory: ./sdk
         run: |
           dotnet build Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
           dotnet build Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
@@ -63,7 +63,7 @@ jobs:
           dotnet build Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
 
       - name: Pack NuGet packages
-        working-directory: ./Dawning.Gateway/src/Shared
+        working-directory: ./sdk
         run: |
           dotnet pack Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
           dotnet pack Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
@@ -73,11 +73,11 @@ jobs:
           dotnet pack Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
 
       - name: List generated packages
-        working-directory: ./Dawning.Gateway/src/Shared
+        working-directory: ./sdk
         run: ls -la ./nupkgs
 
       - name: Publish to GitHub Packages
-        working-directory: ./Dawning.Gateway/src/Shared
+        working-directory: ./sdk
         run: |
           # 移除已存在的源（如果有）
           dotnet nuget remove source github 2>/dev/null || true
