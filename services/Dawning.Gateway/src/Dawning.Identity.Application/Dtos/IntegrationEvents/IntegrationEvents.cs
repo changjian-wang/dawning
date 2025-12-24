@@ -1,6 +1,6 @@
 using Dawning.Identity.Domain.Core.Events;
 
-namespace Dawning.Identity.Application.IntegrationEvents;
+namespace Dawning.Identity.Application.Dtos.IntegrationEvents;
 
 /// <summary>
 /// 审计日志集成事件（发送到 Kafka 用于异步持久化）

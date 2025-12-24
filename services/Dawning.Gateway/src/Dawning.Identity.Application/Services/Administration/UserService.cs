@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.User;
-using Dawning.Identity.Application.IntegrationEvents;
+using Dawning.Identity.Application.Dtos.IntegrationEvents;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Interfaces.Security;

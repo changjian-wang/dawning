@@ -1,4 +1,4 @@
-using Dawning.Identity.Application.IntegrationEvents;
+using Dawning.Identity.Application.Dtos.IntegrationEvents;
 using Dawning.Identity.Application.Interfaces.Caching;
 using Dawning.Identity.Application.Interfaces.Messaging;
 using Dawning.Identity.Application.Interfaces.Notification;

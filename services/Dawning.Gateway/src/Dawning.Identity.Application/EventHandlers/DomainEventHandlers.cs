@@ -1,4 +1,4 @@
-using Dawning.Identity.Application.IntegrationEvents;
+using Dawning.Identity.Application.Dtos.IntegrationEvents;
 using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Domain.Events;
 using MediatR;

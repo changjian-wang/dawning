@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Confluent.Kafka;
-using Dawning.Identity.Application.IntegrationEvents;
+using Dawning.Identity.Application.Dtos.IntegrationEvents;
 using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Interfaces.Messaging;
 using Dawning.Identity.Domain.Core.Events;
