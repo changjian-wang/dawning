@@ -45,7 +45,6 @@ jobs:
       - name: Restore dependencies
         working-directory: ./Dawning.Gateway/src/Shared
         run: |
-          dotnet restore Dawning.Shared.Dapper.Contrib.Attributes/Dawning.Shared.Dapper.Contrib.Attributes.csproj
           dotnet restore Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj
           dotnet restore Dawning.Shared.Utils/Dawning.Shared.Utils.csproj
           dotnet restore Dawning.Shared.Core/Dawning.Shared.Core.csproj
@@ -56,7 +55,6 @@ jobs:
       - name: Build packages
         working-directory: ./Dawning.Gateway/src/Shared
         run: |
-          dotnet build Dawning.Shared.Dapper.Contrib.Attributes/Dawning.Shared.Dapper.Contrib.Attributes.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
           dotnet build Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
           dotnet build Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
           dotnet build Dawning.Shared.Core/Dawning.Shared.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }}
@@ -67,7 +65,6 @@ jobs:
       - name: Pack NuGet packages
         working-directory: ./Dawning.Gateway/src/Shared
         run: |
-          dotnet pack Dawning.Shared.Dapper.Contrib.Attributes/Dawning.Shared.Dapper.Contrib.Attributes.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
           dotnet pack Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
           dotnet pack Dawning.Shared.Utils/Dawning.Shared.Utils.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
           dotnet pack Dawning.Shared.Core/Dawning.Shared.Core.csproj -c Release -p:Version=${{ steps.version.outputs.VERSION }} --no-build -o ./nupkgs
@@ -104,6 +101,5 @@ jobs:
           echo "| Dawning.Shared.Core | ✅ Published |" >> $GITHUB_STEP_SUMMARY
           echo "| Dawning.Shared.Logging | ✅ Published |" >> $GITHUB_STEP_SUMMARY
           echo "| Dawning.Shared.Dapper.Contrib | ✅ Published |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dawning.Shared.Dapper.Contrib.Attributes | ✅ Published |" >> $GITHUB_STEP_SUMMARY
           echo "| Dawning.Shared.Resilience | ✅ Published |" >> $GITHUB_STEP_SUMMARY
           echo "| Dawning.Shared.Utils | ✅ Published |" >> $GITHUB_STEP_SUMMARY

@@ -9,8 +9,7 @@ Dawning 项目的公共组件库，提供统一的认证、日志、异常处理
 | `Dawning.Shared.Authentication` | JWT 认证集成、权限验证、用户上下文 | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
 | `Dawning.Shared.Core` | 业务异常、统一响应、分页、异常处理中间件 | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
 | `Dawning.Shared.Logging` | Serilog 集成、结构化日志、请求上下文富化 | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
-| `Dawning.Shared.Dapper.Contrib` | Dapper 扩展、CRUD 操作、数据库映射 | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
-| `Dawning.Shared.Dapper.Contrib.Attributes` | 数据映射属性 (Table, Key, Column) | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
+| `Dawning.Shared.Dapper.Contrib` | Dapper 扩展、CRUD 操作、数据库映射、Attributes | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
 | `Dawning.Shared.Resilience` | 重试策略、熔断器、超时处理 | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
 | `Dawning.Shared.Utils` | 通用扩展方法、帮助类 | ![Version](https://img.shields.io/badge/version-1.0.0-blue) |
 

@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <PackageId>Dawning.Shared.Dapper.Contrib.Attributes</PackageId>
-    <Description>Dawning Dapper 属性库 - Table、Key、Column 等数据映射属性</Description>
-    <PackageTags>dawning;dapper;attributes;mapping</PackageTags>
-  </PropertyGroup>
-</Project>
