@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     INDEX `idx_created_at` (`created_at` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
--- 插入初始管理员用户（密码: admin123）
+-- 插入初始管理员用户（密码: Admin@123）
 INSERT INTO `users` (
     `id`,
     `username`,
@@ -40,7 +40,7 @@ INSERT INTO `users` (
 ) VALUES (
     UUID(),
     'admin',
-    'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', -- SHA256 hash of 'admin123'
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=', -- PBKDF2 hash of 'Admin@123'
     'admin@dawning.com',
     'Administrator',
     'admin',
@@ -48,7 +48,7 @@ INSERT INTO `users` (
     UTC_TIMESTAMP()
 );
 
--- 插入测试普通用户（密码: user123）
+-- 插入测试普通用户（密码: Admin@123）
 INSERT INTO `users` (
     `id`,
     `username`,
@@ -61,7 +61,7 @@ INSERT INTO `users` (
 ) VALUES (
     UUID(),
     'user',
-    'BPiZbadjt6lpsQKO4wB1aerzpjVIbdqyEdUSyFud+Ps=', -- SHA256 hash of 'user123'
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=', -- PBKDF2 hash of 'Admin@123'
     'user@dawning.com',
     'Test User',
     'user',

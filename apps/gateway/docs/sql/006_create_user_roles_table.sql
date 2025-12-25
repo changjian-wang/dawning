@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
   KEY `idx_user_roles_role_id` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色关联表';
 
--- 为现有用户分配角色（admin用户分配admin角色）
+-- 为admin用户分配 admin 和 super_admin 角色
 INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `created_at`)
 SELECT 
   UUID() AS id,
@@ -26,7 +26,7 @@ SELECT
 FROM `users` u
 CROSS JOIN `roles` r
 WHERE u.username = 'admin' 
-  AND r.name = 'admin'
+  AND r.name IN ('admin', 'super_admin')
   AND r.deleted_at IS NULL
   AND NOT EXISTS (
     SELECT 1 FROM `user_roles` ur 

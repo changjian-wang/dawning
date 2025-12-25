@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS gateway_routes (
     rate_limiter_policy VARCHAR(100),
     cors_policy VARCHAR(100),
     timeout_seconds INT,
-    `order` INT DEFAULT 0,
+    sort_order INT DEFAULT 0,
     is_enabled TINYINT(1) DEFAULT 1,
     metadata JSON,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,19 +60,19 @@ CREATE TABLE IF NOT EXISTS gateway_routes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='网关路由配置表';
 
 -- 创建索引
-CREATE INDEX idx_gateway_routes_cluster_id ON gateway_routes(cluster_id);
-CREATE INDEX idx_gateway_routes_is_enabled ON gateway_routes(is_enabled);
-CREATE INDEX idx_gateway_routes_order ON gateway_routes(`order`);
-CREATE INDEX idx_gateway_clusters_is_enabled ON gateway_clusters(is_enabled);
+CREATE INDEX IF NOT EXISTS idx_gateway_routes_cluster_id ON gateway_routes(cluster_id);
+CREATE INDEX IF NOT EXISTS idx_gateway_routes_is_enabled ON gateway_routes(is_enabled);
+CREATE INDEX IF NOT EXISTS idx_gateway_routes_sort_order ON gateway_routes(sort_order);
+CREATE INDEX IF NOT EXISTS idx_gateway_clusters_is_enabled ON gateway_clusters(is_enabled);
 
--- 插入示例数据（可选，用于测试）
--- INSERT INTO gateway_clusters (cluster_id, name, description, destinations, health_check_enabled, health_check_path)
--- VALUES 
--- ('identity-cluster', 'Identity Service Cluster', '身份认证服务集群', 
---  '[{"destinationId": "identity-dest", "address": "http://localhost:5195"}]', 
---  1, '/health');
+-- 插入默认网关集群（Identity Service）
+INSERT INTO gateway_clusters (cluster_id, name, description, destinations, load_balancing_policy, health_check_enabled, health_check_path, is_enabled)
+VALUES 
+('identity-cluster', 'Identity Service', '身份认证服务集群', '{"destination1": {"Address": "http://localhost:5202"}}', 'RoundRobin', 1, '/health', 1)
+ON DUPLICATE KEY UPDATE name=VALUES(name), destinations=VALUES(destinations);
 
--- INSERT INTO gateway_routes (route_id, name, description, cluster_id, match_path, authorization_policy)
--- VALUES 
--- ('identity-route', 'Identity API Route', '身份认证API路由', 
---  'identity-cluster', '/api/{**catch-all}', 'RequireAuthenticatedUser');
+-- 插入默认网关路由
+INSERT INTO gateway_routes (route_id, name, cluster_id, match_path, transform_path_remove_prefix, sort_order, is_enabled)
+VALUES 
+('identity-route', 'Identity API Route', 'identity-cluster', '/api/identity/{**catch-all}', '/api/identity', 0, 1)
+ON DUPLICATE KEY UPDATE name=VALUES(name);

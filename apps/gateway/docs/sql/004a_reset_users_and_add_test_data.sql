@@ -8,7 +8,7 @@ USE dawning_identity;
 TRUNCATE TABLE users;
 
 -- 2. 初始化管理员账户
--- 密码: Admin123! (默认密码哈希 - 需要在应用中修改为真实哈希值)
+-- 密码: Admin@123 (使用 PBKDF2 哈希: 100000;salt;hash 格式)
 INSERT INTO users (
     id,
     username,
@@ -25,7 +25,7 @@ INSERT INTO users (
 ) VALUES (
     UUID(),
     'admin',
-    'AQAAAAIAAYagAAAAEJ4K8xKz2YNqKCvBPqHD0K6XjgKQ9J5KZ5FGGwYHBYl5X9WQZ8X7+1YZ9X6Y5X4==', -- 示例哈希值
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=', -- 示例哈希值
     '系统管理员',
     'admin@dawning.com',
     '13800138000',
@@ -55,7 +55,7 @@ INSERT INTO users (
 (
     UUID(),
     'zhangsan',
-    'AQAAAAIAAYagAAAAEJ4K8xKz2YNqKCvBPqHD0K6XjgKQ9J5KZ5FGGwYHBYl5X9WQZ8X7+1YZ9X6Y5X4==',
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=',
     '张三',
     'zhangsan@dawning.com',
     '13800138001',
@@ -69,7 +69,7 @@ INSERT INTO users (
 (
     UUID(),
     'lisi',
-    'AQAAAAIAAYagAAAAEJ4K8xKz2YNqKCvBPqHD0K6XjgKQ9J5KZ5FGGwYHBYl5X9WQZ8X7+1YZ9X6Y5X4==',
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=',
     '李四',
     'lisi@dawning.com',
     '13800138002',
@@ -83,7 +83,7 @@ INSERT INTO users (
 (
     UUID(),
     'wangwu',
-    'AQAAAAIAAYagAAAAEJ4K8xKz2YNqKCvBPqHD0K6XjgKQ9J5KZ5FGGwYHBYl5X9WQZ8X7+1YZ9X6Y5X4==',
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=',
     '王五',
     'wangwu@dawning.com',
     '13800138003',
@@ -97,7 +97,7 @@ INSERT INTO users (
 (
     UUID(),
     'zhaoliu',
-    'AQAAAAIAAYagAAAAEJ4K8xKz2YNqKCvBPqHD0K6XjgKQ9J5KZ5FGGwYHBYl5X9WQZ8X7+1YZ9X6Y5X4==',
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=',
     '赵六',
     'zhaoliu@dawning.com',
     '13800138004',
@@ -111,7 +111,7 @@ INSERT INTO users (
 (
     UUID(),
     'sunqi',
-    'AQAAAAIAAYagAAAAEJ4K8xKz2YNqKCvBPqHD0K6XjgKQ9J5KZ5FGGwYHBYl5X9WQZ8X7+1YZ9X6Y5X4==',
+    '100000;HQ2Qh1DuRQGvMRyDJxW23Q==;kgr3tG5/7WTyN/xjxDdWdhRJW740p0kwlcHKnFfIoMc=',
     '孙七',
     'sunqi@dawning.com',
     '13800138005',
