@@ -2,8 +2,11 @@
 # Dawning Gateway Management System
 # Docker Compose Configuration
 # =============================================
-
-version: '3.8'
+# 使用方法:
+#   基础设施: docker-compose up -d mysql redis zookeeper kafka
+#   调试工具: docker-compose --profile debug up -d
+#   全部服务: docker-compose --profile all up -d --build
+# =============================================
 
 services:
   # ===== MySQL Database =====
@@ -88,10 +91,10 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9093,EXTERNAL://localhost:9092,EXTERNAL_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,EXTERNAL_HOST:PLAINTEXT
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092,EXTERNAL_HOST://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -126,7 +129,7 @@ services:
         condition: service_healthy
     environment:
       KAFKA_CLUSTERS_0_NAME: dawning-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9093
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
     ports:
       - "${KAFKA_UI_PORT:-8080}:8080"
@@ -155,7 +158,7 @@ services:
       - ConnectionStrings__MySQL=Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-dawning_identity};Uid=${MYSQL_USER:-dawning};Pwd=${MYSQL_PASSWORD:-dawning_password_2024};
       - Redis__Connection=redis:6379
       - Kafka__Enabled=true
-      - Kafka__BootstrapServers=kafka:9092
+      - Kafka__BootstrapServers=kafka:9093
       - Kafka__ConsumerGroupId=dawning-identity-group
       - OpenIddict__UseDevelopmentCertificate=true
       - TZ=Asia/Shanghai
