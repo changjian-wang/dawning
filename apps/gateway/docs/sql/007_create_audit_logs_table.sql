@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `status_code` INT DEFAULT NULL COMMENT 'HTTP状态码',
   `old_values` JSON DEFAULT NULL COMMENT '修改前的值 (JSON)',
   `new_values` JSON DEFAULT NULL COMMENT '修改后的值 (JSON)',
+  `timestamp` BIGINT NOT NULL COMMENT '时间戳 (毫秒级Unix时间戳)',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_audit_logs_user_id` (`user_id`),
@@ -26,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   KEY `idx_audit_logs_entity_type` (`entity_type`),
   KEY `idx_audit_logs_entity_id` (`entity_id`),
   KEY `idx_audit_logs_created_at` (`created_at`),
+  KEY `idx_audit_logs_timestamp` (`timestamp`),
   KEY `idx_audit_logs_ip_address` (`ip_address`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='审计日志表';
 
