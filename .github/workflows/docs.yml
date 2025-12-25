@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - 'services/**/*.cs'
-      - 'dawning-admin/src/**/*.ts'
-      - 'dawning-admin/src/**/*.vue'
+      - 'apps/gateway/**/*.cs'
+      - 'apps/admin/src/**/*.ts'
+      - 'apps/admin/src/**/*.vue'
       - 'docs/**/*.md'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
@@ -30,10 +30,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore services/Dawning.Gateway/Dawning.Gateway.sln
+        run: dotnet restore apps/gateway/Dawning.Gateway.sln
 
       - name: Build
-        run: dotnet build services/Dawning.Gateway/Dawning.Gateway.sln --no-restore
+        run: dotnet build apps/gateway/Dawning.Gateway.sln --no-restore
 
       # 生成 Swagger JSON (如果服务能启动)
       # - name: Generate Swagger
@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-docs
-          path: services/Dawning.Gateway/docs/
+          path: apps/gateway/docs/
 
   # ===== 生成变更日志 =====
   generate-changelog:

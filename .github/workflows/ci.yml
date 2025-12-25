@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: services/Dawning.Gateway
+        working-directory: apps/gateway
 
     steps:
       - name: Checkout
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: dawning-admin
+        working-directory: apps/admin
 
     steps:
       - name: Checkout
@@ -112,8 +112,8 @@ jobs:
       - name: Build Identity API
         uses: docker/build-push-action@v5
         with:
-          context: ./services/Dawning.Gateway
-          file: ./services/Dawning.Gateway/src/Dawning.Identity.Api/Dockerfile
+          context: ./apps/gateway
+          file: ./apps/gateway/src/Dawning.Identity.Api/Dockerfile
           push: false  # 设为 true 推送到 Docker Hub
           tags: dawning/identity-api:${{ github.sha }}
           cache-from: type=gha
@@ -122,8 +122,8 @@ jobs:
       - name: Build Admin Frontend
         uses: docker/build-push-action@v5
         with:
-          context: ./dawning-admin
-          file: ./dawning-admin/Dockerfile
+          context: ./apps/admin
+          file: ./apps/admin/Dockerfile
           push: false
           tags: dawning/admin-frontend:${{ github.sha }}
           cache-from: type=gha
@@ -142,7 +142,7 @@ jobs:
           version: 'v3.13.0'
 
       - name: Lint Helm Chart
-        run: helm lint ./helm/dawning
+        run: helm lint ./deploy/helm/dawning
 
       - name: Template Helm Chart
-        run: helm template dawning ./helm/dawning --debug
+        run: helm template dawning ./deploy/helm/dawning --debug

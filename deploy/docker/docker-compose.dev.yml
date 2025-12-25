@@ -7,14 +7,14 @@ services:
   # Override Identity API for development
   identity-api:
     build:
-      context: ./Dawning.Gateway
+      context: ../../apps/gateway
       dockerfile: src/Dawning.Identity.Api/Dockerfile
       target: build  # Stop at build stage for hot reload
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - OpenIddict__UseDevelopmentCertificate=true
     volumes:
-      - ./Dawning.Gateway:/src
+      - ../../apps/gateway:/src
     ports:
       - "5001:5001"
       - "5002:5002"  # Debug port
@@ -22,13 +22,13 @@ services:
   # Override Gateway API for development
   gateway-api:
     build:
-      context: ./Dawning.Gateway
+      context: ../../apps/gateway
       dockerfile: src/Dawning.Gateway.Api/Dockerfile
       target: build
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
-      - ./Dawning.Gateway:/src
+      - ../../apps/gateway:/src
     ports:
       - "5000:5000"
       - "5003:5003"  # Debug port
@@ -40,7 +40,7 @@ services:
     working_dir: /app
     command: sh -c "npm install -g pnpm && pnpm install && pnpm dev --host 0.0.0.0"
     volumes:
-      - ./dawning-admin:/app
+      - ../../apps/admin:/app
       - /app/node_modules
     ports:
       - "3000:5173"

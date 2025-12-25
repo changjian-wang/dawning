@@ -65,38 +65,34 @@ Dawning Identity Gateway 是一个基于 .NET 8 和 Vue 3 构建的现代化身�
 
 ```
 dawning/
-├── services/
-│   └── Dawning.Gateway/             # 后端服务
+├── apps/
+│   ├── admin/                       # Vue 3 前端管理系统
+│   │   ├── src/
+│   │   │   ├── api/                 # API 接口
+│   │   │   ├── views/               # 页面视图
+│   │   │   ├── store/               # 状态管理
+│   │   │   └── router/              # 路由配置
+│   │   └── config/                  # 构建配置
+│   └── gateway/                     # .NET 8 后端服务
 │       ├── src/
 │       │   ├── Dawning.Gateway.Api/     # API 网关 (YARP)
 │       │   ├── Dawning.Identity.Api/    # 身份认证 API
 │       │   ├── Dawning.Identity.Application/  # 应用层
 │       │   ├── Dawning.Identity.Domain/       # 领域层
-│       │   ├── Dawning.Identity.Domain.Core/  # 领域核心
-│       │   └── Shared/                  # 共享组件 (认证接入库)
-│       └── docs/                        # API 文档
-├── dawning-admin/                   # 前端管理系统
-│   ├── src/
-│   │   ├── api/                     # API 接口
-│   │   ├── views/                   # 页面视图
-│   │   ├── store/                   # 状态管理
-│   │   └── router/                  # 路由配置
-│   └── config/                      # 构建配置
-├── helm/                            # Kubernetes Helm Chart
-│   └── dawning/
-│       ├── Chart.yaml
-│       ├── values.yaml              # 默认配置
-│       ├── values-dev.yaml          # 开发环境
-│       ├── values-prod.yaml         # 生产环境
-│       └── templates/               # K8s 资源模板
+│       │   └── Dawning.Identity.Domain.Core/  # 领域核心
+│       └── docs/                    # API 文档
+├── sdk/                             # Dawning SDK 组件
+├── deploy/
+│   ├── docker/                      # Docker Compose 配置
+│   ├── helm/                        # Kubernetes Helm Chart
+│   │   └── dawning/
+│   │       ├── Chart.yaml
+│   │       ├── values.yaml          # 默认配置
+│   │       ├── values-dev.yaml      # 开发环境
+│   │       └── values-prod.yaml     # 生产环境
+│   └── scripts/                     # 部署脚本
 ├── docs/                            # 项目文档
-│   ├── AUTHENTICATION_INTEGRATION.md  # 认证接入指南
-│   ├── DEVELOPER_GUIDE.md           # 开发者指南
-│   ├── DEPLOYMENT.md                # 部署文档
-│   └── USER_GUIDE.md                # 用户指南
-├── docker-compose.yml               # Docker 编排
-├── start.ps1                        # Windows 启动脚本
-└── start.sh                         # Linux/Mac 启动脚本
+└── .github/workflows/               # CI/CD 配置
 ```
 
 ### 🚀 快速开始
@@ -112,11 +108,13 @@ dawning/
 #### 方式一：Docker Compose 一键启动（推荐）
 
 ```bash
-# Windows
-.\start.ps1 all
+cd deploy/docker
 
-# Linux/Mac
-./start.sh all
+# 启动基础设施
+docker-compose up -d mysql redis zookeeper kafka
+
+# 启动所有服务
+docker-compose --profile all up -d --build
 ```
 
 这将启动：MySQL、Redis、Zookeeper、Kafka、Kafka UI 和后端服务。
@@ -127,7 +125,7 @@ dawning/
 
 ```bash
 # 1. 进入后端目录
-cd services/Dawning.Gateway
+cd apps/gateway
 
 # 2. 还原依赖
 dotnet restore
@@ -146,7 +144,7 @@ dotnet run
 
 ```bash
 # 1. 进入前端目录
-cd dawning-admin
+cd apps/admin
 
 # 2. 安装依赖
 pnpm install
@@ -164,17 +162,19 @@ pnpm dev
 ### 🐳 Docker 部署
 
 ```bash
+cd deploy/docker
+
 # 启动基础设施
-.\start.ps1 infra
+docker-compose up -d mysql redis zookeeper kafka
 
 # 启动所有服务
-.\start.ps1 all
+docker-compose --profile all up -d --build
 
 # 停止服务
-.\start.ps1 stop
+docker-compose down
 
 # 清理数据
-.\start.ps1 clean
+docker-compose down -v
 ```
 
 ### ☸️ Kubernetes 部署
@@ -184,22 +184,22 @@ pnpm dev
 helm repo add bitnami https://charts.bitnami.com/bitnami
 
 # 更新依赖
-cd helm/dawning && helm dependency update
+cd deploy/helm/dawning && helm dependency update
 
 # 开发环境部署
-helm install dawning ./helm/dawning -f ./helm/dawning/values-dev.yaml -n dawning-dev --create-namespace
+helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-dev.yaml -n dawning-dev --create-namespace
 
 # 生产环境部署
-helm install dawning ./helm/dawning -f ./helm/dawning/values-prod.yaml -n dawning --create-namespace
+helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-prod.yaml -n dawning --create-namespace
 ```
 
 ### 🔗 业务系统接入
 
-其他业务系统可以轻松接入 Dawning 统一认证：
+其他业务系统可以通过 Dawning SDK 轻松接入统一认证：
 
-**1. 添加引用**
+**1. 添加 NuGet 包**
 ```xml
-<ProjectReference Include="Shared/Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj" />
+<PackageReference Include="Dawning.Identity" Version="1.2.0" />
 ```
 
 **2. 配置认证**
@@ -222,7 +222,7 @@ public IActionResult GetData() => Ok();
 
 ```bash
 # 运行单元测试
-cd Dawning.Gateway
+cd apps/gateway
 dotnet test
 
 # 测试覆盖: 52 个测试用例
