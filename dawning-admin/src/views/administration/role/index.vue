@@ -178,6 +178,7 @@
                 {{ $t('common.edit') }}
               </a-button>
               <a-popconfirm
+                v-if="canDeleteRole(record)"
                 :content="$t('common.deleteConfirm')"
                 @ok="handleDelete(record)"
               >
@@ -185,12 +186,21 @@
                   type="text"
                   size="small"
                   status="danger"
-                  :disabled="!canEditRole(record)"
                 >
                   <template #icon><icon-delete /></template>
                   {{ $t('common.delete') }}
                 </a-button>
               </a-popconfirm>
+              <a-tooltip v-else content="系统角色不可删除">
+                <a-button
+                  type="text"
+                  size="small"
+                  :disabled="true"
+                >
+                  <template #icon><icon-lock /></template>
+                  系统角色
+                </a-button>
+              </a-tooltip>
             </a-space>
           </template>
         </a-table>
@@ -376,14 +386,33 @@
   const { loading, setLoading } = useLoading(true);
   const userStore = useUserStore();
 
+  // 判断角色是否是受保护的系统角色
+  const isProtectedRole = (record: RoleModel) => {
+    return record.isSystem === true;
+  };
+
   // 判断当前用户是否可以编辑/删除指定角色
-  // 规则：super_admin 角色只能被 super_admin 用户编辑/删除
+  // 规则：系统角色不可删除/禁用，super_admin 角色只能被 super_admin 用户编辑
   const canEditRole = (record: RoleModel) => {
-    // 如果是 super_admin 角色，只有 super_admin 用户可以编辑
-    if (record.name === 'super_admin') {
-      return userStore.role === 'super_admin';
+    // 系统角色不可删除
+    if (record.isSystem) {
+      // 如果是 super_admin 角色，只有 super_admin 用户可以编辑（但不能删除）
+      if (record.name === 'super_admin') {
+        return userStore.role === 'super_admin';
+      }
+      // 其他系统角色可以编辑权限，但不能删除
+      return true;
     }
-    // 其他角色，admin 和 super_admin 都可以编辑
+    // 非系统角色，admin 和 super_admin 都可以编辑/删除
+    return true;
+  };
+
+  // 判断当前用户是否可以删除指定角色
+  const canDeleteRole = (record: RoleModel) => {
+    // 系统角色不可删除
+    if (record.isSystem) {
+      return false;
+    }
     return true;
   };
 
@@ -569,8 +598,9 @@
 
   // 删除角色
   const handleDelete = (record: RoleModel) => {
-    if (!canEditRole(record)) {
-      Message.warning(t('role.message.superAdminRoleCannotModify'));
+    // 系统角色不可删除
+    if (!canDeleteRole(record)) {
+      Message.warning('系统角色不可删除');
       return;
     }
 
