@@ -1,0 +1,22 @@
+{{- if and .Values.gatewayApi.enabled .Values.gatewayApi.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "dawning.fullname" . }}-gateway-api
+  labels:
+    {{- include "dawning.gatewayApi.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "dawning.fullname" . }}-gateway-api
+  minReplicas: {{ .Values.gatewayApi.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.gatewayApi.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.gatewayApi.autoscaling.targetCPUUtilization }}
+{{- end }}

@@ -1,0 +1,118 @@
+# =============================================
+# Dawning Gateway - 生产环境配置
+# =============================================
+# 使用: helm install dawning ./helm/dawning -f ./helm/dawning/values-prod.yaml -n dawning --create-namespace
+
+global:
+  namespace: dawning
+  environment: production
+
+# 生产环境多副本
+identityApi:
+  replicaCount: 3
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilization: 70
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+gatewayApi:
+  replicaCount: 3
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilization: 70
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+adminFrontend:
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+# 生产环境启用 Ingress + TLS
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: dawning.your-domain.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: admin-frontend
+        - path: /api
+          pathType: Prefix
+          service: identity-api
+        - path: /gateway
+          pathType: Prefix
+          service: gateway-api
+  tls:
+    - secretName: dawning-tls
+      hosts:
+        - dawning.your-domain.com
+
+# 生产环境建议使用外部托管服务
+# ===== 使用外部 MySQL (如 RDS) =====
+database:
+  external:
+    enabled: true
+    host: "your-rds-endpoint.amazonaws.com"
+    port: 3306
+    database: dawning_identity
+    username: "dawning"
+    password: ""  # 使用 --set 或 secrets 传入
+  internal:
+    enabled: false
+
+mysql:
+  enabled: false
+
+# ===== 使用外部 Redis (如 ElastiCache) =====
+cache:
+  external:
+    enabled: true
+    host: "your-elasticache-endpoint.amazonaws.com"
+    port: 6379
+    password: ""
+  internal:
+    enabled: false
+
+redis:
+  enabled: false
+
+# ===== 使用外部 Kafka (如 MSK) =====
+messaging:
+  external:
+    enabled: true
+    bootstrapServers: "b-1.your-msk.amazonaws.com:9092,b-2.your-msk.amazonaws.com:9092"
+  internal:
+    enabled: false
+
+kafka:
+  enabled: false
+
+# 生产密钥（通过 --set 传入或使用 sealed-secrets）
+secrets:
+  jwtSecret: ""  # helm install --set secrets.jwtSecret=xxx
+  openIddictKey: ""

@@ -1,0 +1,92 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+==========================================================
+ Dawning Gateway Management System - Deployment Summary
+==========================================================
+
+{{- if .Values.identityApi.enabled }}
+✅ Identity API: Deployed ({{ .Values.identityApi.replicaCount }} replicas)
+{{- end }}
+
+{{- if .Values.gatewayApi.enabled }}
+✅ Gateway API: Deployed ({{ .Values.gatewayApi.replicaCount }} replicas)
+{{- end }}
+
+{{- if .Values.adminFrontend.enabled }}
+✅ Admin Frontend: Deployed ({{ .Values.adminFrontend.replicaCount }} replicas)
+{{- end }}
+
+{{- if .Values.mysql.enabled }}
+✅ MySQL: Deployed (Internal)
+{{- else if .Values.database.external.enabled }}
+✅ MySQL: External ({{ .Values.database.external.host }})
+{{- end }}
+
+{{- if .Values.redis.enabled }}
+✅ Redis: Deployed (Internal)
+{{- else if .Values.cache.external.enabled }}
+✅ Redis: External ({{ .Values.cache.external.host }})
+{{- end }}
+
+{{- if .Values.kafka.enabled }}
+✅ Kafka: Deployed (Internal)
+{{- else if .Values.messaging.external.enabled }}
+✅ Kafka: External
+{{- end }}
+
+==========================================================
+ Access Instructions
+==========================================================
+
+{{- if .Values.ingress.enabled }}
+The application is accessible via Ingress:
+{{- range .Values.ingress.hosts }}
+  - http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- end }}
+{{- else }}
+
+To access the services, use kubectl port-forward:
+
+# Admin Frontend (Web UI)
+kubectl port-forward svc/{{ include "dawning.fullname" . }}-admin-frontend 8080:{{ .Values.adminFrontend.service.port }} -n {{ .Release.Namespace }}
+
+# Identity API
+kubectl port-forward svc/{{ include "dawning.fullname" . }}-identity-api 5001:{{ .Values.identityApi.service.port }} -n {{ .Release.Namespace }}
+
+# Gateway API
+kubectl port-forward svc/{{ include "dawning.fullname" . }}-gateway-api 5000:{{ .Values.gatewayApi.service.port }} -n {{ .Release.Namespace }}
+
+Then open your browser:
+  - Admin UI: http://localhost:8080
+  - Identity API: http://localhost:5001/swagger
+  - Gateway API: http://localhost:5000/swagger
+{{- end }}
+
+==========================================================
+ Useful Commands
+==========================================================
+
+# Check pod status
+kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+# View logs
+kubectl logs -f deployment/{{ include "dawning.fullname" . }}-identity-api -n {{ .Release.Namespace }}
+
+# Upgrade the release
+helm upgrade {{ .Release.Name }} ./helm/dawning -n {{ .Release.Namespace }}
+
+# Uninstall
+helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+==========================================================
+ Default Credentials
+==========================================================
+Admin Username: admin
+Admin Password: Admin@123
+
+⚠️  Please change the default password after first login!
+
+==========================================================

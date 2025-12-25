@@ -1,0 +1,52 @@
+{{- if .Values.adminFrontend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dawning.fullname" . }}-admin-frontend
+  labels:
+    {{- include "dawning.adminFrontend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.adminFrontend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "dawning.adminFrontend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "dawning.adminFrontend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: admin-frontend
+          image: "{{ .Values.global.imageRegistry }}{{ .Values.adminFrontend.image.repository }}:{{ .Values.adminFrontend.image.tag }}"
+          imagePullPolicy: {{ .Values.adminFrontend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.adminFrontend.service.port }}
+              protocol: TCP
+          {{- with .Values.adminFrontend.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.adminFrontend.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.adminFrontend.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

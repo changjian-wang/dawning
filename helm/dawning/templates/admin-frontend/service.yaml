@@ -1,0 +1,17 @@
+{{- if .Values.adminFrontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dawning.fullname" . }}-admin-frontend
+  labels:
+    {{- include "dawning.adminFrontend.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.adminFrontend.service.type }}
+  ports:
+    - port: {{ .Values.adminFrontend.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "dawning.adminFrontend.selectorLabels" . | nindent 4 }}
+{{- end }}
