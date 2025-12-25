@@ -1,7 +1,7 @@
 export default {
   'menu.administration.permission': '权限管理',
   'permission.title': '权限管理',
-  'permission.button.create': '创建权限',
+  'permission.button.create': '新建权限',
   'permission.button.edit': '编辑权限',
   'permission.button.delete': '删除权限',
   'permission.button.viewGrouped': '按资源查看',
@@ -19,7 +19,7 @@ export default {
   'permission.columns.operations': '操作',
 
   'permission.form.code': '权限代码',
-  'permission.form.code.placeholder': '格式: resource:action',
+  'permission.form.code.placeholder': '请输入权限代码搜索',
   'permission.form.name': '权限名称',
   'permission.form.name.placeholder': '输入权限名称',
   'permission.form.resource': '资源类型',
@@ -32,6 +32,7 @@ export default {
   'permission.form.description.placeholder': '输入描述',
   'permission.form.isActive': '状态',
   'permission.form.displayOrder': '显示顺序',
+  'permission.form.status.placeholder': '请选择状态',
 
   'permission.status.active': '启用',
   'permission.status.inactive': '禁用',

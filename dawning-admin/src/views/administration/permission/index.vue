@@ -12,112 +12,64 @@
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
               <a-form-item
                 field="code"
-                label="权限代码"
+                :label="$t('permission.form.code')"
                 class="form-item-block"
               >
                 <a-input
                   v-model="searchForm.code"
-                  placeholder="输入权限代码搜索"
+                  :placeholder="$t('permission.form.code.placeholder')"
                   allow-clear
                   @press-enter="search"
                 >
                   <template #prefix>
-                    <icon-code />
+                    <icon-safe />
                   </template>
                 </a-input>
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
               <a-form-item
-                field="resource"
-                label="资源类型"
-                class="form-item-block"
-              >
-                <a-select
-                  v-model="searchForm.resource"
-                  placeholder="选择资源类型"
-                  allow-clear
-                >
-                  <template #prefix>
-                    <icon-apps />
-                  </template>
-                  <a-option
-                    v-for="res in resourceOptions"
-                    :key="res"
-                    :value="res"
-                  >
-                    {{ res }}
-                  </a-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item
-                field="category"
-                label="分类"
-                class="form-item-block"
-              >
-                <a-select
-                  v-model="searchForm.category"
-                  placeholder="选择分类"
-                  allow-clear
-                >
-                  <template #prefix>
-                    <icon-folder />
-                  </template>
-                  <a-option
-                    v-for="cat in categoryOptions"
-                    :key="cat"
-                    :value="cat"
-                  >
-                    {{ cat }}
-                  </a-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item
                 field="isActive"
-                label="状态"
+                :label="$t('permission.columns.isActive')"
                 class="form-item-block"
               >
                 <a-select
                   v-model="searchForm.isActive"
-                  placeholder="选择状态"
+                  :placeholder="$t('permission.form.status.placeholder')"
                   allow-clear
                 >
                   <template #prefix>
                     <icon-check-circle />
                   </template>
-                  <a-option :value="true">启用</a-option>
-                  <a-option :value="false">禁用</a-option>
+                  <a-option :value="true">{{
+                    $t('permission.status.active')
+                  }}</a-option>
+                  <a-option :value="false">{{
+                    $t('permission.status.inactive')
+                  }}</a-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col
               :xs="24"
-              :sm="24"
+              :sm="12"
               :md="24"
-              :lg="24"
-              :xl="24"
+              :lg="12"
+              :xl="12"
               class="action-col"
             >
               <a-space :size="12">
                 <a-button type="primary" @click="search">
                   <template #icon><icon-search /></template>
-                  搜索
+                  {{ $t('searchTable.form.search') }}
                 </a-button>
                 <a-button @click="reset">
                   <template #icon><icon-refresh /></template>
-                  重置
+                  {{ $t('searchTable.form.reset') }}
                 </a-button>
                 <a-button type="primary" status="success" @click="handleCreate">
                   <template #icon><icon-plus /></template>
-                  创建权限
-                </a-button>
-                <a-button type="outline" @click="handleViewGrouped">
-                  <template #icon><icon-folder-add /></template>
-                  按资源查看
+                  {{ $t('permission.button.create') }}
                 </a-button>
               </a-space>
             </a-col>
@@ -155,13 +107,13 @@
             </a-tag>
           </template>
           <template #isActive="{ record }">
-            <a-tag v-if="record.isActive" color="green" size="small">
+            <a-tag v-if="record.isActive" color="arcoblue" size="small">
               <template #icon><icon-check-circle-fill /></template>
-              启用
+              {{ $t('permission.status.active') }}
             </a-tag>
             <a-tag v-else color="red" size="small">
               <template #icon><icon-close-circle-fill /></template>
-              禁用
+              {{ $t('permission.status.inactive') }}
             </a-tag>
           </template>
           <template #createdAt="{ record }">
@@ -686,46 +638,74 @@
 
 <style scoped lang="less">
   .permission-management {
-    padding: 20px;
-
     .container {
-      max-width: 1400px;
-      margin: 0 auto;
+      padding: 0 20px 20px 20px;
     }
 
     .search-card {
-      margin-bottom: 16px;
-    }
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
 
-    .form-item-block {
-      width: 100%;
-    }
+      .search-form {
+        width: 100%;
 
-    .action-col {
-      display: flex;
-      align-items: flex-end;
-      justify-content: flex-start;
+        .form-item-block {
+          width: 100%;
+          margin-bottom: 0;
+
+          :deep(.arco-form-item-label-col) {
+            padding-right: 8px;
+          }
+
+          :deep(.arco-input-wrapper),
+          :deep(.arco-select-view) {
+            width: 100%;
+          }
+        }
+
+        .action-col {
+          display: flex;
+          align-items: flex-end;
+          justify-content: flex-start;
+
+          :deep(.arco-space) {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+        }
+      }
     }
 
     .table-card {
-      .permissions-cell {
-        max-width: 300px;
-      }
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      overflow: hidden;
 
-      .permissions-popover {
-        .permission-header {
-          font-weight: 600;
-          margin-bottom: 8px;
-          padding-bottom: 8px;
-          border-bottom: 1px solid var(--color-border);
-        }
+      :deep(.arco-table-th) {
+        background-color: #f7f8fa;
+        font-weight: 600;
+        color: #1d2129;
 
-        .permission-item {
-          padding: 4px 0;
-          display: flex;
-          align-items: center;
+        &:last-child {
+          .arco-table-th-item-title {
+            margin: 0 auto;
+          }
         }
       }
+
+      :deep(.arco-table-tr) {
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: #f7f8fa;
+          transform: scale(1.002);
+        }
+      }
+    }
+
+    :deep(.arco-form-item-wrapper-col) {
+      width: 100%;
     }
   }
 </style>

@@ -1,7 +1,7 @@
 export default {
   'menu.administration.permission': 'Permission Management',
   'permission.title': 'Permission Management',
-  'permission.button.create': 'Create Permission',
+  'permission.button.create': 'New Permission',
   'permission.button.edit': 'Edit Permission',
   'permission.button.delete': 'Delete Permission',
   'permission.button.viewGrouped': 'View by Resource',
@@ -19,7 +19,7 @@ export default {
   'permission.columns.operations': 'Operations',
 
   'permission.form.code': 'Permission Code',
-  'permission.form.code.placeholder': 'Format: resource:action',
+  'permission.form.code.placeholder': 'Enter permission code to search',
   'permission.form.name': 'Permission Name',
   'permission.form.name.placeholder': 'Enter permission name',
   'permission.form.resource': 'Resource Type',
@@ -32,6 +32,7 @@ export default {
   'permission.form.description.placeholder': 'Enter description',
   'permission.form.isActive': 'Status',
   'permission.form.displayOrder': 'Display Order',
+  'permission.form.status.placeholder': 'Select status',
 
   'permission.status.active': 'Active',
   'permission.status.inactive': 'Inactive',
