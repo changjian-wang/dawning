@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   `is_system` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '是否为系统角色（系统角色不可删除）',
   `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT '是否启用',
   `permissions` JSON DEFAULT NULL COMMENT '角色权限列表（JSON数组）',
+  `timestamp` BIGINT NOT NULL DEFAULT 0 COMMENT '时间戳 (毫秒级Unix时间戳)',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `created_by` CHAR(36) DEFAULT NULL COMMENT '创建者ID',
   `updated_at` DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -20,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_roles_name` (`name`),
   KEY `idx_roles_is_active` (`is_active`),
+  KEY `idx_roles_timestamp` (`timestamp`),
   KEY `idx_roles_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
 

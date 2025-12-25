@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `tenants` (
     `subscription_expires_at` DATETIME NULL COMMENT '订阅到期时间',
     `max_users` INT NULL COMMENT '最大用户数限制',
     `max_storage_mb` INT NULL COMMENT '最大存储空间（MB）',
+    `timestamp` BIGINT NOT NULL DEFAULT 0 COMMENT '时间戳 (毫秒级Unix时间戳)',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` DATETIME NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `created_by` CHAR(36) NULL COMMENT '创建者ID',
@@ -29,7 +30,8 @@ CREATE TABLE IF NOT EXISTS `tenants` (
     UNIQUE KEY `uk_tenants_code` (`code`),
     UNIQUE KEY `uk_tenants_domain` (`domain`),
     KEY `idx_tenants_is_active` (`is_active`),
-    KEY `idx_tenants_plan` (`plan`)
+    KEY `idx_tenants_plan` (`plan`),
+    KEY `idx_tenants_timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租户表';
 
 -- 2. 为现有表添加 tenant_id 字段（可选，根据需要启用）
