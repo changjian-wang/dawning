@@ -494,6 +494,13 @@ namespace Dawning.Identity.Api.Controllers
                         var user = await _userRepository.GetAsync(id);
                         if (user != null)
                         {
+                            // 保护系统用户，禁止禁用
+                            if (!request.IsActive && user.IsSystem)
+                            {
+                                failedIds.Add(id);
+                                continue;
+                            }
+
                             user.IsActive = request.IsActive;
                             user.UpdatedAt = DateTime.UtcNow;
                             user.UpdatedBy = operatorId;
@@ -776,11 +783,12 @@ namespace Dawning.Identity.Api.Controllers
                 var createUserDto = new CreateUserDto
                 {
                     Username = "admin",
-                    Password = "admin",
+                    Password = "Admin@123",
                     Email = "admin@dawning.com",
                     DisplayName = "超级管理员",
                     Role = "super_admin",
                     IsActive = true,
+                    IsSystem = true, // 标记为系统用户，不可删除/禁用
                 };
 
                 var admin = await _userService.CreateAsync(createUserDto, null);

@@ -65,6 +65,12 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
         public bool IsActive { get; set; } = true;
 
         /// <summary>
+        /// 是否为系统用户（系统用户不可删除/禁用）
+        /// </summary>
+        [Column("is_system")]
+        public bool IsSystem { get; set; } = false;
+
+        /// <summary>
         /// 邮箱是否已验证
         /// </summary>
         [Column("email_confirmed")]

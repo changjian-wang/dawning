@@ -11,6 +11,7 @@ export interface IUser {
   avatar?: string;
   role: string;
   isActive: boolean;
+  isSystem: boolean;
   emailConfirmed: boolean;
   phoneNumberConfirmed: boolean;
   lastLoginAt?: string;

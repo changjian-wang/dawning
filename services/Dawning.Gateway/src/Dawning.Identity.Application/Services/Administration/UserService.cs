@@ -5,8 +5,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
-using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Dtos.IntegrationEvents;
+using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Interfaces.Security;
@@ -146,6 +146,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 Avatar = dto.Avatar,
                 Role = dto.Role,
                 IsActive = dto.IsActive,
+                IsSystem = dto.IsSystem,
                 Remark = dto.Remark,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = operatorId,
@@ -241,6 +242,12 @@ namespace Dawning.Identity.Application.Services.Administration
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{id}' not found.");
+            }
+
+            // 保护系统用户，禁止删除
+            if (user.IsSystem)
+            {
+                throw new InvalidOperationException("System user cannot be deleted.");
             }
 
             user.UpdatedBy = operatorId;

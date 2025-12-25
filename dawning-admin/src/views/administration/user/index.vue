@@ -189,10 +189,18 @@
                     <icon-refresh /> 重置密码
                   </a-doption>
                   <a-doption
+                    v-if="!isProtectedUser(record)"
                     style="color: rgb(var(--red-6))"
                     @click="handleDelete(record)"
                   >
                     <icon-delete /> 删除
+                  </a-doption>
+                  <a-doption
+                    v-else
+                    :disabled="true"
+                    style="color: var(--color-text-4); cursor: not-allowed"
+                  >
+                    <icon-lock /> 系统用户
                   </a-doption>
                 </template>
               </a-dropdown>
@@ -490,7 +498,7 @@
     user,
   } from '@/api/administration/user';
   import { getAllActiveRoles, type RoleModel } from '@/api/administration/role';
-  import { FieldRule, PaginationProps, Message } from '@arco-design/web-vue';
+  import { FieldRule, PaginationProps, Message, Modal } from '@arco-design/web-vue';
   import {
     exportData,
     formatDateTime,
@@ -516,6 +524,11 @@
     showCheckedAll: true,
     onlyCurrent: false,
   });
+
+  // 判断用户是否是受保护的系统用户
+  const isProtectedUser = (record: IUser) => {
+    return record.isSystem === true;
+  };
 
   // 角色分配相关状态
   const roleLoading = ref(false);
@@ -807,8 +820,13 @@
   const handleDelete = (record: IUser) => {
     if (!record.id) return;
 
-    const modal = (window as any).$modal;
-    modal.confirm({
+    // 保护 admin 用户
+    if (isProtectedUser(record)) {
+      Message.warning('系统管理员账号不能删除');
+      return;
+    }
+
+    Modal.confirm({
       title: '确认删除',
       content: `确定要删除用户 "${record.username}" 吗？此操作不可恢复。`,
       onOk: async () => {
@@ -944,14 +962,30 @@
       return;
     }
 
-    const modal = (window as any).$modal;
-    modal.confirm({
+    // 过滤掉受保护的 admin 用户
+    const protectedUsers = data.value.filter(
+      (u: IUser) => selectedRowKeys.value.includes(u.id) && isProtectedUser(u)
+    );
+    const safeIds = selectedRowKeys.value.filter(
+      (id) => !protectedUsers.some((u: IUser) => u.id === id)
+    );
+
+    if (protectedUsers.length > 0) {
+      Message.warning(`系统管理员账号不能删除，已自动排除 ${protectedUsers.length} 个`);
+    }
+
+    if (safeIds.length === 0) {
+      Message.warning('没有可删除的用户');
+      return;
+    }
+
+    Modal.confirm({
       title: '批量删除确认',
-      content: `确定要删除选中的 ${selectedRowKeys.value.length} 个用户吗？此操作不可恢复。`,
+      content: `确定要删除选中的 ${safeIds.length} 个用户吗？此操作不可恢复。`,
       onOk: async () => {
         try {
           loading.value = true;
-          const result = await user.api.batchDelete(selectedRowKeys.value);
+          const result = await user.api.batchDelete(safeIds);
           if (result.successCount > 0) {
             Message.success(`成功删除 ${result.successCount} 个用户`);
           }
@@ -977,8 +1011,7 @@
       return;
     }
 
-    const modal = (window as any).$modal;
-    modal.confirm({
+    Modal.confirm({
       title: '批量启用确认',
       content: `确定要启用选中的 ${selectedRowKeys.value.length} 个用户吗？`,
       onOk: async () => {
@@ -1013,15 +1046,31 @@
       return;
     }
 
-    const modal = (window as any).$modal;
-    modal.confirm({
+    // 过滤掉受保护的 admin 用户
+    const protectedUsers = data.value.filter(
+      (u: IUser) => selectedRowKeys.value.includes(u.id) && isProtectedUser(u)
+    );
+    const safeIds = selectedRowKeys.value.filter(
+      (id) => !protectedUsers.some((u: IUser) => u.id === id)
+    );
+
+    if (protectedUsers.length > 0) {
+      Message.warning(`系统管理员账号不能禁用，已自动排除 ${protectedUsers.length} 个`);
+    }
+
+    if (safeIds.length === 0) {
+      Message.warning('没有可禁用的用户');
+      return;
+    }
+
+    Modal.confirm({
       title: '批量禁用确认',
-      content: `确定要禁用选中的 ${selectedRowKeys.value.length} 个用户吗？`,
+      content: `确定要禁用选中的 ${safeIds.length} 个用户吗？`,
       onOk: async () => {
         try {
           loading.value = true;
           const result = await user.api.batchUpdateStatus(
-            selectedRowKeys.value,
+            safeIds,
             false
           );
           if (result.successCount > 0) {

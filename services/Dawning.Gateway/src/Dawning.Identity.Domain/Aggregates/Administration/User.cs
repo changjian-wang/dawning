@@ -54,6 +54,11 @@ namespace Dawning.Identity.Domain.Aggregates.Administration
         public bool IsActive { get; set; } = true;
 
         /// <summary>
+        /// 是否为系统用户（系统用户不可删除/禁用）
+        /// </summary>
+        public bool IsSystem { get; set; } = false;
+
+        /// <summary>
         /// 邮箱是否已验证
         /// </summary>
         public bool EmailConfirmed { get; set; } = false;
