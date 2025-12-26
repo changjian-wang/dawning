@@ -1,11 +1,11 @@
 -- =====================================================
 -- V5_add_request_logs.sql
--- 请求日志表创建脚本
--- 创建日期: 2025-12-16
--- 描述: 用于存储API请求日志，支持监控和审计
+-- Request Logs Table Creation Script
+-- Created: 2025-12-16
+-- Description: Store API request logs for monitoring and auditing
 -- =====================================================
 
--- 请求日志表
+-- Request logs table
 CREATE TABLE IF NOT EXISTS request_logs (
     id CHAR(36) NOT NULL PRIMARY KEY,
     request_id VARCHAR(100) NULL,
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS request_logs (
     exception TEXT NULL,
     additional_info JSON NULL,
     
-    -- 索引
+    -- Indexes
     INDEX idx_request_logs_request_time (request_time),
     INDEX idx_request_logs_status_code (status_code),
     INDEX idx_request_logs_user_id (user_id),
@@ -32,39 +32,39 @@ CREATE TABLE IF NOT EXISTS request_logs (
     INDEX idx_request_logs_path (path(255)),
     INDEX idx_request_logs_method (method),
     
-    -- 复合索引用于常见查询
+    -- Composite indexes for common queries
     INDEX idx_request_logs_time_status (request_time, status_code),
     INDEX idx_request_logs_time_path (request_time, path(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 添加表注释
-ALTER TABLE request_logs COMMENT = 'API请求日志表';
+-- Add table comment
+ALTER TABLE request_logs COMMENT = 'API request logs table';
 
 -- =====================================================
--- 日志保留策略配置
+-- Log Retention Policy Configuration
 -- =====================================================
 
--- 添加日志保留天数配置
+-- Add log retention days configuration
 INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
-SELECT UUID(), 'Logging', 'RequestLogRetentionDays', '30', '请求日志保留天数', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
+SELECT UUID(), 'Logging', 'RequestLogRetentionDays', '30', 'Request log retention days', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
     WHERE name = 'Logging' AND `key` = 'RequestLogRetentionDays'
 );
 
--- 添加慢请求阈值配置
+-- Add slow request threshold configuration
 INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
-SELECT UUID(), 'Logging', 'SlowRequestThresholdMs', '1000', '慢请求阈值（毫秒）', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
+SELECT UUID(), 'Logging', 'SlowRequestThresholdMs', '1000', 'Slow request threshold (milliseconds)', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
     WHERE name = 'Logging' AND `key` = 'SlowRequestThresholdMs'
 );
 
--- 添加请求日志启用配置
+-- Add request logging enabled configuration
 INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
-SELECT UUID(), 'Logging', 'RequestLoggingEnabled', 'true', '是否启用请求日志记录', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
+SELECT UUID(), 'Logging', 'RequestLoggingEnabled', 'true', 'Whether to enable request logging', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()
 FROM DUAL
 WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
@@ -72,13 +72,13 @@ WHERE NOT EXISTS (
 );
 
 -- =====================================================
--- 定期清理事件（可选，需要MySQL事件调度器）
+-- Scheduled Cleanup Event (Optional, requires MySQL event scheduler)
 -- =====================================================
 
--- 启用事件调度器（如果尚未启用）
+-- Enable event scheduler (if not already enabled)
 -- SET GLOBAL event_scheduler = ON;
 
--- 创建日志清理事件（每天凌晨3点执行）
+-- Create log cleanup event (runs daily at 3:00 AM)
 -- DELIMITER //
 -- CREATE EVENT IF NOT EXISTS cleanup_request_logs
 -- ON SCHEDULE EVERY 1 DAY
@@ -87,24 +87,24 @@ WHERE NOT EXISTS (
 -- BEGIN
 --     DECLARE retention_days INT DEFAULT 30;
 --     
---     -- 从配置表获取保留天数
+--     -- Get retention days from config table
 --     SELECT CAST(value AS UNSIGNED) INTO retention_days
 --     FROM system_configs 
 --     WHERE name = 'Logging' AND `key` = 'RequestLogRetentionDays'
 --     LIMIT 1;
 --     
---     -- 删除过期日志
+--     -- Delete expired logs
 --     DELETE FROM request_logs 
 --     WHERE request_time < DATE_SUB(NOW(), INTERVAL retention_days DAY);
 -- END //
 -- DELIMITER ;
 
 -- =====================================================
--- 验证
+-- Verification
 -- =====================================================
 
--- 显示表结构
+-- Show table structure
 DESCRIBE request_logs;
 
--- 显示配置
+-- Show configuration
 SELECT * FROM system_configs WHERE name = 'Logging';

@@ -1,8 +1,8 @@
 -- ============================================
--- 网关路由和集群管理表 (MySQL 8.0+)
+-- Gateway Route and Cluster Management Tables (MySQL 8.0+)
 -- ============================================
 
--- 网关集群表（需要先创建，因为路由表引用集群）
+-- Gateway clusters table (must be created first since routes table references clusters)
 CREATE TABLE IF NOT EXISTS gateway_clusters (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     cluster_id VARCHAR(100) NOT NULL UNIQUE,
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS gateway_clusters (
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
     updated_by VARCHAR(100)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='网关集群配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gateway cluster configuration table';
 
--- 网关路由表
+-- Gateway routes table
 CREATE TABLE IF NOT EXISTS gateway_routes (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     route_id VARCHAR(100) NOT NULL UNIQUE,
@@ -57,21 +57,21 @@ CREATE TABLE IF NOT EXISTS gateway_routes (
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
     updated_by VARCHAR(100)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='网关路由配置表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gateway route configuration table';
 
--- 创建索引
+-- Create indexes
 CREATE INDEX IF NOT EXISTS idx_gateway_routes_cluster_id ON gateway_routes(cluster_id);
 CREATE INDEX IF NOT EXISTS idx_gateway_routes_is_enabled ON gateway_routes(is_enabled);
 CREATE INDEX IF NOT EXISTS idx_gateway_routes_sort_order ON gateway_routes(sort_order);
 CREATE INDEX IF NOT EXISTS idx_gateway_clusters_is_enabled ON gateway_clusters(is_enabled);
 
--- 插入默认网关集群（Identity Service）
+-- Insert default gateway cluster (Identity Service)
 INSERT INTO gateway_clusters (cluster_id, name, description, destinations, load_balancing_policy, health_check_enabled, health_check_path, is_enabled)
 VALUES 
-('identity-cluster', 'Identity Service', '身份认证服务集群', '{"destination1": {"Address": "http://localhost:5202"}}', 'RoundRobin', 1, '/health', 1)
+('identity-cluster', 'Identity Service', 'Identity authentication service cluster', '{"destination1": {"Address": "http://localhost:5202"}}', 'RoundRobin', 1, '/health', 1)
 ON DUPLICATE KEY UPDATE name=VALUES(name), destinations=VALUES(destinations);
 
--- 插入默认网关路由
+-- Insert default gateway route
 INSERT INTO gateway_routes (route_id, name, cluster_id, match_path, transform_path_remove_prefix, sort_order, is_enabled)
 VALUES 
 ('identity-route', 'Identity API Route', 'identity-cluster', '/api/identity/{**catch-all}', '/api/identity', 0, 1)

@@ -1,22 +1,22 @@
 -- 006_create_user_roles_table.sql
--- 创建用户-角色关联表
+-- Create user-role association table
 
 USE dawning_identity;
 
--- 创建用户角色关联表
+-- Create user roles association table
 CREATE TABLE IF NOT EXISTS `user_roles` (
-  `id` CHAR(36) NOT NULL COMMENT '关联ID (GUID)',
-  `user_id` CHAR(36) NOT NULL COMMENT '用户ID',
-  `role_id` CHAR(36) NOT NULL COMMENT '角色ID',
-  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '分配时间',
-  `created_by` CHAR(36) DEFAULT NULL COMMENT '分配者ID',
+  `id` CHAR(36) NOT NULL COMMENT 'Association ID (GUID)',
+  `user_id` CHAR(36) NOT NULL COMMENT 'User ID',
+  `role_id` CHAR(36) NOT NULL COMMENT 'Role ID',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Assignment time',
+  `created_by` CHAR(36) DEFAULT NULL COMMENT 'Assigner ID',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_roles` (`user_id`, `role_id`),
   KEY `idx_user_roles_user_id` (`user_id`),
   KEY `idx_user_roles_role_id` (`role_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色关联表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='User roles association table';
 
--- 为admin用户分配 admin 和 super_admin 角色
+-- Assign admin and super_admin roles to admin user
 INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `created_at`)
 SELECT 
   UUID() AS id,
@@ -33,7 +33,7 @@ WHERE u.username = 'admin'
     WHERE ur.user_id = u.id AND ur.role_id = r.id
   );
 
--- 为其他测试用户分配user角色
+-- Assign user role to other test users
 INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `created_at`)
 SELECT 
   UUID() AS id,
@@ -50,8 +50,8 @@ WHERE u.username IN ('zhangsan', 'lisi', 'wangwu', 'zhaoliu', 'sunqi')
     WHERE ur.user_id = u.id AND ur.role_id = r.id
   );
 
--- 显示创建结果
-SELECT '用户角色关联表创建成功！' AS message;
+-- Display creation results
+SELECT 'User roles association table created successfully!' AS message;
 SELECT 
   ur.id,
   u.username,

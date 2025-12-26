@@ -1,8 +1,8 @@
 -- =============================================
--- 限流策略和 IP 访问规则表
+-- Rate Limit Policies and IP Access Rules Tables
 -- =============================================
 
--- 限流策略表
+-- Rate limit policies table
 CREATE TABLE IF NOT EXISTS `rate_limit_policies` (
     `id` CHAR(36) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `rate_limit_policies` (
     UNIQUE KEY `uk_rate_limit_policy_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- IP 访问规则表
+-- IP access rules table
 CREATE TABLE IF NOT EXISTS `ip_access_rules` (
     `id` CHAR(36) NOT NULL,
     `ip_address` VARCHAR(50) NOT NULL,
@@ -39,10 +39,10 @@ CREATE TABLE IF NOT EXISTS `ip_access_rules` (
     KEY `idx_ip_access_expires` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 插入默认限流策略
+-- Insert default rate limit policies
 INSERT INTO `rate_limit_policies` (`id`, `name`, `display_name`, `policy_type`, `permit_limit`, `window_seconds`, `description`) VALUES
-(UUID(), 'default', '默认策略', 'fixed-window', 100, 60, '每分钟 100 次请求'),
-(UUID(), 'strict', '严格限制', 'fixed-window', 30, 60, '每分钟 30 次请求'),
-(UUID(), 'relaxed', '宽松限制', 'fixed-window', 500, 60, '每分钟 500 次请求'),
-(UUID(), 'api-standard', 'API 标准', 'sliding-window', 100, 60, '滑动窗口，每分钟 100 次'),
-(UUID(), 'burst-allow', '允许突发', 'token-bucket', 100, 60, '令牌桶，允许短期突发请求');
+(UUID(), 'default', 'Default Policy', 'fixed-window', 100, 60, '100 requests per minute'),
+(UUID(), 'strict', 'Strict Limit', 'fixed-window', 30, 60, '30 requests per minute'),
+(UUID(), 'relaxed', 'Relaxed Limit', 'fixed-window', 500, 60, '500 requests per minute'),
+(UUID(), 'api-standard', 'API Standard', 'sliding-window', 100, 60, 'Sliding window, 100 requests per minute'),
+(UUID(), 'burst-allow', 'Allow Burst', 'token-bucket', 100, 60, 'Token bucket, allows short-term burst requests');
