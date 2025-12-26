@@ -116,8 +116,8 @@
           const [firstElement] = params as ToolTipFormatterParams[];
           return `<div>
             <p class="tooltip-title">${firstElement.axisValueLabel}</p>
-            <div class="content-panel"><span>总内容量</span><span class="tooltip-value">${(
-              Number(firstElement.value) * 10000
+            <div class="content-panel"><span>Audit Logs</span><span class="tooltip-value">${Number(
+              firstElement.value
             ).toLocaleString()}</span></div>
           </div>`;
         },

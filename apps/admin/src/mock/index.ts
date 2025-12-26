@@ -1,11 +1,9 @@
 import Mock from 'mockjs';
 
-// 禁用所有 mock，使用真实后端 API
+// All mocks disabled - using real backend API
 // import './user';
-import './message-box';
-
-// Dashboard mock - 用于工作台展示数据
-import '@/views/dashboard/workplace/mock';
+// import './message-box';
+// import '@/views/dashboard/workplace/mock';
 
 Mock.setup({
   timeout: '600-1000',

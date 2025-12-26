@@ -6,10 +6,61 @@ export interface ContentDataRecord {
   y: number;
 }
 
-export function queryContentData() {
-  return axios.get<ContentDataRecord[]>('/api/content-data');
+export interface DashboardStats {
+  totalUsers: number;
+  totalRoles: number;
+  todayAuditLogs: number;
+  totalApplications: number;
+  growthRate: number;
 }
 
+export interface CategoryItem {
+  name: string;
+  value: number;
+}
+
+export interface CategoriesData {
+  categories: CategoryItem[];
+  total: number;
+}
+
+export interface ActivityItem {
+  key: number;
+  title: string;
+  description: string;
+  time: string;
+  user: string;
+}
+
+export interface AnnouncementItem {
+  type: string;
+  label: string;
+  content: string;
+}
+
+export function queryDashboardStats() {
+  return axios.get<DashboardStats>('/api/dashboard/stats');
+}
+
+export function queryContentData() {
+  return axios.get<ContentDataRecord[]>('/api/dashboard/content-data');
+}
+
+export function queryRecentActivities(type?: string) {
+  return axios.get<ActivityItem[]>('/api/dashboard/recent-activities', {
+    params: { type },
+  });
+}
+
+export function queryCategories() {
+  return axios.get<CategoriesData>('/api/dashboard/categories');
+}
+
+export function queryAnnouncements() {
+  return axios.get<AnnouncementItem[]>('/api/dashboard/announcements');
+}
+
+// Keep for backward compatibility but mark as deprecated
 export interface PopularRecord {
   key: number;
   clickNumber: string;
@@ -18,5 +69,8 @@ export interface PopularRecord {
 }
 
 export function queryPopularList(params: { type: string }) {
-  return axios.get<TableData[]>('/api/popular/list', { params });
+  return axios.get<TableData[]>('/api/dashboard/recent-activities', {
+    params,
+  });
 }
+

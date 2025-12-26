@@ -1,52 +1,50 @@
 <template>
-  <a-card
-    class="general-card"
-    :title="$t('workplace.announcement')"
-    :header-style="{ paddingBottom: '0' }"
-    :body-style="{ padding: '15px 20px 13px 20px' }"
-  >
-    <template #extra>
-      <a-link>{{ $t('workplace.viewMore') }}</a-link>
-    </template>
-    <div>
-      <div v-for="(item, idx) in list" :key="idx" class="item">
-        <a-tag :color="item.type" size="small">{{ item.label }}</a-tag>
-        <span class="item-content">
-          {{ item.content }}
-        </span>
+  <a-spin :loading="loading" style="width: 100%">
+    <a-card
+      class="general-card"
+      :title="$t('workplace.announcement')"
+      :header-style="{ paddingBottom: '0' }"
+      :body-style="{ padding: '15px 20px 13px 20px' }"
+    >
+      <template #extra>
+        <a-link @click="fetchData">{{ $t('workplace.refresh') }}</a-link>
+      </template>
+      <div>
+        <a-empty v-if="!list.length" />
+        <div v-for="(item, idx) in list" :key="idx" class="item">
+          <a-tag :color="item.type" size="small">{{ item.label }}</a-tag>
+          <span class="item-content">
+            {{ item.content }}
+          </span>
+        </div>
       </div>
-    </div>
-  </a-card>
+    </a-card>
+  </a-spin>
 </template>
 
 <script lang="ts" setup>
-  const list = [
-    {
-      type: 'orangered',
-      label: '活动',
-      content: '内容最新优惠活动',
-    },
-    {
-      type: 'cyan',
-      label: '消息',
-      content: '新增内容尚未通过审核，详情请点击查看。',
-    },
-    {
-      type: 'blue',
-      label: '通知',
-      content: '当前产品试用期即将结束，如需续费请点击查看。',
-    },
-    {
-      type: 'blue',
-      label: '通知',
-      content: '1月新系统升级计划通知',
-    },
-    {
-      type: 'cyan',
-      label: '消息',
-      content: '新增内容已经通过审核，详情请点击查看。',
-    },
-  ];
+  import { ref, onMounted } from 'vue';
+  import { queryAnnouncements, AnnouncementItem } from '@/api/dashboard';
+  import useLoading from '@/hooks/loading';
+
+  const { loading, setLoading } = useLoading(true);
+  const list = ref<AnnouncementItem[]>([]);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { data } = await queryAnnouncements();
+      list.value = data || [];
+    } catch (err) {
+      // Handle error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  onMounted(() => {
+    fetchData();
+  });
 </script>
 
 <style scoped lang="less">

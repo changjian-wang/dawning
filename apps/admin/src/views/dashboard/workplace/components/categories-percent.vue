@@ -3,9 +3,7 @@
     <a-card
       class="general-card"
       :header-style="{ paddingBottom: '0' }"
-      :body-style="{
-        padding: '20px',
-      }"
+      :body-style="{ padding: '20px' }"
     >
       <template #title>
         {{ $t('workplace.categoriesPercent') }}
@@ -16,17 +14,27 @@
 </template>
 
 <script lang="ts" setup>
+  import { ref, onMounted } from 'vue';
+  import { queryCategories, CategoriesData } from '@/api/dashboard';
   import useLoading from '@/hooks/loading';
   import useChartOption from '@/hooks/chart-option';
 
-  const { loading } = useLoading();
+  const { loading, setLoading } = useLoading(true);
+  const categoriesData = ref<CategoriesData>({
+    categories: [],
+    total: 0,
+  });
+
+  const colors = ['#249EFF', '#313CA9', '#21CCFF', '#F7BA1E', '#722ED1'];
+  const darkColors = ['#3D72F6', '#A079DC', '#6CAAF5', '#F5B544', '#9F5EE5'];
+
   const { chartOption } = useChartOption((isDark) => {
-    // echarts support https://echarts.apache.org/zh/theme-builder.html
-    // It's not used here
+    const { categories, total } = categoriesData.value;
+
     return {
       legend: {
         left: 'center',
-        data: ['纯文本', '图文类', '视频类'],
+        data: categories.map((c) => c.name),
         bottom: 0,
         icon: 'circle',
         itemWidth: 8,
@@ -48,7 +56,7 @@
             left: 'center',
             top: '40%',
             style: {
-              text: '内容量',
+              text: 'Total',
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#4E5969',
               fontSize: 14,
@@ -59,7 +67,7 @@
             left: 'center',
             top: '50%',
             style: {
-              text: '928,531',
+              text: total.toLocaleString(),
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#1D2129',
               fontSize: 16,
@@ -82,32 +90,34 @@
             borderColor: isDark ? '#232324' : '#fff',
             borderWidth: 1,
           },
-          data: [
-            {
-              value: [148564],
-              name: '纯文本',
-              itemStyle: {
-                color: isDark ? '#3D72F6' : '#249EFF',
-              },
+          data: categories.map((c, idx) => ({
+            value: c.value,
+            name: c.name,
+            itemStyle: {
+              color: isDark
+                ? darkColors[idx % darkColors.length]
+                : colors[idx % colors.length],
             },
-            {
-              value: [334271],
-              name: '图文类',
-              itemStyle: {
-                color: isDark ? '#A079DC' : '#313CA9',
-              },
-            },
-            {
-              value: [445694],
-              name: '视频类',
-              itemStyle: {
-                color: isDark ? '#6CAAF5' : '#21CCFF',
-              },
-            },
-          ],
+          })),
         },
       ],
     };
+  });
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const { data } = await queryCategories();
+      categoriesData.value = data;
+    } catch (err) {
+      // Handle error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  onMounted(() => {
+    fetchData();
   });
 </script>
 
