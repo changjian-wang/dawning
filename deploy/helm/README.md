@@ -1,224 +1,156 @@
-# Dawning Gateway - Helm Chart
+# Dawning Helm Chart
 
-本 Helm Chart 用于将 Dawning Gateway 管理系统部署到 Kubernetes 集群。
+Deploy Dawning Gateway to Kubernetes using Helm.
 
-## 前置要求
+## Prerequisites
 
-- Kubernetes 1.23+
-- Helm 3.8+
-- PV provisioner（用于持久化存储）
-- Ingress Controller（可选，用于外部访问）
+- Kubernetes 1.25+
+- Helm 3.10+
+- PV provisioner (for persistent volumes)
 
-## 快速开始
+## Installation
 
-### 1. 添加 Bitnami 仓库（基础设施依赖）
-
-```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
-```
-
-### 2. 更新依赖
+### Quick Start
 
 ```bash
-cd helm/dawning
-helm dependency update
+helm install dawning . --namespace dawning --create-namespace
 ```
 
-### 3. 安装
+### With Custom Values
 
-**开发环境：**
 ```bash
-helm install dawning ./helm/dawning \
-  -f ./helm/dawning/values-dev.yaml \
-  -n dawning-dev --create-namespace
+helm install dawning . \
+  --namespace dawning \
+  --create-namespace \
+  --set image.tag=v1.0.0 \
+  --set mysql.password=your-password \
+  --set ingress.enabled=true \
+  --set ingress.hosts[0].host=dawning.example.com
 ```
 
-**生产环境：**
+### From Values File
+
 ```bash
-helm install dawning ./helm/dawning \
-  -f ./helm/dawning/values-prod.yaml \
-  -n dawning --create-namespace \
-  --set database.external.password=<your-db-password> \
-  --set secrets.jwtSecret=<your-jwt-secret>
+helm install dawning . -f my-values.yaml --namespace dawning --create-namespace
 ```
 
-## 配置说明
+## Configuration
 
-### values.yaml 结构
+### Key Parameters
 
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `global.namespace` | 命名空间 | `dawning` |
-| `global.environment` | 环境标识 | `production` |
-| `identityApi.replicaCount` | Identity API 副本数 | `2` |
-| `identityApi.image.repository` | 镜像仓库 | `dawning/identity-api` |
-| `gatewayApi.replicaCount` | Gateway API 副本数 | `2` |
-| `adminFrontend.replicaCount` | 前端副本数 | `2` |
-| `ingress.enabled` | 是否启用 Ingress | `true` |
-| `mysql.enabled` | 是否部署内置 MySQL | `true` |
-| `redis.enabled` | 是否部署内置 Redis | `true` |
-| `kafka.enabled` | 是否部署内置 Kafka | `true` |
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `replicaCount` | Number of replicas | `1` |
+| `image.repository` | Image repository | `dawning-gateway` |
+| `image.tag` | Image tag | `latest` |
+| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `service.type` | Service type | `ClusterIP` |
+| `service.port` | Service port | `8080` |
+| `ingress.enabled` | Enable ingress | `false` |
+| `ingress.className` | Ingress class | `nginx` |
+| `resources.limits.cpu` | CPU limit | `1000m` |
+| `resources.limits.memory` | Memory limit | `1Gi` |
+| `mysql.enabled` | Deploy MySQL | `true` |
+| `mysql.password` | MySQL root password | `""` |
+| `redis.enabled` | Deploy Redis | `true` |
 
-### 使用外部数据库
-
-生产环境建议使用云托管数据库服务：
+### Full Values Example
 
 ```yaml
-# values-prod.yaml
-database:
-  external:
-    enabled: true
-    host: "your-rds.amazonaws.com"
-    port: 3306
-    database: dawning_identity
-    username: "dawning"
-    password: ""  # 通过 --set 传入
+replicaCount: 3
 
-mysql:
-  enabled: false
-```
+image:
+  repository: your-registry/dawning-gateway
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
 
-### 自定义 Ingress
+imagePullSecrets:
+  - name: registry-secret
 
-```yaml
+service:
+  type: ClusterIP
+  port: 8080
+
 ingress:
   enabled: true
   className: nginx
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - host: dawning.your-domain.com
+    - host: dawning.example.com
       paths:
         - path: /
           pathType: Prefix
-          service: admin-frontend
-        - path: /api
-          pathType: Prefix
-          service: identity-api
   tls:
     - secretName: dawning-tls
       hosts:
-        - dawning.your-domain.com
+        - dawning.example.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+mysql:
+  enabled: true
+  password: secure-password
+  persistence:
+    enabled: true
+    size: 10Gi
+
+redis:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 1Gi
+
+env:
+  ASPNETCORE_ENVIRONMENT: Production
 ```
 
-## 常用命令
-
-### 查看部署状态
+## Upgrade
 
 ```bash
-# 查看所有资源
-kubectl get all -n dawning
-
-# 查看 Pod 日志
-kubectl logs -f deployment/dawning-identity-api -n dawning
-
-# 查看 ConfigMap
-kubectl get configmap -n dawning
+helm upgrade dawning . --namespace dawning -f my-values.yaml
 ```
 
-### 升级
+## Uninstall
 
 ```bash
-helm upgrade dawning ./helm/dawning -n dawning
+helm uninstall dawning --namespace dawning
 ```
 
-### 回滚
+## Troubleshooting
+
+### Check Pod Status
 
 ```bash
-# 查看历史版本
-helm history dawning -n dawning
-
-# 回滚到上一版本
-helm rollback dawning -n dawning
-```
-
-### 卸载
-
-```bash
-helm uninstall dawning -n dawning
-
-# 如果需要删除 PVC
-kubectl delete pvc -l app.kubernetes.io/instance=dawning -n dawning
-```
-
-## 本地开发调试
-
-使用 port-forward 访问服务：
-
-```bash
-# 前端
-kubectl port-forward svc/dawning-admin-frontend 8080:80 -n dawning-dev
-
-# Identity API
-kubectl port-forward svc/dawning-identity-api 5001:5001 -n dawning-dev
-
-# MySQL
-kubectl port-forward svc/dawning-mysql 3306:3306 -n dawning-dev
-```
-
-## 构建 Docker 镜像
-
-在部署之前，需要构建并推送 Docker 镜像：
-
-```bash
-# Identity API
-docker build -t dawning/identity-api:latest -f services/Dawning.Gateway/src/Dawning.Identity.Api/Dockerfile .
-
-# Gateway API
-docker build -t dawning/gateway-api:latest -f services/Dawning.Gateway/src/Dawning.Gateway.Api/Dockerfile .
-
-# Admin Frontend
-docker build -t dawning/admin-frontend:latest -f dawning-admin/Dockerfile .
-```
-
-## 目录结构
-
-```
-helm/dawning/
-├── Chart.yaml              # Chart 元信息
-├── values.yaml             # 默认配置
-├── values-dev.yaml         # 开发环境配置
-├── values-prod.yaml        # 生产环境配置
-└── templates/
-    ├── _helpers.tpl        # 模板函数
-    ├── configmap.yaml      # ConfigMap
-    ├── secrets.yaml        # Secrets
-    ├── ingress.yaml        # Ingress
-    ├── NOTES.txt           # 安装后提示
-    ├── identity-api/
-    │   ├── deployment.yaml
-    │   ├── service.yaml
-    │   └── hpa.yaml
-    ├── gateway-api/
-    │   ├── deployment.yaml
-    │   ├── service.yaml
-    │   └── hpa.yaml
-    └── admin-frontend/
-        ├── deployment.yaml
-        └── service.yaml
-```
-
-## 故障排查
-
-### Pod 启动失败
-
-```bash
-# 查看事件
+kubectl get pods -n dawning
 kubectl describe pod <pod-name> -n dawning
-
-# 查看日志
-kubectl logs <pod-name> -n dawning --previous
 ```
 
-### 数据库连接失败
+### View Logs
 
-1. 检查 Secret 是否正确创建
-2. 检查网络策略
-3. 验证数据库服务是否可达
+```bash
+kubectl logs -n dawning deployment/dawning-gateway
+```
 
-### Ingress 不生效
+### Check Configuration
 
-1. 确认 Ingress Controller 已安装
-2. 检查 IngressClass 是否正确
-3. 查看 Ingress Controller 日志
+```bash
+kubectl get configmap -n dawning
+kubectl get secret -n dawning
+```
+
+---
+
+See [Deployment Guide](../../docs/DEPLOYMENT.md) for detailed deployment instructions.

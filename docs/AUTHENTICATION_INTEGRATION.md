@@ -1,548 +1,296 @@
-# Dawning 认证接入指南
+# Authentication Integration Guide
 
-本文档说明如何在新业务系统中接入 Dawning 统一认证中心。
-
-## 目录
-
-- [快速开始](#快速开始)
-- [配置说明](#配置说明)
-- [使用方式](#使用方式)
-- [常见场景](#常见场景)
-- [网关路由配置](#网关路由配置)
-- [故障排查](#故障排查)
+**Version**: 1.0.0  
+**Last Updated**: 2025-12-26
 
 ---
 
-## 快速开始
+## Table of Contents
 
-### 1. 添加项目引用
+1. [Overview](#1-overview)
+2. [OpenIddict Configuration](#2-openiddict-configuration)
+3. [OAuth 2.0 Flows](#3-oauth-20-flows)
+4. [Client Integration](#4-client-integration)
+5. [Token Management](#5-token-management)
+6. [Security Best Practices](#6-security-best-practices)
 
-```xml
-<!-- 在你的 .csproj 中添加 -->
-<ItemGroup>
-  <ProjectReference Include="..\Shared\Dawning.Shared.Authentication\Dawning.Shared.Authentication.csproj" />
-</ItemGroup>
+---
+
+## 1. Overview
+
+Dawning Gateway uses **OpenIddict** as the OAuth 2.0 / OpenID Connect server, supporting:
+
+- Authorization Code Flow (with PKCE)
+- Client Credentials Flow
+- Resource Owner Password Flow
+- Refresh Token Flow
+
+---
+
+## 2. OpenIddict Configuration
+
+### 2.1 Supported Grant Types
+
+| Grant Type | Use Case |
+|------------|----------|
+| `client_credentials` | Server-to-server authentication |
+| `password` | Legacy applications (not recommended) |
+| `authorization_code` | Web applications |
+| `refresh_token` | Token renewal |
+
+### 2.2 Creating OAuth Clients
+
+Via Admin Panel:
+1. Navigate to **OpenIddict** > **Applications**
+2. Click **Add Application**
+3. Configure:
+   - **Client ID**: Unique identifier
+   - **Client Secret**: For confidential clients
+   - **Grant Types**: Select appropriate flows
+   - **Redirect URIs**: For authorization code flow
+   - **Scopes**: Requested permissions
+
+---
+
+## 3. OAuth 2.0 Flows
+
+### 3.1 Client Credentials Flow
+
+For machine-to-machine authentication:
+
+```http
+POST /connect/token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id=your-client-id
+&client_secret=your-client-secret
+&scope=api
 ```
 
-或者发布为 NuGet 包后:
-
-```xml
-<PackageReference Include="Dawning.Shared.Authentication" Version="1.0.0" />
-```
-
-### 2. 配置 appsettings.json
-
+Response:
 ```json
 {
-  "DawningAuth": {
-    "Authority": "http://localhost:5202",
-    "Issuer": "http://localhost:5202",
-    "RequireHttpsMetadata": false,
-    "ClockSkewMinutes": 5
-  }
+  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "token_type": "Bearer",
+  "expires_in": 3600
 }
 ```
 
-**生产环境配置:**
+### 3.2 Authorization Code Flow (with PKCE)
 
-```json
-{
-  "DawningAuth": {
-    "Authority": "https://identity.yourdomain.com",
-    "Issuer": "https://identity.yourdomain.com",
-    "RequireHttpsMetadata": true,
-    "ClockSkewMinutes": 5
-  }
-}
+**Step 1: Generate Code Verifier and Challenge**
+
+```javascript
+// Generate random code verifier (43-128 chars)
+const codeVerifier = generateRandomString(64);
+
+// Create SHA256 hash and base64url encode
+const codeChallenge = base64UrlEncode(sha256(codeVerifier));
 ```
 
-### 3. 注册服务 (Program.cs)
+**Step 2: Authorization Request**
 
-```csharp
-using Dawning.Shared.Authentication.Extensions;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// 添加 Dawning 认证
-builder.Services.AddDawningAuthentication(builder.Configuration);
-
-// 添加 Dawning 授权策略 (可选)
-builder.Services.AddDawningAuthorization();
-
-var app = builder.Build();
-
-// 启用认证和授权中间件
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-app.Run();
+```http
+GET /connect/authorize
+  ?response_type=code
+  &client_id=your-client-id
+  &redirect_uri=https://your-app.com/callback
+  &scope=openid profile api
+  &state=random-state-value
+  &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+  &code_challenge_method=S256
 ```
 
-就这样！你的服务现在已经接入统一认证了。
+**Step 3: Token Exchange**
 
----
+```http
+POST /connect/token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
 
-## 配置说明
-
-| 配置项 | 说明 | 默认值 | 必填 |
-|--------|------|--------|:----:|
-| `Authority` | Identity 服务器地址 | - | ✅ |
-| `Issuer` | Token 签发者 | - | ✅ |
-| `Audience` | 受众 (留空不验证) | null | ❌ |
-| `RequireHttpsMetadata` | 是否要求 HTTPS | true | ❌ |
-| `ClockSkewMinutes` | Token 过期容差(分钟) | 5 | ❌ |
-| `ValidateRoles` | 是否验证角色 | true | ❌ |
-| `ValidatePermissions` | 是否验证权限 | true | ❌ |
-| `ValidateTenant` | 是否验证租户 | false | ❌ |
-| `GatewayUrl` | API 网关地址 | null | ❌ |
-
----
-
-## 使用方式
-
-### 方式一: 使用 [Authorize] 特性
-
-```csharp
-using Microsoft.AspNetCore.Authorization;
-
-[ApiController]
-[Route("api/[controller]")]
-public class OrderController : ControllerBase
-{
-    // 需要认证
-    [Authorize]
-    [HttpGet]
-    public IActionResult GetOrders()
-    {
-        return Ok();
-    }
-
-    // 需要特定角色
-    [Authorize(Roles = "admin,super_admin")]
-    [HttpDelete("{id}")]
-    public IActionResult DeleteOrder(int id)
-    {
-        return Ok();
-    }
-}
+grant_type=authorization_code
+&client_id=your-client-id
+&code=authorization-code-from-callback
+&redirect_uri=https://your-app.com/callback
+&code_verifier=your-original-code-verifier
 ```
 
-### 方式二: 使用 Dawning 授权特性
+### 3.3 Resource Owner Password Flow
 
-```csharp
-using Dawning.Shared.Authentication.Attributes;
+⚠️ **Not recommended for new applications**
 
-[ApiController]
-[Route("api/[controller]")]
-public class ProductController : ControllerBase
-{
-    // 仅管理员
-    [AdminOnly]
-    [HttpPost]
-    public IActionResult CreateProduct()
-    {
-        return Ok();
-    }
+```http
+POST /connect/token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
 
-    // 仅超级管理员
-    [SuperAdminOnly]
-    [HttpDelete("{id}")]
-    public IActionResult DeleteProduct(int id)
-    {
-        return Ok();
-    }
-
-    // 需要特定权限
-    [RequirePermission("product.update")]
-    [HttpPut("{id}")]
-    public IActionResult UpdateProduct(int id)
-    {
-        return Ok();
-    }
-}
-```
-
-### 方式三: 注入 ICurrentUser 获取当前用户
-
-```csharp
-using Dawning.Shared.Authentication;
-
-[ApiController]
-[Route("api/[controller]")]
-public class ProfileController : ControllerBase
-{
-    private readonly ICurrentUser _currentUser;
-
-    public ProfileController(ICurrentUser currentUser)
-    {
-        _currentUser = currentUser;
-    }
-
-    [Authorize]
-    [HttpGet]
-    public IActionResult GetProfile()
-    {
-        return Ok(new
-        {
-            UserId = _currentUser.UserId,
-            UserName = _currentUser.UserName,
-            Email = _currentUser.Email,
-            Roles = _currentUser.Roles,
-            TenantId = _currentUser.TenantId,
-            IsAdmin = _currentUser.IsAdmin
-        });
-    }
-
-    [Authorize]
-    [HttpGet("permissions")]
-    public IActionResult GetPermissions()
-    {
-        // 检查权限
-        if (!_currentUser.HasPermission("profile.read"))
-        {
-            return Forbid();
-        }
-
-        return Ok(_currentUser.Permissions);
-    }
-}
-```
-
-### 方式四: 使用 ClaimsPrincipal 扩展方法
-
-```csharp
-using Dawning.Shared.Authentication.Extensions;
-
-[Authorize]
-[HttpGet("info")]
-public IActionResult GetUserInfo()
-{
-    var user = User; // ControllerBase.User
-
-    return Ok(new
-    {
-        UserId = user.GetUserId(),
-        UserName = user.GetUserName(),
-        Roles = user.GetRoles(),
-        Permissions = user.GetPermissions(),
-        TenantId = user.GetTenantId(),
-        IsSuperAdmin = user.IsSuperAdmin(),
-        IsHost = user.IsHost()
-    });
-}
+grant_type=password
+&client_id=your-client-id
+&client_secret=your-client-secret
+&username=user@example.com
+&password=user-password
+&scope=openid profile api
 ```
 
 ---
 
-## 常见场景
+## 4. Client Integration
 
-### 场景一: 多租户数据隔离
+### 4.1 JavaScript / TypeScript
 
-```csharp
-public class OrderService
-{
-    private readonly ICurrentUser _currentUser;
-    private readonly IDbConnection _db;
-
-    public async Task<List<Order>> GetOrdersAsync()
-    {
-        var tenantId = _currentUser.TenantId;
-        
-        // 宿主管理员可看所有数据
-        if (_currentUser.IsHost)
-        {
-            return await _db.QueryAsync<Order>("SELECT * FROM orders");
-        }
-
-        // 普通用户只能看自己租户的数据
-        return await _db.QueryAsync<Order>(
-            "SELECT * FROM orders WHERE tenant_id = @TenantId",
-            new { TenantId = tenantId });
-    }
-}
-```
-
-### 场景二: 审计日志
-
-```csharp
-public class AuditService
-{
-    private readonly ICurrentUser _currentUser;
-
-    public void LogAction(string action, string entity)
-    {
-        var log = new AuditLog
-        {
-            UserId = _currentUser.UserIdAsGuid ?? Guid.Empty,
-            UserName = _currentUser.UserName ?? "Anonymous",
-            TenantId = _currentUser.TenantIdAsGuid,
-            Action = action,
-            Entity = entity,
-            Timestamp = DateTime.UtcNow,
-            IpAddress = GetClientIp()
-        };
-
-        // 保存日志...
-    }
-}
-```
-
-### 场景三: 动态权限检查
-
-```csharp
-public class DocumentService
-{
-    private readonly ICurrentUser _currentUser;
-
-    public async Task<Document> GetDocumentAsync(Guid id)
-    {
-        var document = await _repository.GetByIdAsync(id);
-
-        // 检查是否有权限访问
-        if (document.IsConfidential && 
-            !_currentUser.HasPermission("document.confidential"))
-        {
-            throw new UnauthorizedAccessException("无权访问机密文档");
-        }
-
-        // 检查租户
-        if (!_currentUser.IsHost && 
-            document.TenantId != _currentUser.TenantIdAsGuid)
-        {
-            throw new UnauthorizedAccessException("无权访问其他租户的文档");
-        }
-
-        return document;
-    }
-}
-```
-
----
-
-## 网关路由配置
-
-新服务需要在网关中配置路由才能被外部访问。
-
-### 方式一: 管理界面配置
-
-1. 登录 Dawning Admin (http://localhost:5173)
-2. 进入 **网关管理** → **集群管理**
-3. 添加新集群，填入你的服务地址
-4. 进入 **路由管理**
-5. 添加新路由，关联集群
-
-### 方式二: 数据库配置
-
-```sql
--- 1. 添加集群
-INSERT INTO gateway_clusters (id, cluster_id, destinations, created_at, updated_at)
-VALUES (
-    UUID(),
-    'my-service',
-    '[{"Address": "http://localhost:5300"}]',
-    NOW(),
-    NOW()
-);
-
--- 2. 添加路由
-INSERT INTO gateway_routes (id, route_id, cluster_id, match_path, transforms, created_at, updated_at)
-VALUES (
-    UUID(),
-    'my-service-route',
-    'my-service',
-    '/api/my-service/{**catch-all}',
-    '{"RequestHeader": "X-Forwarded-Prefix"}',
-    NOW(),
-    NOW()
-);
-```
-
-### 方式三: appsettings.json 配置
-
-在 `Dawning.Gateway.Api/appsettings.json` 中:
-
-```json
-{
-  "ReverseProxy": {
-    "Clusters": {
-      "my-service": {
-        "Destinations": {
-          "destination1": {
-            "Address": "http://localhost:5300"
-          }
-        }
-      }
+```typescript
+// Using fetch API
+async function getToken() {
+  const response = await fetch('/connect/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
-    "Routes": {
-      "my-service-route": {
-        "ClusterId": "my-service",
-        "Match": {
-          "Path": "/api/my-service/{**catch-all}"
-        }
-      }
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: 'your-client-id',
+      client_secret: 'your-client-secret',
+      scope: 'api'
+    })
+  });
+  
+  return response.json();
+}
+
+// Using the token
+async function callApi(accessToken: string) {
+  const response = await fetch('/api/resource', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
     }
-  }
+  });
+  
+  return response.json();
 }
 ```
 
----
-
-## 故障排查
-
-### 问题一: 401 Unauthorized
-
-**检查步骤:**
-
-1. 确认请求头包含 `Authorization: Bearer <token>`
-2. 确认 Token 未过期
-3. 确认 `Authority` 和 `Issuer` 配置正确
-4. 检查 Identity 服务是否可访问
-
-**调试代码:**
+### 4.2 C# / .NET
 
 ```csharp
-// 在 Controller 中
-[AllowAnonymous]
-[HttpGet("debug-auth")]
-public IActionResult DebugAuth()
-{
-    var authHeader = Request.Headers["Authorization"].ToString();
-    var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-    var claims = User.Claims.Select(c => new { c.Type, c.Value });
+using var client = new HttpClient();
 
-    return Ok(new { authHeader, isAuthenticated, claims });
-}
-```
-
-### 问题二: 403 Forbidden
-
-**检查步骤:**
-
-1. 确认用户有所需角色
-2. 确认用户有所需权限
-3. 检查 Token 中的 Claims
-
-**查看 Token 内容:**
-
-```bash
-# 在 https://jwt.io 解析 Token 查看 Claims
-```
-
-### 问题三: Token 验证失败
-
-**常见原因:**
-
-| 错误 | 原因 | 解决方案 |
-|------|------|----------|
-| `IDX10214` | Audience 验证失败 | 移除 Audience 验证或配置正确的 Audience |
-| `IDX10223` | Token 已过期 | 刷新 Token 或增加 ClockSkew |
-| `IDX10500` | 签名验证失败 | 确认 Authority 可访问 |
-
-### 问题四: 开发环境 HTTPS 问题
-
-```json
-{
-  "DawningAuth": {
-    "RequireHttpsMetadata": false  // 开发环境设为 false
-  }
-}
-```
-
----
-
-## 附录: 完整示例
-
-### 新服务 Program.cs 完整示例
-
-```csharp
-using Dawning.Shared.Authentication.Extensions;
-using Microsoft.OpenApi.Models;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// ===== 基础服务 =====
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-
-// ===== Swagger 配置 (带 Token 支持) =====
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "My Service API", Version = "v1" });
-
-    // 添加 Bearer Token 认证
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+// Get token
+var tokenResponse = await client.PostAsync("/connect/token", 
+    new FormUrlEncodedContent(new Dictionary<string, string>
     {
-        Description = "JWT Authorization header. Example: \"Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
+        ["grant_type"] = "client_credentials",
+        ["client_id"] = "your-client-id",
+        ["client_secret"] = "your-client-secret",
+        ["scope"] = "api"
+    }));
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
-    });
-});
+var token = await tokenResponse.Content.ReadFromJsonAsync<TokenResponse>();
 
-// ===== Dawning 认证 =====
-builder.Services.AddDawningAuthentication(builder.Configuration);
-builder.Services.AddDawningAuthorization();
+// Use token
+client.DefaultRequestHeaders.Authorization = 
+    new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
-var app = builder.Build();
-
-// ===== 中间件 =====
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+var response = await client.GetAsync("/api/resource");
 ```
 
-### 新服务 appsettings.json 完整示例
+### 4.3 Python
 
-```json
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
+```python
+import requests
+
+# Get token
+token_response = requests.post(
+    'https://your-gateway.com/connect/token',
+    data={
+        'grant_type': 'client_credentials',
+        'client_id': 'your-client-id',
+        'client_secret': 'your-client-secret',
+        'scope': 'api'
     }
-  },
-  "AllowedHosts": "*",
-  "DawningAuth": {
-    "Authority": "http://localhost:5202",
-    "Issuer": "http://localhost:5202",
-    "RequireHttpsMetadata": false,
-    "ClockSkewMinutes": 5
-  }
-}
+)
+token = token_response.json()
+
+# Use token
+headers = {'Authorization': f"Bearer {token['access_token']}"}
+response = requests.get('https://your-gateway.com/api/resource', headers=headers)
 ```
 
 ---
 
-## 联系与支持
+## 5. Token Management
 
-如有问题，请联系:
+### 5.1 Token Lifetime
 
-- 查看 API 文档: http://localhost:5202/swagger
-- 查看管理后台: http://localhost:5173
-- 查看项目文档: `/docs` 目录
+Default token lifetimes:
+- Access Token: 1 hour
+- Refresh Token: 14 days
+- ID Token: 1 hour
+
+### 5.2 Refresh Tokens
+
+```http
+POST /connect/token HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token
+&client_id=your-client-id
+&client_secret=your-client-secret
+&refresh_token=your-refresh-token
+```
+
+### 5.3 Token Revocation
+
+```http
+POST /connect/revoke HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+token=access-or-refresh-token
+&client_id=your-client-id
+&client_secret=your-client-secret
+```
+
+---
+
+## 6. Security Best Practices
+
+### 6.1 Client Security
+
+- ✅ Use HTTPS in production
+- ✅ Store client secrets securely
+- ✅ Use PKCE for public clients
+- ✅ Rotate secrets periodically
+- ❌ Never expose secrets in client-side code
+
+### 6.2 Token Security
+
+- ✅ Use short-lived access tokens
+- ✅ Validate token signatures
+- ✅ Check token expiration
+- ✅ Verify token audience and issuer
+- ❌ Never log tokens
+
+### 6.3 Scope Management
+
+Request only necessary scopes:
+
+```http
+scope=api:read api:write
+```
+
+Define granular scopes in your application.
+
+---
+
+## Endpoints Reference
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/connect/authorize` | Authorization endpoint |
+| `/connect/token` | Token endpoint |
+| `/connect/revoke` | Token revocation |
+| `/connect/introspect` | Token introspection |
+| `/connect/userinfo` | User info (OIDC) |
+| `/.well-known/openid-configuration` | Discovery document |
+
+---
+
+*See [Developer Guide](DEVELOPER_GUIDE.md) for implementation details.*

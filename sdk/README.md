@@ -1,344 +1,240 @@
 # Dawning SDK
 
-Dawning 项目的公共组件库，提供微服务开发的通用功能。
+A collection of .NET libraries for building enterprise applications.
 
-## 安装
+## Libraries
 
-### 配置 NuGet 源
+| Package | Description |
+|---------|-------------|
+| `Dawning.Core` | Core utilities, result types, and middleware |
+| `Dawning.Identity` | Authentication and authorization utilities |
+| `Dawning.Logging` | Structured logging with correlation |
+| `Dawning.Caching` | Redis and in-memory caching |
+| `Dawning.Messaging` | Message queue abstractions (RabbitMQ, Azure Service Bus) |
+| `Dawning.Resilience` | Retry policies and circuit breakers |
+| `Dawning.Extensions` | Common extension methods |
+| `Dawning.ORM.Dapper` | Dapper extensions for CRUD operations |
+
+## Installation
 
 ```bash
-dotnet nuget add source "https://nuget.pkg.github.com/changjian-wang/index.json" \
-  --name "github" \
-  --username YOUR_GITHUB_USERNAME \
-  --password YOUR_GITHUB_PAT
+# Install from NuGet
+dotnet add package Dawning.Core
+dotnet add package Dawning.Identity
+dotnet add package Dawning.Logging
+dotnet add package Dawning.Caching
 ```
 
-### 安装包
+## Quick Start
 
-```bash
-dotnet add package Dawning.Core --version 1.2.0
-dotnet add package Dawning.Identity --version 1.2.0
-dotnet add package Dawning.Logging --version 1.2.0
-dotnet add package Dawning.ORM.Dapper --version 1.2.0
-dotnet add package Dawning.Resilience --version 1.2.0
-dotnet add package Dawning.Extensions --version 1.2.0
-dotnet add package Dawning.Caching --version 1.2.0
-dotnet add package Dawning.Messaging --version 1.2.0
-```
-
----
-
-## 可用包
-
-| 包名 | 描述 |
-|------|------|
-| Dawning.Core | 业务异常、统一 API 响应、异常处理中间件 |
-| Dawning.Identity | JWT 认证集成、用户上下文、Claims 扩展 |
-| Dawning.Logging | Serilog 集成、结构化日志、请求日志中间件 |
-| Dawning.ORM.Dapper | Dapper CRUD 扩展方法 |
-| Dawning.Resilience | 重试策略、熔断器、超时处理 (基于 Polly) |
-| Dawning.Extensions | 通用扩展方法（字符串、集合、日期、JSON、对象） |
-| Dawning.Caching | 缓存服务（内存缓存、Redis 分布式缓存） |
-| Dawning.Messaging | 消息队列（RabbitMQ、Azure Service Bus） |
-
----
-
-## 使用指南
-
-### 1. Dawning.Core
-
-统一 API 响应和异常处理。
+### Dawning.Core
 
 ```csharp
 using Dawning.Core.Results;
-using Dawning.Core.Exceptions;
-using Dawning.Core.Extensions;
+using Dawning.Core.Middleware;
 
-// Program.cs - 注册异常处理中间件
-app.UseDawningExceptionHandling();
-
-// Controller 返回统一响应
-[HttpGet]
-public ApiResult<UserDto> GetUser(int id)
+// Use Result type for operation outcomes
+public Result<User> GetUser(string id)
 {
-    var user = _userService.GetById(id);
-    return ApiResult<UserDto>.Success(user);
+    var user = _repository.Find(id);
+    if (user == null)
+        return Result<User>.Failure("User not found");
+    
+    return Result<User>.Success(user);
 }
 
-// 抛出业务异常
-if (user == null)
-    throw new NotFoundException("用户不存在");
-
-// 分页响应
-return PagedResult<UserDto>.Success(items, total, page, pageSize);
+// Add exception handling middleware
+app.UseExceptionHandling();
 ```
 
-**可用异常类型：**
-- `BusinessException` - 通用业务异常 (400)
-- `NotFoundException` - 资源不存在 (404)
-- `UnauthorizedException` - 未授权 (401)
-- `ForbiddenException` - 禁止访问 (403)
-- `ValidationException` - 验证失败 (400)
-
----
-
-### 2. Dawning.Identity
-
-JWT 认证和用户上下文。
+### Dawning.Identity
 
 ```csharp
 using Dawning.Identity;
 using Dawning.Identity.Extensions;
 
-// Program.cs - 注册服务
-builder.Services.AddDawningAuthentication(options =>
+// Configure identity services
+services.AddDawningIdentity(options =>
 {
-    options.Authority = "https://your-identity-server";
-    options.Audience = "your-api";
+    options.JwtSecret = "your-secret";
+    options.TokenExpiration = TimeSpan.FromHours(1);
 });
 
-// 注入当前用户
-public class MyService
-{
-    private readonly CurrentUser _currentUser;
-
-    public MyService(CurrentUser currentUser)
-    {
-        _currentUser = currentUser;
-    }
-
-    public void DoSomething()
-    {
-        var userId = _currentUser.Id;
-        var userName = _currentUser.UserName;
-        var tenantId = _currentUser.TenantId;
-        var roles = _currentUser.Roles;
-    }
-}
-
-// Claims 扩展
-var userId = User.GetUserId();
-var tenantId = User.GetTenantId();
-bool isAdmin = User.HasRole("Admin");
+// Get current user in controllers
+var currentUser = HttpContext.GetCurrentUser();
 ```
 
----
-
-### 3. Dawning.Logging
-
-Serilog 结构化日志。
+### Dawning.Logging
 
 ```csharp
 using Dawning.Logging.Extensions;
 
-// Program.cs
-builder.AddDawningLogging(options =>
+// Configure structured logging
+services.AddDawningLogging(options =>
 {
     options.ApplicationName = "MyService";
     options.EnableConsole = true;
     options.EnableFile = true;
-    options.FilePath = "logs/app-.log";
-    options.SeqServerUrl = "http://localhost:5341"; // 可选
 });
 
-// 使用日志丰富中间件
-app.UseDawningLogEnrichment();
+// Use correlation middleware
+app.UseCorrelationId();
+app.UseRequestLogging();
 ```
 
----
-
-### 4. Dawning.ORM.Dapper
-
-Dapper CRUD 扩展。
+### Dawning.Caching
 
 ```csharp
-using Dawning.ORM.Dapper;
+using Dawning.Caching;
 
-// 实体定义
-[Table("users")]
-public class User
+// Configure Redis caching
+services.AddDawningCaching(options =>
 {
-    [Key]
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-}
-
-// CRUD 操作
-using var connection = new NpgsqlConnection(connectionString);
-
-// 插入
-var id = await connection.InsertAsync(new User { Name = "张三", Email = "test@example.com" });
-
-// 查询
-var user = await connection.GetAsync<User>(id);
-var allUsers = await connection.GetAllAsync<User>();
-
-// 更新
-user.Name = "李四";
-await connection.UpdateAsync(user);
-
-// 删除
-await connection.DeleteAsync(user);
-```
-
----
-
-### 5. Dawning.Resilience
-
-弹性策略（重试、熔断、超时）。
-
-```csharp
-using Dawning.Resilience.Extensions;
-using Dawning.Resilience.Options;
-using Dawning.Resilience.Policies;
-
-// 方式1: 注册弹性服务
-builder.Services.AddDawningResilience(options =>
-{
-    // 重试配置
-    options.Retry.MaxRetryAttempts = 3;
-    options.Retry.BaseDelayMs = 200;
-    options.Retry.UseExponentialBackoff = true;
-    
-    // 熔断器配置
-    options.CircuitBreaker.FailureRatioThreshold = 0.5;
-    options.CircuitBreaker.SamplingDurationSeconds = 30;
-    options.CircuitBreaker.BreakDurationSeconds = 30;
-    
-    // 超时配置
-    options.Timeout.TimeoutSeconds = 30;
+    options.ConnectionString = "localhost:6379";
+    options.DefaultExpiration = TimeSpan.FromMinutes(5);
 });
 
-// 方式2: 添加弹性 HttpClient
-builder.Services.AddResilientHttpClient<IMyApiClient>(
-    client => 
-    {
-        client.BaseAddress = new Uri("https://api.example.com");
-    },
-    options =>
-    {
-        options.Retry.MaxRetryAttempts = 5;
-        options.CircuitBreaker.Enabled = true;
-    });
-
-// 方式3: 手动使用策略
+// Use cache service
 public class MyService
 {
-    private readonly ResiliencePolicyBuilder _policyBuilder;
-
-    public MyService(ResiliencePolicyBuilder policyBuilder)
+    private readonly ICacheService _cache;
+    
+    public async Task<User?> GetUserAsync(string id)
     {
-        _policyBuilder = policyBuilder;
-    }
-
-    public async Task<string> CallExternalApiAsync()
-    {
-        var pipeline = _policyBuilder.Build<string>();
-        
-        return await pipeline.ExecuteAsync(async () =>
-        {
-            // 调用外部 API
-            return await _httpClient.GetStringAsync("/api/data");
-        });
+        return await _cache.GetOrSetAsync(
+            $"user:{id}",
+            async () => await _repository.GetByIdAsync(id),
+            TimeSpan.FromMinutes(10));
     }
 }
 ```
 
----
+### Dawning.Messaging
 
-### 6. Dawning.Extensions
+```csharp
+using Dawning.Messaging;
 
-通用扩展方法库。
+// Configure RabbitMQ
+services.AddDawningMessaging(options =>
+{
+    options.UseRabbitMQ(cfg =>
+    {
+        cfg.HostName = "localhost";
+        cfg.UserName = "guest";
+        cfg.Password = "guest";
+    });
+});
+
+// Publish messages
+await _messageBus.PublishAsync(new OrderCreatedEvent { OrderId = orderId });
+
+// Subscribe to messages
+services.AddMessageHandler<OrderCreatedEvent, OrderCreatedHandler>();
+```
+
+### Dawning.Resilience
+
+```csharp
+using Dawning.Resilience;
+
+// Configure resilience policies
+services.AddDawningResilience(options =>
+{
+    options.RetryCount = 3;
+    options.RetryDelay = TimeSpan.FromSeconds(1);
+    options.CircuitBreakerThreshold = 5;
+});
+
+// Apply to HTTP clients
+services.AddHttpClient<IMyApiClient, MyApiClient>()
+    .AddDawningResilience();
+```
+
+### Dawning.Extensions
 
 ```csharp
 using Dawning.Extensions;
 
-// 字符串扩展
-"hello_world".ToPascalCase();     // "HelloWorld"
-"HelloWorld".ToCamelCase();       // "helloWorld"
-"HelloWorld".ToSnakeCase();       // "hello_world"
-"test@example.com".IsValidEmail(); // true
-"13812345678".Mask();              // "138****5678"
-"长字符串".Truncate(5);            // "长字..."
+// String extensions
+string? value = null;
+bool isEmpty = value.IsNullOrEmpty();  // true
 
-// 集合扩展
-list.IsNullOrEmpty();
-items.Batch(100);                  // 分批处理
-users.DistinctBy(u => u.Email);   // 去重
-dict1.Merge(dict2);               // 合并字典
-list.JoinToString(", ");          // 连接字符串
+// Collection extensions
+var items = new List<string> { "a", "b", "c" };
+bool hasItems = items.IsNotEmpty();  // true
 
-// 日期时间扩展
-DateTime.Now.StartOfDay();         // 00:00:00
-DateTime.Now.EndOfMonth();         // 月末最后一天
-dateTime.IsWeekend();             // 是否周末
-birthDate.CalculateAge();          // 计算年龄
-dateTime.ToRelativeTime();         // "3分钟前"
-date.AddWorkdays(5);              // 添加工作日
+// JSON extensions
+var obj = json.FromJson<MyClass>();
+var jsonString = obj.ToJson();
 
-// JSON 扩展
-var json = obj.ToJson();           // 序列化
-var obj = json.FromJson<User>();   // 反序列化
-obj.DeepClone();                  // 深克隆
-json.PrettyPrint();               // 格式化
-
-// 对象扩展
-obj.IfNull(defaultValue);
-value.IsIn(1, 2, 3);
-value.Clamp(0, 100);
-MyEnum.Value.GetDescription();
+// DateTime extensions
+var timestamp = DateTime.UtcNow.ToUnixTimestamp();
+var dateTime = timestamp.FromUnixTimestamp();
 ```
+
+### Dawning.ORM.Dapper
+
+```csharp
+using Dawning.ORM.Dapper;
+
+// CRUD operations
+var user = await connection.GetAsync<User>(id);
+var users = await connection.GetAllAsync<User>();
+
+await connection.InsertAsync(newUser);
+await connection.UpdateAsync(existingUser);
+await connection.DeleteAsync(user);
+
+// Bulk operations
+await connection.InsertAllAsync(users);
+```
+
+## Configuration
+
+All libraries support configuration via `IOptions<T>`:
+
+```json
+{
+  "DawningLogging": {
+    "ApplicationName": "MyApp",
+    "EnableConsole": true,
+    "LogLevel": "Information"
+  },
+  "DawningCaching": {
+    "ConnectionString": "localhost:6379",
+    "InstanceName": "myapp"
+  }
+}
+```
+
+## Samples
+
+See the `samples/` directory for complete examples:
+
+- `BasicWebApi/` - Simple API with all SDK components
+- `MicroserviceTemplate/` - Microservice with messaging
+- `AuthenticationSample/` - Identity integration
+
+## Benchmarks
+
+Performance benchmarks are in `benchmarks/Dawning.Benchmarks/`:
+
+```bash
+cd benchmarks/Dawning.Benchmarks
+dotnet run -c Release
+```
+
+## Testing
+
+```bash
+cd tests
+dotnet test
+```
+
+## License
+
+MIT License - see [LICENSE](../LICENSE) for details.
 
 ---
 
-## 项目结构
-
-```
-sdk/
-├── Dawning.Core/           # 核心库
-├── Dawning.Identity/       # 认证库
-├── Dawning.Logging/        # 日志库
-├── Dawning.ORM.Dapper/     # ORM 库
-├── Dawning.Resilience/     # 弹性库
-├── Dawning.Extensions/     # 扩展库
-├── Directory.Build.props   # 统一构建配置
-└── Dawning.SDK.sln         # 解决方案文件
-```
-
-## 开发
-
-```bash
-# 构建所有包
-cd sdk
-dotnet build
-
-# 运行测试
-dotnet test
-
-# 打包
-dotnet pack -c Release -o ./nupkgs
-
-# 发布到 GitHub Packages
-dotnet nuget push ./nupkgs/*.nupkg --source "github"
-```
-
-## 版本历史
-
-### v1.1.0 (2024-12-24)
-- **Dawning.Extensions 增强**
-  - 新增 StringExtensions: 命名转换、验证、掩码、截断
-  - 新增 CollectionExtensions: 批处理、去重、合并、遍历
-  - 新增 DateTimeExtensions: 时间边界、周末判断、年龄计算
-  - 新增 JsonExtensions: 序列化、深克隆、验证、合并
-  - 新增 ObjectExtensions: 空值处理、反射、范围检查
-- 新增 149 个单元测试
-
-### v1.0.0 (2024-12-24)
-- 初始版本
-- Dawning.Core: 异常处理、API 响应
-- Dawning.Identity: JWT 认证、用户上下文
-- Dawning.Logging: Serilog 集成
-- Dawning.ORM.Dapper: Dapper CRUD 扩展
-- Dawning.Resilience: Polly 弹性策略
-- Dawning.Extensions: 通用扩展方法
+For gateway documentation, see [Developer Guide](../docs/DEVELOPER_GUIDE.md).

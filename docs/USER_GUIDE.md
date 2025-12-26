@@ -1,309 +1,231 @@
-# Dawning Gateway 用户使用手册
+# Dawning Gateway User Guide
 
-**版本**: 1.0.0  
-**更新日期**: 2025-12-16
-
----
-
-## 目录
-
-1. [系统概述](#1-系统概述)
-2. [登录与认证](#2-登录与认证)
-3. [用户管理](#3-用户管理)
-4. [角色与权限](#4-角色与权限)
-5. [系统配置](#5-系统配置)
-6. [网关管理](#6-网关管理)
-7. [监控与日志](#7-监控与日志)
-8. [常见问题](#8-常见问题)
+**Version**: 1.0.0  
+**Last Updated**: 2025-12-26
 
 ---
 
-## 1. 系统概述
+## Table of Contents
 
-### 1.1 什么是 Dawning Gateway
-
-Dawning Gateway 是一个基于 .NET 8 和 Vue 3 构建的企业级 API 网关管理系统，提供：
-
-- **身份认证** - 基于 OpenIddict 的 OAuth 2.0 / OpenID Connect 认证
-- **API 网关** - 基于 YARP 的反向代理和路由管理
-- **用户管理** - 完整的用户、角色、权限管理功能
-- **系统监控** - 实时请求监控和性能分析
-
-### 1.2 系统要求
-
-- 现代浏览器（Chrome、Firefox、Edge、Safari 最新版本）
-- 屏幕分辨率：建议 1920x1080 或以上
-- 网络连接：稳定的互联网连接
-
-### 1.3 首次使用
-
-1. 打开浏览器，访问系统地址（由管理员提供）
-2. 使用管理员提供的账号密码登录
-3. 首次登录后建议立即修改密码
+1. [System Overview](#1-system-overview)
+2. [Login and Authentication](#2-login-and-authentication)
+3. [User Management](#3-user-management)
+4. [Roles and Permissions](#4-roles-and-permissions)
+5. [System Configuration](#5-system-configuration)
+6. [Gateway Management](#6-gateway-management)
+7. [Monitoring and Logs](#7-monitoring-and-logs)
+8. [FAQ](#8-faq)
 
 ---
 
-## 2. 登录与认证
+## 1. System Overview
 
-### 2.1 登录系统
+### 1.1 What is Dawning Gateway
 
-1. 访问系统登录页面
-2. 输入用户名和密码
-3. 点击「登录」按钮
+Dawning Gateway is an enterprise-grade API Gateway management system built with .NET 8 and Vue 3, providing:
 
-![登录页面示意](./images/login.png)
+- **Identity Authentication** - OAuth 2.0 / OpenID Connect based on OpenIddict
+- **API Gateway** - Reverse proxy and routing based on YARP
+- **User Management** - Complete user, role, and permission management
+- **System Monitoring** - Real-time request monitoring and performance analysis
 
-### 2.2 登录失败处理
+### 1.2 Key Features
 
-- **密码错误**: 系统会提示"用户名或密码错误"
-- **账户锁定**: 连续登录失败 5 次后，账户将被锁定 15 分钟
-- **忘记密码**: 请联系系统管理员重置密码
-
-### 2.3 会话管理
-
-- 登录后系统会保持会话状态
-- 默认会话超时时间为 30 分钟
-- 支持多设备同时登录（根据系统配置）
-- 可在「个人设置」中查看和管理登录设备
-
-### 2.4 退出登录
-
-点击右上角用户头像，选择「退出登录」即可安全退出系统。
+| Feature | Description |
+|---------|-------------|
+| Single Sign-On | Unified authentication across all services |
+| Role-Based Access | Fine-grained permission control |
+| API Routing | Dynamic route configuration |
+| Rate Limiting | Protect services from abuse |
+| Audit Logging | Track all administrative actions |
 
 ---
 
-## 3. 用户管理
+## 2. Login and Authentication
 
-### 3.1 查看用户列表
+### 2.1 Login
 
-1. 进入「系统管理」→「用户管理」
-2. 可查看所有用户的基本信息
-3. 支持按用户名、邮箱、状态筛选
+1. Navigate to the login page
+2. Enter your username and password
+3. Click **Login**
 
-### 3.2 搜索用户
+### 2.2 Forgot Password
 
-- 在搜索框中输入用户名或邮箱
-- 点击搜索按钮或按回车键
-- 支持模糊搜索
+1. Click **Forgot Password** on the login page
+2. Enter your email address
+3. Check your email for reset instructions
+4. Follow the link to reset your password
 
-### 3.3 修改个人信息
+### 2.3 Logout
 
-1. 点击右上角用户头像
-2. 选择「个人设置」
-3. 可修改：
-   - 头像
-   - 昵称
-   - 邮箱
-   - 手机号
-   - 密码
-
-### 3.4 修改密码
-
-1. 进入「个人设置」→「安全设置」
-2. 输入当前密码
-3. 输入新密码（需符合密码策略）
-4. 确认新密码
-5. 点击「保存」
-
-**密码要求**（默认策略）：
-- 最少 8 个字符
-- 包含大写字母
-- 包含小写字母
-- 包含数字
-- 包含特殊字符
+1. Click your avatar in the top-right corner
+2. Select **Logout**
 
 ---
 
-## 4. 角色与权限
+## 3. User Management
 
-### 4.1 角色说明
+### 3.1 View User List
 
-系统预设以下角色：
+1. Navigate to **Administration** → **User Permission** → **User Management**
+2. View all users in the system
+3. Use filters to search for specific users
 
-| 角色 | 说明 | 权限范围 |
-|------|------|----------|
-| admin | 超级管理员 | 所有权限 |
-| operator | 运维人员 | 系统监控、日志查看 |
-| user | 普通用户 | 基本功能访问 |
+### 3.2 User Details
 
-### 4.2 查看我的权限
+Click the **View** icon to see:
+- Basic information
+- Assigned roles
+- Account status
+- Activity history
 
-1. 点击右上角用户头像
-2. 选择「个人设置」→「我的权限」
-3. 可查看当前拥有的所有权限
+### 3.3 Edit Profile
 
-### 4.3 权限不足
-
-如果操作时提示"权限不足"，请联系管理员申请相应权限。
-
----
-
-## 5. 系统配置
-
-### 5.1 查看系统配置
-
-1. 进入「系统管理」→「系统配置」
-2. 左侧显示配置分组
-3. 点击分组查看对应配置项
-
-### 5.2 配置分组说明
-
-| 分组 | 说明 |
-|------|------|
-| System | 系统基本配置 |
-| Security | 安全相关配置 |
-| Email | 邮件服务配置 |
-| Logging | 日志配置 |
-| Gateway | 网关配置 |
-| Backup | 备份配置 |
-
-### 5.3 修改配置
-
-1. 找到需要修改的配置项
-2. 点击编辑图标
-3. 修改配置值
-4. 点击保存
-
-> ⚠️ 注意：部分配置修改后需要重启服务才能生效
+1. Click your avatar → **Profile**
+2. Update your information
+3. Click **Save**
 
 ---
 
-## 6. 网关管理
+## 4. Roles and Permissions
 
-### 6.1 路由管理
+### 4.1 Understanding Roles
 
-#### 查看路由列表
-1. 进入「网关管理」→「路由配置」
-2. 查看所有已配置的路由规则
+Roles define what actions a user can perform:
 
-#### 路由信息说明
-- **路由ID**: 路由的唯一标识
-- **匹配路径**: 请求路径匹配规则
-- **目标集群**: 转发到的后端集群
-- **状态**: 启用/禁用
+| Role | Access Level |
+|------|--------------|
+| Super Admin | Full system access |
+| Admin | Administrative functions |
+| User Manager | User management only |
+| Auditor | Read-only access |
+| User | Self-management only |
 
-### 6.2 集群管理
+### 4.2 Viewing Permissions
 
-#### 查看集群列表
-1. 进入「网关管理」→「集群配置」
-2. 查看所有后端服务集群
-
-#### 集群信息说明
-- **集群ID**: 集群的唯一标识
-- **目的地**: 后端服务地址列表
-- **负载均衡**: 负载均衡策略
-- **健康检查**: 健康检查配置
-
-### 6.3 限流策略
-
-#### 查看限流策略
-1. 进入「网关管理」→「限流策略」
-2. 查看当前配置的限流规则
-
-#### 限流算法说明
-- **固定窗口**: 固定时间窗口内限制请求数
-- **滑动窗口**: 滑动时间窗口限制
-- **令牌桶**: 令牌桶算法限流
-- **并发限制**: 限制并发请求数
+1. Navigate to **Administration** → **User Permission** → **Permission Management**
+2. Browse the permission tree
+3. View permission details
 
 ---
 
-## 7. 监控与日志
+## 5. System Configuration
 
-### 7.1 系统仪表盘
+### 5.1 Accessing Settings
 
-访问「仪表盘」页面查看：
-- 请求量统计
-- 响应时间趋势
-- 错误率监控
-- 系统资源使用
+Navigate to **Administration** → **Settings** → **System Config**
 
-### 7.2 请求日志
+### 5.2 Configuration Categories
 
-1. 进入「监控中心」→「请求日志」
-2. 可按以下条件筛选：
-   - 时间范围
-   - HTTP 方法
-   - 请求路径
-   - 状态码
-   - 客户端 IP
-
-### 7.3 性能监控
-
-查看系统性能指标：
-- CPU 使用率
-- 内存使用
-- GC 信息
-- 线程数
-
-### 7.4 导出日志
-
-1. 设置筛选条件
-2. 点击「导出」按钮
-3. 选择导出格式（CSV/Excel）
+- **Security** - Password policies, session settings
+- **Gateway** - Default route settings
+- **Monitoring** - Alert thresholds
+- **General** - System-wide settings
 
 ---
 
-## 8. 常见问题
+## 6. Gateway Management
 
-### 8.1 无法登录
+### 6.1 Routes
 
-**问题**: 输入正确的用户名密码后仍无法登录
+View and manage API routes:
 
-**解决方案**:
-1. 确认账号未被锁定（等待 15 分钟后重试）
-2. 确认账号未被禁用
-3. 清除浏览器缓存和 Cookie
-4. 联系管理员检查账号状态
+1. Navigate to **Gateway Management** → **Routes**
+2. View configured routes
+3. Check route status
 
-### 8.2 页面加载缓慢
+### 6.2 Clusters
 
-**问题**: 页面加载时间过长
+View backend service clusters:
 
-**解决方案**:
-1. 检查网络连接
-2. 尝试刷新页面
-3. 清除浏览器缓存
-4. 尝试使用其他浏览器
+1. Navigate to **Gateway Management** → **Clusters**
+2. View cluster configurations
+3. Check health status
 
-### 8.3 操作提示权限不足
+### 6.3 Rate Limiting
 
-**问题**: 执行某些操作时提示"权限不足"
+View rate limit policies:
 
-**解决方案**:
-1. 确认当前角色是否有该操作权限
-2. 联系管理员申请权限
-3. 如果刚获得权限，尝试重新登录
-
-### 8.4 数据不显示
-
-**问题**: 列表页面不显示数据
-
-**解决方案**:
-1. 检查筛选条件是否正确
-2. 尝试清除筛选条件
-3. 刷新页面
-4. 检查网络连接
-
-### 8.5 会话过期
-
-**问题**: 操作时提示"会话已过期"
-
-**解决方案**:
-1. 重新登录系统
-2. 如果频繁出现，联系管理员调整会话超时时间
+1. Navigate to **Gateway Management** → **Rate Limit**
+2. View configured policies
+3. Check current limits
 
 ---
 
-## 获取帮助
+## 7. Monitoring and Logs
 
-如果您在使用过程中遇到问题，可以：
+### 7.1 System Monitor
 
-1. 查阅本使用手册
-2. 联系系统管理员
-3. 提交问题到 GitHub Issues
+Access real-time system metrics:
+
+1. Navigate to **Monitoring** → **System Monitor**
+2. View:
+   - System health status
+   - Performance metrics
+   - Active connections
+
+### 7.2 Audit Log
+
+View administrative action history:
+
+1. Navigate to **Monitoring** → **Audit Log**
+2. Filter by:
+   - User
+   - Action type
+   - Date range
+3. View action details
+
+### 7.3 System Log
+
+View application logs:
+
+1. Navigate to **Monitoring** → **System Log**
+2. Filter by:
+   - Log level
+   - Message content
+   - Time range
+3. View full log details
+
+### 7.4 Alert Management
+
+Manage system alerts:
+
+1. Navigate to **Monitoring** → **Alert Management**
+2. View alert rules
+3. Check alert history
 
 ---
 
-**文档维护**: Dawning 开发团队  
-**最后更新**: 2025-12-16
+## 8. FAQ
+
+### Q: How do I change my password?
+
+1. Click your avatar → **Profile**
+2. Navigate to **Security** tab
+3. Click **Change Password**
+4. Enter current and new password
+5. Click **Confirm**
+
+### Q: Why can't I access certain features?
+
+Your access is determined by your assigned roles. Contact your administrator to request additional permissions.
+
+### Q: How do I enable two-factor authentication?
+
+1. Go to **Profile** → **Security**
+2. Click **Enable 2FA**
+3. Follow the setup instructions
+
+### Q: What should I do if I'm locked out?
+
+Contact your system administrator to unlock your account.
+
+### Q: How can I view my login history?
+
+1. Go to **Profile** → **Security**
+2. View **Recent Activity** section
+
+---
+
+*For administrative tasks, see the [Administrator Guide](ADMIN_GUIDE.md).*
+*For technical details, see the [Developer Guide](DEVELOPER_GUIDE.md).*

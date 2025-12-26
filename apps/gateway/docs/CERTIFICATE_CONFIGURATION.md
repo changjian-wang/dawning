@@ -1,144 +1,212 @@
-# 生产环境证书配置示例
+# Certificate Configuration Guide
 
-## 证书配置选项
+This guide explains how to configure HTTPS certificates for Dawning Gateway.
 
-### 1. 从文件加载 (推荐用于 Docker)
+## Overview
 
-```json
-{
-  "OpenIddict": {
-    "UseDevelopmentCertificate": false,
-    "Certificates": {
-      "Signing": {
-        "Type": "File",
-        "Path": "/app/certificates/signing.pfx",
-        "Password": "your-password"
-      },
-      "Encryption": {
-        "Type": "File",
-        "Path": "/app/certificates/encryption.pfx",
-        "Password": "your-password"
-      }
-    }
-  }
-}
-```
+Dawning Gateway supports multiple certificate configuration methods:
 
-### 2. 从证书存储加载 (推荐用于 Windows Server)
+1. **Development**: Self-signed certificates
+2. **Production**: CA-signed certificates
+3. **Kubernetes**: cert-manager with Let's Encrypt
 
-```json
-{
-  "OpenIddict": {
-    "UseDevelopmentCertificate": false,
-    "Certificates": {
-      "Signing": {
-        "Type": "Store",
-        "StoreLocation": "CurrentUser",
-        "StoreName": "My",
-        "Thumbprint": "ABC123..."
-      },
-      "Encryption": {
-        "Type": "Store",
-        "StoreLocation": "CurrentUser",
-        "StoreName": "My",
-        "SubjectName": "CN=dawning-encryption"
-      }
-    }
-  }
-}
-```
+## Development Certificates
 
-### 3. 从 Azure Key Vault 加载 (未实现)
-
-```json
-{
-  "OpenIddict": {
-    "UseDevelopmentCertificate": false,
-    "Certificates": {
-      "Signing": {
-        "Type": "AzureKeyVault",
-        "KeyVaultUrl": "https://your-vault.vault.azure.net/",
-        "CertificateName": "dawning-signing"
-      }
-    }
-  }
-}
-```
-
-## 生成自签名证书（测试用）
-
-### Windows (PowerShell)
-
-```powershell
-# 生成签名证书
-$cert = New-SelfSignedCertificate -Subject "CN=Dawning Signing" -CertStoreLocation "Cert:\CurrentUser\My" -KeyExportPolicy Exportable -KeySpec Signature -KeyLength 2048 -KeyAlgorithm RSA -HashAlgorithm SHA256 -NotAfter (Get-Date).AddYears(5)
-$password = ConvertTo-SecureString -String "YourPassword123!" -Force -AsPlainText
-Export-PfxCertificate -Cert $cert -FilePath ".\signing.pfx" -Password $password
-
-# 生成加密证书
-$cert = New-SelfSignedCertificate -Subject "CN=Dawning Encryption" -CertStoreLocation "Cert:\CurrentUser\My" -KeyExportPolicy Exportable -KeySpec KeyExchange -KeyLength 2048 -KeyAlgorithm RSA -HashAlgorithm SHA256 -NotAfter (Get-Date).AddYears(5)
-Export-PfxCertificate -Cert $cert -FilePath ".\encryption.pfx" -Password $password
-```
-
-### Linux (OpenSSL)
+### Generate Self-Signed Certificate
 
 ```bash
-# 生成签名证书
-openssl req -x509 -newkey rsa:2048 -keyout signing-key.pem -out signing-cert.pem -days 1825 -nodes -subj "/CN=Dawning Signing"
-openssl pkcs12 -export -out signing.pfx -inkey signing-key.pem -in signing-cert.pem -password pass:YourPassword123!
+# Windows (PowerShell)
+$cert = New-SelfSignedCertificate -DnsName "localhost" -CertStoreLocation "cert:\LocalMachine\My"
 
-# 生成加密证书
-openssl req -x509 -newkey rsa:2048 -keyout encryption-key.pem -out encryption-cert.pem -days 1825 -nodes -subj "/CN=Dawning Encryption"
-openssl pkcs12 -export -out encryption.pfx -inkey encryption-key.pem -in encryption-cert.pem -password pass:YourPassword123!
+# Linux/macOS
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes \
+  -subj "/CN=localhost"
 ```
 
-## Docker 部署配置
+### Configure in appsettings.json
 
-### Dockerfile
-
-```dockerfile
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /app
-COPY publish/ .
-COPY certificates/ /app/certificates/
-ENTRYPOINT ["dotnet", "Dawning.Identity.Api.dll"]
+```json
+{
+  "Kestrel": {
+    "Endpoints": {
+      "Https": {
+        "Url": "https://localhost:5001",
+        "Certificate": {
+          "Path": "./certs/cert.pfx",
+          "Password": "your-password"
+        }
+      }
+    }
+  }
+}
 ```
 
-### docker-compose.yml
+## Production Certificates
+
+### Option 1: PFX Certificate
+
+```json
+{
+  "Kestrel": {
+    "Endpoints": {
+      "Https": {
+        "Url": "https://*:443",
+        "Certificate": {
+          "Path": "/app/certs/production.pfx",
+          "Password": "${CERT_PASSWORD}"
+        }
+      }
+    }
+  }
+}
+```
+
+### Option 2: PEM Certificate
+
+```json
+{
+  "Kestrel": {
+    "Endpoints": {
+      "Https": {
+        "Url": "https://*:443",
+        "Certificate": {
+          "Path": "/app/certs/cert.pem",
+          "KeyPath": "/app/certs/key.pem"
+        }
+      }
+    }
+  }
+}
+```
+
+### Option 3: Certificate Store (Windows)
+
+```json
+{
+  "Kestrel": {
+    "Endpoints": {
+      "Https": {
+        "Url": "https://*:443",
+        "Certificate": {
+          "Subject": "CN=your-domain.com",
+          "Store": "My",
+          "Location": "LocalMachine"
+        }
+      }
+    }
+  }
+}
+```
+
+## Kubernetes with cert-manager
+
+### Install cert-manager
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+```
+
+### Create ClusterIssuer
 
 ```yaml
-services:
-  identity-api:
-    image: dawning-identity-api:latest
-    ports:
-      - "5001:8080"
-    volumes:
-      - ./certificates:/app/certificates:ro
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__MySQL=Server=mysql;Database=dawning_identity;Uid=root;Pwd=password
-      - OpenIddict__Certificates__Signing__Password=${CERT_PASSWORD}
-      - OpenIddict__Certificates__Encryption__Password=${CERT_PASSWORD}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: your-email@example.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
 ```
 
-## 证书要求
+### Configure Ingress with TLS
 
-1. **签名证书**: 用于签署 JWT tokens
-   - 算法: RSA 2048+
-   - 有效期: 建议 2-5 年
-   - 用途: 数字签名
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dawning-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - dawning.your-domain.com
+      secretName: dawning-tls
+  rules:
+    - host: dawning.your-domain.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dawning-gateway
+                port:
+                  number: 8080
+```
 
-2. **加密证书**: 用于加密敏感数据
-   - 算法: RSA 2048+
-   - 有效期: 建议 2-5 年
-   - 用途: 密钥加密
+## Certificate Renewal
 
-## 安全最佳实践
+### Manual Renewal
 
-1. ✅ 使用强密码保护证书文件
-2. ✅ 证书密码存储在环境变量或密钥管理服务中
-3. ✅ 定期轮换证书（每 1-2 年）
-4. ✅ 限制证书文件访问权限（chmod 400）
-5. ✅ 备份证书文件到安全位置
-6. ✅ 使用 CA 签发的证书（生产环境）
-7. ✅ 监控证书过期时间
+Replace certificate files and restart the application:
+
+```bash
+# Docker
+docker-compose restart gateway
+
+# Kubernetes
+kubectl rollout restart deployment/dawning-gateway -n dawning
+```
+
+### Automatic Renewal
+
+For Kubernetes with cert-manager, certificates are renewed automatically 30 days before expiration.
+
+## Security Recommendations
+
+- ✅ Use TLS 1.2 or higher
+- ✅ Use strong cipher suites
+- ✅ Enable HSTS in production
+- ✅ Keep private keys secure
+- ✅ Set up certificate monitoring
+- ✅ Plan for certificate renewal
+
+## Troubleshooting
+
+### Certificate Not Found
+
+```bash
+# Check certificate file exists
+ls -la /app/certs/
+
+# Verify certificate is valid
+openssl x509 -in cert.pem -text -noout
+```
+
+### Certificate Chain Issues
+
+Ensure the certificate file includes the full chain:
+1. Server certificate
+2. Intermediate certificate(s)
+3. Root certificate (optional)
+
+### Permission Issues
+
+```bash
+# Linux: Ensure correct permissions
+chmod 600 /app/certs/key.pem
+chmod 644 /app/certs/cert.pem
+```
+
+---
+
+See [Deployment Guide](../../docs/DEPLOYMENT.md) for full deployment instructions.

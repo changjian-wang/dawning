@@ -1,208 +1,90 @@
-# Dawning 网关管理系统 - 部署指南
+# Dawning Gateway Deployment Guide
 
-## 目录
-
-- [快速开始](#快速开始)
-- [环境要求](#环境要求)
-- [Docker 部署](#docker-部署)
-- [手动部署](#手动部署)
-- [配置说明](#配置说明)
-- [生产环境配置](#生产环境配置)
-- [故障排查](#故障排查)
+**Version**: 1.0.0  
+**Last Updated**: 2025-12-26
 
 ---
 
-## 快速开始
+## Table of Contents
 
-### 使用 Docker Compose (推荐)
-
-```bash
-# 1. 克隆项目
-git clone https://github.com/changjian-wang/dawning.git
-cd dawning
-
-# 2. 复制环境配置文件
-cp .env.example .env
-
-# 3. 修改 .env 文件中的敏感信息
-# 编辑 MYSQL_PASSWORD, MYSQL_ROOT_PASSWORD 等
-
-# 4. 启动所有服务
-docker-compose up -d
-
-# 5. 查看服务状态
-docker-compose ps
-
-# 6. 查看日志
-docker-compose logs -f
-```
-
-服务启动后访问:
-- **管理后台**: http://localhost
-- **Identity API**: http://localhost:5001
-- **Gateway API**: http://localhost:5000
+1. [Deployment Overview](#1-deployment-overview)
+2. [Prerequisites](#2-prerequisites)
+3. [Configuration](#3-configuration)
+4. [Docker Deployment](#4-docker-deployment)
+5. [Kubernetes Deployment](#5-kubernetes-deployment)
+6. [Database Migration](#6-database-migration)
+7. [Health Checks](#7-health-checks)
+8. [Troubleshooting](#8-troubleshooting)
 
 ---
 
-## 环境要求
+## 1. Deployment Overview
 
-### 最低配置
+Dawning Gateway supports multiple deployment modes:
 
-| 组件 | 版本 | 说明 |
-|------|------|------|
-| Docker | 20.10+ | 容器运行时 |
-| Docker Compose | 2.0+ | 容器编排 |
-| 内存 | 4GB+ | 推荐 8GB |
-| 磁盘 | 20GB+ | 日志和数据库存储 |
-
-### 开发环境
-
-| 组件 | 版本 |
-|------|------|
-| .NET SDK | 8.0 |
-| Node.js | 20+ |
-| pnpm | 8+ |
-| MySQL | 8.0 |
-| Redis | 7+ |
+| Mode | Use Case |
+|------|----------|
+| Docker Compose | Development, Small deployments |
+| Kubernetes + Helm | Production, High availability |
+| Standalone | Testing, Demo |
 
 ---
 
-## Docker 部署
+## 2. Prerequisites
 
-### 1. 生产环境部署
+### 2.1 System Requirements
 
-```bash
-# 使用生产配置
-docker-compose -f docker-compose.yml up -d
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 2 cores | 4+ cores |
+| Memory | 4 GB | 8+ GB |
+| Disk | 20 GB | 50+ GB SSD |
 
-# 或者指定环境文件
-docker-compose --env-file .env.production up -d
-```
+### 2.2 Software Requirements
 
-### 2. 开发环境部署
+- Docker 20.10+
+- Docker Compose 2.0+ (for Docker deployment)
+- kubectl 1.25+ (for Kubernetes)
+- Helm 3.10+ (for Kubernetes)
 
-```bash
-# 使用开发配置（支持热重载）
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
-```
+### 2.3 External Dependencies
 
-### 3. 单独构建镜像
-
-```bash
-# 构建 Identity API
-docker build -t dawning-identity-api:latest \
-  -f Dawning.Gateway/src/Dawning.Identity.Api/Dockerfile \
-  ./Dawning.Gateway
-
-# 构建 Gateway API
-docker build -t dawning-gateway-api:latest \
-  -f Dawning.Gateway/src/Dawning.Gateway.Api/Dockerfile \
-  ./Dawning.Gateway
-
-# 构建前端
-docker build -t dawning-admin:latest ./dawning-admin
-```
-
-### 4. 推送到镜像仓库
-
-```bash
-# 登录 GitHub Container Registry
-echo $GITHUB_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
-
-# 打标签
-docker tag dawning-identity-api:latest ghcr.io/changjian-wang/dawning-identity-api:latest
-
-# 推送
-docker push ghcr.io/changjian-wang/dawning-identity-api:latest
-```
+- MySQL 8.x
+- Redis 7.x
+- (Optional) Kafka 3.x
 
 ---
 
-## 手动部署
+## 3. Configuration
 
-### 1. 后端服务
+### 3.1 Environment Variables
 
-```bash
-# 进入后端目录
-cd Dawning.Gateway
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ASPNETCORE_ENVIRONMENT` | Runtime environment | `Production` |
+| `MySQL__ConnectionString` | MySQL connection string | - |
+| `Redis__ConnectionString` | Redis connection string | - |
+| `Jwt__Secret` | JWT signing key | - |
+| `Jwt__Issuer` | Token issuer | - |
+| `Jwt__Audience` | Token audience | - |
 
-# 还原依赖
-dotnet restore
+### 3.2 Production Configuration
 
-# 构建
-dotnet build -c Release
-
-# 发布 Identity API
-dotnet publish src/Dawning.Identity.Api -c Release -o ./publish/identity-api
-
-# 发布 Gateway API
-dotnet publish src/Dawning.Gateway.Api -c Release -o ./publish/gateway-api
-
-# 运行
-cd publish/identity-api
-dotnet Dawning.Identity.Api.dll
-```
-
-### 2. 前端服务
-
-```bash
-# 进入前端目录
-cd dawning-admin
-
-# 安装依赖
-pnpm install
-
-# 构建
-pnpm build
-
-# 部署到 Nginx
-cp -r dist/* /var/www/html/
-```
-
----
-
-## 配置说明
-
-### 环境变量
-
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| `MYSQL_ROOT_PASSWORD` | dawning_root_2024 | MySQL root 密码 |
-| `MYSQL_DATABASE` | dawning_identity | 数据库名称 |
-| `MYSQL_USER` | dawning | 数据库用户 |
-| `MYSQL_PASSWORD` | dawning_password_2024 | 数据库密码 |
-| `REDIS_PORT` | 6379 | Redis 端口 |
-| `IDENTITY_API_PORT` | 5001 | Identity API 端口 |
-| `GATEWAY_API_PORT` | 5000 | Gateway API 端口 |
-| `FRONTEND_PORT` | 80 | 前端端口 |
-
-### appsettings.Production.json
+Create `appsettings.Production.json`:
 
 ```json
 {
   "ConnectionStrings": {
-    "MySQL": "Server=mysql;Port=3306;Database=dawning_identity;Uid=dawning;Pwd=your_secure_password;"
+    "MySQL": "Server=mysql;Database=dawning;User=app;Password=***;",
+    "Redis": "redis:6379"
   },
-  "Redis": {
-    "Connection": "redis:6379"
+  "Jwt": {
+    "Secret": "your-256-bit-secret-key",
+    "Issuer": "https://your-domain.com",
+    "Audience": "dawning-api"
   },
-  "OpenIddict": {
-    "UseDevelopmentCertificate": false,
-    "Certificates": {
-      "Signing": {
-        "Source": "File",
-        "Path": "/app/certs/signing.pfx",
-        "Password": "your_cert_password"
-      },
-      "Encryption": {
-        "Source": "File",
-        "Path": "/app/certs/encryption.pfx",
-        "Password": "your_cert_password"
-      }
-    }
-  },
-  "Serilog": {
-    "MinimumLevel": {
+  "Logging": {
+    "LogLevel": {
       "Default": "Warning"
     }
   }
@@ -211,174 +93,251 @@ cp -r dist/* /var/www/html/
 
 ---
 
-## 生产环境配置
+## 4. Docker Deployment
 
-### 1. 生成证书
+### 4.1 Quick Start
 
 ```bash
-# 创建证书目录
-mkdir -p certs
-
-# 生成签名证书
-openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
-  -keyout certs/signing.key -out certs/signing.crt \
-  -subj "/CN=Dawning Signing Certificate" \
-  -nodes
-
-# 转换为 PFX 格式
-openssl pkcs12 -export -out certs/signing.pfx \
-  -inkey certs/signing.key -in certs/signing.crt \
-  -password pass:your_cert_password
-
-# 生成加密证书
-openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 \
-  -keyout certs/encryption.key -out certs/encryption.crt \
-  -subj "/CN=Dawning Encryption Certificate" \
-  -nodes
-
-openssl pkcs12 -export -out certs/encryption.pfx \
-  -inkey certs/encryption.key -in certs/encryption.crt \
-  -password pass:your_cert_password
+cd deploy/docker
+docker-compose up -d
 ```
 
-### 2. HTTPS 配置
+### 4.2 Build Images
 
-使用反向代理 (如 Traefik 或 Nginx) 来终止 SSL：
+```bash
+# Build gateway image
+docker build -t dawning-gateway:latest -f apps/gateway/Dockerfile .
+
+# Build admin image
+docker build -t dawning-admin:latest -f apps/admin/Dockerfile .
+```
+
+### 4.3 Docker Compose Configuration
 
 ```yaml
-# docker-compose.override.yml
+# deploy/docker/docker-compose.yml
+version: '3.8'
 services:
-  traefik:
-    image: traefik:v2.10
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=admin@example.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+  gateway:
+    image: dawning-gateway:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - mysql
+      - redis
+
+  admin:
+    image: dawning-admin:latest
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dawning
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./letsencrypt:/letsencrypt
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mysql_data:
+  redis_data:
 ```
 
-### 3. 数据库备份
+### 4.4 Scaling
 
 ```bash
-# 备份数据库
-docker exec dawning-mysql mysqldump -u root -p$MYSQL_ROOT_PASSWORD \
-  dawning_identity > backup_$(date +%Y%m%d).sql
-
-# 恢复数据库
-docker exec -i dawning-mysql mysql -u root -p$MYSQL_ROOT_PASSWORD \
-  dawning_identity < backup_20241216.sql
-```
-
-### 4. 日志管理
-
-```bash
-# 查看服务日志
-docker-compose logs -f identity-api
-
-# 日志轮转配置
-docker-compose logs --tail=1000 gateway-api
-
-# 清理旧日志
-docker system prune -f
+docker-compose up -d --scale gateway=3
 ```
 
 ---
 
-## 故障排查
+## 5. Kubernetes Deployment
 
-### 常见问题
-
-#### 1. 数据库连接失败
+### 5.1 Install with Helm
 
 ```bash
-# 检查 MySQL 容器状态
-docker-compose ps mysql
+cd deploy/helm/dawning
 
-# 查看 MySQL 日志
-docker-compose logs mysql
+# Install
+helm install dawning . \
+  --namespace dawning \
+  --create-namespace \
+  --set mysql.password=your-password
 
-# 测试连接
-docker exec -it dawning-mysql mysql -u dawning -p
+# Upgrade
+helm upgrade dawning . --namespace dawning
 ```
 
-#### 2. 服务健康检查失败
+### 5.2 Values Configuration
 
-```bash
-# 检查服务健康状态
-docker inspect --format='{{.State.Health.Status}}' dawning-identity-api
-
-# 手动测试健康端点
-curl http://localhost:5001/health
-```
-
-#### 3. 前端无法连接后端
-
-```bash
-# 检查网络连接
-docker network inspect dawning_dawning-network
-
-# 检查 nginx 配置
-docker exec dawning-admin-frontend cat /etc/nginx/conf.d/default.conf
-```
-
-#### 4. 权限问题
-
-```bash
-# 修复文件权限
-sudo chown -R 1001:1001 ./certs
-sudo chmod 600 ./certs/*.pfx
-```
-
-### 日志位置
-
-| 服务 | 容器内路径 | 宿主机挂载 |
-|------|-----------|-----------|
-| Identity API | /app/Logs | identity_logs 卷 |
-| Gateway API | /app/Logs | gateway_logs 卷 |
-| MySQL | /var/log/mysql | mysql_data 卷 |
-| Nginx | /var/log/nginx | - |
-
-### 性能调优
+Edit `values.yaml`:
 
 ```yaml
-# docker-compose.override.yml
-services:
-  mysql:
-    command: >
-      --innodb_buffer_pool_size=512M
-      --max_connections=1000
-      --query_cache_size=64M
-  
-  identity-api:
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
+replicaCount: 3
+
+image:
+  repository: your-registry/dawning-gateway
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: dawning.your-domain.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+mysql:
+  enabled: true
+  password: your-password
+
+redis:
+  enabled: true
+```
+
+### 5.3 TLS Configuration
+
+```yaml
+ingress:
+  enabled: true
+  tls:
+    - secretName: dawning-tls
+      hosts:
+        - dawning.your-domain.com
+```
+
+Create TLS secret:
+
+```bash
+kubectl create secret tls dawning-tls \
+  --cert=path/to/tls.crt \
+  --key=path/to/tls.key \
+  -n dawning
 ```
 
 ---
 
-## CI/CD
+## 6. Database Migration
 
-项目已配置 GitHub Actions 自动化流程：
+### 6.1 Initial Setup
 
-- **PR 检查**: 构建验证、类型检查、提交消息规范检查
-- **主分支推送**: 自动构建、测试、发布 Docker 镜像
-- **安全扫描**: Trivy 漏洞扫描
+Execute schema scripts in order:
 
-查看 `.github/workflows/` 目录了解详细配置。
+```bash
+# Connect to MySQL
+mysql -u root -p dawning
+
+# Execute schema scripts
+source apps/gateway/docs/sql/schema/001_create_users_table.sql
+source apps/gateway/docs/sql/schema/002_create_roles_table.sql
+# ... continue with all schema scripts
+
+# Execute seed data
+source apps/gateway/docs/sql/seed/001_init_admin.sql
+```
+
+### 6.2 Default Admin Account
+
+After initialization:
+- **Username**: `admin`
+- **Password**: `Admin@123456`
+
+⚠️ **Change the default password immediately after first login!**
 
 ---
 
-## 联系支持
+## 7. Health Checks
 
-如遇到问题，请提交 Issue 或联系开发团队。
+### 7.1 Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `/health` | Basic health check |
+| `/health/ready` | Readiness probe |
+| `/health/live` | Liveness probe |
+
+### 7.2 Kubernetes Probes
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 5
+```
+
+---
+
+## 8. Troubleshooting
+
+### 8.1 Common Issues
+
+**Container fails to start:**
+```bash
+# Check logs
+docker logs dawning-gateway
+
+# Kubernetes
+kubectl logs -n dawning deployment/dawning-gateway
+```
+
+**Database connection failed:**
+- Verify connection string
+- Check network connectivity
+- Ensure MySQL is running
+
+**Redis connection failed:**
+- Verify Redis is running
+- Check firewall rules
+
+### 8.2 Log Levels
+
+Set via environment variable:
+```bash
+Logging__LogLevel__Default=Debug
+```
+
+### 8.3 Performance Tuning
+
+For high traffic:
+- Increase replica count
+- Configure connection pooling
+- Enable Redis caching
+- Use CDN for static assets
+
+---
+
+*See [Developer Guide](DEVELOPER_GUIDE.md) for development setup.*
+*See [Administrator Guide](ADMIN_GUIDE.md) for system configuration.*

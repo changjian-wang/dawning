@@ -1,511 +1,278 @@
-# Dawning Gateway 管理员指南
+# Dawning Gateway Administrator Guide
 
-**版本**: 1.0.0  
-**更新日期**: 2025-12-16
-
----
-
-## 目录
-
-1. [管理员职责](#1-管理员职责)
-2. [用户管理](#2-用户管理)
-3. [角色与权限管理](#3-角色与权限管理)
-4. [安全配置](#4-安全配置)
-5. [网关配置](#5-网关配置)
-6. [系统监控](#6-系统监控)
-7. [备份与恢复](#7-备份与恢复)
-8. [故障排查](#8-故障排查)
-9. [最佳实践](#9-最佳实践)
+**Version**: 1.0.0  
+**Last Updated**: 2025-12-26
 
 ---
 
-## 1. 管理员职责
+## Table of Contents
 
-### 1.1 日常运维
-
-- 监控系统运行状态
-- 处理用户权限申请
-- 定期检查安全日志
-- 执行数据备份
-
-### 1.2 安全管理
-
-- 配置密码策略
-- 管理登录锁定策略
-- 审查操作审计日志
-- 处理安全事件
-
-### 1.3 系统维护
-
-- 定期更新系统配置
-- 清理过期数据
-- 优化系统性能
-- 执行版本升级
+1. [Administrator Responsibilities](#1-administrator-responsibilities)
+2. [User Management](#2-user-management)
+3. [Role and Permission Management](#3-role-and-permission-management)
+4. [Security Configuration](#4-security-configuration)
+5. [Gateway Configuration](#5-gateway-configuration)
+6. [System Monitoring](#6-system-monitoring)
+7. [Backup and Recovery](#7-backup-and-recovery)
+8. [Troubleshooting](#8-troubleshooting)
+9. [Best Practices](#9-best-practices)
 
 ---
 
-## 2. 用户管理
+## 1. Administrator Responsibilities
 
-### 2.1 创建用户
+### 1.1 Daily Operations
 
-1. 进入「系统管理」→「用户管理」
-2. 点击「新增用户」按钮
-3. 填写用户信息：
-   - 用户名（必填，唯一）
-   - 邮箱（必填，唯一）
-   - 密码（必填，需符合密码策略）
-   - 昵称
-   - 手机号
-4. 分配角色
-5. 点击「保存」
+- Monitor system status
+- Process user permission requests
+- Regular security log reviews
+- Execute data backups
 
-### 2.2 编辑用户
+### 1.2 Security Management
 
-1. 在用户列表中找到目标用户
-2. 点击「编辑」按钮
-3. 修改用户信息
-4. 点击「保存」
+- Configure password policies
+- Manage access controls
+- Review audit logs
+- Update security settings
 
-### 2.3 禁用/启用用户
+### 1.3 System Maintenance
 
-1. 在用户列表中找到目标用户
-2. 点击状态开关切换启用/禁用状态
-3. 禁用后用户将无法登录
-
-### 2.4 删除用户
-
-1. 在用户列表中找到目标用户
-2. 点击「删除」按钮
-3. 确认删除操作
-
-> ⚠️ 注意：删除操作不可恢复，请谨慎操作
-
-### 2.5 重置用户密码
-
-1. 在用户列表中找到目标用户
-2. 点击「重置密码」按钮
-3. 输入新密码或选择自动生成
-4. 通知用户新密码
-
-### 2.6 解锁用户
-
-当用户因多次登录失败被锁定时：
-
-1. 进入「系统管理」→「用户管理」
-2. 找到被锁定的用户（状态显示"已锁定"）
-3. 点击「解锁」按钮
-4. 用户即可立即登录
-
-### 2.7 批量操作
-
-支持批量操作：
-- 批量启用/禁用
-- 批量删除
-- 批量分配角色
-
-1. 勾选需要操作的用户
-2. 点击对应的批量操作按钮
-3. 确认操作
+- Update system configurations
+- Manage API gateway routes
+- Performance optimization
+- Capacity planning
 
 ---
 
-## 3. 角色与权限管理
+## 2. User Management
 
-### 3.1 角色管理
+### 2.1 Creating Users
 
-#### 查看角色列表
-进入「系统管理」→「角色管理」
+1. Navigate to **Administration** → **User Management**
+2. Click **Add** button
+3. Fill in required information:
+   - Username (required)
+   - Email (required)
+   - Display Name
+   - Password
+4. Click **Submit**
 
-#### 创建角色
-1. 点击「新增角色」
-2. 填写角色信息：
-   - 角色名称（英文标识）
-   - 角色描述
-3. 分配权限
-4. 点击「保存」
+### 2.2 Editing Users
 
-#### 编辑角色
-1. 点击角色的「编辑」按钮
-2. 修改角色信息或权限
-3. 点击「保存」
+1. Find the user in the list
+2. Click the **Edit** icon
+3. Modify user information
+4. Click **Submit**
 
-#### 删除角色
-1. 点击角色的「删除」按钮
-2. 确认删除
+### 2.3 Disabling Users
 
-> ⚠️ 注意：已分配给用户的角色无法删除
+1. Find the user in the list
+2. Toggle the **Status** switch
+3. Confirm the action
 
-### 3.2 权限管理
+### 2.4 Resetting Passwords
 
-#### 系统预设权限
-
-| 权限代码 | 说明 |
-|----------|------|
-| user:read | 查看用户 |
-| user:create | 创建用户 |
-| user:update | 编辑用户 |
-| user:delete | 删除用户 |
-| role:read | 查看角色 |
-| role:manage | 管理角色 |
-| config:read | 查看配置 |
-| config:manage | 管理配置 |
-| gateway:read | 查看网关 |
-| gateway:manage | 管理网关 |
-| monitor:read | 查看监控 |
-| backup:manage | 管理备份 |
-
-#### 分配权限给角色
-1. 编辑角色
-2. 在权限列表中勾选需要的权限
-3. 保存角色
-
-### 3.3 为用户分配角色
-
-1. 编辑用户
-2. 在角色选择区域选择角色
-3. 一个用户可以拥有多个角色
-4. 保存用户
+1. Find the user in the list
+2. Click **More** → **Reset Password**
+3. Enter new password
+4. Confirm the action
 
 ---
 
-## 4. 安全配置
+## 3. Role and Permission Management
 
-### 4.1 密码策略
+### 3.1 System Roles
 
-进入「系统管理」→「系统配置」→「Security」分组
+| Role | Description | Permissions |
+|------|-------------|-------------|
+| super_admin | Super Administrator | All permissions |
+| admin | Administrator | User and application management |
+| user_manager | User Manager | User CRUD operations |
+| auditor | Auditor | Read-only access |
+| user | Regular User | Self-management only |
 
-| 配置项 | 说明 | 建议值 |
-|--------|------|--------|
-| PasswordMinLength | 最小密码长度 | 8 |
-| PasswordMaxLength | 最大密码长度 | 128 |
-| PasswordRequireUppercase | 要求大写字母 | true |
-| PasswordRequireLowercase | 要求小写字母 | true |
-| PasswordRequireDigit | 要求数字 | true |
-| PasswordRequireSpecialChar | 要求特殊字符 | true |
+### 3.2 Creating Custom Roles
 
-### 4.2 登录锁定策略
+1. Navigate to **Administration** → **Role Management**
+2. Click **Create**
+3. Enter role name and description
+4. Select permissions
+5. Click **Submit**
 
-| 配置项 | 说明 | 建议值 |
-|--------|------|--------|
-| MaxFailedAttempts | 最大失败次数 | 5 |
-| LockoutDurationMinutes | 锁定时长（分钟） | 15 |
-| LockoutEnabled | 是否启用锁定 | true |
+### 3.3 Assigning Roles to Users
 
-### 4.3 会话管理
-
-| 配置项 | 说明 | 建议值 |
-|--------|------|--------|
-| SessionTimeout | 会话超时（分钟） | 30 |
-| AllowMultipleDevices | 允许多设备登录 | true |
-| MaxDevices | 最大设备数 | 5 |
-
-### 4.4 Token 配置
-
-| 配置项 | 说明 | 建议值 |
-|--------|------|--------|
-| AccessTokenLifetimeMinutes | Access Token 有效期 | 60 |
-| RefreshTokenLifetimeDays | Refresh Token 有效期 | 14 |
-
-### 4.5 安全头配置
-
-系统默认启用以下安全头：
-- `X-Content-Type-Options: nosniff`
-- `X-Frame-Options: DENY`
-- `X-XSS-Protection: 1; mode=block`
-- `Referrer-Policy: strict-origin-when-cross-origin`
-- `Content-Security-Policy`
-
-### 4.6 CSRF 防护
-
-系统默认启用 CSRF 防护：
-- 通过 `/api/auth/csrf-token` 获取 Token
-- 请求头 `X-CSRF-TOKEN` 携带 Token
+1. Navigate to **User Management**
+2. Click the **Assign Roles** icon for the target user
+3. Select roles to assign
+4. Click **Confirm**
 
 ---
 
-## 5. 网关配置
+## 4. Security Configuration
 
-### 5.1 路由管理
+### 4.1 Password Policy
 
-#### 创建路由
-1. 进入「网关管理」→「路由配置」
-2. 点击「新增路由」
-3. 填写路由信息：
-   - 路由ID
-   - 匹配路径（支持通配符）
-   - 目标集群
-   - 请求转换规则
-4. 点击「保存」
+Configure password requirements in **System Config**:
 
-#### 路由匹配规则示例
+- Minimum length
+- Complexity requirements
+- Expiration period
+- History count
 
-| 路径模式 | 说明 |
-|----------|------|
-| `/api/users` | 精确匹配 |
-| `/api/users/{id}` | 路径参数 |
-| `/api/{**catch-all}` | 捕获所有 |
+### 4.2 Session Management
 
-#### 热更新路由
-修改路由配置后，点击「重载配置」按钮即可热更新，无需重启服务。
+- Session timeout duration
+- Concurrent session limits
+- Remember me settings
 
-### 5.2 集群管理
+### 4.3 Access Control
 
-#### 创建集群
-1. 进入「网关管理」→「集群配置」
-2. 点击「新增集群」
-3. 填写集群信息：
-   - 集群ID
-   - 目的地地址列表
-   - 负载均衡策略
-   - 健康检查配置
-4. 点击「保存」
-
-#### 负载均衡策略
-
-| 策略 | 说明 |
-|------|------|
-| RoundRobin | 轮询 |
-| Random | 随机 |
-| PowerOfTwoChoices | 两次随机选择 |
-| LeastRequests | 最少请求 |
-| FirstAlphabetical | 按字母顺序 |
-
-### 5.3 限流配置
-
-#### 创建限流策略
-1. 进入「网关管理」→「限流策略」
-2. 点击「新增策略」
-3. 填写策略信息：
-   - 策略名称
-   - 限流算法
-   - 时间窗口
-   - 请求限制
-   - 应用路径
-4. 点击「保存」
-
-#### IP 黑白名单
-
-**添加黑名单**：
-1. 进入「IP 规则」Tab
-2. 点击「添加规则」
-3. 选择类型「黑名单」
-4. 输入 IP 地址或 CIDR
-5. 设置过期时间（可选）
-
-**添加白名单**：
-与黑名单操作相同，类型选择「白名单」
+- IP whitelist/blacklist
+- Rate limiting
+- CORS configuration
 
 ---
 
-## 6. 系统监控
+## 5. Gateway Configuration
 
-### 6.1 仪表盘
+### 5.1 Route Management
 
-仪表盘展示关键指标：
-- 今日请求总量
-- 平均响应时间
-- 错误率
-- 系统健康状态
+1. Navigate to **Gateway Management** → **Routes**
+2. Add or modify routes
+3. Configure:
+   - Route path pattern
+   - Target cluster
+   - Authentication requirements
+   - Rate limiting
 
-### 6.2 请求日志
+### 5.2 Cluster Management
 
-#### 查看请求日志
-1. 进入「监控中心」→「请求日志」
-2. 设置筛选条件
-3. 查看请求详情
+1. Navigate to **Gateway Management** → **Clusters**
+2. Define backend service clusters
+3. Configure:
+   - Destination addresses
+   - Health checks
+   - Load balancing
 
-#### 筛选条件
-- 时间范围
-- HTTP 方法
-- 请求路径
-- 状态码范围
-- 客户端 IP
-- 用户 ID
-- 仅错误请求
-- 慢请求（自定义阈值）
+### 5.3 Rate Limiting
 
-### 6.3 性能监控
+Configure rate limiting policies:
+- Request per second limits
+- IP-based rules
+- API-specific limits
 
-监控系统性能指标：
+---
 
-| 指标 | 说明 | 告警阈值建议 |
-|------|------|--------------|
-| 内存使用 | 进程内存占用 | > 80% |
-| GC 次数 | 垃圾回收频率 | Gen2 频繁 |
-| 线程数 | 活动线程数 | > 100 |
-| 响应时间 | 平均响应时间 | > 1000ms |
+## 6. System Monitoring
 
-### 6.4 日志清理
+### 6.1 System Monitor Dashboard
 
-定期清理过期日志：
-1. 进入「监控中心」→「日志管理」
-2. 点击「清理日志」
-3. 设置保留天数
-4. 确认清理
+Access real-time metrics:
+- CPU usage
+- Memory usage
+- Active connections
+- Request throughput
 
-或通过 API：
+### 6.2 Audit Logs
+
+View all administrative actions:
+- User management operations
+- Configuration changes
+- Permission modifications
+
+### 6.3 System Logs
+
+Monitor application logs:
+- Error logs
+- Warning logs
+- Information logs
+
+### 6.4 Alert Management
+
+Configure alert rules for:
+- High error rates
+- Performance degradation
+- Resource exhaustion
+
+---
+
+## 7. Backup and Recovery
+
+### 7.1 Database Backup
+
+Regular backup schedule:
 ```bash
-POST /api/monitoring/logs/cleanup?retentionDays=30
+# Daily backup
+mysqldump -u root -p dawning_identity > backup_$(date +%Y%m%d).sql
 ```
 
----
+### 7.2 Configuration Backup
 
-## 7. 备份与恢复
+Export system configurations periodically:
+- Gateway routes
+- Rate limiting rules
+- System settings
 
-### 7.1 手动备份
+### 7.3 Recovery Procedures
 
-1. 进入「系统管理」→「备份管理」
-2. 点击「创建备份」
-3. 选择备份选项：
-   - 备份类型（完整/增量）
-   - 是否压缩
-   - 是否包含日志
-4. 点击「开始备份」
-
-### 7.2 自动备份配置
-
-1. 进入「备份管理」→「备份配置」
-2. 配置自动备份：
-   - 启用自动备份
-   - 备份间隔（小时）
-   - 保留天数
-   - 最大备份数
-
-### 7.3 查看备份历史
-
-1. 进入「备份管理」
-2. 查看备份列表
-3. 可查看：
-   - 备份时间
-   - 文件大小
-   - 备份状态
-   - 备份类型
-
-### 7.4 删除备份
-
-1. 在备份列表中找到目标备份
-2. 点击「删除」按钮
-3. 确认删除
-
-### 7.5 清理过期备份
-
-1. 点击「清理备份」按钮
-2. 设置保留天数
-3. 确认清理
-
-### 7.6 恢复数据
-
-> ⚠️ 重要：数据恢复操作需要停止服务，请在维护窗口执行
-
-1. 停止应用服务
-2. 找到备份文件位置
-3. 解压备份文件（如果压缩）
-4. 执行 SQL 恢复：
-   ```bash
-   mysql -u root -p dawning_identity < backup_file.sql
-   ```
-5. 重启应用服务
-6. 验证数据完整性
+1. Stop the application
+2. Restore database from backup
+3. Restore configuration files
+4. Restart the application
+5. Verify system status
 
 ---
 
-## 8. 故障排查
+## 8. Troubleshooting
 
-### 8.1 服务无法启动
+### 8.1 Common Issues
 
-**检查步骤**：
-1. 检查端口是否被占用
-   ```bash
-   netstat -ano | findstr :5000
-   ```
-2. 检查数据库连接
-3. 检查配置文件是否正确
-4. 查看启动日志
+| Issue | Possible Cause | Solution |
+|-------|---------------|----------|
+| Login failure | Invalid credentials | Check username/password |
+| 403 Forbidden | Insufficient permissions | Verify role assignments |
+| 502 Bad Gateway | Backend service down | Check cluster health |
+| High latency | Resource constraints | Scale resources |
 
-### 8.2 数据库连接失败
+### 8.2 Log Analysis
 
-**检查步骤**：
-1. 确认 MySQL 服务运行中
-2. 检查连接字符串配置
-3. 确认数据库用户权限
-4. 测试网络连通性
+Check logs at:
+- Application logs: `/var/log/dawning/`
+- System logs: `Administration` → `System Log`
+- Audit logs: `Administration` → `Audit Log`
 
-### 8.3 认证失败
+### 8.3 Health Checks
 
-**检查步骤**：
-1. 检查 OpenIddict 配置
-2. 确认证书有效
-3. 检查 Token 签名密钥
-4. 查看认证日志
-
-### 8.4 性能问题
-
-**排查步骤**：
-1. 查看性能监控指标
-2. 检查慢请求日志
-3. 分析数据库查询
-4. 检查内存使用
-
-### 8.5 日志文件位置
-
-| 日志类型 | 位置 |
-|----------|------|
-| 应用日志 | `Logs/identity-*.txt` |
-| 请求日志 | 数据库 `request_logs` 表 |
-| 审计日志 | 数据库 `audit_logs` 表 |
+Access health endpoints:
+- `/health` - Overall health status
+- `/health/ready` - Readiness check
+- `/health/live` - Liveness check
 
 ---
 
-## 9. 最佳实践
+## 9. Best Practices
 
-### 9.1 安全建议
+### 9.1 Security
 
-1. **定期更换密码**：建议每 90 天强制更换密码
-2. **最小权限原则**：只授予必要的权限
-3. **定期审计**：定期检查操作审计日志
-4. **及时更新**：保持系统和依赖更新
-5. **备份策略**：每日自动备份，保留 30 天
+- Enable MFA for administrator accounts
+- Regular password rotation
+- Principle of least privilege
+- Regular security audits
 
-### 9.2 性能优化
+### 9.2 Performance
 
-1. **定期清理日志**：避免日志表过大
-2. **优化查询**：使用索引优化
-3. **配置缓存**：启用 Redis 缓存
-4. **监控资源**：设置告警阈值
+- Monitor resource usage
+- Configure appropriate rate limits
+- Use caching effectively
+- Regular maintenance windows
 
-### 9.3 运维规范
+### 9.3 Operations
 
-1. **变更管理**：重要配置变更需审批
-2. **文档记录**：记录所有配置变更
-3. **备份验证**：定期验证备份可用性
-4. **应急预案**：制定故障应急处理流程
-
-### 9.4 监控告警
-
-建议配置以下告警：
-- 错误率 > 1%
-- 响应时间 P99 > 3s
-- 内存使用 > 80%
-- 磁盘使用 > 85%
-- 备份失败
+- Document all changes
+- Use staging environment for testing
+- Maintain runbooks for common procedures
+- Regular backup verification
 
 ---
 
-## 附录
-
-### A. 配置项速查表
-
-详见 [系统配置文档](./CONFIGURATION.md)
-
-### B. API 接口文档
-
-详见 Swagger 文档：`/swagger`
-
-### C. 数据库表结构
-
-详见 [数据库设计文档](./DATABASE.md)
-
----
-
-**文档维护**: Dawning 开发团队  
-**最后更新**: 2025-12-16
+*For technical details, see the [Developer Guide](DEVELOPER_GUIDE.md).*
