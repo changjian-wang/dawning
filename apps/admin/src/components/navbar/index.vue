@@ -2,16 +2,17 @@
   <div class="navbar">
     <div class="left-side">
       <a-space>
-        <img
-          alt="logo"
-          src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image"
-        />
-        <a-typography-title
-          :style="{ margin: 0, fontSize: '18px' }"
-          :heading="5"
-        >
-          Dawning
-        </a-typography-title>
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="arrowGradient" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#165DFF"/>
+              <stop offset="100%" stop-color="#6AA1FF"/>
+            </linearGradient>
+          </defs>
+          <path d="M16 2 L28 28 L20 28 L16 18 L12 28 L4 28 Z" fill="url(#arrowGradient)"/>
+          <path d="M16 12 L13 20 L16 20 L19 20 Z" fill="white"/>
+        </svg>
+        <span class="brand-title">Dawning</span>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
           style="font-size: 22px; cursor: pointer"
@@ -303,6 +304,21 @@
     display: flex;
     align-items: center;
     padding-left: 20px;
+  }
+
+  .brand-title {
+    display: inline-block;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    padding-bottom: 2px;
+    font-family: 'Poppins', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #165DFF 0%, #4080FF 50%, #6AA1FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
   }
 
   .center-side {
