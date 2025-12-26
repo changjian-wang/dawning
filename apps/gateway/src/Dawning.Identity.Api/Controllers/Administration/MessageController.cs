@@ -42,7 +42,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var model = new AuditLogModel
                 {
                     StartDate = DateTime.UtcNow.AddDays(-7),
-                    EndDate = DateTime.UtcNow
+                    EndDate = DateTime.UtcNow,
                 };
                 var result = await _auditLogService.GetPagedListAsync(model, 1, 20);
 

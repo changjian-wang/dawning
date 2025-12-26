@@ -56,13 +56,13 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 // Get role count
                 var roles = await _roleService.GetAllAsync();
-                var totalRoles = roles.Count();
+                var totalRoles = roles?.Count() ?? 0;
 
                 // Get today's audit logs count
                 var todayModel = new AuditLogModel
                 {
                     StartDate = DateTime.UtcNow.Date,
-                    EndDate = DateTime.UtcNow
+                    EndDate = DateTime.UtcNow,
                 };
                 var todayLogs = await _auditLogService.GetPagedListAsync(todayModel, 1, 1);
                 var todayLogsCount = todayLogs.TotalCount;
@@ -71,23 +71,24 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var yesterdayModel = new AuditLogModel
                 {
                     StartDate = DateTime.UtcNow.Date.AddDays(-1),
-                    EndDate = DateTime.UtcNow.Date
+                    EndDate = DateTime.UtcNow.Date,
                 };
                 var yesterdayLogs = await _auditLogService.GetPagedListAsync(yesterdayModel, 1, 1);
                 var yesterdayLogsCount = yesterdayLogs.TotalCount;
 
                 // Calculate growth rate
-                var growthRate = yesterdayLogsCount > 0
-                    ? Math.Round(
-                          ((double)(todayLogsCount - yesterdayLogsCount) / yesterdayLogsCount)
-                              * 100,
-                          1
-                      )
-                    : 0;
+                var growthRate =
+                    yesterdayLogsCount > 0
+                        ? Math.Round(
+                            ((double)(todayLogsCount - yesterdayLogsCount) / yesterdayLogsCount)
+                                * 100,
+                            1
+                        )
+                        : 0;
 
                 // Get application count
                 var apps = await _applicationService.GetAllAsync();
-                var totalApps = apps.Count();
+                var totalApps = apps?.Count() ?? 0;
 
                 var stats = new DashboardStatsDto
                 {
@@ -95,7 +96,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     TotalRoles = totalRoles,
                     TodayAuditLogs = todayLogsCount,
                     TotalApplications = totalApps,
-                    GrowthRate = growthRate
+                    GrowthRate = growthRate,
                 };
 
                 return Ok(new { code = 20000, data = stats });
@@ -103,13 +104,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving dashboard stats");
-                return Ok(
-                    new
-                    {
-                        code = 20000,
-                        data = new DashboardStatsDto()
-                    }
-                );
+                return Ok(new { code = 20000, data = new DashboardStatsDto() });
             }
         }
 
@@ -128,15 +123,15 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 for (int i = 7; i >= 0; i--)
                 {
                     var date = DateTime.UtcNow.Date.AddDays(-i);
-                    var model = new AuditLogModel
-                    {
-                        StartDate = date,
-                        EndDate = date.AddDays(1)
-                    };
+                    var model = new AuditLogModel { StartDate = date, EndDate = date.AddDays(1) };
                     var result = await _auditLogService.GetPagedListAsync(model, 1, 1);
 
                     chartData.Add(
-                        new ChartDataPoint { X = date.ToString("yyyy-MM-dd"), Y = result.TotalCount }
+                        new ChartDataPoint
+                        {
+                            X = date.ToString("yyyy-MM-dd"),
+                            Y = result.TotalCount,
+                        }
                     );
                 }
 
@@ -162,7 +157,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 {
                     StartDate = DateTime.UtcNow.AddDays(-7),
                     EndDate = DateTime.UtcNow,
-                    EntityType = type
+                    EntityType = type,
                 };
                 var result = await _auditLogService.GetPagedListAsync(model, 1, 10);
 
@@ -175,7 +170,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                                 Title = $"{log.Action} {log.EntityType}",
                                 Description = log.Description ?? "",
                                 Time = log.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
-                                User = log.UserId.ToString()
+                                User = log.UserId?.ToString() ?? "",
                             }
                     )
                     .ToList();
@@ -202,7 +197,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var model = new AuditLogModel
                 {
                     StartDate = DateTime.UtcNow.AddDays(-30),
-                    EndDate = DateTime.UtcNow
+                    EndDate = DateTime.UtcNow,
                 };
                 var result = await _auditLogService.GetPagedListAsync(model, 1, 1000);
 
@@ -225,7 +220,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     new
                     {
                         code = 20000,
-                        data = new { categories = new List<CategoryItem>(), total = 0 }
+                        data = new { categories = new List<CategoryItem>(), total = 0 },
                     }
                 );
             }
@@ -244,7 +239,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 var model = new AuditLogModel
                 {
                     StartDate = DateTime.UtcNow.AddDays(-7),
-                    EndDate = DateTime.UtcNow
+                    EndDate = DateTime.UtcNow,
                 };
                 var result = await _auditLogService.GetPagedListAsync(model, 1, 5);
 
@@ -253,7 +248,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     {
                         Type = GetAnnouncementType(log.Action),
                         Label = GetAnnouncementLabel(log.Action),
-                        Content = log.Description ?? $"{log.Action} {log.EntityType}"
+                        Content = log.Description ?? $"{log.Action} {log.EntityType}",
                     })
                     .ToList();
 
@@ -275,7 +270,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 "Delete" => "orangered",
                 "Login" => "cyan",
                 "Logout" => "cyan",
-                _ => "blue"
+                _ => "blue",
             };
         }
 
@@ -288,7 +283,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 "Delete" => "Deleted",
                 "Login" => "Login",
                 "Logout" => "Logout",
-                _ => "Activity"
+                _ => "Activity",
             };
         }
     }
