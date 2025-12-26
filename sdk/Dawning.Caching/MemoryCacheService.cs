@@ -32,14 +32,20 @@ public class MemoryCacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
+    public Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var fullKey = GetFullKey(key);
-        var actualExpiration = expiration ?? TimeSpan.FromMinutes(_options.DefaultExpirationMinutes);
+        var actualExpiration =
+            expiration ?? TimeSpan.FromMinutes(_options.DefaultExpirationMinutes);
 
         var options = new MemoryCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = actualExpiration
+            AbsoluteExpirationRelativeToNow = actualExpiration,
         };
 
         _cache.Set(fullKey, value, options);
@@ -49,7 +55,12 @@ public class MemoryCacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
+    public async Task<T?> GetOrSetAsync<T>(
+        string key,
+        Func<Task<T>> factory,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var existing = await GetAsync<T>(key, cancellationToken);
         if (existing is not null)
@@ -76,8 +87,11 @@ public class MemoryCacheService : ICacheService
     {
         var fullPattern = GetFullKey(pattern);
         var regex = new System.Text.RegularExpressions.Regex(
-            "^" + System.Text.RegularExpressions.Regex.Escape(fullPattern).Replace("\\*", ".*") + "$",
-            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            "^"
+                + System.Text.RegularExpressions.Regex.Escape(fullPattern).Replace("\\*", ".*")
+                + "$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase
+        );
 
         var keysToRemove = _keys.Keys.Where(k => regex.IsMatch(k)).ToList();
 
@@ -98,7 +112,11 @@ public class MemoryCacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public async Task RefreshAsync(string key, TimeSpan expiration, CancellationToken cancellationToken = default)
+    public async Task RefreshAsync(
+        string key,
+        TimeSpan expiration,
+        CancellationToken cancellationToken = default
+    )
     {
         var value = await GetAsync<object>(key, cancellationToken);
         if (value is not null)

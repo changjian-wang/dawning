@@ -22,7 +22,12 @@ public interface ICacheService
     /// <param name="value">缓存值</param>
     /// <param name="expiration">过期时间</param>
     /// <param name="cancellationToken">取消令牌</param>
-    Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default);
+    Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// 获取或设置缓存值
@@ -33,7 +38,12 @@ public interface ICacheService
     /// <param name="expiration">过期时间</param>
     /// <param name="cancellationToken">取消令牌</param>
     /// <returns>缓存值</returns>
-    Task<T?> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null, CancellationToken cancellationToken = default);
+    Task<T?> GetOrSetAsync<T>(
+        string key,
+        Func<Task<T>> factory,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    );
 
     /// <summary>
     /// 移除缓存
@@ -63,5 +73,9 @@ public interface ICacheService
     /// <param name="key">缓存键</param>
     /// <param name="expiration">新的过期时间</param>
     /// <param name="cancellationToken">取消令牌</param>
-    Task RefreshAsync(string key, TimeSpan expiration, CancellationToken cancellationToken = default);
+    Task RefreshAsync(
+        string key,
+        TimeSpan expiration,
+        CancellationToken cancellationToken = default
+    );
 }

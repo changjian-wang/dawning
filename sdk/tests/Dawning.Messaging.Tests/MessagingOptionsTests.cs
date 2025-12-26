@@ -55,7 +55,7 @@ public class MessagingOptionsTests
         var options = new MessagingOptions
         {
             Provider = MessagingProvider.AzureServiceBus,
-            DefaultExchange = "custom-exchange"
+            DefaultExchange = "custom-exchange",
         };
 
         // Assert

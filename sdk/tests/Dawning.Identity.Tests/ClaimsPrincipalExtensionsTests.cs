@@ -1,7 +1,7 @@
-using Dawning.Identity.Extensions;
-using Dawning.Identity.Constants;
-using FluentAssertions;
 using System.Security.Claims;
+using Dawning.Identity.Constants;
+using Dawning.Identity.Extensions;
+using FluentAssertions;
 
 namespace Dawning.Identity.Tests;
 
@@ -69,7 +69,7 @@ public class ClaimsPrincipalExtensionsTests
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Role, "Admin"),
-            new Claim(ClaimTypes.Role, "User")
+            new Claim(ClaimTypes.Role, "User"),
         };
         var principal = new ClaimsPrincipal(new ClaimsIdentity(claims));
 

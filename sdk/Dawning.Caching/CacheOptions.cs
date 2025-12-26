@@ -65,5 +65,5 @@ public enum CacheProvider
     /// <summary>
     /// Redis 分布式缓存
     /// </summary>
-    Redis
+    Redis,
 }

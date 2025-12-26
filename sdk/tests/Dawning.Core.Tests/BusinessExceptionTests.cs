@@ -1,6 +1,6 @@
+using System.Net;
 using Dawning.Core.Exceptions;
 using FluentAssertions;
-using System.Net;
 
 namespace Dawning.Core.Tests;
 

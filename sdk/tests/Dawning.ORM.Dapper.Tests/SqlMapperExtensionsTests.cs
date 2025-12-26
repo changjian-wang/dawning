@@ -1,7 +1,7 @@
-using Dawning.ORM.Dapper;
-using FluentAssertions;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dawning.ORM.Dapper;
+using FluentAssertions;
 
 namespace Dawning.ORM.Dapper.Tests;
 
@@ -12,9 +12,9 @@ public class SqlMapperExtensionsTests
     {
         [Key]
         public int Id { get; set; }
-        
+
         public string Name { get; set; } = string.Empty;
-        
+
         [Column("email_address")]
         public string Email { get; set; } = string.Empty;
     }
@@ -26,8 +26,9 @@ public class SqlMapperExtensionsTests
         var type = typeof(TestEntity);
 
         // Act
-        var tableAttr = type.GetCustomAttributes(typeof(TableAttribute), true)
-            .FirstOrDefault() as TableAttribute;
+        var tableAttr =
+            type.GetCustomAttributes(typeof(TableAttribute), true).FirstOrDefault()
+            as TableAttribute;
 
         // Assert
         tableAttr.Should().NotBeNull();
@@ -42,8 +43,7 @@ public class SqlMapperExtensionsTests
         var idProperty = type.GetProperty("Id");
 
         // Act
-        var keyAttr = idProperty?.GetCustomAttributes(typeof(KeyAttribute), true)
-            .FirstOrDefault();
+        var keyAttr = idProperty?.GetCustomAttributes(typeof(KeyAttribute), true).FirstOrDefault();
 
         // Assert
         keyAttr.Should().NotBeNull();
@@ -57,8 +57,9 @@ public class SqlMapperExtensionsTests
         var emailProperty = type.GetProperty("Email");
 
         // Act
-        var columnAttr = emailProperty?.GetCustomAttributes(typeof(ColumnAttribute), true)
-            .FirstOrDefault() as ColumnAttribute;
+        var columnAttr =
+            emailProperty?.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault()
+            as ColumnAttribute;
 
         // Assert
         columnAttr.Should().NotBeNull();

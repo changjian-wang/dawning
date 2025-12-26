@@ -20,11 +20,13 @@ public class LogEnrichmentMiddleware
     {
         // 提取请求相关信息
         var traceId = context.TraceIdentifier;
-        var userId = context.User?.FindFirst("sub")?.Value 
-                  ?? context.User?.FindFirst("user_id")?.Value 
-                  ?? "anonymous";
-        var userName = context.User?.FindFirst("name")?.Value 
-                    ?? context.User?.FindFirst("preferred_username")?.Value;
+        var userId =
+            context.User?.FindFirst("sub")?.Value
+            ?? context.User?.FindFirst("user_id")?.Value
+            ?? "anonymous";
+        var userName =
+            context.User?.FindFirst("name")?.Value
+            ?? context.User?.FindFirst("preferred_username")?.Value;
         var clientIp = GetClientIp(context);
         var userAgent = context.Request.Headers.UserAgent.FirstOrDefault();
         var tenantId = context.User?.FindFirst("tenant_id")?.Value;

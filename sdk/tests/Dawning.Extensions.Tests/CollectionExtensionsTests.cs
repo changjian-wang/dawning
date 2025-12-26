@@ -80,7 +80,7 @@ public class CollectionExtensionsTests
         {
             new { Name = "A", Value = 1 },
             new { Name = "B", Value = 2 },
-            new { Name = "A", Value = 3 }
+            new { Name = "A", Value = 3 },
         };
 
         var result = items.DistinctBy(x => x.Name).ToList();
@@ -111,12 +111,16 @@ public class CollectionExtensionsTests
 
         var result = dict1.Merge(dict2);
 
-        result.Should().BeEquivalentTo(new Dictionary<string, int>
-        {
-            ["a"] = 1,
-            ["b"] = 3,
-            ["c"] = 4
-        });
+        result
+            .Should()
+            .BeEquivalentTo(
+                new Dictionary<string, int>
+                {
+                    ["a"] = 1,
+                    ["b"] = 3,
+                    ["c"] = 4,
+                }
+            );
     }
 
     [Fact]

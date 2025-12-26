@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using Dawning.Identity;
 using Dawning.Identity.Constants;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using System.Security.Claims;
 
 namespace Dawning.Identity.Tests;
 
@@ -19,7 +19,7 @@ public class CurrentUserTests
             new Claim(DawningClaimTypes.UserName, "testuser"),
             new Claim(DawningClaimTypes.Email, "test@example.com"),
             new Claim(DawningClaimTypes.Role, "Admin"),
-            new Claim(DawningClaimTypes.Role, "User")
+            new Claim(DawningClaimTypes.Role, "User"),
         };
         var identity = new ClaimsIdentity(claims, "Test");
         var principal = new ClaimsPrincipal(identity);

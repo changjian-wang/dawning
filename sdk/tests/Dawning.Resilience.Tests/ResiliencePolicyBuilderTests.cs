@@ -28,7 +28,7 @@ public class ResiliencePolicyBuilderTests
         {
             Retry = { Enabled = false },
             CircuitBreaker = { Enabled = false },
-            Timeout = { Enabled = false }
+            Timeout = { Enabled = false },
         };
         var builder = new ResiliencePolicyBuilder(options);
 
@@ -47,7 +47,7 @@ public class ResiliencePolicyBuilderTests
         {
             Retry = { Enabled = false },
             CircuitBreaker = { Enabled = false },
-            Timeout = { Enabled = false }
+            Timeout = { Enabled = false },
         };
         var builder = new ResiliencePolicyBuilder(options);
         var pipeline = builder.Build<string>();

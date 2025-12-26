@@ -54,8 +54,8 @@ public class DateTimeExtensionsTests
     }
 
     [Theory]
-    [InlineData(2024, 1, 13, true)]  // Saturday
-    [InlineData(2024, 1, 14, true)]  // Sunday
+    [InlineData(2024, 1, 13, true)] // Saturday
+    [InlineData(2024, 1, 14, true)] // Sunday
     [InlineData(2024, 1, 15, false)] // Monday
     public void IsWeekend_ShouldReturnCorrectResult(int year, int month, int day, bool expected)
     {
@@ -64,7 +64,7 @@ public class DateTimeExtensionsTests
     }
 
     [Theory]
-    [InlineData(2024, 1, 15, true)]  // Monday
+    [InlineData(2024, 1, 15, true)] // Monday
     [InlineData(2024, 1, 13, false)] // Saturday
     public void IsWeekday_ShouldReturnCorrectResult(int year, int month, int day, bool expected)
     {

@@ -1781,9 +1781,8 @@ namespace Dawning.ORM.Dapper
                 {
                     case MemberExpression member:
                         name =
-                            member.Member.GetCustomAttribute<ColumnAttribute>()?.Name ?? member
-                                .Member
-                                .Name;
+                            member.Member.GetCustomAttribute<ColumnAttribute>()?.Name
+                            ?? member.Member.Name;
                         return name;
 
                     case UnaryExpression unary when unary.Operand is MemberExpression:

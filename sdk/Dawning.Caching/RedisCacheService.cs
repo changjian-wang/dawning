@@ -14,7 +14,7 @@ public class RedisCacheService : ICacheService
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = false
+        WriteIndented = false,
     };
 
     /// <summary>
@@ -41,14 +41,20 @@ public class RedisCacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public async Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
+    public async Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var fullKey = GetFullKey(key);
-        var actualExpiration = expiration ?? TimeSpan.FromMinutes(_options.DefaultExpirationMinutes);
+        var actualExpiration =
+            expiration ?? TimeSpan.FromMinutes(_options.DefaultExpirationMinutes);
 
         var options = new DistributedCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = actualExpiration
+            AbsoluteExpirationRelativeToNow = actualExpiration,
         };
 
         var data = JsonSerializer.Serialize(value, JsonOptions);
@@ -56,7 +62,12 @@ public class RedisCacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetOrSetAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
+    public async Task<T?> GetOrSetAsync<T>(
+        string key,
+        Func<Task<T>> factory,
+        TimeSpan? expiration = null,
+        CancellationToken cancellationToken = default
+    )
     {
         var existing = await GetAsync<T>(key, cancellationToken);
         if (existing is not null)
@@ -82,7 +93,9 @@ public class RedisCacheService : ICacheService
         // Redis 的模式删除需要使用 StackExchange.Redis 直接操作
         // IDistributedCache 接口不支持此功能
         // 如需此功能，请直接注入 IConnectionMultiplexer
-        throw new NotSupportedException("Pattern-based removal requires direct Redis connection. Use IConnectionMultiplexer instead.");
+        throw new NotSupportedException(
+            "Pattern-based removal requires direct Redis connection. Use IConnectionMultiplexer instead."
+        );
     }
 
     /// <inheritdoc />
@@ -94,7 +107,11 @@ public class RedisCacheService : ICacheService
     }
 
     /// <inheritdoc />
-    public async Task RefreshAsync(string key, TimeSpan expiration, CancellationToken cancellationToken = default)
+    public async Task RefreshAsync(
+        string key,
+        TimeSpan expiration,
+        CancellationToken cancellationToken = default
+    )
     {
         var fullKey = GetFullKey(key);
         await _cache.RefreshAsync(fullKey, cancellationToken);

@@ -21,24 +21,33 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
     /// <summary>
     /// 初始化 RabbitMQ 订阅者
     /// </summary>
-    public RabbitMQSubscriber(IOptions<MessagingOptions> options, ILogger<RabbitMQSubscriber> logger)
+    public RabbitMQSubscriber(
+        IOptions<MessagingOptions> options,
+        ILogger<RabbitMQSubscriber> logger
+    )
     {
         _options = options.Value;
         _logger = logger;
     }
 
     /// <inheritdoc />
-    public async Task SubscribeAsync<T>(Func<T, CancellationToken, Task> handler, string? subscriptionName = null, CancellationToken cancellationToken = default) where T : class
+    public async Task SubscribeAsync<T>(
+        Func<T, CancellationToken, Task> handler,
+        string? subscriptionName = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
         await EnsureConnectionAsync(cancellationToken);
 
-        var queueName = subscriptionName ?? $"{_options.DefaultExchange}.{typeof(T).Name.ToLowerInvariant()}";
+        var queueName =
+            subscriptionName ?? $"{_options.DefaultExchange}.{typeof(T).Name.ToLowerInvariant()}";
         var routingKey = typeof(T).Name.ToLowerInvariant();
 
         await _channel!.QueueDeclareAsync(
@@ -46,19 +55,22 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
             durable: _options.RabbitMQ.Durable,
             exclusive: false,
             autoDelete: false,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         await _channel.QueueBindAsync(
             queue: queueName,
             exchange: _options.DefaultExchange,
             routingKey: routingKey,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         await _channel.BasicQosAsync(
             prefetchSize: 0,
             prefetchCount: _options.RabbitMQ.PrefetchCount,
             global: false,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (_, ea) =>
@@ -80,7 +92,12 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing message from queue {Queue}", queueName);
-                await _channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: true, cancellationToken);
+                await _channel.BasicNackAsync(
+                    ea.DeliveryTag,
+                    multiple: false,
+                    requeue: true,
+                    cancellationToken
+                );
             }
         };
 
@@ -88,14 +105,22 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
             queue: queueName,
             autoAck: false,
             consumer: consumer,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         _consumerTags[queueName] = consumerTag;
-        _logger.LogInformation("Subscribed to queue {Queue} with routing key {RoutingKey}", queueName, routingKey);
+        _logger.LogInformation(
+            "Subscribed to queue {Queue} with routing key {RoutingKey}",
+            queueName,
+            routingKey
+        );
     }
 
     /// <inheritdoc />
-    public async Task UnsubscribeAsync(string subscriptionName, CancellationToken cancellationToken = default)
+    public async Task UnsubscribeAsync(
+        string subscriptionName,
+        CancellationToken cancellationToken = default
+    )
     {
         if (_channel is null || !_consumerTags.TryGetValue(subscriptionName, out var consumerTag))
         {
@@ -109,7 +134,12 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
 
     private async Task EnsureConnectionAsync(CancellationToken cancellationToken)
     {
-        if (_connection is not null && _connection.IsOpen && _channel is not null && _channel.IsOpen)
+        if (
+            _connection is not null
+            && _connection.IsOpen
+            && _channel is not null
+            && _channel.IsOpen
+        )
         {
             return;
         }
@@ -120,7 +150,7 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
             Port = _options.RabbitMQ.Port,
             UserName = _options.RabbitMQ.UserName,
             Password = _options.RabbitMQ.Password,
-            VirtualHost = _options.RabbitMQ.VirtualHost
+            VirtualHost = _options.RabbitMQ.VirtualHost,
         };
 
         _connection = await factory.CreateConnectionAsync(cancellationToken);
@@ -131,9 +161,14 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
             type: _options.RabbitMQ.ExchangeType,
             durable: _options.RabbitMQ.Durable,
             autoDelete: false,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
-        _logger.LogInformation("RabbitMQ subscriber connection established to {Host}:{Port}", _options.RabbitMQ.HostName, _options.RabbitMQ.Port);
+        _logger.LogInformation(
+            "RabbitMQ subscriber connection established to {Host}:{Port}",
+            _options.RabbitMQ.HostName,
+            _options.RabbitMQ.Port
+        );
     }
 
     /// <summary>
@@ -141,7 +176,8 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         if (_channel is not null)
         {

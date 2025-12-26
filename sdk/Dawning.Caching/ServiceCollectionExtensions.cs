@@ -17,7 +17,8 @@ public static class CachingServiceCollectionExtensions
     /// <returns>服务集合</returns>
     public static IServiceCollection AddDawningCaching(
         this IServiceCollection services,
-        Action<CacheOptions>? configure = null)
+        Action<CacheOptions>? configure = null
+    )
     {
         var options = new CacheOptions();
         configure?.Invoke(options);
@@ -59,7 +60,8 @@ public static class CachingServiceCollectionExtensions
     /// <returns>服务集合</returns>
     public static IServiceCollection AddDawningMemoryCache(
         this IServiceCollection services,
-        Action<CacheOptions>? configure = null)
+        Action<CacheOptions>? configure = null
+    )
     {
         return services.AddDawningCaching(options =>
         {
@@ -78,7 +80,8 @@ public static class CachingServiceCollectionExtensions
     public static IServiceCollection AddDawningRedisCache(
         this IServiceCollection services,
         string connectionString,
-        Action<CacheOptions>? configure = null)
+        Action<CacheOptions>? configure = null
+    )
     {
         return services.AddDawningCaching(options =>
         {

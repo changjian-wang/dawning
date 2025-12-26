@@ -1,5 +1,5 @@
-using Dawning.Messaging.RabbitMQ;
 using Dawning.Messaging.AzureServiceBus;
+using Dawning.Messaging.RabbitMQ;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -41,10 +41,13 @@ public class ServiceCollectionExtensionsTests
         services.AddLogging();
 
         // Act
-        services.AddDawningServiceBus("Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test", options =>
-        {
-            options.TopicName = "test-topic";
-        });
+        services.AddDawningServiceBus(
+            "Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=test",
+            options =>
+            {
+                options.TopicName = "test-topic";
+            }
+        );
 
         var provider = services.BuildServiceProvider();
         var publisher = provider.GetService<IMessagePublisher>();

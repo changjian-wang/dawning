@@ -18,20 +18,28 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
     /// <summary>
     /// 初始化 Azure Service Bus 订阅者
     /// </summary>
-    public ServiceBusSubscriber(IOptions<MessagingOptions> options, ILogger<ServiceBusSubscriber> logger)
+    public ServiceBusSubscriber(
+        IOptions<MessagingOptions> options,
+        ILogger<ServiceBusSubscriber> logger
+    )
     {
         _options = options.Value;
         _logger = logger;
     }
 
     /// <inheritdoc />
-    public async Task SubscribeAsync<T>(Func<T, CancellationToken, Task> handler, string? subscriptionName = null, CancellationToken cancellationToken = default) where T : class
+    public async Task SubscribeAsync<T>(
+        Func<T, CancellationToken, Task> handler,
+        string? subscriptionName = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
         EnsureConnection();
 
@@ -43,8 +51,9 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
             new ServiceBusProcessorOptions
             {
                 MaxConcurrentCalls = _options.ServiceBus.MaxConcurrentCalls,
-                AutoCompleteMessages = _options.ServiceBus.AutoCompleteMessages
-            });
+                AutoCompleteMessages = _options.ServiceBus.AutoCompleteMessages,
+            }
+        );
 
         processor.ProcessMessageAsync += async args =>
         {
@@ -63,29 +72,50 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
                     await args.CompleteMessageAsync(args.Message, cancellationToken);
                 }
 
-                _logger.LogDebug("Processed message from {Topic}/{Subscription}", _options.ServiceBus.TopicName, actualSubscriptionName);
+                _logger.LogDebug(
+                    "Processed message from {Topic}/{Subscription}",
+                    _options.ServiceBus.TopicName,
+                    actualSubscriptionName
+                );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing message from {Topic}/{Subscription}", _options.ServiceBus.TopicName, actualSubscriptionName);
+                _logger.LogError(
+                    ex,
+                    "Error processing message from {Topic}/{Subscription}",
+                    _options.ServiceBus.TopicName,
+                    actualSubscriptionName
+                );
                 throw;
             }
         };
 
         processor.ProcessErrorAsync += args =>
         {
-            _logger.LogError(args.Exception, "Error in Service Bus processor for {Topic}/{Subscription}", _options.ServiceBus.TopicName, actualSubscriptionName);
+            _logger.LogError(
+                args.Exception,
+                "Error in Service Bus processor for {Topic}/{Subscription}",
+                _options.ServiceBus.TopicName,
+                actualSubscriptionName
+            );
             return Task.CompletedTask;
         };
 
         await processor.StartProcessingAsync(cancellationToken);
         _processors[actualSubscriptionName] = processor;
 
-        _logger.LogInformation("Subscribed to {Topic}/{Subscription}", _options.ServiceBus.TopicName, actualSubscriptionName);
+        _logger.LogInformation(
+            "Subscribed to {Topic}/{Subscription}",
+            _options.ServiceBus.TopicName,
+            actualSubscriptionName
+        );
     }
 
     /// <inheritdoc />
-    public async Task UnsubscribeAsync(string subscriptionName, CancellationToken cancellationToken = default)
+    public async Task UnsubscribeAsync(
+        string subscriptionName,
+        CancellationToken cancellationToken = default
+    )
     {
         if (!_processors.TryGetValue(subscriptionName, out var processor))
         {
@@ -96,7 +126,11 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
         await processor.DisposeAsync();
         _processors.Remove(subscriptionName);
 
-        _logger.LogInformation("Unsubscribed from {Topic}/{Subscription}", _options.ServiceBus.TopicName, subscriptionName);
+        _logger.LogInformation(
+            "Unsubscribed from {Topic}/{Subscription}",
+            _options.ServiceBus.TopicName,
+            subscriptionName
+        );
     }
 
     private void EnsureConnection()
@@ -107,7 +141,10 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
         }
 
         _client = new ServiceBusClient(_options.ServiceBus.ConnectionString);
-        _logger.LogInformation("Azure Service Bus client created for {Topic}", _options.ServiceBus.TopicName);
+        _logger.LogInformation(
+            "Azure Service Bus client created for {Topic}",
+            _options.ServiceBus.TopicName
+        );
     }
 
     /// <summary>
@@ -115,7 +152,8 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         foreach (var processor in _processors.Values)
         {

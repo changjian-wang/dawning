@@ -12,11 +12,9 @@ public class MemoryCacheServiceTests
     public MemoryCacheServiceTests()
     {
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var options = Options.Create(new CacheOptions
-        {
-            DefaultExpirationMinutes = 30,
-            KeyPrefix = "test"
-        });
+        var options = Options.Create(
+            new CacheOptions { DefaultExpirationMinutes = 30, KeyPrefix = "test" }
+        );
         _cacheService = new MemoryCacheService(memoryCache, options);
     }
 
@@ -54,9 +52,7 @@ public class MemoryCacheServiceTests
         await _cacheService.SetAsync(key, cachedValue);
 
         // Act
-        var result = await _cacheService.GetOrSetAsync(
-            key,
-            () => Task.FromResult("new-value"));
+        var result = await _cacheService.GetOrSetAsync(key, () => Task.FromResult("new-value"));
 
         // Assert
         result.Should().Be(cachedValue);
@@ -77,7 +73,8 @@ public class MemoryCacheServiceTests
             {
                 factoryCalled = true;
                 return Task.FromResult(newValue);
-            });
+            }
+        );
 
         // Assert
         result.Should().Be(newValue);
@@ -135,7 +132,9 @@ public class MemoryCacheServiceTests
         await _cacheService.RemoveByPatternAsync("user:*");
 
         // Assert
-        (await _cacheService.ExistsAsync("user:1")).Should().BeFalse();
+        (await _cacheService.ExistsAsync("user:1"))
+            .Should()
+            .BeFalse();
         (await _cacheService.ExistsAsync("user:2")).Should().BeFalse();
         (await _cacheService.ExistsAsync("order:1")).Should().BeTrue();
     }
@@ -160,7 +159,12 @@ public class MemoryCacheServiceTests
     {
         // Arrange
         var key = "complex-key";
-        var value = new TestObject { Id = 1, Name = "Test", CreatedAt = DateTime.UtcNow };
+        var value = new TestObject
+        {
+            Id = 1,
+            Name = "Test",
+            CreatedAt = DateTime.UtcNow,
+        };
 
         // Act
         await _cacheService.SetAsync(key, value);

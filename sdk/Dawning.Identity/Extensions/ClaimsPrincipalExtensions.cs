@@ -48,7 +48,8 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     public static IEnumerable<string> GetRoles(this ClaimsPrincipal principal)
     {
-        return principal.FindAll(DawningClaimTypes.Role)
+        return principal
+            .FindAll(DawningClaimTypes.Role)
             .Concat(principal.FindAll(ClaimTypes.Role))
             .Select(c => c.Value)
             .Distinct();
@@ -76,9 +77,7 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     public static IEnumerable<string> GetPermissions(this ClaimsPrincipal principal)
     {
-        return principal.FindAll(DawningClaimTypes.Permission)
-            .Select(c => c.Value)
-            .Distinct();
+        return principal.FindAll(DawningClaimTypes.Permission).Select(c => c.Value).Distinct();
     }
 
     /// <summary>
@@ -94,7 +93,9 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     public static bool HasAnyPermission(this ClaimsPrincipal principal, params string[] permissions)
     {
-        var userPermissions = principal.GetPermissions().ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var userPermissions = principal
+            .GetPermissions()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         return permissions.Any(p => userPermissions.Contains(p));
     }
 
@@ -161,8 +162,6 @@ public static class ClaimsPrincipalExtensions
     /// </summary>
     public static IEnumerable<string> GetScopes(this ClaimsPrincipal principal)
     {
-        return principal.FindAll(DawningClaimTypes.Scope)
-            .Select(c => c.Value)
-            .Distinct();
+        return principal.FindAll(DawningClaimTypes.Scope).Select(c => c.Value).Distinct();
     }
 }

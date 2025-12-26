@@ -30,17 +30,17 @@ public class ExternalApiClient : IExternalApiClient
     public async Task<IEnumerable<PostDto>> GetPostsAsync()
     {
         _logger.LogInformation("正在获取帖子列表");
-        
+
         var response = await _httpClient.GetStringAsync("/posts");
         var posts = response.FromJson<List<PostDto>>();
-        
+
         return posts.OrEmpty();
     }
 
     public async Task<PostDto?> GetPostAsync(int id)
     {
         _logger.LogInformation("正在获取帖子 {PostId}", id);
-        
+
         try
         {
             var response = await _httpClient.GetStringAsync($"/posts/{id}");

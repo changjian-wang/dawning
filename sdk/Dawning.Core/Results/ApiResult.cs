@@ -48,9 +48,7 @@ public class ApiResult<T>
 /// <summary>
 /// 统一 API 响应结果 (无数据)
 /// </summary>
-public class ApiResult : ApiResult<object>
-{
-}
+public class ApiResult : ApiResult<object> { }
 
 /// <summary>
 /// API 结果工厂
@@ -67,7 +65,7 @@ public static class ApiResults
             Success = true,
             Code = "OK",
             Message = message,
-            Data = data
+            Data = data,
         };
     }
 
@@ -80,7 +78,7 @@ public static class ApiResults
         {
             Success = true,
             Code = "OK",
-            Message = message
+            Message = message,
         };
     }
 
@@ -94,7 +92,7 @@ public static class ApiResults
             Success = true,
             Code = "CREATED",
             Message = message ?? "Resource created successfully",
-            Data = data
+            Data = data,
         };
     }
 
@@ -108,7 +106,7 @@ public static class ApiResults
             Success = false,
             Code = code,
             Message = message,
-            Data = data
+            Data = data,
         };
     }
 
@@ -121,7 +119,7 @@ public static class ApiResults
         {
             Success = false,
             Code = code,
-            Message = message
+            Message = message,
         };
     }
 
@@ -138,14 +136,15 @@ public static class ApiResults
     /// </summary>
     public static ApiResult ValidationError(
         IDictionary<string, string[]>? errors = null,
-        string message = "Validation failed")
+        string message = "Validation failed"
+    )
     {
         return new ApiResult
         {
             Success = false,
             Code = "VALIDATION_ERROR",
             Message = message,
-            Data = errors
+            Data = errors,
         };
     }
 
@@ -175,7 +174,7 @@ public static class ApiResults
             Success = false,
             Code = "INTERNAL_ERROR",
             Message = message,
-            TraceId = traceId
+            TraceId = traceId,
         };
     }
 }

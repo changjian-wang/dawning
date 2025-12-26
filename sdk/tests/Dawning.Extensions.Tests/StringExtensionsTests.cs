@@ -19,7 +19,11 @@ public class StringExtensionsTests
     [InlineData("", "default", "default")]
     [InlineData(null, "default", "default")]
     [InlineData("hello", "default", "hello")]
-    public void IfNullOrWhiteSpace_ShouldReturnCorrectValue(string? input, string defaultValue, string expected)
+    public void IfNullOrWhiteSpace_ShouldReturnCorrectValue(
+        string? input,
+        string defaultValue,
+        string expected
+    )
     {
         input.IfNullOrWhiteSpace(defaultValue).Should().Be(expected);
     }
@@ -95,7 +99,12 @@ public class StringExtensionsTests
     [InlineData("hello world", 0, 5, "hello")]
     [InlineData("hello", 10, null, "")]
     [InlineData(null, 0, 5, "")]
-    public void SafeSubstring_ShouldReturnSafeResult(string? input, int start, int? length, string expected)
+    public void SafeSubstring_ShouldReturnSafeResult(
+        string? input,
+        int start,
+        int? length,
+        string expected
+    )
     {
         input.SafeSubstring(start, length).Should().Be(expected);
     }

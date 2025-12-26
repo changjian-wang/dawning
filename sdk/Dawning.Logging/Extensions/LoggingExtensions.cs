@@ -22,8 +22,9 @@ public static class LoggingExtensions
     /// </code>
     /// </example>
     public static IHostBuilder UseDawningLogging(
-        this IHostBuilder hostBuilder, 
-        string applicationName)
+        this IHostBuilder hostBuilder,
+        string applicationName
+    )
     {
         return hostBuilder.UseDawningLogging(options =>
         {
@@ -50,15 +51,18 @@ public static class LoggingExtensions
     /// </example>
     public static IHostBuilder UseDawningLogging(
         this IHostBuilder hostBuilder,
-        Action<DawningLogOptions> configure)
+        Action<DawningLogOptions> configure
+    )
     {
         var options = new DawningLogOptions();
         configure(options);
 
-        return hostBuilder.UseSerilog((context, services, loggerConfiguration) =>
-        {
-            ConfigureLogger(loggerConfiguration, options, context.Configuration);
-        });
+        return hostBuilder.UseSerilog(
+            (context, services, loggerConfiguration) =>
+            {
+                ConfigureLogger(loggerConfiguration, options, context.Configuration);
+            }
+        );
     }
 
     /// <summary>
@@ -69,7 +73,7 @@ public static class LoggingExtensions
     /// <example>
     /// <code>
     /// Log.Logger = DawningLoggingExtensions.CreateBootstrapLogger("MyService");
-    /// 
+    ///
     /// try
     /// {
     ///     var builder = WebApplication.CreateBuilder(args);
@@ -92,7 +96,8 @@ public static class LoggingExtensions
             .Enrich.FromLogContext()
             .Enrich.WithProperty("Application", applicationName)
             .WriteTo.Console(
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+            )
             .CreateBootstrapLogger();
     }
 
@@ -102,7 +107,8 @@ public static class LoggingExtensions
     private static void ConfigureLogger(
         LoggerConfiguration loggerConfiguration,
         DawningLogOptions options,
-        IConfiguration configuration)
+        IConfiguration configuration
+    )
     {
         // 基础配置
         loggerConfiguration
@@ -127,13 +133,11 @@ public static class LoggingExtensions
         {
             if (options.UseJsonFormat)
             {
-                loggerConfiguration.WriteTo.Console(
-                    new Serilog.Formatting.Json.JsonFormatter());
+                loggerConfiguration.WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter());
             }
             else
             {
-                loggerConfiguration.WriteTo.Console(
-                    outputTemplate: options.ConsoleOutputTemplate);
+                loggerConfiguration.WriteTo.Console(outputTemplate: options.ConsoleOutputTemplate);
             }
         }
 
@@ -151,7 +155,8 @@ public static class LoggingExtensions
                     rollingInterval: RollingInterval.Day,
                     retainedFileCountLimit: options.RetainedFileCountLimit,
                     fileSizeLimitBytes: fileSizeBytes,
-                    rollOnFileSizeLimit: options.RollOnFileSizeLimit);
+                    rollOnFileSizeLimit: options.RollOnFileSizeLimit
+                );
             }
             else
             {
@@ -161,7 +166,8 @@ public static class LoggingExtensions
                     outputTemplate: options.FileOutputTemplate,
                     retainedFileCountLimit: options.RetainedFileCountLimit,
                     fileSizeLimitBytes: fileSizeBytes,
-                    rollOnFileSizeLimit: options.RollOnFileSizeLimit);
+                    rollOnFileSizeLimit: options.RollOnFileSizeLimit
+                );
             }
         }
     }

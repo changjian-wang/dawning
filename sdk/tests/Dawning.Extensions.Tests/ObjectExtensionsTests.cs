@@ -16,7 +16,7 @@ public class ObjectExtensionsTests
     {
         [Description("First Value")]
         First,
-        Second
+        Second,
     }
 
     [Fact]
@@ -206,7 +206,13 @@ public class ObjectExtensionsTests
     [InlineData(0, 0, 10, true, true)]
     [InlineData(0, 0, 10, false, false)]
     [InlineData(-1, 0, 10, true, false)]
-    public void IsBetween_ShouldCheckRange(int value, int min, int max, bool inclusive, bool expected)
+    public void IsBetween_ShouldCheckRange(
+        int value,
+        int min,
+        int max,
+        bool inclusive,
+        bool expected
+    )
     {
         value.IsBetween(min, max, inclusive).Should().Be(expected);
     }

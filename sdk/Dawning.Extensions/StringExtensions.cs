@@ -10,20 +10,18 @@ public static class StringExtensions
     /// <summary>
     /// 检查字符串是否为 null 或空白
     /// </summary>
-    public static bool IsNullOrWhiteSpace(this string? value)
-        => string.IsNullOrWhiteSpace(value);
+    public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
 
     /// <summary>
     /// 检查字符串是否为 null 或空
     /// </summary>
-    public static bool IsNullOrEmpty(this string? value)
-        => string.IsNullOrEmpty(value);
+    public static bool IsNullOrEmpty(this string? value) => string.IsNullOrEmpty(value);
 
     /// <summary>
     /// 如果字符串为 null 或空白，返回默认值
     /// </summary>
-    public static string IfNullOrWhiteSpace(this string? value, string defaultValue)
-        => string.IsNullOrWhiteSpace(value) ? defaultValue : value;
+    public static string IfNullOrWhiteSpace(this string? value, string defaultValue) =>
+        string.IsNullOrWhiteSpace(value) ? defaultValue : value;
 
     /// <summary>
     /// 截断字符串到指定长度，超出部分用省略号代替
@@ -45,8 +43,9 @@ public static class StringExtensions
             return string.Empty;
 
         var words = Regex.Split(value, @"[\s_\-]+");
-        return string.Concat(words.Select(word =>
-            char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant()));
+        return string.Concat(
+            words.Select(word => char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant())
+        );
     }
 
     /// <summary>
@@ -58,7 +57,12 @@ public static class StringExtensions
             return string.Empty;
 
         // 如果已经是 PascalCase（首字母大写），直接处理
-        if (char.IsUpper(value[0]) && !value.Contains('_') && !value.Contains('-') && !value.Contains(' '))
+        if (
+            char.IsUpper(value[0])
+            && !value.Contains('_')
+            && !value.Contains('-')
+            && !value.Contains(' ')
+        )
         {
             return char.ToLowerInvariant(value[0]) + value[1..];
         }
@@ -78,7 +82,8 @@ public static class StringExtensions
         if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
 
-        return Regex.Replace(value, @"([a-z])([A-Z])", "$1_$2")
+        return Regex
+            .Replace(value, @"([a-z])([A-Z])", "$1_$2")
             .Replace(" ", "_")
             .Replace("-", "_")
             .ToLowerInvariant();
@@ -92,7 +97,8 @@ public static class StringExtensions
         if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
 
-        return Regex.Replace(value, @"([a-z])([A-Z])", "$1-$2")
+        return Regex
+            .Replace(value, @"([a-z])([A-Z])", "$1-$2")
             .Replace(" ", "-")
             .Replace("_", "-")
             .ToLowerInvariant();
@@ -151,7 +157,12 @@ public static class StringExtensions
     /// <summary>
     /// 对字符串进行掩码处理（用于隐私保护）
     /// </summary>
-    public static string Mask(this string? value, int visibleStart = 3, int visibleEnd = 4, char maskChar = '*')
+    public static string Mask(
+        this string? value,
+        int visibleStart = 3,
+        int visibleEnd = 4,
+        char maskChar = '*'
+    )
     {
         if (string.IsNullOrEmpty(value))
             return string.Empty;

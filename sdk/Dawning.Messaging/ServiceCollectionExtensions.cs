@@ -17,7 +17,8 @@ public static class MessagingServiceCollectionExtensions
     /// <returns>服务集合</returns>
     public static IServiceCollection AddDawningMessaging(
         this IServiceCollection services,
-        Action<MessagingOptions>? configure = null)
+        Action<MessagingOptions>? configure = null
+    )
     {
         var options = new MessagingOptions();
         configure?.Invoke(options);
@@ -56,7 +57,8 @@ public static class MessagingServiceCollectionExtensions
     /// <returns>服务集合</returns>
     public static IServiceCollection AddDawningRabbitMQ(
         this IServiceCollection services,
-        Action<RabbitMQOptions>? configure = null)
+        Action<RabbitMQOptions>? configure = null
+    )
     {
         return services.AddDawningMessaging(options =>
         {
@@ -75,7 +77,8 @@ public static class MessagingServiceCollectionExtensions
     public static IServiceCollection AddDawningServiceBus(
         this IServiceCollection services,
         string connectionString,
-        Action<ServiceBusOptions>? configure = null)
+        Action<ServiceBusOptions>? configure = null
+    )
     {
         return services.AddDawningMessaging(options =>
         {

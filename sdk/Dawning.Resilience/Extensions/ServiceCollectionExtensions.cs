@@ -19,7 +19,8 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddDawningResilience(
         this IServiceCollection services,
-        Action<ResilienceOptions>? configure = null)
+        Action<ResilienceOptions>? configure = null
+    )
     {
         var options = new ResilienceOptions();
         configure?.Invoke(options);
@@ -45,7 +46,8 @@ public static class ServiceCollectionExtensions
     public static IHttpClientBuilder AddResilientHttpClient<TClient>(
         this IServiceCollection services,
         Action<HttpClient>? configureClient = null,
-        Action<ResilienceOptions>? configureResilience = null)
+        Action<ResilienceOptions>? configureResilience = null
+    )
         where TClient : class
     {
         var options = new ResilienceOptions();
@@ -58,67 +60,83 @@ public static class ServiceCollectionExtensions
             builder.ConfigureHttpClient(configureClient);
         }
 
-        builder.AddResilienceHandler("default", (pipelineBuilder, context) =>
-        {
-            var logger = context.ServiceProvider.GetService<ILogger<TClient>>();
-
-            if (options.Timeout.Enabled)
+        builder.AddResilienceHandler(
+            "default",
+            (pipelineBuilder, context) =>
             {
-                pipelineBuilder.AddTimeout(TimeSpan.FromSeconds(options.Timeout.TimeoutSeconds));
-            }
+                var logger = context.ServiceProvider.GetService<ILogger<TClient>>();
 
-            if (options.Retry.Enabled)
-            {
-                pipelineBuilder.AddRetry(new Polly.Retry.RetryStrategyOptions<HttpResponseMessage>
+                if (options.Timeout.Enabled)
                 {
-                    MaxRetryAttempts = options.Retry.MaxRetryAttempts,
-                    BackoffType = options.Retry.UseExponentialBackoff
-                        ? DelayBackoffType.Exponential
-                        : DelayBackoffType.Constant,
-                    Delay = TimeSpan.FromMilliseconds(options.Retry.BaseDelayMs),
-                    UseJitter = true,
-                    ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
-                        .Handle<HttpRequestException>()
-                        .Handle<TaskCanceledException>()
-                        .HandleResult(r => (int)r.StatusCode >= 500),
-                    OnRetry = args =>
-                    {
-                        logger?.LogWarning(
-                            "HTTP 请求重试第 {AttemptNumber} 次，状态码: {StatusCode}，异常: {Exception}",
-                            args.AttemptNumber,
-                            args.Outcome.Result?.StatusCode,
-                            args.Outcome.Exception?.Message ?? "无");
-                        return default;
-                    }
-                });
-            }
+                    pipelineBuilder.AddTimeout(
+                        TimeSpan.FromSeconds(options.Timeout.TimeoutSeconds)
+                    );
+                }
 
-            if (options.CircuitBreaker.Enabled)
-            {
-                pipelineBuilder.AddCircuitBreaker(new Polly.CircuitBreaker.CircuitBreakerStrategyOptions<HttpResponseMessage>
+                if (options.Retry.Enabled)
                 {
-                    FailureRatio = options.CircuitBreaker.FailureRatioThreshold,
-                    SamplingDuration = TimeSpan.FromSeconds(options.CircuitBreaker.SamplingDurationSeconds),
-                    MinimumThroughput = options.CircuitBreaker.MinimumThroughput,
-                    BreakDuration = TimeSpan.FromSeconds(options.CircuitBreaker.BreakDurationSeconds),
-                    ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
-                        .Handle<HttpRequestException>()
-                        .Handle<TaskCanceledException>()
-                        .HandleResult(r => (int)r.StatusCode >= 500),
-                    OnOpened = args =>
-                    {
-                        logger?.LogError("HTTP 客户端熔断器已打开，持续 {BreakDuration} 秒",
-                            options.CircuitBreaker.BreakDurationSeconds);
-                        return default;
-                    },
-                    OnClosed = _ =>
-                    {
-                        logger?.LogInformation("HTTP 客户端熔断器已关闭");
-                        return default;
-                    }
-                });
+                    pipelineBuilder.AddRetry(
+                        new Polly.Retry.RetryStrategyOptions<HttpResponseMessage>
+                        {
+                            MaxRetryAttempts = options.Retry.MaxRetryAttempts,
+                            BackoffType = options.Retry.UseExponentialBackoff
+                                ? DelayBackoffType.Exponential
+                                : DelayBackoffType.Constant,
+                            Delay = TimeSpan.FromMilliseconds(options.Retry.BaseDelayMs),
+                            UseJitter = true,
+                            ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
+                                .Handle<HttpRequestException>()
+                                .Handle<TaskCanceledException>()
+                                .HandleResult(r => (int)r.StatusCode >= 500),
+                            OnRetry = args =>
+                            {
+                                logger?.LogWarning(
+                                    "HTTP 请求重试第 {AttemptNumber} 次，状态码: {StatusCode}，异常: {Exception}",
+                                    args.AttemptNumber,
+                                    args.Outcome.Result?.StatusCode,
+                                    args.Outcome.Exception?.Message ?? "无"
+                                );
+                                return default;
+                            },
+                        }
+                    );
+                }
+
+                if (options.CircuitBreaker.Enabled)
+                {
+                    pipelineBuilder.AddCircuitBreaker(
+                        new Polly.CircuitBreaker.CircuitBreakerStrategyOptions<HttpResponseMessage>
+                        {
+                            FailureRatio = options.CircuitBreaker.FailureRatioThreshold,
+                            SamplingDuration = TimeSpan.FromSeconds(
+                                options.CircuitBreaker.SamplingDurationSeconds
+                            ),
+                            MinimumThroughput = options.CircuitBreaker.MinimumThroughput,
+                            BreakDuration = TimeSpan.FromSeconds(
+                                options.CircuitBreaker.BreakDurationSeconds
+                            ),
+                            ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
+                                .Handle<HttpRequestException>()
+                                .Handle<TaskCanceledException>()
+                                .HandleResult(r => (int)r.StatusCode >= 500),
+                            OnOpened = args =>
+                            {
+                                logger?.LogError(
+                                    "HTTP 客户端熔断器已打开，持续 {BreakDuration} 秒",
+                                    options.CircuitBreaker.BreakDurationSeconds
+                                );
+                                return default;
+                            },
+                            OnClosed = _ =>
+                            {
+                                logger?.LogInformation("HTTP 客户端熔断器已关闭");
+                                return default;
+                            },
+                        }
+                    );
+                }
             }
-        });
+        );
 
         return builder;
     }
@@ -130,7 +148,8 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         string name,
         Action<HttpClient>? configureClient = null,
-        Action<ResilienceOptions>? configureResilience = null)
+        Action<ResilienceOptions>? configureResilience = null
+    )
     {
         var options = new ResilienceOptions();
         configureResilience?.Invoke(options);
@@ -142,47 +161,62 @@ public static class ServiceCollectionExtensions
             builder.ConfigureHttpClient(configureClient);
         }
 
-        builder.AddResilienceHandler("default", (pipelineBuilder, context) =>
-        {
-            var logger = context.ServiceProvider.GetService<ILoggerFactory>()?.CreateLogger($"HttpClient.{name}");
-
-            if (options.Timeout.Enabled)
+        builder.AddResilienceHandler(
+            "default",
+            (pipelineBuilder, context) =>
             {
-                pipelineBuilder.AddTimeout(TimeSpan.FromSeconds(options.Timeout.TimeoutSeconds));
-            }
+                var logger = context
+                    .ServiceProvider.GetService<ILoggerFactory>()
+                    ?.CreateLogger($"HttpClient.{name}");
 
-            if (options.Retry.Enabled)
-            {
-                pipelineBuilder.AddRetry(new Polly.Retry.RetryStrategyOptions<HttpResponseMessage>
+                if (options.Timeout.Enabled)
                 {
-                    MaxRetryAttempts = options.Retry.MaxRetryAttempts,
-                    BackoffType = options.Retry.UseExponentialBackoff
-                        ? DelayBackoffType.Exponential
-                        : DelayBackoffType.Constant,
-                    Delay = TimeSpan.FromMilliseconds(options.Retry.BaseDelayMs),
-                    UseJitter = true,
-                    ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
-                        .Handle<HttpRequestException>()
-                        .Handle<TaskCanceledException>()
-                        .HandleResult(r => (int)r.StatusCode >= 500)
-                });
-            }
+                    pipelineBuilder.AddTimeout(
+                        TimeSpan.FromSeconds(options.Timeout.TimeoutSeconds)
+                    );
+                }
 
-            if (options.CircuitBreaker.Enabled)
-            {
-                pipelineBuilder.AddCircuitBreaker(new Polly.CircuitBreaker.CircuitBreakerStrategyOptions<HttpResponseMessage>
+                if (options.Retry.Enabled)
                 {
-                    FailureRatio = options.CircuitBreaker.FailureRatioThreshold,
-                    SamplingDuration = TimeSpan.FromSeconds(options.CircuitBreaker.SamplingDurationSeconds),
-                    MinimumThroughput = options.CircuitBreaker.MinimumThroughput,
-                    BreakDuration = TimeSpan.FromSeconds(options.CircuitBreaker.BreakDurationSeconds),
-                    ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
-                        .Handle<HttpRequestException>()
-                        .Handle<TaskCanceledException>()
-                        .HandleResult(r => (int)r.StatusCode >= 500)
-                });
+                    pipelineBuilder.AddRetry(
+                        new Polly.Retry.RetryStrategyOptions<HttpResponseMessage>
+                        {
+                            MaxRetryAttempts = options.Retry.MaxRetryAttempts,
+                            BackoffType = options.Retry.UseExponentialBackoff
+                                ? DelayBackoffType.Exponential
+                                : DelayBackoffType.Constant,
+                            Delay = TimeSpan.FromMilliseconds(options.Retry.BaseDelayMs),
+                            UseJitter = true,
+                            ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
+                                .Handle<HttpRequestException>()
+                                .Handle<TaskCanceledException>()
+                                .HandleResult(r => (int)r.StatusCode >= 500),
+                        }
+                    );
+                }
+
+                if (options.CircuitBreaker.Enabled)
+                {
+                    pipelineBuilder.AddCircuitBreaker(
+                        new Polly.CircuitBreaker.CircuitBreakerStrategyOptions<HttpResponseMessage>
+                        {
+                            FailureRatio = options.CircuitBreaker.FailureRatioThreshold,
+                            SamplingDuration = TimeSpan.FromSeconds(
+                                options.CircuitBreaker.SamplingDurationSeconds
+                            ),
+                            MinimumThroughput = options.CircuitBreaker.MinimumThroughput,
+                            BreakDuration = TimeSpan.FromSeconds(
+                                options.CircuitBreaker.BreakDurationSeconds
+                            ),
+                            ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
+                                .Handle<HttpRequestException>()
+                                .Handle<TaskCanceledException>()
+                                .HandleResult(r => (int)r.StatusCode >= 500),
+                        }
+                    );
+                }
             }
-        });
+        );
 
         return builder;
     }

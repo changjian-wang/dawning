@@ -20,7 +20,7 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = false
+        WriteIndented = false,
     };
 
     /// <summary>
@@ -33,7 +33,12 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
     }
 
     /// <inheritdoc />
-    public async Task PublishAsync<T>(T message, string? routingKey = null, CancellationToken cancellationToken = default) where T : class
+    public async Task PublishAsync<T>(
+        T message,
+        string? routingKey = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
         await EnsureConnectionAsync(cancellationToken);
 
@@ -44,7 +49,7 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
         {
             Persistent = _options.RabbitMQ.Durable,
             ContentType = "application/json",
-            Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
+            Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
         };
 
         await _channel!.BasicPublishAsync(
@@ -53,13 +58,23 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
             mandatory: false,
             basicProperties: properties,
             body: body,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
-        _logger.LogDebug("Published message to {Exchange}/{RoutingKey}", _options.DefaultExchange, actualRoutingKey);
+        _logger.LogDebug(
+            "Published message to {Exchange}/{RoutingKey}",
+            _options.DefaultExchange,
+            actualRoutingKey
+        );
     }
 
     /// <inheritdoc />
-    public async Task PublishBatchAsync<T>(IEnumerable<T> messages, string? routingKey = null, CancellationToken cancellationToken = default) where T : class
+    public async Task PublishBatchAsync<T>(
+        IEnumerable<T> messages,
+        string? routingKey = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class
     {
         foreach (var message in messages)
         {
@@ -69,7 +84,12 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
 
     private async Task EnsureConnectionAsync(CancellationToken cancellationToken)
     {
-        if (_connection is not null && _connection.IsOpen && _channel is not null && _channel.IsOpen)
+        if (
+            _connection is not null
+            && _connection.IsOpen
+            && _channel is not null
+            && _channel.IsOpen
+        )
         {
             return;
         }
@@ -80,7 +100,7 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
             Port = _options.RabbitMQ.Port,
             UserName = _options.RabbitMQ.UserName,
             Password = _options.RabbitMQ.Password,
-            VirtualHost = _options.RabbitMQ.VirtualHost
+            VirtualHost = _options.RabbitMQ.VirtualHost,
         };
 
         _connection = await factory.CreateConnectionAsync(cancellationToken);
@@ -91,9 +111,14 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
             type: _options.RabbitMQ.ExchangeType,
             durable: _options.RabbitMQ.Durable,
             autoDelete: false,
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
-        _logger.LogInformation("RabbitMQ connection established to {Host}:{Port}", _options.RabbitMQ.HostName, _options.RabbitMQ.Port);
+        _logger.LogInformation(
+            "RabbitMQ connection established to {Host}:{Port}",
+            _options.RabbitMQ.HostName,
+            _options.RabbitMQ.Port
+        );
     }
 
     /// <summary>
@@ -101,7 +126,8 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
 
         if (_channel is not null)
         {

@@ -8,14 +8,14 @@ public static class CollectionExtensions
     /// <summary>
     /// 检查集合是否为 null 或空
     /// </summary>
-    public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source)
-        => source == null || !source.Any();
+    public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source) =>
+        source == null || !source.Any();
 
     /// <summary>
     /// 如果集合为 null，返回空集合
     /// </summary>
-    public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source)
-        => source ?? Enumerable.Empty<T>();
+    public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source) =>
+        source ?? Enumerable.Empty<T>();
 
     /// <summary>
     /// 对集合中的每个元素执行操作
@@ -53,7 +53,10 @@ public static class CollectionExtensions
     {
         ArgumentNullException.ThrowIfNull(source);
         if (batchSize <= 0)
-            throw new ArgumentOutOfRangeException(nameof(batchSize), "Batch size must be greater than 0");
+            throw new ArgumentOutOfRangeException(
+                nameof(batchSize),
+                "Batch size must be greater than 0"
+            );
 
         return source
             .Select((item, index) => new { item, index })
@@ -64,7 +67,10 @@ public static class CollectionExtensions
     /// <summary>
     /// 获取集合中的不同元素（基于指定的键选择器）
     /// </summary>
-    public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> keySelector)
+    public static IEnumerable<T> DistinctBy<T, TKey>(
+        this IEnumerable<T> source,
+        Func<T, TKey> keySelector
+    )
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(keySelector);
@@ -85,7 +91,8 @@ public static class CollectionExtensions
     public static TValue? GetValueOrDefault<TKey, TValue>(
         this IDictionary<TKey, TValue> dictionary,
         TKey key,
-        TValue? defaultValue = default)
+        TValue? defaultValue = default
+    )
     {
         ArgumentNullException.ThrowIfNull(dictionary);
         return dictionary.TryGetValue(key, out var value) ? value : defaultValue;
@@ -124,7 +131,9 @@ public static class CollectionExtensions
     /// </summary>
     public static Dictionary<TKey, TValue> Merge<TKey, TValue>(
         this IDictionary<TKey, TValue> first,
-        IDictionary<TKey, TValue> second) where TKey : notnull
+        IDictionary<TKey, TValue> second
+    )
+        where TKey : notnull
     {
         ArgumentNullException.ThrowIfNull(first);
         ArgumentNullException.ThrowIfNull(second);

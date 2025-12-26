@@ -11,25 +11,26 @@ public static class ObjectExtensions
     /// <summary>
     /// 判断对象是否为 null
     /// </summary>
-    public static bool IsNull<T>(this T? obj) where T : class
-        => obj == null;
+    public static bool IsNull<T>(this T? obj)
+        where T : class => obj == null;
 
     /// <summary>
     /// 判断对象是否不为 null
     /// </summary>
-    public static bool IsNotNull<T>(this T? obj) where T : class
-        => obj != null;
+    public static bool IsNotNull<T>(this T? obj)
+        where T : class => obj != null;
 
     /// <summary>
     /// 如果对象为 null，返回默认值
     /// </summary>
-    public static T IfNull<T>(this T? obj, T defaultValue) where T : class
-        => obj ?? defaultValue;
+    public static T IfNull<T>(this T? obj, T defaultValue)
+        where T : class => obj ?? defaultValue;
 
     /// <summary>
     /// 如果对象为 null，执行工厂方法获取默认值
     /// </summary>
-    public static T IfNull<T>(this T? obj, Func<T> defaultFactory) where T : class
+    public static T IfNull<T>(this T? obj, Func<T> defaultFactory)
+        where T : class
     {
         ArgumentNullException.ThrowIfNull(defaultFactory);
         return obj ?? defaultFactory();
@@ -66,23 +67,18 @@ public static class ObjectExtensions
         return obj.GetType()
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanRead)
-            .ToDictionary(
-                p => p.Name,
-                p => p.GetValue(obj)
-            );
+            .ToDictionary(p => p.Name, p => p.GetValue(obj));
     }
 
     /// <summary>
     /// 检查对象是否在指定的值列表中
     /// </summary>
-    public static bool IsIn<T>(this T obj, params T[] values)
-        => values.Contains(obj);
+    public static bool IsIn<T>(this T obj, params T[] values) => values.Contains(obj);
 
     /// <summary>
     /// 检查对象是否不在指定的值列表中
     /// </summary>
-    public static bool IsNotIn<T>(this T obj, params T[] values)
-        => !values.Contains(obj);
+    public static bool IsNotIn<T>(this T obj, params T[] values) => !values.Contains(obj);
 
     /// <summary>
     /// 执行操作并返回对象（链式调用）
@@ -106,8 +102,8 @@ public static class ObjectExtensions
     /// <summary>
     /// 尝试将对象转换为指定类型
     /// </summary>
-    public static T? As<T>(this object? obj) where T : class
-        => obj as T;
+    public static T? As<T>(this object? obj)
+        where T : class => obj as T;
 
     /// <summary>
     /// 获取枚举的 Description 特性值
@@ -128,7 +124,8 @@ public static class ObjectExtensions
         if (string.IsNullOrWhiteSpace(propertyName))
             return null;
 
-        var property = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        var property = obj.GetType()
+            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
         return property?.GetValue(obj);
     }
 
@@ -141,7 +138,8 @@ public static class ObjectExtensions
         if (string.IsNullOrWhiteSpace(propertyName))
             return false;
 
-        var property = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        var property = obj.GetType()
+            .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
         if (property == null || !property.CanWrite)
             return false;
 
@@ -152,17 +150,21 @@ public static class ObjectExtensions
     /// <summary>
     /// 将值限制在指定范围内
     /// </summary>
-    public static T Clamp<T>(this T value, T min, T max) where T : IComparable<T>
+    public static T Clamp<T>(this T value, T min, T max)
+        where T : IComparable<T>
     {
-        if (value.CompareTo(min) < 0) return min;
-        if (value.CompareTo(max) > 0) return max;
+        if (value.CompareTo(min) < 0)
+            return min;
+        if (value.CompareTo(max) > 0)
+            return max;
         return value;
     }
 
     /// <summary>
     /// 检查值是否在指定范围内
     /// </summary>
-    public static bool IsBetween<T>(this T value, T min, T max, bool inclusive = true) where T : IComparable<T>
+    public static bool IsBetween<T>(this T value, T min, T max, bool inclusive = true)
+        where T : IComparable<T>
     {
         if (inclusive)
             return value.CompareTo(min) >= 0 && value.CompareTo(max) <= 0;

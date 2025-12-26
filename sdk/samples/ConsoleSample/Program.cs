@@ -97,7 +97,9 @@ var dict2 = new Dictionary<string, int> { ["b"] = 3, ["c"] = 4 };
 Console.WriteLine($"字典合并:");
 Console.WriteLine($"  dict1: {dict1.Select(kv => $"{kv.Key}={kv.Value}").JoinToString(", ")}");
 Console.WriteLine($"  dict2: {dict2.Select(kv => $"{kv.Key}={kv.Value}").JoinToString(", ")}");
-Console.WriteLine($"  Merge: {dict1.Merge(dict2).Select(kv => $"{kv.Key}={kv.Value}").JoinToString(", ")}");
+Console.WriteLine(
+    $"  Merge: {dict1.Merge(dict2).Select(kv => $"{kv.Key}={kv.Value}").JoinToString(", ")}"
+);
 Console.WriteLine();
 
 // ========================================
@@ -106,7 +108,12 @@ Console.WriteLine();
 Console.WriteLine("【JSON 扩展】");
 Console.WriteLine();
 
-var user = new { Name = "张三", Age = 25, Email = "test@example.com" };
+var user = new
+{
+    Name = "张三",
+    Age = 25,
+    Email = "test@example.com",
+};
 var json = user.ToJson();
 var prettyJson = user.ToJson(indented: true);
 

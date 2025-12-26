@@ -88,7 +88,7 @@ public class PagedResult<T>
             Items = Items.Select(mapper).ToList(),
             TotalCount = TotalCount,
             PageIndex = PageIndex,
-            PageSize = PageSize
+            PageSize = PageSize,
         };
     }
 }

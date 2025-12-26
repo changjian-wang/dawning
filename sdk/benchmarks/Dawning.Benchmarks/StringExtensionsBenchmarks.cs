@@ -13,7 +13,8 @@ namespace Dawning.Benchmarks;
 public class StringExtensionsBenchmarks
 {
     private const string TestString = "getUserInfoFromDatabase";
-    private const string LongString = "This is a very long string that needs to be truncated to a shorter length for display purposes";
+    private const string LongString =
+        "This is a very long string that needs to be truncated to a shorter length for display purposes";
     private const string Email = "test.user@example.com";
     private const string Phone = "13800138000";
     private const string SensitiveData = "1234567890123456";

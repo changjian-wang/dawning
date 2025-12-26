@@ -26,7 +26,7 @@ public class DawningLogOptionsTests
             ApplicationName = "TestApp",
             EnableConsole = false,
             EnableFile = true,
-            LogFilePath = "logs/test-.log"
+            LogFilePath = "logs/test-.log",
         };
 
         // Assert

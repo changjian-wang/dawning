@@ -56,25 +56,26 @@ public class DawningLogOptions
     /// <summary>
     /// 控制台日志模板
     /// </summary>
-    public string ConsoleOutputTemplate { get; set; } = 
+    public string ConsoleOutputTemplate { get; set; } =
         "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}{NewLine}      {Message:lj}{NewLine}{Exception}";
 
     /// <summary>
     /// 文件日志模板
     /// </summary>
-    public string FileOutputTemplate { get; set; } = 
+    public string FileOutputTemplate { get; set; } =
         "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext}] [{TraceId}] {Message:lj}{NewLine}{Exception}";
 
     /// <summary>
     /// 覆盖特定命名空间的日志级别
     /// </summary>
-    public Dictionary<string, LogLevel> OverrideMinimumLevels { get; set; } = new()
-    {
-        ["Microsoft"] = LogLevel.Warning,
-        ["Microsoft.Hosting.Lifetime"] = LogLevel.Information,
-        ["Microsoft.AspNetCore.Authentication"] = LogLevel.Warning,
-        ["System"] = LogLevel.Warning
-    };
+    public Dictionary<string, LogLevel> OverrideMinimumLevels { get; set; } =
+        new()
+        {
+            ["Microsoft"] = LogLevel.Warning,
+            ["Microsoft.Hosting.Lifetime"] = LogLevel.Information,
+            ["Microsoft.AspNetCore.Authentication"] = LogLevel.Warning,
+            ["System"] = LogLevel.Warning,
+        };
 
     /// <summary>
     /// 获取完整的日志文件路径
@@ -97,7 +98,7 @@ public class DawningLogOptions
             LogLevel.Warning => Serilog.Events.LogEventLevel.Warning,
             LogLevel.Error => Serilog.Events.LogEventLevel.Error,
             LogLevel.Critical => Serilog.Events.LogEventLevel.Fatal,
-            _ => Serilog.Events.LogEventLevel.Information
+            _ => Serilog.Events.LogEventLevel.Information,
         };
     }
 }
@@ -113,5 +114,5 @@ public enum LogLevel
     Warning = 3,
     Error = 4,
     Critical = 5,
-    None = 6
+    None = 6,
 }

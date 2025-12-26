@@ -126,7 +126,7 @@ public enum MessagingProvider
     /// <summary>
     /// Azure Service Bus
     /// </summary>
-    AzureServiceBus
+    AzureServiceBus,
 }
 
 /// <summary>
@@ -137,5 +137,5 @@ public enum SerializationFormat
     /// <summary>
     /// JSON 格式
     /// </summary>
-    Json
+    Json,
 }

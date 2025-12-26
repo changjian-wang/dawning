@@ -23,7 +23,8 @@ public class CollectionExtensionsBenchmarks
         _smallList = Enumerable.Range(1, 100).ToList();
         _mediumList = Enumerable.Range(1, 1000).ToList();
         _largeList = Enumerable.Range(1, 10000).ToList();
-        _itemList = Enumerable.Range(1, 1000)
+        _itemList = Enumerable
+            .Range(1, 1000)
             .Select(i => new TestItem { Id = i, Category = $"Cat{i % 10}" })
             .ToList();
     }
@@ -38,7 +39,8 @@ public class CollectionExtensionsBenchmarks
     public List<IEnumerable<int>> Batch_Large() => _largeList.Batch(1000).ToList();
 
     [Benchmark]
-    public List<TestItem> DistinctBy() => Dawning.Extensions.CollectionExtensions.DistinctBy(_itemList, x => x.Category).ToList();
+    public List<TestItem> DistinctBy() =>
+        Dawning.Extensions.CollectionExtensions.DistinctBy(_itemList, x => x.Category).ToList();
 
     [Benchmark]
     public string JoinToString_Small() => _smallList.JoinToString(",");

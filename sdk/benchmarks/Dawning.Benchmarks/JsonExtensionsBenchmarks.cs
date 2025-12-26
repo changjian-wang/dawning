@@ -27,7 +27,7 @@ public class JsonExtensionsBenchmarks
             Id = 1,
             Name = "Test",
             Email = "test@example.com",
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
 
         _complexObject = new TestObject
@@ -41,17 +41,18 @@ public class JsonExtensionsBenchmarks
             {
                 ["key1"] = "value1",
                 ["key2"] = 123,
-                ["key3"] = true
-            }
+                ["key3"] = true,
+            },
         };
 
-        _objectList = Enumerable.Range(1, 100)
+        _objectList = Enumerable
+            .Range(1, 100)
             .Select(i => new TestObject
             {
                 Id = i,
                 Name = $"Test{i}",
                 Email = $"test{i}@example.com",
-                CreatedAt = DateTime.Now.AddDays(-i)
+                CreatedAt = DateTime.Now.AddDays(-i),
             })
             .ToList();
 

@@ -26,9 +26,9 @@ public class ExtensionsController : ControllerBase
             ToKebabCase = input.ToKebabCase(),
             Truncated = input.Truncate(5),
             IsValidEmail = input.IsValidEmail(),
-            RemoveWhitespace = input.RemoveWhitespace()
+            RemoveWhitespace = input.RemoveWhitespace(),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 
@@ -40,7 +40,7 @@ public class ExtensionsController : ControllerBase
     {
         var now = DateTime.Now;
         var birthDate = new DateTime(1990, 5, 15);
-        
+
         var result = new
         {
             Now = now.ToDateTimeString(),
@@ -54,9 +54,9 @@ public class ExtensionsController : ControllerBase
             Age = birthDate.CalculateAge(),
             UnixTimestamp = now.ToUnixTimeSeconds(),
             RelativeTime = now.AddHours(-3).ToRelativeTime(),
-            Iso8601 = now.ToIso8601()
+            Iso8601 = now.ToIso8601(),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 
@@ -69,15 +69,15 @@ public class ExtensionsController : ControllerBase
         var json = input.ToJson();
         var prettyJson = json.PrettyPrint();
         var isValid = json.IsValidJson();
-        
+
         var result = new
         {
             Minified = json,
             Pretty = prettyJson,
             IsValid = isValid,
-            DeepCloned = input.DeepClone()
+            DeepCloned = input.DeepClone(),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 
@@ -91,7 +91,7 @@ public class ExtensionsController : ControllerBase
         var words = new List<string> { "apple", "banana", "cherry" };
         var dict1 = new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 };
         var dict2 = new Dictionary<string, int> { ["b"] = 3, ["c"] = 4 };
-        
+
         var result = new
         {
             Original = numbers,
@@ -100,9 +100,9 @@ public class ExtensionsController : ControllerBase
             RandomElement = numbers.RandomElement(),
             JoinedWords = words.JoinToString(" | "),
             MergedDict = dict1.Merge(dict2),
-            IsNullOrEmpty = new List<int>().IsNullOrEmpty()
+            IsNullOrEmpty = new List<int>().IsNullOrEmpty(),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 
@@ -115,7 +115,7 @@ public class ExtensionsController : ControllerBase
         var value = 50;
         string? nullString = null;
         var testObj = new { Name = "Test", Age = 25 };
-        
+
         var result = new
         {
             Clamped = value.Clamp(0, 30),
@@ -123,9 +123,9 @@ public class ExtensionsController : ControllerBase
             IsIn = value.IsIn(10, 20, 50, 100),
             IfNullOrWhiteSpace = nullString.IfNullOrWhiteSpace("默认值"),
             ToDictionary = testObj.ToDictionary(),
-            PropertyValue = testObj.GetPropertyValue("Name")
+            PropertyValue = testObj.GetPropertyValue("Name"),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 
@@ -139,9 +139,9 @@ public class ExtensionsController : ControllerBase
         {
             Original = phone,
             Masked = phone.Mask(),
-            IsValidPhone = phone.IsValidPhoneNumber()
+            IsValidPhone = phone.IsValidPhoneNumber(),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 
@@ -152,15 +152,15 @@ public class ExtensionsController : ControllerBase
     public ActionResult<ApiResult<object>> TimestampDemo()
     {
         var currentTs = TimestampUtil.GetCurrentTimestamp();
-        
+
         var result = new
         {
             CurrentTimestamp = currentTs,
             FromTimestamp = currentTs.FromUnixTimeMilliseconds().ToDateTimeString(),
             ToUnixSeconds = DateTime.UtcNow.ToUnixTimeSeconds(),
-            ToUnixMilliseconds = DateTime.UtcNow.ToUnixTimeMilliseconds()
+            ToUnixMilliseconds = DateTime.UtcNow.ToUnixTimeMilliseconds(),
         };
-        
+
         return Ok(ApiResults.Ok(result));
     }
 }

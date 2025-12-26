@@ -9,7 +9,7 @@ namespace Dawning.Identity.Attributes;
 /// <code>
 /// [RequirePermission("user.create")]
 /// public async Task&lt;IActionResult&gt; CreateUser() { }
-/// 
+///
 /// [RequirePermission("user.read", "user.list")]
 /// public async Task&lt;IActionResult&gt; GetUsers() { }
 /// </code>

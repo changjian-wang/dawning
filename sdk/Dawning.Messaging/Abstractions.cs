@@ -12,7 +12,12 @@ public interface IMessagePublisher
     /// <param name="message">消息内容</param>
     /// <param name="routingKey">路由键（可选）</param>
     /// <param name="cancellationToken">取消令牌</param>
-    Task PublishAsync<T>(T message, string? routingKey = null, CancellationToken cancellationToken = default) where T : class;
+    Task PublishAsync<T>(
+        T message,
+        string? routingKey = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class;
 
     /// <summary>
     /// 批量发布消息
@@ -21,7 +26,12 @@ public interface IMessagePublisher
     /// <param name="messages">消息列表</param>
     /// <param name="routingKey">路由键（可选）</param>
     /// <param name="cancellationToken">取消令牌</param>
-    Task PublishBatchAsync<T>(IEnumerable<T> messages, string? routingKey = null, CancellationToken cancellationToken = default) where T : class;
+    Task PublishBatchAsync<T>(
+        IEnumerable<T> messages,
+        string? routingKey = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class;
 }
 
 /// <summary>
@@ -36,7 +46,12 @@ public interface IMessageSubscriber
     /// <param name="handler">消息处理器</param>
     /// <param name="subscriptionName">订阅名称</param>
     /// <param name="cancellationToken">取消令牌</param>
-    Task SubscribeAsync<T>(Func<T, CancellationToken, Task> handler, string? subscriptionName = null, CancellationToken cancellationToken = default) where T : class;
+    Task SubscribeAsync<T>(
+        Func<T, CancellationToken, Task> handler,
+        string? subscriptionName = null,
+        CancellationToken cancellationToken = default
+    )
+        where T : class;
 
     /// <summary>
     /// 取消订阅
@@ -50,7 +65,8 @@ public interface IMessageSubscriber
 /// 消息处理器接口
 /// </summary>
 /// <typeparam name="T">消息类型</typeparam>
-public interface IMessageHandler<in T> where T : class
+public interface IMessageHandler<in T>
+    where T : class
 {
     /// <summary>
     /// 处理消息

@@ -74,10 +74,13 @@ public class ServiceCollectionExtensionsTests
         var connectionString = "redis.example.com:6379";
 
         // Act
-        services.AddDawningRedisCache(connectionString, options =>
-        {
-            options.KeyPrefix = "myapp";
-        });
+        services.AddDawningRedisCache(
+            connectionString,
+            options =>
+            {
+                options.KeyPrefix = "myapp";
+            }
+        );
 
         var provider = services.BuildServiceProvider();
         var cacheService = provider.GetService<ICacheService>();

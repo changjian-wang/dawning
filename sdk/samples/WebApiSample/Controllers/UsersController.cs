@@ -16,13 +16,34 @@ public class UsersController : ControllerBase
 {
     private readonly CurrentUser _currentUser;
     private readonly ILogger<UsersController> _logger;
-    
+
     // 模拟数据库
     private static readonly List<UserDto> _users = new()
     {
-        new UserDto { Id = 1, Name = "张三", Email = "zhangsan@example.com", Phone = "13812345678", CreatedAt = DateTime.Now.AddDays(-30) },
-        new UserDto { Id = 2, Name = "李四", Email = "lisi@example.com", Phone = "13987654321", CreatedAt = DateTime.Now.AddDays(-20) },
-        new UserDto { Id = 3, Name = "王五", Email = "wangwu@example.com", Phone = "13611112222", CreatedAt = DateTime.Now.AddDays(-10) }
+        new UserDto
+        {
+            Id = 1,
+            Name = "张三",
+            Email = "zhangsan@example.com",
+            Phone = "13812345678",
+            CreatedAt = DateTime.Now.AddDays(-30),
+        },
+        new UserDto
+        {
+            Id = 2,
+            Name = "李四",
+            Email = "lisi@example.com",
+            Phone = "13987654321",
+            CreatedAt = DateTime.Now.AddDays(-20),
+        },
+        new UserDto
+        {
+            Id = 3,
+            Name = "王五",
+            Email = "wangwu@example.com",
+            Phone = "13611112222",
+            CreatedAt = DateTime.Now.AddDays(-10),
+        },
     };
 
     public UsersController(CurrentUser currentUser, ILogger<UsersController> logger)
@@ -39,24 +60,20 @@ public class UsersController : ControllerBase
     public ActionResult<PagedResult<UserDto>> GetUsers(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
-        [FromQuery] string? search = null)
+        [FromQuery] string? search = null
+    )
     {
         var query = _users.AsQueryable();
-        
+
         // 使用 StringExtensions 检查搜索条件
         if (!search.IsNullOrWhiteSpace())
         {
-            query = query.Where(u => 
-                u.Name.Contains(search!) || 
-                u.Email.Contains(search!));
+            query = query.Where(u => u.Name.Contains(search!) || u.Email.Contains(search!));
         }
-        
+
         var total = query.Count();
-        var items = query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-        
+        var items = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
         // 使用 PagedResult 返回分页数据
         return Ok(new PagedResult<UserDto>(items, total, page, pageSize));
     }
@@ -69,13 +86,13 @@ public class UsersController : ControllerBase
     public ActionResult<ApiResult<UserDto>> GetUser(int id)
     {
         var user = _users.FirstOrDefault(u => u.Id == id);
-        
+
         if (user == null)
         {
             // 抛出业务异常，由异常中间件统一处理
             throw new NotFoundException($"用户 {id} 不存在");
         }
-        
+
         // 使用 ApiResult 返回成功响应
         return Ok(ApiResults.Ok(user));
     }
@@ -92,36 +109,36 @@ public class UsersController : ControllerBase
         {
             throw new ValidationException("用户名不能为空");
         }
-        
+
         if (!request.Email.IsValidEmail())
         {
             throw new ValidationException("邮箱格式不正确");
         }
-        
+
         if (!request.Phone.IsValidPhoneNumber())
         {
             throw new ValidationException("手机号格式不正确");
         }
-        
+
         // 检查邮箱是否已存在
         if (_users.Any(u => u.Email == request.Email))
         {
             throw new BusinessException("邮箱已被使用");
         }
-        
+
         var user = new UserDto
         {
             Id = _users.Max(u => u.Id) + 1,
             Name = request.Name,
             Email = request.Email,
             Phone = request.Phone.Mask(), // 使用 Mask 隐藏手机号
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
         };
-        
+
         _users.Add(user);
-        
+
         _logger.LogInformation("用户 {UserId} 创建成功", user.Id);
-        
+
         return Ok(ApiResults.Ok(user, "创建成功"));
     }
 
@@ -140,9 +157,9 @@ public class UsersController : ControllerBase
             UserName = _currentUser.UserName,
             Email = _currentUser.Email,
             Roles = _currentUser.Roles,
-            TenantId = _currentUser.TenantId
+            TenantId = _currentUser.TenantId,
         };
-        
+
         return Ok(ApiResults.Ok(userInfo));
     }
 }
@@ -158,7 +175,7 @@ public class UserDto
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
-    
+
     /// <summary>
     /// 使用 DateTimeExtensions 获取相对时间
     /// </summary>
