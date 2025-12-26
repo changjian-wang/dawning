@@ -4,16 +4,27 @@
       <div class="panel">
         <Banner />
         <DataPanel />
-        <ContentChart />
       </div>
       <a-grid :cols="24" :col-gap="16" :row-gap="16" style="margin-top: 16px">
         <a-grid-item :span="24">
-          <CategoriesPercent />
+          <GatewayMonitor />
+        </a-grid-item>
+        <a-grid-item :span="{ xs: 24, sm: 24, md: 24, lg: 12, xl: 12 }">
+          <SuccessRate />
+        </a-grid-item>
+        <a-grid-item :span="{ xs: 24, sm: 24, md: 24, lg: 12, xl: 12 }">
+          <TopPaths />
+        </a-grid-item>
+        <a-grid-item :span="24">
+          <ContentChart />
         </a-grid-item>
       </a-grid>
     </div>
     <div class="right-side">
       <a-grid :cols="24" :row-gap="16">
+        <a-grid-item :span="24">
+          <QuickOperation />
+        </a-grid-item>
         <a-grid-item class="panel" :span="24">
           <Announcement />
         </a-grid-item>
@@ -29,9 +40,12 @@
   import Banner from './components/banner.vue';
   import DataPanel from './components/data-panel.vue';
   import ContentChart from './components/content-chart.vue';
-  import CategoriesPercent from './components/categories-percent.vue';
   import Announcement from './components/announcement.vue';
   import RecentActivities from './components/recent-activities.vue';
+  import GatewayMonitor from './components/gateway-monitor.vue';
+  import SuccessRate from './components/success-rate.vue';
+  import TopPaths from './components/top-paths.vue';
+  import QuickOperation from './components/quick-operation.vue';
 </script>
 
 <script lang="ts">
