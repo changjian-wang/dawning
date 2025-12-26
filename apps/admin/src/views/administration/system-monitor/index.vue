@@ -83,41 +83,95 @@
       <a-row :gutter="16" style="margin-top: 16px">
         <a-col :xs="24" :md="12">
           <a-card class="general-card" :title="$t('systemMonitor.memoryDetails')">
-            <a-descriptions :column="1" bordered size="small">
-              <a-descriptions-item :label="$t('systemMonitor.memory.workingSet')">
-                {{ metrics?.memory?.workingSet || '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.memory.privateMemory')">
-                {{ metrics?.memory?.privateMemory || '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.memory.virtualMemory')">
-                {{ metrics?.memory?.virtualMemory || '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.memory.gcMemory')">
-                {{ metrics?.memory?.gcMemory || '-' }}
-              </a-descriptions-item>
-            </a-descriptions>
+            <template #extra>
+              <icon-storage style="color: rgb(var(--primary-6)); font-size: 18px" />
+            </template>
+            <div class="metric-grid">
+              <div class="metric-item memory-working">
+                <div class="metric-icon">
+                  <icon-common />
+                </div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.memory.workingSet') }}</div>
+                  <div class="metric-value">{{ metrics?.memory?.workingSet || '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item memory-private">
+                <div class="metric-icon">
+                  <icon-lock />
+                </div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.memory.privateMemory') }}</div>
+                  <div class="metric-value">{{ metrics?.memory?.privateMemory || '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item memory-virtual">
+                <div class="metric-icon">
+                  <icon-layers />
+                </div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.memory.virtualMemory') }}</div>
+                  <div class="metric-value">{{ metrics?.memory?.virtualMemory || '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item memory-gc">
+                <div class="metric-icon">
+                  <icon-sync />
+                </div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.memory.gcMemory') }}</div>
+                  <div class="metric-value">{{ metrics?.memory?.gcMemory || '-' }}</div>
+                </div>
+              </div>
+            </div>
           </a-card>
         </a-col>
         <a-col :xs="24" :md="12">
           <a-card class="general-card" :title="$t('systemMonitor.cpuGc')">
-            <a-descriptions :column="1" bordered size="small">
-              <a-descriptions-item :label="$t('systemMonitor.cpu.totalProcessorTime')">
-                {{ metrics?.cpu?.totalProcessorTime || '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.cpu.userProcessorTime')">
-                {{ metrics?.cpu?.userProcessorTime || '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.gc.gen0Collections')">
-                {{ metrics?.gc?.gen0Collections ?? '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.gc.gen1Collections')">
-                {{ metrics?.gc?.gen1Collections ?? '-' }}
-              </a-descriptions-item>
-              <a-descriptions-item :label="$t('systemMonitor.gc.gen2Collections')">
-                {{ metrics?.gc?.gen2Collections ?? '-' }}
-              </a-descriptions-item>
-            </a-descriptions>
+            <template #extra>
+              <icon-thunderbolt style="color: rgb(var(--orange-6)); font-size: 18px" />
+            </template>
+            <div class="metric-grid">
+              <div class="metric-item cpu-total">
+                <div class="metric-icon">
+                  <icon-desktop />
+                </div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.cpu.totalProcessorTime') }}</div>
+                  <div class="metric-value">{{ metrics?.cpu?.totalProcessorTime || '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item cpu-user">
+                <div class="metric-icon">
+                  <icon-user />
+                </div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.cpu.userProcessorTime') }}</div>
+                  <div class="metric-value">{{ metrics?.cpu?.userProcessorTime || '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item gc-gen0">
+                <div class="metric-icon gc-badge">0</div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.gc.gen0Collections') }}</div>
+                  <div class="metric-value highlight-green">{{ metrics?.gc?.gen0Collections ?? '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item gc-gen1">
+                <div class="metric-icon gc-badge">1</div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.gc.gen1Collections') }}</div>
+                  <div class="metric-value highlight-orange">{{ metrics?.gc?.gen1Collections ?? '-' }}</div>
+                </div>
+              </div>
+              <div class="metric-item gc-gen2">
+                <div class="metric-icon gc-badge">2</div>
+                <div class="metric-content">
+                  <div class="metric-label">{{ $t('systemMonitor.gc.gen2Collections') }}</div>
+                  <div class="metric-value highlight-red">{{ metrics?.gc?.gen2Collections ?? '-' }}</div>
+                </div>
+              </div>
+            </div>
           </a-card>
         </a-col>
       </a-row>
@@ -383,6 +437,113 @@
     .response-slow {
       color: #f53f3f;
       font-weight: 500;
+    }
+
+    // 内存和CPU指标网格样式
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+
+      .metric-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--color-fill-1) 0%, var(--color-fill-2) 100%);
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .metric-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          margin-right: 12px;
+          color: #fff;
+        }
+
+        .metric-content {
+          flex: 1;
+
+          .metric-label {
+            font-size: 12px;
+            color: var(--color-text-3);
+            margin-bottom: 4px;
+          }
+
+          .metric-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text-1);
+          }
+
+          .highlight-green {
+            color: rgb(var(--green-6));
+          }
+
+          .highlight-orange {
+            color: rgb(var(--orange-6));
+          }
+
+          .highlight-red {
+            color: rgb(var(--red-6));
+          }
+        }
+
+        // 内存类型图标颜色
+        &.memory-working .metric-icon {
+          background: linear-gradient(135deg, #165dff 0%, #0fc6c2 100%);
+        }
+
+        &.memory-private .metric-icon {
+          background: linear-gradient(135deg, #722ed1 0%, #f759ab 100%);
+        }
+
+        &.memory-virtual .metric-icon {
+          background: linear-gradient(135deg, #0fc6c2 0%, #00b42a 100%);
+        }
+
+        &.memory-gc .metric-icon {
+          background: linear-gradient(135deg, #ff7d00 0%, #fadb14 100%);
+        }
+
+        // CPU类型图标颜色
+        &.cpu-total .metric-icon {
+          background: linear-gradient(135deg, #f53f3f 0%, #ff7d00 100%);
+        }
+
+        &.cpu-user .metric-icon {
+          background: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
+        }
+
+        // GC徽章样式
+        &.gc-gen0 .metric-icon,
+        &.gc-gen1 .metric-icon,
+        &.gc-gen2 .metric-icon {
+          font-weight: 700;
+          font-size: 16px;
+        }
+
+        &.gc-gen0 .metric-icon.gc-badge {
+          background: linear-gradient(135deg, #00b42a 0%, #23c343 100%);
+        }
+
+        &.gc-gen1 .metric-icon.gc-badge {
+          background: linear-gradient(135deg, #ff7d00 0%, #faad14 100%);
+        }
+
+        &.gc-gen2 .metric-icon.gc-badge {
+          background: linear-gradient(135deg, #f53f3f 0%, #ff7875 100%);
+        }
+      }
     }
   }
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <a-layout-footer class="footer">Arco Pro</a-layout-footer>
+  <a-layout-footer class="footer">
+    <span>© {{ new Date().getFullYear() }} Dawning Gateway Admin</span>
+  </a-layout-footer>
 </template>
 
 <script lang="ts" setup></script>

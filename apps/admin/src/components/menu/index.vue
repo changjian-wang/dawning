@@ -115,22 +115,22 @@
                       ASubMenu,
                       {
                         key: element?.name,
-                        icon,
                       },
                       {
                         default: () => travel(element?.children || []),
                         title: () => h('span', null, menuTitle),
+                        icon,
                       }
                     )
                   : h(
                       AMenuItem,
                       {
                         key: element?.name,
-                        icon,
                         onClick: () => goto(element),
                       },
                       {
                         default: () => h('span', null, menuTitle),
+                        icon,
                       }
                     );
               nodes.push(node);
@@ -171,8 +171,8 @@
   });
 </script>
 
-<style lang="less" scoped>
-  :deep(.arco-menu-inner) {
+<style lang="less">
+  .arco-menu-inner {
     .arco-menu-inline-header {
       display: flex;
       align-items: center;
@@ -180,6 +180,157 @@
     .arco-icon {
       &:not(.arco-icon-down) {
         font-size: 18px;
+      }
+    }
+
+    // 确保所有层级的菜单项都显示图标
+    .arco-menu-item,
+    .arco-menu-inline-header {
+      .arco-menu-icon {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        color: var(--color-text-2);
+
+        .arco-icon {
+          font-size: 16px;
+        }
+      }
+    }
+
+    // 子菜单项的图标样式
+    .arco-menu-inline-content {
+      .arco-menu-item {
+        .arco-menu-icon {
+          margin-right: 8px;
+
+          .arco-icon {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    // 选中状态的图标颜色
+    .arco-menu-item.arco-menu-selected,
+    .arco-menu-inline-header.arco-menu-selected {
+      .arco-menu-icon {
+        color: rgb(var(--primary-6));
+      }
+    }
+  }
+
+  // 菜单收起时的样式优化
+  .arco-menu-collapsed {
+    width: 48px;
+
+    // 收起时的一级菜单项（包含子菜单的）
+    .arco-menu-pop {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 0 !important;
+      height: 40px;
+      cursor: pointer;
+
+      .arco-menu-icon {
+        margin-right: 0 !important;
+
+        .arco-icon {
+          font-size: 18px;
+          color: var(--color-text-2);
+        }
+      }
+
+      // 隐藏文字和箭头
+      .arco-menu-title,
+      .arco-menu-icon-suffix {
+        display: none !important;
+      }
+
+      &:hover {
+        background-color: var(--color-fill-2);
+
+        .arco-menu-icon .arco-icon {
+          color: rgb(var(--primary-6));
+        }
+      }
+    }
+
+    // 收起时的单独菜单项（无子菜单）
+    .arco-menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 !important;
+      height: 40px;
+
+      .arco-menu-icon {
+        margin-right: 0 !important;
+      }
+
+      .arco-menu-title {
+        display: none !important;
+      }
+    }
+  }
+</style>
+
+<!-- 弹出菜单样式（需要全局样式，挂载在 body 上） -->
+<style lang="less">
+  // 收起时弹出的子菜单样式
+  .arco-trigger-popup {
+    .arco-menu {
+      min-width: 180px;
+      padding: 4px 0;
+      border-radius: 4px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+      .arco-menu-item {
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        height: 36px;
+
+        .arco-menu-icon {
+          display: inline-flex !important;
+          align-items: center;
+          margin-right: 10px;
+
+          .arco-icon {
+            font-size: 14px;
+            color: var(--color-text-2);
+          }
+        }
+
+        &:hover {
+          background-color: var(--color-fill-2);
+        }
+
+        &.arco-menu-selected {
+          background-color: var(--color-primary-light-1);
+
+          .arco-menu-icon .arco-icon {
+            color: rgb(var(--primary-6));
+          }
+        }
+      }
+
+      // 弹出菜单内的子菜单标题
+      .arco-menu-inline-header {
+        display: flex;
+        align-items: center;
+
+        .arco-menu-icon {
+          display: inline-flex !important;
+          margin-right: 10px;
+
+          .arco-icon {
+            font-size: 14px;
+          }
+        }
       }
     }
   }
