@@ -77,4 +77,29 @@ export default {
   'tenant.current': '当前租户',
   'tenant.current.host': '主机模式（超级管理员）',
   'tenant.current.none': '未选择租户',
+
+  // 操作
+  'tenant.action.view': '查看',
+  'tenant.action.edit': '编辑',
+  'tenant.action.delete': '删除',
+  'tenant.action.enable': '启用',
+  'tenant.action.disable': '禁用',
+
+  // 状态显示
+  'tenant.status.active': '启用',
+  'tenant.status.inactive': '禁用',
+  'tenant.status.unlimited': '无限制',
+
+  // 验证消息
+  'tenant.validation.codeRequired': '请输入租户代码',
+  'tenant.validation.codePattern': '只能包含小写字母、数字、下划线和横杠',
+  'tenant.validation.codeLength': '长度为2-50个字符',
+  'tenant.validation.nameRequired': '请输入租户名称',
+  'tenant.validation.nameMaxLength': '最多100个字符',
+  'tenant.validation.emailInvalid': '请输入有效的邮箱地址',
+
+  // 错误消息
+  'tenant.message.loadFailed': '获取租户列表失败',
+  'tenant.message.operationFailed': '操作失败',
+  'tenant.message.deleteFailed': '删除失败',
 };

@@ -28,4 +28,8 @@ export default {
     '这将添加系统默认配置项（已存在的不会被覆盖），是否继续？',
   'systemConfig.initDefaultsSuccess': '默认配置已初始化',
   'systemConfig.initDefaultsFailed': '初始化失败',
+
+  // Modal buttons
+  'systemConfig.modal.ok': '确定',
+  'systemConfig.modal.cancel': '取消',
 };

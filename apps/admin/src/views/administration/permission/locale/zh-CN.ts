@@ -48,4 +48,15 @@ export default {
   'permission.message.deleteSuccess': '删除成功',
   'permission.message.deleteConfirm': '确定要删除此权限吗？',
   'permission.message.deleteWarning': '系统权限不能删除',
+
+  'permission.modal.create': '创建权限',
+  'permission.modal.edit': '编辑权限',
+  'permission.modal.viewGrouped': '按资源分组查看权限',
+  'permission.form.resource.required': '请输入资源类型',
+  'permission.form.action.required': '请输入操作类型',
+  'permission.form.code.required': '请输入权限代码',
+  'permission.form.code.format': '格式: resource:action',
+  'permission.form.code.suggest': '建议格式',
+  'permission.form.name.required': '请输入权限名称',
+  'permission.form.category.required': '请选择分类',
 };

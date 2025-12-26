@@ -9,13 +9,13 @@
       <a-col :xs="24" :sm="12" :md="6">
         <a-card class="stat-card">
           <a-statistic
-            title="告警规则"
+            :title="$t('alert.stats.alertRules')"
             :value="statistics.totalRules"
             :value-style="{ color: '#165DFF' }"
           >
             <template #suffix>
               <span style="font-size: 14px; color: #86909c">
-                / {{ statistics.enabledRules }} 启用
+                / {{ statistics.enabledRules }} {{ $t('alert.stats.enabled') }}
               </span>
             </template>
           </a-statistic>
@@ -24,7 +24,7 @@
       <a-col :xs="24" :sm="12" :md="6">
         <a-card class="stat-card">
           <a-statistic
-            title="今日告警"
+            :title="$t('alert.stats.todayAlerts')"
             :value="statistics.totalAlertsToday"
             :value-style="{ color: '#F77234' }"
           />
@@ -33,7 +33,7 @@
       <a-col :xs="24" :sm="12" :md="6">
         <a-card class="stat-card">
           <a-statistic
-            title="未解决告警"
+            :title="$t('alert.stats.unresolvedAlerts')"
             :value="statistics.unresolvedAlerts"
             :value-style="{ color: '#F53F3F' }"
           />
@@ -42,7 +42,7 @@
       <a-col :xs="24" :sm="12" :md="6">
         <a-card class="stat-card">
           <a-statistic
-            title="严重告警"
+            :title="$t('alert.stats.criticalAlerts')"
             :value="statistics.criticalAlerts"
             :value-style="{ color: '#EB2F96' }"
           />
@@ -50,18 +50,18 @@
       </a-col>
     </a-row>
 
-    <a-card class="general-card" title="告警管理">
+    <a-card class="general-card" :title="$t('alert.management')">
       <a-tabs v-model:active-key="activeTab">
         <!-- 告警规则 Tab -->
-        <a-tab-pane key="rules" title="告警规则">
+        <a-tab-pane key="rules" :title="$t('alert.tab.rules')">
           <div class="toolbar">
             <a-button type="primary" @click="handleAddRule">
               <template #icon><icon-plus /></template>
-              添加规则
+              {{ $t('alert.addRule') }}
             </a-button>
             <a-button :loading="checkLoading" @click="handleTriggerCheck">
               <template #icon><icon-thunderbolt /></template>
-              手动检查
+              {{ $t('alert.manualCheck') }}
             </a-button>
           </div>
 
@@ -99,7 +99,7 @@
               </span>
               <span v-else style="color: #86909c">-</span>
             </template>
-            <template #operations="{ record }">
+            <template #actions="{ record }">
               <a-space>
                 <a-button
                   type="text"
@@ -124,18 +124,18 @@
         </a-tab-pane>
 
         <!-- 告警历史 Tab -->
-        <a-tab-pane key="history" title="告警历史">
+        <a-tab-pane key="history" :title="$t('alert.tab.history')">
           <div class="toolbar">
             <a-space>
               <a-select
                 v-model="historyFilter.severity"
-                placeholder="严重程度"
+                :placeholder="$t('alert.filter.severity')"
                 allow-clear
                 style="width: 120px"
                 @change="loadHistory"
               >
                 <a-option
-                  v-for="item in severityOptions"
+                  v-for="item in localSeverityOptions"
                   :key="item.value"
                   :value="item.value"
                 >
@@ -144,13 +144,13 @@
               </a-select>
               <a-select
                 v-model="historyFilter.status"
-                placeholder="状态"
+                :placeholder="$t('alert.filter.status')"
                 allow-clear
                 style="width: 120px"
                 @change="loadHistory"
               >
                 <a-option
-                  v-for="item in alertStatusOptions"
+                  v-for="item in localAlertStatusOptions"
                   :key="item.value"
                   :value="item.value"
                 >
@@ -189,14 +189,14 @@
               <span>
                 {{ record.metricValue.toFixed(2) }}
                 <span style="color: #86909c; font-size: 12px">
-                  (阈值: {{ record.threshold }})
+                  ({{ $t('alert.column.threshold') }}: {{ record.threshold }})
                 </span>
               </span>
             </template>
             <template #triggeredAt="{ record }">
               {{ formatDateTime(record.triggeredAt) }}
             </template>
-            <template #operations="{ record }">
+            <template #actions="{ record }">
               <a-space>
                 <a-button
                   v-if="record.status === 'triggered'"
@@ -205,7 +205,7 @@
                   @click="handleAcknowledge(record)"
                 >
                   <template #icon><icon-check /></template>
-                  确认
+                  {{ $t('alert.action.acknowledge') }}
                 </a-button>
                 <a-button
                   v-if="record.status !== 'resolved'"
@@ -215,7 +215,7 @@
                   @click="handleResolve(record)"
                 >
                   <template #icon><icon-check-circle /></template>
-                  解决
+                  {{ $t('alert.action.resolve') }}
                 </a-button>
               </a-space>
             </template>
@@ -227,7 +227,7 @@
     <!-- 规则编辑弹窗 -->
     <a-modal
       v-model:visible="ruleModalVisible"
-      :title="isEditMode ? '编辑告警规则' : '添加告警规则'"
+      :title="isEditMode ? $t('alert.modal.editRule') : $t('alert.modal.addRule')"
       width="600px"
       :ok-loading="ruleSubmitting"
       @before-ok="handleRuleBeforeOk"
@@ -239,22 +239,22 @@
         :rules="ruleFormRules"
         layout="vertical"
       >
-        <a-form-item field="name" label="规则名称">
-          <a-input v-model="ruleForm.name" placeholder="请输入规则名称" />
+        <a-form-item field="name" :label="$t('alert.form.ruleName')">
+          <a-input v-model="ruleForm.name" :placeholder="$t('alert.placeholder.ruleName')" />
         </a-form-item>
-        <a-form-item field="description" label="描述">
+        <a-form-item field="description" :label="$t('alert.form.description')">
           <a-textarea
             v-model="ruleForm.description"
-            placeholder="请输入规则描述"
+            :placeholder="$t('alert.placeholder.description')"
             :max-length="500"
           />
         </a-form-item>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item field="metricType" label="指标类型">
-              <a-select v-model="ruleForm.metricType" placeholder="请选择指标">
+            <a-form-item field="metricType" :label="$t('alert.form.metricType')">
+              <a-select v-model="ruleForm.metricType" :placeholder="$t('alert.placeholder.metricType')">
                 <a-option
-                  v-for="item in metricTypeOptions"
+                  v-for="item in localMetricTypeOptions"
                   :key="item.value"
                   :value="item.value"
                 >
@@ -264,13 +264,13 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="severity" label="严重程度">
+            <a-form-item field="severity" :label="$t('alert.form.severity')">
               <a-select
                 v-model="ruleForm.severity"
-                placeholder="请选择严重程度"
+                :placeholder="$t('alert.placeholder.severity')"
               >
                 <a-option
-                  v-for="item in severityOptions"
+                  v-for="item in localSeverityOptions"
                   :key="item.value"
                   :value="item.value"
                 >
@@ -282,10 +282,10 @@
         </a-row>
         <a-row :gutter="16">
           <a-col :span="8">
-            <a-form-item field="operator" label="比较操作符">
-              <a-select v-model="ruleForm.operator" placeholder="请选择操作符">
+            <a-form-item field="operator" :label="$t('alert.form.operator')">
+              <a-select v-model="ruleForm.operator" :placeholder="$t('alert.placeholder.operator')">
                 <a-option
-                  v-for="item in operatorOptions"
+                  v-for="item in localOperatorOptions"
                   :key="item.value"
                   :value="item.value"
                 >
@@ -295,7 +295,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="8">
-            <a-form-item field="threshold" label="阈值">
+            <a-form-item field="threshold" :label="$t('alert.form.threshold')">
               <a-input-number
                 v-model="ruleForm.threshold"
                 :min="0"
@@ -304,7 +304,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="8">
-            <a-form-item field="durationSeconds" label="持续时间(秒)">
+            <a-form-item field="durationSeconds" :label="$t('alert.form.duration')">
               <a-input-number
                 v-model="ruleForm.durationSeconds"
                 :min="0"
@@ -315,7 +315,7 @@
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item field="cooldownMinutes" label="冷却时间(分钟)">
+            <a-form-item field="cooldownMinutes" :label="$t('alert.form.cooldown')">
               <a-input-number
                 v-model="ruleForm.cooldownMinutes"
                 :min="1"
@@ -324,16 +324,16 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="isEnabled" label="启用状态">
+            <a-form-item field="isEnabled" :label="$t('alert.form.enabled')">
               <a-switch v-model="ruleForm.isEnabled" />
             </a-form-item>
           </a-col>
         </a-row>
-        <a-divider>通知设置</a-divider>
-        <a-form-item field="notifyChannels" label="通知渠道">
+        <a-divider>{{ $t('alert.form.notifySettings') }}</a-divider>
+        <a-form-item field="notifyChannels" :label="$t('alert.form.notifyChannels')">
           <a-checkbox-group v-model="ruleForm.notifyChannels">
             <a-checkbox
-              v-for="item in notifyChannelOptions"
+              v-for="item in localNotifyChannelOptions"
               :key="item.value"
               :value="item.value"
             >
@@ -344,21 +344,21 @@
         <a-form-item
           v-if="ruleForm.notifyChannels.includes('email')"
           field="notifyEmails"
-          label="通知邮箱"
+          :label="$t('alert.form.notifyEmails')"
         >
           <a-input
             v-model="ruleForm.notifyEmails"
-            placeholder="多个邮箱用逗号分隔"
+            :placeholder="$t('alert.placeholder.emails')"
           />
         </a-form-item>
         <a-form-item
           v-if="ruleForm.notifyChannels.includes('webhook')"
           field="webhookUrl"
-          label="Webhook URL"
+          :label="$t('alert.form.webhookUrl')"
         >
           <a-input
             v-model="ruleForm.webhookUrl"
-            placeholder="请输入 Webhook URL"
+            :placeholder="$t('alert.placeholder.webhookUrl')"
           />
         </a-form-item>
       </a-form>
@@ -367,9 +367,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted } from 'vue';
+  import { ref, reactive, computed, onMounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import type { TableColumnData } from '@arco-design/web-vue';
+  import { useI18n } from 'vue-i18n';
   import Breadcrumb from '@/components/breadcrumb/index.vue';
   import {
     getAllRules,
@@ -381,16 +382,13 @@
     updateAlertStatus,
     triggerAlertCheck,
     getAlertStatistics,
-    metricTypeOptions,
-    operatorOptions,
-    severityOptions,
-    alertStatusOptions,
-    notifyChannelOptions,
     type AlertRuleDto,
     type AlertHistoryDto,
     type AlertStatisticsDto,
     type CreateAlertRuleRequest,
   } from '@/api/alert';
+
+  const { t } = useI18n();
 
   // 状态
   const activeTab = ref('rules');
@@ -447,41 +445,76 @@
     cooldownMinutes: 5,
   });
 
-  const ruleFormRules = {
-    name: [{ required: true, message: '请输入规则名称' }],
-    metricType: [{ required: true, message: '请选择指标类型' }],
-    operator: [{ required: true, message: '请选择操作符' }],
-    threshold: [{ required: true, message: '请输入阈值' }],
-    severity: [{ required: true, message: '请选择严重程度' }],
-  };
+  const ruleFormRules = computed(() => ({
+    name: [{ required: true, message: t('alert.validation.ruleName') }],
+    metricType: [{ required: true, message: t('alert.validation.metricType') }],
+    operator: [{ required: true, message: t('alert.validation.operator') }],
+    threshold: [{ required: true, message: t('alert.validation.threshold') }],
+    severity: [{ required: true, message: t('alert.validation.severity') }],
+  }));
+
+  // 本地化选项
+  const localMetricTypeOptions = computed(() => [
+    { label: t('alert.metricType.cpu'), value: 'cpu' },
+    { label: t('alert.metricType.memory'), value: 'memory' },
+    { label: t('alert.metricType.responseTime'), value: 'response_time' },
+    { label: t('alert.metricType.errorRate'), value: 'error_rate' },
+    { label: t('alert.metricType.requestCount'), value: 'request_count' },
+  ]);
+
+  const localOperatorOptions = computed(() => [
+    { label: t('alert.operator.gt'), value: 'gt' },
+    { label: t('alert.operator.gte'), value: 'gte' },
+    { label: t('alert.operator.lt'), value: 'lt' },
+    { label: t('alert.operator.lte'), value: 'lte' },
+    { label: t('alert.operator.eq'), value: 'eq' },
+  ]);
+
+  const localSeverityOptions = computed(() => [
+    { label: t('alert.severity.info'), value: 'info', color: 'blue' },
+    { label: t('alert.severity.warning'), value: 'warning', color: 'orange' },
+    { label: t('alert.severity.error'), value: 'error', color: 'red' },
+    { label: t('alert.severity.critical'), value: 'critical', color: 'magenta' },
+  ]);
+
+  const localAlertStatusOptions = computed(() => [
+    { label: t('alert.status.triggered'), value: 'triggered', color: 'red' },
+    { label: t('alert.status.acknowledged'), value: 'acknowledged', color: 'orange' },
+    { label: t('alert.status.resolved'), value: 'resolved', color: 'green' },
+  ]);
+
+  const localNotifyChannelOptions = computed(() => [
+    { label: t('alert.notify.email'), value: 'email' },
+    { label: t('alert.notify.webhook'), value: 'webhook' },
+  ]);
 
   // 表格列定义
-  const ruleColumns: TableColumnData[] = [
-    { title: '规则名称', dataIndex: 'name', ellipsis: true, width: 150 },
-    { title: '指标类型', slotName: 'metricType', width: 120 },
-    { title: '条件', slotName: 'condition', width: 100 },
+  const ruleColumns = computed<TableColumnData[]>(() => [
+    { title: t('alert.column.ruleName'), dataIndex: 'name', ellipsis: true, width: 150 },
+    { title: t('alert.column.metricType'), slotName: 'metricType', width: 120 },
+    { title: t('alert.column.condition'), slotName: 'condition', width: 100 },
     {
-      title: '持续时间',
+      title: t('alert.column.duration'),
       dataIndex: 'durationSeconds',
       width: 90,
       render: ({ record }: { record: AlertRuleDto }) =>
-        `${record.durationSeconds}秒`,
+        `${record.durationSeconds}${t('alert.duration.seconds')}`,
     },
-    { title: '严重程度', slotName: 'severity', width: 100 },
-    { title: '启用', slotName: 'isEnabled', width: 80 },
-    { title: '上次触发', slotName: 'lastTriggeredAt', width: 160 },
-    { title: '操作', slotName: 'operations', width: 160 },
-  ];
+    { title: t('alert.column.severity'), slotName: 'severity', width: 100 },
+    { title: t('alert.column.enabled'), slotName: 'isEnabled', width: 80 },
+    { title: t('alert.column.lastTriggered'), slotName: 'lastTriggeredAt', width: 160 },
+    { title: t('common.actions'), slotName: 'actions', width: 160 },
+  ]);
 
-  const historyColumns: TableColumnData[] = [
-    { title: '规则名称', dataIndex: 'ruleName', ellipsis: true, width: 150 },
-    { title: '严重程度', slotName: 'severity', width: 90 },
-    { title: '状态', slotName: 'status', width: 90 },
-    { title: '指标值', slotName: 'metricValue', width: 150 },
-    { title: '消息', dataIndex: 'message', ellipsis: true },
-    { title: '触发时间', slotName: 'triggeredAt', width: 160 },
-    { title: '操作', slotName: 'operations', width: 160 },
-  ];
+  const historyColumns = computed<TableColumnData[]>(() => [
+    { title: t('alert.column.ruleName'), dataIndex: 'ruleName', ellipsis: true, width: 150 },
+    { title: t('alert.column.severity'), slotName: 'severity', width: 90 },
+    { title: t('alert.column.status'), slotName: 'status', width: 90 },
+    { title: t('alert.column.metricValue'), slotName: 'metricValue', width: 150 },
+    { title: t('alert.column.message'), dataIndex: 'message', ellipsis: true },
+    { title: t('alert.column.triggeredAt'), slotName: 'triggeredAt', width: 160 },
+    { title: t('common.actions'), slotName: 'actions', width: 160 },
+  ]);
 
   // 工具函数
   const formatDateTime = (dateStr: string) => {
@@ -490,7 +523,7 @@
   };
 
   const getMetricTypeLabel = (type: string) => {
-    return metricTypeOptions.find((o) => o.value === type)?.label || type;
+    return localMetricTypeOptions.value.find((o) => o.value === type)?.label || type;
   };
 
   const getOperatorLabel = (op: string) => {
@@ -505,7 +538,7 @@
   };
 
   const getSeverityLabel = (severity: string) => {
-    return severityOptions.find((o) => o.value === severity)?.label || severity;
+    return localSeverityOptions.value.find((o) => o.value === severity)?.label || severity;
   };
 
   const getSeverityColor = (severity: string) => {
@@ -519,7 +552,7 @@
   };
 
   const getStatusLabel = (status: string) => {
-    return alertStatusOptions.find((o) => o.value === status)?.label || status;
+    return localAlertStatusOptions.value.find((o) => o.value === status)?.label || status;
   };
 
   const getStatusColor = (status: string) => {

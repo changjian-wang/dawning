@@ -75,6 +75,11 @@
         <template #routeId="{ record }">
           <a-tag color="blue">{{ record.routeId }}</a-tag>
         </template>
+        <template #name="{ record }">
+          <a-tooltip :content="record.name">
+            <span class="name-text">{{ record.name }}</span>
+          </a-tooltip>
+        </template>
         <template #clusterId="{ record }">
           <a-tag color="cyan">{{ record.clusterId }}</a-tag>
         </template>
@@ -94,7 +99,7 @@
               {{ method }}
             </a-tag>
           </a-space>
-          <span v-else style="color: #86909c">全部</span>
+          <span v-else style="color: #86909c">{{ $t('gateway.route.matchMethodsAll') }}</span>
         </template>
         <template #policies="{ record }">
           <a-space wrap>
@@ -119,20 +124,22 @@
             @change="(val) => handleToggleEnabled(record, val as boolean)"
           />
         </template>
-        <template #operations="{ record }">
+        <template #actions="{ record }">
           <a-space>
-            <a-button type="text" size="small" status="warning" @click="handleEdit(record)">
-              <template #icon><icon-edit /></template>
-              {{ $t('common.edit') }}
-            </a-button>
+            <a-tooltip :content="$t('common.edit')">
+              <a-button type="text" size="small" status="warning" @click="handleEdit(record)">
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
               :content="$t('common.deleteConfirm')"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
-                {{ $t('common.delete') }}
-              </a-button>
+              <a-tooltip :content="$t('common.delete')">
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -354,14 +361,26 @@
     deleteRoute,
     toggleRouteEnabled,
     getClusterOptions,
-    authorizationPolicies,
-    rateLimiterPolicies,
     type GatewayRoute,
     type GatewayRouteQueryParams,
     type ClusterOption,
   } from '@/api/gateway/gateway';
 
   const { t } = useI18n();
+
+  // Authorization policy options with i18n
+  const authorizationPolicies = computed(() => [
+    { value: '', label: t('gateway.route.authorizationPolicy.none') },
+    { value: 'RequireAuthenticatedUser', label: t('gateway.route.authorizationPolicy.requireAuthenticatedUser') },
+    { value: 'RequireAdmin', label: t('gateway.route.authorizationPolicy.requireAdmin') },
+  ]);
+
+  // Rate limiter policy options with i18n
+  const rateLimiterPolicies = computed(() => [
+    { value: '', label: t('gateway.route.rateLimiterPolicy.none') },
+    { value: 'FixedWindowPolicy', label: t('gateway.route.rateLimiterPolicy.fixedWindow') },
+    { value: 'SlidingWindowPolicy', label: t('gateway.route.rateLimiterPolicy.slidingWindow') },
+  ]);
 
   // 查询参数
   const queryParams = reactive<GatewayRouteQueryParams>({
@@ -391,9 +410,9 @@
   }));
 
   // 表格列配置
-  const columns: TableColumnData[] = [
+  const columns = computed(() => [
     { title: t('gateway.route.routeId'), slotName: 'routeId', width: 150 },
-    { title: t('gateway.route.name'), dataIndex: 'name', width: 120 },
+    { title: t('gateway.route.name'), slotName: 'name', width: 120, ellipsis: true },
     { title: t('gateway.route.clusterId'), slotName: 'clusterId', width: 120 },
     { title: t('gateway.route.matchPath'), slotName: 'matchPath', width: 180 },
     {
@@ -404,8 +423,8 @@
     { title: t('gateway.route.policies'), slotName: 'policies', width: 180 },
     { title: t('gateway.route.order'), slotName: 'order', width: 60 },
     { title: t('gateway.status'), slotName: 'isEnabled', width: 80 },
-    { title: t('common.operations'), slotName: 'operations', width: 140, align: 'center' },
-  ];
+    { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
+  ]);
 
   // 弹窗相关
   const modalVisible = ref(false);
@@ -634,6 +653,14 @@
 
   .path-text {
     max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .name-text {
+    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

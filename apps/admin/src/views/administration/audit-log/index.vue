@@ -195,13 +195,14 @@
           {{ formatDateTime(record.createdAt) }}
         </template>
 
-        <template #operations="{ record }">
-          <a-button type="text" size="small" @click="handleViewDetail(record)">
-            <template #icon>
-              <icon-eye />
-            </template>
-            {{ $t('common.detail') }}
-          </a-button>
+        <template #actions="{ record }">
+          <a-tooltip :content="$t('common.detail')">
+            <a-button type="text" size="small" @click="handleViewDetail(record)">
+              <template #icon>
+                <icon-eye />
+              </template>
+            </a-button>
+          </a-tooltip>
         </template>
       </a-table>
     </a-card>
@@ -423,8 +424,8 @@
       width: 160,
     },
     {
-      title: t('auditLog.columns.operations'),
-      slotName: 'operations',
+      title: t('common.actions'),
+      slotName: 'actions',
       width: 70,
       align: 'center',
       fixed: 'right',
@@ -615,6 +616,11 @@
 </script>
 
 <style scoped lang="less">
+  // 表格标题不加粗
+  :deep(.arco-table-th) {
+    font-weight: normal !important;
+  }
+
   .container {
     padding: 0 20px 20px 20px;
   }

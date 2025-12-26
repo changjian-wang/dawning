@@ -22,7 +22,7 @@ export default {
   'tenant.column.maxUsers': 'Max Users',
   'tenant.column.isActive': 'Status',
   'tenant.column.createdAt': 'Created At',
-  'tenant.column.operations': 'Actions',
+  'tenant.column.operations': 'Operations',
 
   // Form
   'tenant.form.code': 'Tenant Code',
@@ -78,4 +78,29 @@ export default {
   'tenant.current': 'Current Tenant',
   'tenant.current.host': 'Host Mode (Super Admin)',
   'tenant.current.none': 'No tenant selected',
+
+  // Actions
+  'tenant.action.view': 'View',
+  'tenant.action.edit': 'Edit',
+  'tenant.action.delete': 'Delete',
+  'tenant.action.enable': 'Enable',
+  'tenant.action.disable': 'Disable',
+
+  // Status display
+  'tenant.status.active': 'Active',
+  'tenant.status.inactive': 'Inactive',
+  'tenant.status.unlimited': 'Unlimited',
+
+  // Validation messages
+  'tenant.validation.codeRequired': 'Please enter tenant code',
+  'tenant.validation.codePattern': 'Only lowercase letters, numbers, underscores and hyphens allowed',
+  'tenant.validation.codeLength': 'Length must be 2-50 characters',
+  'tenant.validation.nameRequired': 'Please enter tenant name',
+  'tenant.validation.nameMaxLength': 'Maximum 100 characters',
+  'tenant.validation.emailInvalid': 'Please enter a valid email address',
+
+  // Error messages
+  'tenant.message.loadFailed': 'Failed to load tenant list',
+  'tenant.message.operationFailed': 'Operation failed',
+  'tenant.message.deleteFailed': 'Delete failed',
 };

@@ -24,9 +24,9 @@ export default {
   'gateway.cluster.description': 'Description',
   'gateway.cluster.descriptionPlaceholder': 'Enter cluster description',
   'gateway.cluster.destinations': 'Destinations',
+  'gateway.cluster.destinationCount': 'destinations',
   'gateway.cluster.destinationsPlaceholder':
-    'JSON format, e.g.: {"dest1":{"Address":"http://localhost:5000"}}',
-  'gateway.cluster.destinationsRequired': 'Destinations are required',
+    'JSON format, e.g.: {"dest1":{"Address":"http://localhost:5000"}}',  'gateway.cluster.destinationsFormat': 'JSON format, e.g.: [{"destinationId": "dest1", "address": "http://localhost:5000"}]',  'gateway.cluster.destinationsRequired': 'Destinations are required',
   'gateway.cluster.isEnabled': 'Enabled',
 
   // Load Balancing Policies
@@ -77,6 +77,7 @@ export default {
     'Path pattern, e.g.: /api/{**catch-all}',
   'gateway.route.matchPathRequired': 'Match path is required',
   'gateway.route.matchMethods': 'Match Methods',
+  'gateway.route.matchMethodsAll': 'All',
   'gateway.route.matchMethodsPlaceholder': 'Leave empty to match all methods',
   'gateway.route.order': 'Priority',
   'gateway.route.orderPlaceholder': 'Lower value = higher priority',
@@ -85,7 +86,13 @@ export default {
   // Policy Settings
   'gateway.route.policies': 'Policy Settings',
   'gateway.route.authorizationPolicy': 'Authorization Policy',
+  'gateway.route.authorizationPolicy.none': 'None',
+  'gateway.route.authorizationPolicy.requireAuthenticatedUser': 'Require Authenticated User',
+  'gateway.route.authorizationPolicy.requireAdmin': 'Require Admin',
   'gateway.route.rateLimiterPolicy': 'Rate Limiter Policy',
+  'gateway.route.rateLimiterPolicy.none': 'None',
+  'gateway.route.rateLimiterPolicy.fixedWindow': 'Fixed Window',
+  'gateway.route.rateLimiterPolicy.slidingWindow': 'Sliding Window',
   'gateway.route.timeoutSeconds': 'Timeout (seconds)',
 
   // Path Transforms
@@ -104,6 +111,10 @@ export default {
   'rateLimit.policyName': 'Policy Name',
   'rateLimit.displayName': 'Display Name',
   'rateLimit.policyType': 'Policy Type',
+  'rateLimit.policyType.fixedWindow': 'Fixed Window',
+  'rateLimit.policyType.slidingWindow': 'Sliding Window',
+  'rateLimit.policyType.tokenBucket': 'Token Bucket',
+  'rateLimit.policyType.concurrency': 'Concurrency',
   'rateLimit.permitLimit': 'Permit Limit',
   'rateLimit.windowSeconds': 'Window (seconds)',
   'rateLimit.segments': 'Segments Per Window',
@@ -113,6 +124,7 @@ export default {
   'rateLimit.description': 'Description',
   'rateLimit.operations': 'Operations',
   'rateLimit.ipAddress': 'IP Address',
+  'rateLimit.ipAddressPlaceholder': '192.168.1.1 or 192.168.1.0/24',
   'rateLimit.ruleType': 'Rule Type',
   'rateLimit.blacklist': 'Blacklist',
   'rateLimit.whitelist': 'Whitelist',

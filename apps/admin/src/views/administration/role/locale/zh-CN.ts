@@ -37,4 +37,22 @@ export default {
   'role.message.updateFailed': '更新失败',
   'role.message.systemRoleCannotModify': '系统角色不能修改或删除',
   'role.message.superAdminRoleCannotModify': 'super_admin 角色只能由超级管理员修改',
+  'role.action.permissions': '权限',
+  'role.action.systemRole': '系统角色',
+  'role.action.systemRoleNoDelete': '系统角色不可删除',
+  'role.permission.allPermissions': '全部权限',
+
+  // Permission assignment modal
+  'role.permission.assignTitle': '分配权限 - {roleName}',
+  'role.permission.searchPlaceholder': '搜索权限...',
+  'role.permission.available': '可分配权限',
+  'role.permission.assigned': '已分配权限',
+  'role.permission.loadFailed': '加载权限数据失败',
+  'role.permission.assignSuccess': '权限分配成功',
+  'role.permission.assignFailed': '权限分配失败',
+  'role.message.systemRoleNoDelete': '系统角色不可删除',
+
+  // Modal buttons
+  'role.modal.ok': '确定',
+  'role.modal.cancel': '取消',
 };

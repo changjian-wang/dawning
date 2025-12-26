@@ -99,7 +99,6 @@
       const renderSubMenu = () => {
         const ASubMenu = resolveComponent('ASubMenu');
         const AMenuItem = resolveComponent('AMenuItem');
-        const ATooltip = resolveComponent('ATooltip');
 
         function travel(_route: RouteRecordRaw[]) {
           const nodes: any[] = [];
@@ -110,11 +109,6 @@
                 ? () => h(compile(`<${element?.meta?.icon}/>`)) as any
                 : null;
               const menuTitle = t(element?.meta?.locale || '');
-              const tooltipProps = {
-                content: menuTitle,
-                position: 'right',
-                mini: true,
-              };
               const node =
                 element?.children && element?.children.length !== 0
                   ? h(
@@ -125,12 +119,7 @@
                       },
                       {
                         default: () => travel(element?.children || []),
-                        title: () =>
-                          h(
-                            ATooltip,
-                            tooltipProps,
-                            { default: () => h('span', null, menuTitle) }
-                          ),
+                        title: () => h('span', null, menuTitle),
                       }
                     )
                   : h(
@@ -141,12 +130,7 @@
                         onClick: () => goto(element),
                       },
                       {
-                        default: () =>
-                          h(
-                            ATooltip,
-                            tooltipProps,
-                            { default: () => h('span', null, menuTitle) }
-                          ),
+                        default: () => h('span', null, menuTitle),
                       }
                     );
               nodes.push(node);

@@ -8,10 +8,10 @@
         <a-form :model="model" layout="inline" class="search-form">
           <a-row :gutter="[16, 16]" style="width: 100%">
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="name" label="名称" class="form-item-block">
+              <a-form-item field="name" :label="$t('claimType.search.name')" class="form-item-block">
                 <a-input
                   v-model="model.name"
-                  placeholder="请输入名称"
+                  :placeholder="$t('claimType.placeholder.name')"
                   allow-clear
                 >
                   <template #prefix>
@@ -21,10 +21,10 @@
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="type" label="类型" class="form-item-block">
+              <a-form-item field="type" :label="$t('claimType.search.type')" class="form-item-block">
                 <a-select
                   v-model="model.type"
-                  placeholder="请选择类型"
+                  :placeholder="$t('claimType.placeholder.type')"
                   allow-clear
                 >
                   <template #prefix>
@@ -49,15 +49,15 @@
               <a-space :size="12">
                 <a-button type="primary" @click="handleSearch">
                   <template #icon><icon-search /></template>
-                  查询
+                  {{ $t('claimType.button.search') }}
                 </a-button>
                 <a-button @click="handleReset">
                   <template #icon><icon-refresh /></template>
-                  重置
+                  {{ $t('claimType.button.reset') }}
                 </a-button>
                 <a-button type="primary" status="success" @click="handleAdd">
                   <template #icon><icon-plus /></template>
-                  新增
+                  {{ $t('claimType.button.add') }}
                 </a-button>
               </a-space>
             </a-col>
@@ -75,46 +75,49 @@
           <template #required="{ record }">
             <a-tag v-if="record.required" color="green" size="small">
               <template #icon><icon-check-circle-fill /></template>
-              必需
+              {{ $t('claimType.tag.required') }}
             </a-tag>
             <a-tag v-else color="gray" size="small">
               <template #icon><icon-minus-circle-fill /></template>
-              可选
+              {{ $t('claimType.tag.optional') }}
             </a-tag>
           </template>
           <template #nonEditable="{ record }">
             <a-tag v-if="!record.nonEditable" color="arcoblue" size="small">
               <template #icon><icon-edit /></template>
-              可编辑
+              {{ $t('claimType.tag.editable') }}
             </a-tag>
             <a-tag v-else color="orange" size="small">
               <template #icon><icon-lock /></template>
-              锁定
+              {{ $t('claimType.tag.locked') }}
             </a-tag>
           </template>
           <template #optional="{ record }">
             <a-space>
-              <a-button type="text" size="small" @click="handleView(record)">
-                <template #icon><icon-eye /></template>
-                查看
-              </a-button>
-              <a-button
-                type="text"
-                size="small"
-                status="warning"
-                @click="handleEdit(record)"
-              >
-                <template #icon><icon-edit /></template>
-                编辑
-              </a-button>
+              <a-tooltip :content="$t('claimType.action.view')">
+                <a-button type="text" size="small" @click="handleView(record)">
+                  <template #icon><icon-eye /></template>
+                </a-button>
+              </a-tooltip>
+              <a-tooltip :content="$t('claimType.action.edit')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="warning"
+                  @click="handleEdit(record)"
+                >
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
               <a-popconfirm
-                content="确定要删除此声明类型吗？"
+                :content="$t('claimType.delete.confirm')"
                 @ok="handleDel(record.id)"
               >
-                <a-button type="text" size="small" status="danger">
-                  <template #icon><icon-delete /></template>
-                  删除
-                </a-button>
+                <a-tooltip :content="$t('claimType.action.delete')">
+                  <a-button type="text" size="small" status="danger">
+                    <template #icon><icon-delete /></template>
+                  </a-button>
+                </a-tooltip>
               </a-popconfirm>
             </a-space>
           </template>
@@ -125,32 +128,32 @@
       <a-modal
         v-model:visible="visible"
         width="auto"
-        title="新增"
+        :title="isEditMode ? $t('claimType.modal.edit') : $t('claimType.modal.add')"
         :ok-loading="submitLoading"
         @before-ok="handleBeforeOk"
       >
-        <a-form ref="formRef" :rules="rules" :model="form">
+        <a-form ref="formRef" :rules="rules" :model="form" layout="vertical">
           <a-card class="general-card">
             <a-row :gutter="80">
               <a-col :span="12">
-                <a-form-item field="name" label="名称" validate-trigger="blur">
+                <a-form-item field="name" :label="$t('claimType.form.name')" validate-trigger="blur">
                   <a-input
                     v-model="form.name"
-                    placeholder="请输入..."
+                    :placeholder="$t('claimType.placeholder.input')"
                   ></a-input>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="显示名称">
+                <a-form-item :label="$t('claimType.form.displayName')">
                   <a-input
                     v-model="form.displayName"
-                    placeholder="请输入..."
+                    :placeholder="$t('claimType.placeholder.input')"
                   ></a-input>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="类型">
-                  <a-select v-model="form.type" placeholder="请选择...">
+                <a-form-item :label="$t('claimType.form.type')">
+                  <a-select v-model="form.type" :placeholder="$t('claimType.placeholder.select')">
                     <a-option>String</a-option>
                     <a-option>Int</a-option>
                     <a-option>DateTime</a-option>
@@ -160,7 +163,7 @@
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="是否必须项">
+                <a-form-item :label="$t('claimType.form.required')">
                   <a-switch v-model="form.required">
                     <template #checked-icon>
                       <icon-check />
@@ -172,15 +175,15 @@
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="说明">
+                <a-form-item :label="$t('claimType.form.description')">
                   <a-textarea
                     v-model="form.description"
-                    placeholder="请输入..."
+                    :placeholder="$t('claimType.placeholder.input')"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="用户可编辑">
+                <a-form-item :label="$t('claimType.form.nonEditable')">
                   <a-switch v-model="form.nonEditable">
                     <template #checked-icon>
                       <icon-check />
@@ -200,51 +203,49 @@
     <!-- 查看详情弹窗 -->
     <a-modal
       v-model:visible="viewVisible"
-      title="声明类型详情"
+      :title="$t('claimType.modal.detail')"
       width="560px"
       :footer="false"
     >
       <div class="detail-content">
         <div class="detail-row">
-          <span class="label">名称</span>
+          <span class="label">{{ $t('claimType.detail.name') }}</span>
           <span class="value">{{ currentRecord?.name || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">显示名称</span>
+          <span class="label">{{ $t('claimType.detail.displayName') }}</span>
           <span class="value">{{ currentRecord?.displayName || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">类型</span>
+          <span class="label">{{ $t('claimType.detail.type') }}</span>
           <span class="value">{{ currentRecord?.type || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">是否必需</span>
+          <span class="label">{{ $t('claimType.detail.required') }}</span>
           <span class="value">
-            <a-tag v-if="currentRecord?.required" color="green" size="small"
-              >必需</a-tag
-            >
-            <a-tag v-else color="gray" size="small">可选</a-tag>
+            <a-tag v-if="currentRecord?.required" color="green" size="small">{{ $t('claimType.tag.required') }}</a-tag>
+            <a-tag v-else color="gray" size="small">{{ $t('claimType.tag.optional') }}</a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">可编辑性</span>
+          <span class="label">{{ $t('claimType.detail.editable') }}</span>
           <span class="value">
             <a-tag
               v-if="!currentRecord?.nonEditable"
               color="arcoblue"
               size="small"
-              >可编辑</a-tag
+              >{{ $t('claimType.tag.editable') }}</a-tag
             >
-            <a-tag v-else color="orange" size="small">锁定</a-tag>
+            <a-tag v-else color="orange" size="small">{{ $t('claimType.tag.locked') }}</a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">描述</span>
+          <span class="label">{{ $t('claimType.detail.description') }}</span>
           <span class="value">{{ currentRecord?.description || '-' }}</span>
         </div>
       </div>
@@ -253,7 +254,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, onMounted, onUnmounted } from 'vue';
+  import { reactive, ref, computed, onMounted, onUnmounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import {
     IClaimType,
     IClaimTypeModel,
@@ -261,54 +263,58 @@
   } from '@/api/administration/claim-type';
   import { FieldRule, PaginationProps } from '@arco-design/web-vue';
 
+  const { t } = useI18n();
+
   const visible = ref(false);
   const viewVisible = ref(false);
   const currentRecord = ref<IClaimType | null>(null);
   const formRef = ref<any>(null);
-  const columns = reactive([
+  const isEditMode = ref(false);
+
+  const columns = computed(() => [
     {
-      title: '名称',
+      title: t('claimType.column.name'),
       dataIndex: 'name',
     },
     {
-      title: '显示名称',
+      title: t('claimType.column.displayName'),
       dataIndex: 'displayName',
     },
     {
-      title: '类型',
+      title: t('claimType.column.type'),
       dataIndex: 'type',
     },
     {
-      title: '描述',
+      title: t('claimType.column.description'),
       dataIndex: 'description',
     },
     {
-      title: '是否必要',
+      title: t('claimType.column.required'),
       dataIndex: 'required',
       slotName: 'required',
     },
     {
-      title: '用户可编辑',
+      title: t('claimType.column.nonEditable'),
       dataIndex: 'nonEditable',
       slotName: 'nonEditable',
     },
     {
-      title: '操作',
+      title: t('common.actions'),
       slotName: 'optional',
-      width: 180,
+      width: 120,
       align: 'center',
     },
   ]);
   const data = ref<IClaimType[]>([]);
   const form = reactive<IClaimType>({ ...claimType.form.create() });
-  const rules: Record<string, FieldRule<any> | FieldRule<any>[]> | undefined = {
+  const rules = computed<Record<string, FieldRule<any> | FieldRule<any>[]>>(() => ({
     name: [
       {
         required: true,
-        message: '不能为空',
+        message: t('claimType.validation.nameRequired'),
       },
     ],
-  };
+  }));
   const model = reactive<IClaimTypeModel>({
     name: '',
     displayName: '',
@@ -397,6 +403,8 @@
   };
 
   const handleAdd = () => {
+    isEditMode.value = false;
+    claimType.form.reset(form);
     visible.value = true;
   };
 
@@ -406,9 +414,7 @@
   };
 
   const handleEdit = (record: IClaimType) => {
-    // 跳转到编辑页面
-    // router.push(`/administration/claim-type/${record.id}/info`);
-    // 或者打开弹窗编辑
+    isEditMode.value = true;
     Object.assign(form, record);
     visible.value = true;
   };

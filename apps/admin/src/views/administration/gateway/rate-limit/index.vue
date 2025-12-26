@@ -36,25 +36,27 @@
                 @change="(val) => handleTogglePolicy(record, val as boolean)"
               />
             </template>
-            <template #operations="{ record }">
+            <template #actions="{ record }">
               <a-space>
-                <a-button
-                  type="text"
-                  size="small"
-                  status="warning"
-                  @click="handleEditPolicy(record)"
-                >
-                  <template #icon><icon-edit /></template>
-                  {{ $t('common.edit') }}
-                </a-button>
+                <a-tooltip :content="$t('common.edit')">
+                  <a-button
+                    type="text"
+                    size="small"
+                    status="warning"
+                    @click="handleEditPolicy(record)"
+                  >
+                    <template #icon><icon-edit /></template>
+                  </a-button>
+                </a-tooltip>
                 <a-popconfirm
                   :content="$t('rateLimit.deleteConfirm')"
                   @ok="handleDeletePolicy(record.id)"
                 >
-                  <a-button type="text" size="small" status="danger">
-                    <template #icon><icon-delete /></template>
-                    {{ $t('common.delete') }}
-                  </a-button>
+                  <a-tooltip :content="$t('common.delete')">
+                    <a-button type="text" size="small" status="danger">
+                      <template #icon><icon-delete /></template>
+                    </a-button>
+                  </a-tooltip>
                 </a-popconfirm>
               </a-space>
             </template>
@@ -119,25 +121,27 @@
                 $t('rateLimit.permanent')
               }}</span>
             </template>
-            <template #operations="{ record }">
+            <template #actions="{ record }">
               <a-space>
-                <a-button
-                  type="text"
-                  size="small"
-                  status="warning"
-                  @click="handleEditIpRule(record)"
-                >
-                  <template #icon><icon-edit /></template>
-                  {{ $t('common.edit') }}
-                </a-button>
+                <a-tooltip :content="$t('common.edit')">
+                  <a-button
+                    type="text"
+                    size="small"
+                    status="warning"
+                    @click="handleEditIpRule(record)"
+                  >
+                    <template #icon><icon-edit /></template>
+                  </a-button>
+                </a-tooltip>
                 <a-popconfirm
                   :content="$t('rateLimit.deleteConfirm')"
                   @ok="handleDeleteIpRule(record.id)"
                 >
-                  <a-button type="text" size="small" status="danger">
-                    <template #icon><icon-delete /></template>
-                    {{ $t('common.delete') }}
-                  </a-button>
+                  <a-tooltip :content="$t('common.delete')">
+                    <a-button type="text" size="small" status="danger">
+                      <template #icon><icon-delete /></template>
+                    </a-button>
+                  </a-tooltip>
                 </a-popconfirm>
               </a-space>
             </template>
@@ -170,7 +174,7 @@
         >
           <a-select v-model="policyForm.policyType">
             <a-option
-              v-for="pt in policyTypes"
+              v-for="pt in localPolicyTypes"
               :key="pt.value"
               :value="pt.value"
             >
@@ -246,7 +250,7 @@
         >
           <a-input
             v-model="ipForm.ipAddress"
-            placeholder="192.168.1.1 或 192.168.1.0/24"
+            :placeholder="$t('rateLimit.ipAddressPlaceholder')"
           />
         </a-form-item>
         <a-form-item
@@ -294,12 +298,19 @@
     createIpRule,
     updateIpRule,
     deleteIpRule,
-    policyTypes,
     RateLimitPolicy,
     IpAccessRule,
   } from '@/api/gateway/rate-limit';
 
   const { t } = useI18n();
+
+  // Policy type options with i18n
+  const localPolicyTypes = computed(() => [
+    { value: 'fixed-window', label: t('rateLimit.policyType.fixedWindow') },
+    { value: 'sliding-window', label: t('rateLimit.policyType.slidingWindow') },
+    { value: 'token-bucket', label: t('rateLimit.policyType.tokenBucket') },
+    { value: 'concurrency', label: t('rateLimit.policyType.concurrency') },
+  ]);
 
   // ==================== 限流策略 ====================
   const policyLoading = ref(false);
@@ -327,7 +338,7 @@
     { title: t('rateLimit.policyType'), slotName: 'policyType' },
     { title: t('rateLimit.limit'), slotName: 'permitLimit' },
     { title: t('rateLimit.enabled'), slotName: 'isEnabled', width: 100 },
-    { title: t('rateLimit.operations'), slotName: 'operations', width: 140, align: 'center' },
+    { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
   ]);
 
   const loadPolicies = async () => {
@@ -353,8 +364,13 @@
   };
 
   const getPolicyTypeLabel = (type: string) => {
-    const item = policyTypes.find((p) => p.value === type);
-    return item?.label || type;
+    const typeMap: Record<string, string> = {
+      'fixed-window': t('rateLimit.policyType.fixedWindow'),
+      'sliding-window': t('rateLimit.policyType.slidingWindow'),
+      'token-bucket': t('rateLimit.policyType.tokenBucket'),
+      'concurrency': t('rateLimit.policyType.concurrency'),
+    };
+    return typeMap[type] || type;
   };
 
   const handleAddPolicy = () => {
@@ -477,7 +493,7 @@
     },
     { title: t('rateLimit.expiresAt'), slotName: 'expiresAt', width: 160 },
     { title: t('rateLimit.enabled'), slotName: 'isEnabled', width: 80 },
-    { title: t('rateLimit.operations'), slotName: 'operations', width: 140, align: 'center' },
+    { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
   ]);
 
   const loadIpRules = async () => {

@@ -10,12 +10,12 @@
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
               <a-form-item
                 field="username"
-                label="用户名"
+                :label="$t('user.form.userName')"
                 class="form-item-block"
               >
                 <a-input
                   v-model="model.username"
-                  placeholder="请输入用户名"
+                  :placeholder="$t('user.form.userName.placeholder')"
                   allow-clear
                 >
                   <template #prefix>
@@ -25,10 +25,10 @@
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="email" label="邮箱" class="form-item-block">
+              <a-form-item field="email" :label="$t('user.form.email')" class="form-item-block">
                 <a-input
                   v-model="model.email"
-                  placeholder="请输入邮箱"
+                  :placeholder="$t('user.form.email.placeholder')"
                   allow-clear
                 >
                   <template #prefix>
@@ -38,53 +38,53 @@
               </a-form-item>
             </a-col>
             <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-              <a-form-item field="role" label="角色" class="form-item-block">
+              <a-form-item field="role" :label="$t('user.form.role')" class="form-item-block">
                 <a-select
                   v-model="model.role"
-                  placeholder="请选择角色"
+                  :placeholder="$t('user.form.role.placeholder')"
                   allow-clear
                 >
                   <template #prefix>
                     <icon-safe />
                   </template>
-                  <a-option value="admin">管理员</a-option>
-                  <a-option value="user">普通用户</a-option>
-                  <a-option value="manager">管理者</a-option>
+                  <a-option value="admin">{{ $t('user.role.admin') }}</a-option>
+                  <a-option value="user">{{ $t('user.role.user') }}</a-option>
+                  <a-option value="manager">{{ $t('user.role.manager') }}</a-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col
               :xs="24"
-              :sm="12"
+              :sm="24"
               :md="24"
-              :lg="6"
-              :xl="6"
+              :lg="24"
+              :xl="24"
               class="action-col"
             >
               <a-space :size="12">
                 <a-button type="primary" @click="handleSearch">
                   <template #icon><icon-search /></template>
-                  查询
+                  {{ $t('common.search') }}
                 </a-button>
                 <a-button @click="handleReset">
                   <template #icon><icon-refresh /></template>
-                  重置
+                  {{ $t('common.reset') }}
                 </a-button>
                 <a-button type="primary" status="success" @click="handleAdd">
                   <template #icon><icon-plus /></template>
-                  新增
+                  {{ $t('common.add') }}
                 </a-button>
                 <a-dropdown>
                   <a-button>
                     <template #icon><icon-download /></template>
-                    导出
+                    {{ $t('user.button.export') }}
                   </a-button>
                   <template #content>
                     <a-doption @click="handleExport('csv')">
-                      <icon-file /> 导出 CSV
+                      <icon-file /> {{ $t('user.button.exportCsv') }}
                     </a-doption>
                     <a-doption @click="handleExport('xlsx')">
-                      <icon-file /> 导出 Excel
+                      <icon-file /> {{ $t('user.button.exportExcel') }}
                     </a-doption>
                   </template>
                 </a-dropdown>
@@ -98,10 +98,10 @@
         <div v-if="selectedRowKeys.length > 0" class="batch-action-bar">
           <a-space>
             <span class="selected-count">
-              已选择 <strong>{{ selectedRowKeys.length }}</strong> 项
+              {{ $t('user.batch.selected', { count: selectedRowKeys.length }) }}
             </span>
             <a-button size="small" @click="handleClearSelection">
-              取消选择
+              {{ $t('user.batch.clearSelection') }}
             </a-button>
             <a-divider direction="vertical" />
             <a-button
@@ -111,7 +111,7 @@
               @click="handleBatchEnable"
             >
               <template #icon><icon-check-circle /></template>
-              批量启用
+              {{ $t('user.batch.enable') }}
             </a-button>
             <a-button
               type="primary"
@@ -120,7 +120,7 @@
               @click="handleBatchDisable"
             >
               <template #icon><icon-close-circle /></template>
-              批量禁用
+              {{ $t('user.batch.disable') }}
             </a-button>
             <a-button
               type="primary"
@@ -129,7 +129,7 @@
               @click="handleBatchDelete"
             >
               <template #icon><icon-delete /></template>
-              批量删除
+              {{ $t('user.batch.delete') }}
             </a-button>
           </a-space>
         </div>
@@ -149,58 +149,64 @@
           <template #isActive="{ record }">
             <a-tag v-if="record.isActive" color="arcoblue" size="small">
               <template #icon><icon-check-circle-fill /></template>
-              启用
+              {{ $t('user.status.enabled') }}
             </a-tag>
             <a-tag v-else color="red" size="small">
               <template #icon><icon-close-circle-fill /></template>
-              禁用
+              {{ $t('user.status.disabled') }}
             </a-tag>
+          </template>
+          <template #createdAt="{ record }">
+            {{ formatDateTime(record.createdAt) }}
           </template>
           <template #optional="{ record }">
             <a-space>
-              <a-button type="text" size="small" @click="handleView(record)">
-                <template #icon><icon-eye /></template>
-                查看
-              </a-button>
-              <a-button
-                type="text"
-                size="small"
-                status="warning"
-                @click="handleEdit(record)"
-              >
-                <template #icon><icon-edit /></template>
-                编辑
-              </a-button>
-              <a-button
-                type="text"
-                size="small"
-                status="success"
-                @click="handleAssignRoles(record)"
-              >
-                <template #icon><icon-user-group /></template>
-                角色
-              </a-button>
+              <a-tooltip :content="$t('user.action.view')">
+                <a-button type="text" size="small" @click="handleView(record)">
+                  <template #icon><icon-eye /></template>
+                </a-button>
+              </a-tooltip>
+              <a-tooltip :content="$t('user.action.edit')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="warning"
+                  @click="handleEdit(record)"
+                >
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
+              <a-tooltip :content="$t('user.action.roles')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="success"
+                  @click="handleAssignRoles(record)"
+                >
+                  <template #icon><icon-user-group /></template>
+                </a-button>
+              </a-tooltip>
               <a-dropdown>
                 <a-button type="text" size="small">
                   <template #icon><icon-more /></template>
                 </a-button>
                 <template #content>
                   <a-doption @click="handleResetPassword(record)">
-                    <icon-refresh /> 重置密码
+                    <icon-refresh /> {{ $t('user.action.resetPassword') }}
                   </a-doption>
                   <a-doption
                     v-if="!isProtectedUser(record)"
                     style="color: rgb(var(--red-6))"
                     @click="handleDelete(record)"
                   >
-                    <icon-delete /> 删除
+                    <icon-delete /> {{ $t('user.action.delete') }}
                   </a-doption>
                   <a-doption
                     v-else
                     :disabled="true"
                     style="color: var(--color-text-4); cursor: not-allowed"
                   >
-                    <icon-lock /> 系统用户
+                    <icon-lock /> {{ $t('user.action.systemUser') }}
                   </a-doption>
                 </template>
               </a-dropdown>
@@ -214,76 +220,76 @@
     <a-modal
       v-model:visible="modalVisible"
       :title="modalTitle"
-      width="800px"
+      width="900px"
       :ok-loading="submitLoading"
       @before-ok="handleBeforeOk"
       @cancel="handleModalCancel"
     >
-      <a-form ref="formRef" :rules="rules" :model="form">
+      <a-form ref="formRef" :rules="rules" :model="form" layout="vertical">
         <a-row :gutter="24">
           <a-col :span="12">
             <a-form-item
               field="username"
-              label="用户名"
+              :label="$t('user.form.userName')"
               validate-trigger="blur"
             >
               <a-input
                 v-model="form.username"
-                placeholder="请输入用户名"
+                :placeholder="$t('user.form.userName.placeholder')"
                 :disabled="isEdit"
               ></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="email" label="邮箱" validate-trigger="blur">
-              <a-input v-model="form.email" placeholder="请输入邮箱"></a-input>
+            <a-form-item field="email" :label="$t('user.form.email')" validate-trigger="blur">
+              <a-input v-model="form.email" :placeholder="$t('user.form.email.placeholder')"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="phoneNumber" label="手机号">
+            <a-form-item field="phoneNumber" :label="$t('user.form.phoneNumber')">
               <a-input
                 v-model="form.phoneNumber"
-                placeholder="请输入手机号"
+                :placeholder="$t('user.form.phoneNumber.placeholder')"
               ></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="displayName" label="显示名称">
+            <a-form-item field="displayName" :label="$t('user.form.displayName')">
               <a-input
                 v-model="form.displayName"
-                placeholder="请输入显示名称"
+                :placeholder="$t('user.form.displayName.placeholder')"
               ></a-input>
             </a-form-item>
           </a-col>
           <a-col v-if="!isEdit" :span="12">
-            <a-form-item field="password" label="密码" validate-trigger="blur">
+            <a-form-item field="password" :label="$t('user.form.password')" validate-trigger="blur">
               <a-input-password
                 v-model="form.password"
-                placeholder="请输入密码"
+                :placeholder="$t('user.form.password.placeholder')"
               ></a-input-password>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item field="role" label="角色">
-              <a-select v-model="form.role" placeholder="请选择角色">
-                <a-option value="admin">管理员</a-option>
-                <a-option value="user">普通用户</a-option>
+            <a-form-item field="role" :label="$t('user.form.role')">
+              <a-select v-model="form.role" :placeholder="$t('user.form.role.placeholder')">
+                <a-option value="admin">{{ $t('user.form.role.admin') }}</a-option>
+                <a-option value="user">{{ $t('user.form.role.user') }}</a-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="账户状态">
+            <a-form-item :label="$t('user.form.accountStatus')">
               <a-switch v-model="form.isActive">
-                <template #checked>启用</template>
-                <template #unchecked>禁用</template>
+                <template #checked>{{ $t('user.status.enabled') }}</template>
+                <template #unchecked>{{ $t('user.status.disabled') }}</template>
               </a-switch>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item field="remark" label="备注">
+            <a-form-item field="remark" :label="$t('user.form.remark')">
               <a-textarea
                 v-model="form.remark"
-                placeholder="请输入备注"
+                :placeholder="$t('user.form.remark.placeholder')"
                 :max-length="200"
                 show-word-limit
               ></a-textarea>
@@ -296,74 +302,74 @@
     <!-- 查看用户详情弹窗 -->
     <a-modal
       v-model:visible="viewModalVisible"
-      title="用户详情"
+      :title="$t('user.modal.detail.title')"
       width="650px"
       :footer="false"
     >
       <div class="detail-content">
         <div class="detail-row">
-          <span class="label">用户名</span>
+          <span class="label">{{ $t('user.form.userName') }}</span>
           <span class="value">{{ currentUser?.username || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">显示名称</span>
+          <span class="label">{{ $t('user.form.displayName') }}</span>
           <span class="value">{{ currentUser?.displayName || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">邮箱</span>
+          <span class="label">{{ $t('user.form.email') }}</span>
           <span class="value">{{ currentUser?.email || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">手机号</span>
+          <span class="label">{{ $t('user.form.phoneNumber') }}</span>
           <span class="value">{{ currentUser?.phoneNumber || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">角色</span>
+          <span class="label">{{ $t('user.form.role') }}</span>
           <span class="value">{{ currentUser?.role }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">账户状态</span>
+          <span class="label">{{ $t('user.form.accountStatus') }}</span>
           <span class="value">
             <a-tag v-if="currentUser?.isActive" color="green" size="small"
-              >启用</a-tag
+              >{{ $t('user.status.enabled') }}</a-tag
             >
-            <a-tag v-else color="red" size="small">禁用</a-tag>
+            <a-tag v-else color="red" size="small">{{ $t('user.status.disabled') }}</a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">邮箱已验证</span>
+          <span class="label">{{ $t('user.form.emailConfirmed') }}</span>
           <span class="value">
             <a-tag
               v-if="currentUser?.emailConfirmed"
               color="arcoblue"
               size="small"
-              >是</a-tag
+              >{{ $t('user.form.emailConfirmed.yes') }}</a-tag
             >
-            <a-tag v-else color="gray" size="small">否</a-tag>
+            <a-tag v-else color="gray" size="small">{{ $t('user.form.emailConfirmed.no') }}</a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">手机已验证</span>
+          <span class="label">{{ $t('user.form.phoneNumberConfirmed') }}</span>
           <span class="value">
             <a-tag
               v-if="currentUser?.phoneNumberConfirmed"
               color="arcoblue"
               size="small"
-              >是</a-tag
+              >{{ $t('user.form.phoneConfirmed.yes') }}</a-tag
             >
-            <a-tag v-else color="gray" size="small">否</a-tag>
+            <a-tag v-else color="gray" size="small">{{ $t('user.form.phoneConfirmed.no') }}</a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">最后登录</span>
+          <span class="label">{{ $t('user.form.lastLogin') }}</span>
           <span class="value">{{
             currentUser?.lastLoginAt
               ? formatDateTime(currentUser.lastLoginAt)
@@ -372,21 +378,21 @@
         </div>
 
         <div class="detail-row">
-          <span class="label">创建时间</span>
+          <span class="label">{{ $t('user.form.createdAt') }}</span>
           <span class="value">{{
             currentUser?.createdAt ? formatDateTime(currentUser.createdAt) : '-'
           }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">更新时间</span>
+          <span class="label">{{ $t('user.form.updatedAt') }}</span>
           <span class="value">{{
             currentUser?.updatedAt ? formatDateTime(currentUser.updatedAt) : '-'
           }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">备注</span>
+          <span class="label">{{ $t('user.form.remark') }}</span>
           <span class="value">{{ currentUser?.remark || '-' }}</span>
         </div>
       </div>
@@ -395,15 +401,15 @@
     <!-- 重置密码弹窗 -->
     <a-modal
       v-model:visible="resetPasswordVisible"
-      title="重置密码"
+      :title="$t('user.resetPassword.title')"
       :ok-loading="resetPasswordLoading"
       @before-ok="handleResetPasswordBeforeOk"
     >
       <a-form :model="resetPasswordForm">
-        <a-form-item label="新密码">
+        <a-form-item :label="$t('user.resetPassword.newPassword')">
           <a-input-password
             v-model="resetPasswordForm.newPassword"
-            placeholder="请输入新密码（至少6个字符）"
+            :placeholder="$t('user.resetPassword.placeholder')"
           ></a-input-password>
         </a-form-item>
       </a-form>
@@ -412,7 +418,7 @@
     <!-- 角色分配模态框 -->
     <a-modal
       v-model:visible="roleModalVisible"
-      :title="`分配角色 - ${currentUser?.username}`"
+      :title="$t('user.role.assignTitle', { username: currentUser?.username })"
       width="800px"
       :mask-closable="false"
       @cancel="handleRoleCancel"
@@ -422,14 +428,14 @@
         <div class="role-assignment">
           <a-input-search
             v-model="roleSearchText"
-            placeholder="搜索角色..."
+            :placeholder="$t('user.role.searchPlaceholder')"
             allow-clear
             style="margin-bottom: 16px"
           />
           <a-transfer
             v-model="selectedRoleIds"
             :data="allRoles"
-            :title="['可分配角色', '已分配角色']"
+            :title="[$t('user.role.available'), $t('user.role.assigned')]"
             :show-search="false"
             @change="handleRoleChange"
           >
@@ -490,6 +496,7 @@
 
 <script lang="ts" setup>
   import { reactive, ref, onMounted, onUnmounted, computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import {
     IUser,
     IUserModel,
@@ -506,13 +513,15 @@
     type ExportColumn,
   } from '@/utils/export';
 
+  const { t } = useI18n();
+
   const loading = ref(false);
   const modalVisible = ref(false);
   const viewModalVisible = ref(false);
   const resetPasswordVisible = ref(false);
   const roleModalVisible = ref(false);
   const isEdit = ref(false);
-  const modalTitle = ref('新增用户');
+  const modalTitle = ref('');
   const formRef = ref<any>(null);
   const currentUserId = ref<string>('');
   const currentUser = ref<IUser | null>(null);
@@ -552,47 +561,48 @@
     );
   });
 
-  const columns = reactive([
+  const columns = computed(() => [
     {
-      title: '用户名',
+      title: t('user.column.userName'),
       dataIndex: 'username',
       width: 150,
     },
     {
-      title: '显示名称',
+      title: t('user.column.displayName'),
       dataIndex: 'displayName',
       width: 150,
     },
     {
-      title: '邮箱',
+      title: t('user.column.email'),
       dataIndex: 'email',
       width: 200,
     },
     {
-      title: '手机号',
+      title: t('user.column.phoneNumber'),
       dataIndex: 'phoneNumber',
       width: 130,
     },
     {
-      title: '角色',
+      title: t('user.column.role'),
       dataIndex: 'role',
       width: 100,
     },
     {
-      title: '账户状态',
+      title: t('user.column.isActive'),
       dataIndex: 'isActive',
       slotName: 'isActive',
       width: 100,
     },
     {
-      title: '创建时间',
+      title: t('user.column.createdAt'),
       dataIndex: 'createdAt',
+      slotName: 'createdAt',
       width: 180,
     },
     {
-      title: '操作',
+      title: t('user.column.action'),
       slotName: 'optional',
-      width: 200,
+      width: 130,
       align: 'center',
       fixed: 'right',
     },
@@ -606,21 +616,21 @@
     username: [
       {
         required: true,
-        message: '用户名不能为空',
+        message: t('user.validation.usernameRequired'),
       },
       {
         minLength: 3,
-        message: '用户名至少3个字符',
+        message: t('user.validation.usernameMinLength'),
       },
     ],
     password: [
       {
         required: true,
-        message: '密码不能为空',
+        message: t('user.validation.passwordRequired'),
       },
       {
         minLength: 6,
-        message: '密码至少6个字符',
+        message: t('user.validation.passwordMinLength'),
       },
     ],
   };
@@ -677,7 +687,7 @@
       );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      Message.error(`加载数据失败: ${errorMessage}`);
+      Message.error(t('user.message.loadFailed', { error: errorMessage }));
     } finally {
       loading.value = false;
       console.log('🔍 Component - Finally block, loading set to false');
@@ -699,14 +709,14 @@
 
   const handleAdd = () => {
     isEdit.value = false;
-    modalTitle.value = '新增用户';
+    modalTitle.value = t('user.modal.create.title');
     Object.assign(form, user.form.create());
     modalVisible.value = true;
   };
 
   const handleEdit = (record: IUser) => {
     isEdit.value = true;
-    modalTitle.value = '编辑用户';
+    modalTitle.value = t('user.modal.edit.title');
     Object.assign(form, user.form.clone(record));
     modalVisible.value = true;
   };
@@ -733,10 +743,10 @@
       // 提交数据
       if (isEdit.value) {
         await user.api.update(form as IUpdateUserModel);
-        Message.success('更新成功');
+        Message.success(t('user.message.updateSuccess'));
       } else {
         await user.api.create(form as ICreateUserModel);
-        Message.success('创建成功');
+        Message.success(t('user.message.createSuccess'));
       }
 
       // 成功后关闭弹窗并刷新数据
@@ -745,7 +755,7 @@
     } catch (error: any) {
       const errorMsg =
         error?.response?.data?.message ||
-        (isEdit.value ? '更新失败' : '创建失败');
+        (isEdit.value ? t('user.message.updateFailed') : t('user.message.createFailed'));
       Message.error(errorMsg);
       console.error(error);
       // 提交失败，不关闭弹窗
@@ -776,34 +786,34 @@
   // 导出用户数据
   const handleExport = async (format: 'csv' | 'xlsx') => {
     try {
-      Message.loading({ content: '正在导出...', id: 'export' });
+      Message.loading({ content: t('user.message.exporting'), id: 'export' });
 
       // 获取所有数据（或当前筛选条件下的数据）
       const result = await user.api.getPagedList(model, 1, 10000); // 获取最多10000条
       const exportColumns: ExportColumn[] = [
-        { field: 'username', title: '用户名' },
-        { field: 'email', title: '邮箱' },
-        { field: 'phoneNumber', title: '手机号' },
-        { field: 'displayName', title: '显示名称' },
+        { field: 'username', title: t('user.export.username') },
+        { field: 'email', title: t('user.export.email') },
+        { field: 'phoneNumber', title: t('user.export.phoneNumber') },
+        { field: 'displayName', title: t('user.export.displayName') },
         {
           field: 'isActive',
-          title: '状态',
-          formatter: (value) => (value ? '启用' : '禁用'),
+          title: t('user.export.status'),
+          formatter: (value) => (value ? t('user.export.statusEnabled') : t('user.export.statusDisabled')),
         },
         {
           field: 'createdAt',
-          title: '创建时间',
+          title: t('user.export.createdAt'),
           formatter: (value) => formatDateTime(value),
         },
         {
           field: 'lastLoginAt',
-          title: '最后登录',
+          title: t('user.export.lastLogin'),
           formatter: (value) => formatDateTime(value),
         },
       ];
 
       exportData({
-        filename: `用户列表_${new Date()
+        filename: `${t('user.export.filename')}_${new Date()
           .toLocaleDateString('zh-CN')
           .replace(/\//g, '-')}`,
         columns: exportColumns,
@@ -811,9 +821,9 @@
         format,
       });
 
-      Message.success({ content: '导出成功', id: 'export' });
+      Message.success({ content: t('user.message.exportSuccess'), id: 'export' });
     } catch (error: any) {
-      Message.error({ content: error?.message || '导出失败', id: 'export' });
+      Message.error({ content: error?.message || t('user.message.exportFailed'), id: 'export' });
     }
   };
 
@@ -822,20 +832,22 @@
 
     // 保护 admin 用户
     if (isProtectedUser(record)) {
-      Message.warning('系统管理员账号不能删除');
+      Message.warning(t('user.delete.adminProtected'));
       return;
     }
 
     Modal.confirm({
-      title: '确认删除',
-      content: `确定要删除用户 "${record.username}" 吗？此操作不可恢复。`,
+      title: t('user.delete.title'),
+      content: t('user.delete.content', { username: record.username }),
+      okText: t('user.modal.ok'),
+      cancelText: t('user.modal.cancel'),
       onOk: async () => {
         try {
           await user.api.delete(record.id);
-          Message.success('删除成功');
+          Message.success(t('user.delete.success'));
           fetchData();
         } catch (error: any) {
-          const errorMsg = error?.response?.data?.message || '删除失败';
+          const errorMsg = error?.response?.data?.message || t('user.delete.failed');
           Message.error(errorMsg);
           console.error(error);
         }
@@ -858,7 +870,7 @@
       !resetPasswordForm.newPassword ||
       resetPasswordForm.newPassword.length < 6
     ) {
-      Message.warning('密码至少6个字符');
+      Message.warning(t('user.resetPassword.minLength'));
       done(false);
       return;
     }
@@ -869,10 +881,10 @@
         currentUserId.value,
         resetPasswordForm.newPassword
       );
-      Message.success('密码重置成功');
+      Message.success(t('user.resetPassword.success'));
       done(true);
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.message || '密码重置失败';
+      const errorMsg = error?.response?.data?.message || t('user.resetPassword.failed');
       Message.error(errorMsg);
       console.error(error);
       done(false);
@@ -903,7 +915,7 @@
       selectedRoleIds.value = [...userRoleIds];
       initialRoleIds.value = [...userRoleIds];
     } catch (error: any) {
-      Message.error('加载角色列表失败');
+      Message.error(t('user.role.loadFailed'));
       console.error(error);
       roleModalVisible.value = false;
     } finally {
@@ -922,17 +934,17 @@
       !selectedRoleIds.value.every((id) => initialRoleIds.value.includes(id));
 
     if (!hasChanges) {
-      Message.info('没有变化');
+      Message.info(t('user.role.noChange'));
       return true;
     }
 
     try {
       await user.api.assignRoles(currentUser.value!.id, selectedRoleIds.value);
-      Message.success('角色分配成功');
+      Message.success(t('user.role.assignSuccess'));
       await fetchData();
       return true;
     } catch (error: any) {
-      const errorMsg = error?.response?.data?.message || '角色分配失败';
+      const errorMsg = error?.response?.data?.message || t('user.role.assignFailed');
       Message.error(errorMsg);
       console.error(error);
       return false;
@@ -958,7 +970,7 @@
 
   const handleBatchDelete = async () => {
     if (selectedRowKeys.value.length === 0) {
-      Message.warning('请先选择要删除的用户');
+      Message.warning(t('user.batch.selectUsersToDelete'));
       return;
     }
 
@@ -971,31 +983,33 @@
     );
 
     if (protectedUsers.length > 0) {
-      Message.warning(`系统管理员账号不能删除，已自动排除 ${protectedUsers.length} 个`);
+      Message.warning(t('user.batch.adminProtected', { count: protectedUsers.length }));
     }
 
     if (safeIds.length === 0) {
-      Message.warning('没有可删除的用户');
+      Message.warning(t('user.batch.noUsers'));
       return;
     }
 
     Modal.confirm({
-      title: '批量删除确认',
-      content: `确定要删除选中的 ${safeIds.length} 个用户吗？此操作不可恢复。`,
+      title: t('user.batch.deleteTitle'),
+      content: t('user.batch.deleteContent', { count: safeIds.length }),
+      okText: t('user.modal.ok'),
+      cancelText: t('user.modal.cancel'),
       onOk: async () => {
         try {
           loading.value = true;
           const result = await user.api.batchDelete(safeIds);
           if (result.successCount > 0) {
-            Message.success(`成功删除 ${result.successCount} 个用户`);
+            Message.success(t('user.batch.deleteSuccess', { count: result.successCount }));
           }
           if (result.failedCount > 0) {
-            Message.warning(`${result.failedCount} 个用户删除失败`);
+            Message.warning(t('user.batch.deleteFailed', { count: result.failedCount }));
           }
           selectedRowKeys.value = [];
           fetchData();
         } catch (error: any) {
-          const errorMsg = error?.response?.data?.message || '批量删除失败';
+          const errorMsg = error?.response?.data?.message || t('user.batch.deleteFailed.all');
           Message.error(errorMsg);
           console.error(error);
         } finally {
@@ -1007,13 +1021,15 @@
 
   const handleBatchEnable = async () => {
     if (selectedRowKeys.value.length === 0) {
-      Message.warning('请先选择要启用的用户');
+      Message.warning(t('user.batch.selectUsersToEnable'));
       return;
     }
 
     Modal.confirm({
-      title: '批量启用确认',
-      content: `确定要启用选中的 ${selectedRowKeys.value.length} 个用户吗？`,
+      title: t('user.batch.enableTitle'),
+      content: t('user.batch.enableContent', { count: selectedRowKeys.value.length }),
+      okText: t('user.modal.ok'),
+      cancelText: t('user.modal.cancel'),
       onOk: async () => {
         try {
           loading.value = true;
@@ -1022,15 +1038,15 @@
             true
           );
           if (result.successCount > 0) {
-            Message.success(`成功启用 ${result.successCount} 个用户`);
+            Message.success(t('user.batch.enableSuccess', { count: result.successCount }));
           }
           if (result.failedCount > 0) {
-            Message.warning(`${result.failedCount} 个用户启用失败`);
+            Message.warning(t('user.batch.enableFailed', { count: result.failedCount }));
           }
           selectedRowKeys.value = [];
           fetchData();
         } catch (error: any) {
-          const errorMsg = error?.response?.data?.message || '批量启用失败';
+          const errorMsg = error?.response?.data?.message || t('user.batch.enableFailed.all');
           Message.error(errorMsg);
           console.error(error);
         } finally {
@@ -1042,7 +1058,7 @@
 
   const handleBatchDisable = async () => {
     if (selectedRowKeys.value.length === 0) {
-      Message.warning('请先选择要禁用的用户');
+      Message.warning(t('user.batch.selectUsersToDisable'));
       return;
     }
 
@@ -1055,17 +1071,19 @@
     );
 
     if (protectedUsers.length > 0) {
-      Message.warning(`系统管理员账号不能禁用，已自动排除 ${protectedUsers.length} 个`);
+      Message.warning(t('user.batch.adminProtected', { count: protectedUsers.length }));
     }
 
     if (safeIds.length === 0) {
-      Message.warning('没有可禁用的用户');
+      Message.warning(t('user.batch.noUsersToDisable'));
       return;
     }
 
     Modal.confirm({
-      title: '批量禁用确认',
-      content: `确定要禁用选中的 ${safeIds.length} 个用户吗？`,
+      title: t('user.batch.disableTitle'),
+      content: t('user.batch.disableContent', { count: safeIds.length }),
+      okText: t('user.modal.ok'),
+      cancelText: t('user.modal.cancel'),
       onOk: async () => {
         try {
           loading.value = true;
@@ -1074,15 +1092,15 @@
             false
           );
           if (result.successCount > 0) {
-            Message.success(`成功禁用 ${result.successCount} 个用户`);
+            Message.success(t('user.batch.disableSuccess', { count: result.successCount }));
           }
           if (result.failedCount > 0) {
-            Message.warning(`${result.failedCount} 个用户禁用失败`);
+            Message.warning(t('user.batch.disableFailed', { count: result.failedCount }));
           }
           selectedRowKeys.value = [];
           fetchData();
         } catch (error: any) {
-          const errorMsg = error?.response?.data?.message || '批量禁用失败';
+          const errorMsg = error?.response?.data?.message || t('user.batch.disableFailed.all');
           Message.error(errorMsg);
           console.error(error);
         } finally {
@@ -1097,6 +1115,11 @@
   .user-management {
     .search-card {
       margin-bottom: 16px;
+    }
+
+    // 表格标题不加粗
+    :deep(.arco-table-th) {
+      font-weight: normal !important;
     }
 
     .batch-action-bar {
@@ -1131,10 +1154,11 @@
       .action-col {
         display: flex;
         align-items: flex-end;
-        justify-content: flex-end;
+        justify-content: flex-start;
+        margin-top: 8px;
 
         :deep(.arco-space) {
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
         }
 
         :deep(.arco-btn) {
@@ -1198,6 +1222,15 @@
         background-color: #f7f8fa;
         transform: scale(1.002);
       }
+    }
+  }
+
+  // 用户表单弹窗样式 - 防止标签换行
+  :deep(.arco-modal) {
+    .arco-form-item-label {
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 90px;
     }
   }
 

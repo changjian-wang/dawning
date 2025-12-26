@@ -9,6 +9,9 @@ import localeRole from '@/views/administration/role/locale/zh-CN';
 import localePermission from '@/views/administration/permission/locale/zh-CN';
 import localeApplication from '@/views/administration/openiddict/application/locale/zh-CN';
 import localeScope from '@/views/administration/openiddict/scope/locale/zh-CN';
+import localeApiResource from '@/views/administration/openiddict/api-resource/locale/zh-CN';
+import localeIdentityResource from '@/views/administration/openiddict/identity-resource/locale/zh-CN';
+import localeAuthorization from '@/views/administration/openiddict/authorization/locale/zh-CN';
 import localeOpenIddict from '@/views/administration/openiddict/locale/zh-CN';
 import localeClaimType from '@/views/administration/claim-type/locale/zh-CN';
 import localeAuditLog from '@/views/administration/audit-log/locale/zh-CN';
@@ -26,6 +29,7 @@ export default {
   'common.search': '搜索',
   'common.reset': '重置',
   'common.create': '新建',
+  'common.add': '新增',
   'common.edit': '编辑',
   'common.delete': '删除',
   'common.operations': '操作',
@@ -37,10 +41,18 @@ export default {
   'common.all': '全部',
   'common.advancedSearch': '高级搜索',
   'common.createdAt': '创建时间',
+  'common.updatedAt': '更新时间',
   'common.actions': '操作',
   'common.system': '系统',
   'common.operationFailed': '操作失败',
   'common.operationSuccess': '操作成功',
+  'common.loadFailed': '加载数据失败',
+  'common.createSuccess': '创建成功',
+  'common.createFailed': '创建失败',
+  'common.updateSuccess': '更新成功',
+  'common.updateFailed': '更新失败',
+  'common.deleteSuccess': '删除成功',
+  'common.deleteFailed': '删除失败',
 
   'menu.dashboard': '仪表盘',
   'menu.server.dashboard': '仪表盘-服务端',
@@ -78,6 +90,9 @@ export default {
   ...localePermission,
   ...localeApplication,
   ...localeScope,
+  ...localeApiResource,
+  ...localeIdentityResource,
+  ...localeAuthorization,
   ...localeClaimType,
   ...localeAuditLog,
   ...localeSystemLog,

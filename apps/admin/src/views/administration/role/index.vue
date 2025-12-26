@@ -133,7 +133,7 @@
                   <template #content>
                     <div class="permissions-popover">
                       <div class="permission-header"
-                        >全部权限 ({{ record.permissions.length }})</div
+                        >{{ $t('role.permission.allPermissions') }} ({{ record.permissions.length }})</div
                       >
                       <div
                         v-for="(perm, idx) in record.permissions"
@@ -152,53 +152,52 @@
             </div>
             <span v-else style="color: var(--color-text-3)">-</span>
           </template>
-          <template #createdAt="{ record }">
-            {{ formatDateTime(record.createdAt) }}
-          </template>
-          <template #operations="{ record }">
+          <template #actions="{ record }">
             <a-space>
-              <a-button
-                type="text"
-                size="small"
-                status="success"
-                :disabled="!canEditRole(record)"
-                @click="handleAssignPermissions(record)"
-              >
-                <template #icon><icon-safe /></template>
-                权限
-              </a-button>
-              <a-button
-                type="text"
-                size="small"
-                status="warning"
-                :disabled="!canEditRole(record)"
-                @click="handleEdit(record)"
-              >
-                <template #icon><icon-edit /></template>
-                {{ $t('common.edit') }}
-              </a-button>
+              <a-tooltip :content="$t('role.action.permissions')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="success"
+                  :disabled="!canEditRole(record)"
+                  @click="handleAssignPermissions(record)"
+                >
+                  <template #icon><icon-safe /></template>
+                </a-button>
+              </a-tooltip>
+              <a-tooltip :content="$t('common.edit')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="warning"
+                  :disabled="!canEditRole(record)"
+                  @click="handleEdit(record)"
+                >
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
               <a-popconfirm
                 v-if="canDeleteRole(record)"
                 :content="$t('common.deleteConfirm')"
                 @ok="handleDelete(record)"
               >
-                <a-button
-                  type="text"
-                  size="small"
-                  status="danger"
-                >
-                  <template #icon><icon-delete /></template>
-                  {{ $t('common.delete') }}
-                </a-button>
+                <a-tooltip :content="$t('common.delete')">
+                  <a-button
+                    type="text"
+                    size="small"
+                    status="danger"
+                  >
+                    <template #icon><icon-delete /></template>
+                  </a-button>
+                </a-tooltip>
               </a-popconfirm>
-              <a-tooltip v-else content="系统角色不可删除">
+              <a-tooltip v-else :content="$t('role.action.systemRoleNoDelete')">
                 <a-button
                   type="text"
                   size="small"
                   :disabled="true"
                 >
                   <template #icon><icon-lock /></template>
-                  系统角色
                 </a-button>
               </a-tooltip>
             </a-space>
@@ -209,8 +208,10 @@
       <!-- 权限分配对话框 -->
       <a-modal
         v-model:visible="permissionModalVisible"
-        :title="`分配权限 - ${currentRole?.displayName}`"
+        :title="$t('role.permission.assignTitle', { roleName: currentRole?.displayName })"
         width="800px"
+        :ok-text="$t('role.modal.ok')"
+        :cancel-text="$t('role.modal.cancel')"
         @cancel="handlePermissionCancel"
         @before-ok="handlePermissionBeforeOk"
       >
@@ -218,14 +219,14 @@
           <div class="permission-assignment">
             <a-input-search
               v-model="permissionSearchText"
-              placeholder="搜索权限..."
+              :placeholder="$t('role.permission.searchPlaceholder')"
               allow-clear
               style="margin-bottom: 16px"
             />
             <a-transfer
               v-model="selectedPermissionIds"
               :data="allPermissions"
-              :title="['可分配权限', '已分配权限']"
+              :title="transferTitles"
               :show-search="false"
               @change="handlePermissionChange"
             >
@@ -474,15 +475,9 @@
       tooltip: false,
     },
     {
-      title: t('role.columns.createdAt'),
-      dataIndex: 'createdAt',
-      slotName: 'createdAt',
-      width: 160,
-    },
-    {
-      title: t('role.columns.operations'),
-      slotName: 'operations',
-      width: 200,
+      title: t('common.actions'),
+      slotName: 'actions',
+      width: 120,
       align: 'center',
       fixed: 'right',
     },
@@ -511,6 +506,12 @@
   >([]);
   const selectedPermissionIds = ref<string[]>([]);
   const permissionSearchText = ref('');
+
+  // Transfer组件标题
+  const transferTitles = computed(() => [
+    t('role.permission.available'),
+    t('role.permission.assigned'),
+  ]);
 
   // 格式化日期时间
   const formatDateTime = (dateStr: string) => {
@@ -600,13 +601,15 @@
   const handleDelete = (record: RoleModel) => {
     // 系统角色不可删除
     if (!canDeleteRole(record)) {
-      Message.warning('系统角色不可删除');
+      Message.warning(t('role.message.systemRoleNoDelete'));
       return;
     }
 
     Modal.confirm({
       title: t('role.message.deleteConfirm'),
       content: `${record.displayName} (${record.name})`,
+      okText: t('role.modal.ok'),
+      cancelText: t('role.modal.cancel'),
       onOk: async () => {
         try {
           await deleteRole(record.id!);
@@ -705,7 +708,7 @@
       const rolePermissions = await getRolePermissions(record.id!);
       selectedPermissionIds.value = rolePermissions.map((p) => p.id);
     } catch (error) {
-      Message.error('加载权限数据失败');
+      Message.error(t('role.permission.loadFailed'));
     } finally {
       permissionLoading.value = false;
     }
@@ -735,11 +738,11 @@
         currentRole.value.id!,
         selectedPermissionIds.value
       );
-      Message.success('权限分配成功');
+      Message.success(t('role.permission.assignSuccess'));
       fetchData(); // 刷新列表
       return true;
     } catch (error) {
-      Message.error('权限分配失败');
+      Message.error(t('role.permission.assignFailed'));
       return false;
     }
   };
@@ -756,6 +759,11 @@
 
 <style scoped lang="less">
   .role-management {
+    // 表格标题不加粗
+    :deep(.arco-table-th) {
+      font-weight: normal !important;
+    }
+
     .container {
       padding: 0 20px 20px 20px;
     }

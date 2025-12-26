@@ -269,6 +269,8 @@
     Modal.confirm({
       title: t('systemConfig.deleteConfirm'),
       content: t('systemConfig.deleteConfirmContent', { key: config.key }),
+      okText: t('systemConfig.modal.ok'),
+      cancelText: t('systemConfig.modal.cancel'),
       okButtonProps: { status: 'danger' },
       onOk: async () => {
         try {
@@ -332,6 +334,8 @@
     Modal.confirm({
       title: t('systemConfig.initDefaultsConfirm'),
       content: t('systemConfig.initDefaultsContent'),
+      okText: t('systemConfig.modal.ok'),
+      cancelText: t('systemConfig.modal.cancel'),
       onOk: async () => {
         try {
           await initDefaultConfigs();

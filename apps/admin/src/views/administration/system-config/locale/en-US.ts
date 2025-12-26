@@ -29,4 +29,8 @@ export default {
     'This will add default system configurations (existing ones will not be overwritten). Continue?',
   'systemConfig.initDefaultsSuccess': 'Default configurations initialized',
   'systemConfig.initDefaultsFailed': 'Initialization failed',
+
+  // Modal buttons
+  'systemConfig.modal.ok': 'OK',
+  'systemConfig.modal.cancel': 'Cancel',
 };

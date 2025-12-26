@@ -9,6 +9,9 @@ import localeRole from '@/views/administration/role/locale/en-US';
 import localePermission from '@/views/administration/permission/locale/en-US';
 import localeApplication from '@/views/administration/openiddict/application/locale/en-US';
 import localeScope from '@/views/administration/openiddict/scope/locale/en-US';
+import localeApiResource from '@/views/administration/openiddict/api-resource/locale/en-US';
+import localeIdentityResource from '@/views/administration/openiddict/identity-resource/locale/en-US';
+import localeAuthorization from '@/views/administration/openiddict/authorization/locale/en-US';
 import localeOpenIddict from '@/views/administration/openiddict/locale/en-US';
 import localeClaimType from '@/views/administration/claim-type/locale/en-US';
 import localeAuditLog from '@/views/administration/audit-log/locale/en-US';
@@ -26,6 +29,7 @@ export default {
   'common.search': 'Search',
   'common.reset': 'Reset',
   'common.create': 'Create',
+  'common.add': 'Add',
   'common.edit': 'Edit',
   'common.delete': 'Delete',
   'common.operations': 'Operations',
@@ -37,10 +41,18 @@ export default {
   'common.all': 'All',
   'common.advancedSearch': 'Advanced Search',
   'common.createdAt': 'Created At',
+  'common.updatedAt': 'Updated At',
   'common.actions': 'Actions',
   'common.system': 'System',
   'common.operationFailed': 'Operation Failed',
   'common.operationSuccess': 'Operation Success',
+  'common.loadFailed': 'Failed to load data',
+  'common.createSuccess': 'Created successfully',
+  'common.createFailed': 'Failed to create',
+  'common.updateSuccess': 'Updated successfully',
+  'common.updateFailed': 'Failed to update',
+  'common.deleteSuccess': 'Deleted successfully',
+  'common.deleteFailed': 'Failed to delete',
 
   'menu.dashboard': 'Dashboard',
   'menu.server.dashboard': 'Dashboard-Server',
@@ -60,7 +72,7 @@ export default {
   // --begin--
   'menu.administration': 'Administration',
   'menu.administration.tenant': 'Tenant Management',
-  'menu.administration.userPermission': 'User & Permission',
+  'menu.administration.userPermission': 'User Permission',
   'menu.administration.openiddict': 'Authentication',
   'menu.administration.monitoring': 'Monitoring',
   'menu.administration.settings': 'Settings',
@@ -78,6 +90,9 @@ export default {
   ...localePermission,
   ...localeApplication,
   ...localeScope,
+  ...localeApiResource,
+  ...localeIdentityResource,
+  ...localeAuthorization,
   ...localeClaimType,
   ...localeAuditLog,
   ...localeSystemLog,

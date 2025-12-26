@@ -11,10 +11,10 @@
       <a-form :model="searchForm" layout="inline" class="search-form">
         <a-row :gutter="[16, 16]" style="width: 100%">
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="name" label="名称" class="form-item-block">
+            <a-form-item field="name" :label="$t('identityResource.form.name')" class="form-item-block">
               <a-input
                 v-model="searchForm.name"
-                placeholder="请输入资源名称"
+                :placeholder="$t('identityResource.form.name.placeholder')"
                 allow-clear
               >
                 <template #prefix>
@@ -26,12 +26,12 @@
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
             <a-form-item
               field="displayName"
-              label="显示名称"
+              :label="$t('identityResource.form.displayName')"
               class="form-item-block"
             >
               <a-input
                 v-model="searchForm.displayName"
-                placeholder="请输入显示名称"
+                :placeholder="$t('identityResource.form.displayName.placeholder')"
                 allow-clear
               >
                 <template #prefix>
@@ -41,17 +41,17 @@
             </a-form-item>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="enabled" label="启用" class="form-item-block">
+            <a-form-item field="enabled" :label="$t('identityResource.form.enabled')" class="form-item-block">
               <a-select
                 v-model="searchForm.enabled"
-                placeholder="请选择"
+                :placeholder="$t('identityResource.form.enabled.placeholder')"
                 allow-clear
               >
                 <template #prefix>
                   <icon-check-circle />
                 </template>
-                <a-option :value="true">是</a-option>
-                <a-option :value="false">否</a-option>
+                <a-option :value="true">{{ $t('identityResource.form.enabled.yes') }}</a-option>
+                <a-option :value="false">{{ $t('identityResource.form.enabled.no') }}</a-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -59,15 +59,15 @@
             <a-space :size="12">
               <a-button type="primary" @click="handleSearch">
                 <template #icon><icon-search /></template>
-                查询
+                {{ $t('identityResource.button.search') }}
               </a-button>
               <a-button @click="handleReset">
                 <template #icon><icon-refresh /></template>
-                重置
+                {{ $t('identityResource.button.reset') }}
               </a-button>
               <a-button type="primary" status="success" @click="handleCreate">
                 <template #icon><icon-plus /></template>
-                新增
+                {{ $t('identityResource.button.add') }}
               </a-button>
             </a-space>
           </a-col>
@@ -93,12 +93,12 @@
       >
         <template #enabled="{ record }">
           <a-tag :color="record.enabled ? 'green' : 'gray'">
-            {{ record.enabled ? '是' : '否' }}
+            {{ record.enabled ? $t('identityResource.form.enabled.yes') : $t('identityResource.form.enabled.no') }}
           </a-tag>
         </template>
         <template #required="{ record }">
           <a-tag :color="record.required ? 'orange' : 'gray'">
-            {{ record.required ? '是' : '否' }}
+            {{ record.required ? $t('identityResource.form.enabled.yes') : $t('identityResource.form.enabled.no') }}
           </a-tag>
         </template>
         <template #userClaims="{ record }">
@@ -117,23 +117,25 @@
         </template>
         <template #optional="{ record }">
           <a-space>
-            <a-button
-              type="text"
-              size="small"
-              status="warning"
-              @click="handleEdit(record)"
-            >
-              <template #icon><icon-edit /></template>
-              编辑
-            </a-button>
+            <a-tooltip :content="$t('common.edit')">
+              <a-button
+                type="text"
+                size="small"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
-              content="确定删除该资源吗？"
+              :content="$t('identityResource.message.deleteConfirm')"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
-                删除
-              </a-button>
+              <a-tooltip :content="$t('common.delete')">
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -149,47 +151,47 @@
       @before-ok="handleModalOk"
     >
       <a-form ref="formRef" :model="formData" layout="vertical">
-        <a-form-item field="name" label="名称" required>
+        <a-form-item field="name" :label="$t('identityResource.form.name')" required>
           <a-input
             v-model="formData.name"
-            placeholder="请输入名称"
+            :placeholder="$t('identityResource.form.name.placeholder')"
             :disabled="isEdit"
           />
         </a-form-item>
-        <a-form-item field="displayName" label="显示名" required>
-          <a-input v-model="formData.displayName" placeholder="请输入显示名" />
+        <a-form-item field="displayName" :label="$t('identityResource.form.displayName')" required>
+          <a-input v-model="formData.displayName" :placeholder="$t('identityResource.form.displayName.placeholder')" />
         </a-form-item>
-        <a-form-item field="description" label="描述">
+        <a-form-item field="description" :label="$t('identityResource.form.description')">
           <a-textarea
             v-model="formData.description"
-            placeholder="请输入描述"
+            :placeholder="$t('identityResource.form.description.placeholder')"
             :max-length="500"
           />
         </a-form-item>
         <a-row :gutter="16">
           <a-col :span="8">
-            <a-form-item field="enabled" label="启用">
+            <a-form-item field="enabled" :label="$t('identityResource.form.enabled')">
               <a-switch v-model="formData.enabled" />
             </a-form-item>
           </a-col>
           <a-col :span="8">
-            <a-form-item field="required" label="必须同意">
+            <a-form-item field="required" :label="$t('identityResource.form.required')">
               <a-switch v-model="formData.required" />
             </a-form-item>
           </a-col>
           <a-col :span="8">
-            <a-form-item field="emphasize" label="强调">
+            <a-form-item field="emphasize" :label="$t('identityResource.form.emphasize')">
               <a-switch v-model="formData.emphasize" />
             </a-form-item>
           </a-col>
         </a-row>
-        <a-form-item field="showInDiscoveryDocument" label="显示在发现文档">
+        <a-form-item field="showInDiscoveryDocument" :label="$t('identityResource.form.showInDiscoveryDocument')">
           <a-switch v-model="formData.showInDiscoveryDocument" />
         </a-form-item>
-        <a-form-item field="userClaims" label="声明类型">
+        <a-form-item field="userClaims" :label="$t('identityResource.form.userClaims')">
           <a-select
             v-model="formData.userClaims"
-            placeholder="请选择声明类型"
+            :placeholder="$t('identityResource.form.userClaims.placeholder')"
             multiple
             allow-clear
             :max-tag-count="3"
@@ -210,7 +212,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted } from 'vue';
+  import { ref, reactive, computed, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { Message } from '@arco-design/web-vue';
   import {
     identityResourceApi,
@@ -218,6 +221,8 @@
     IIdentityResourceModel,
   } from '@/api/openiddict/identity-resource-api';
   import { claimType, IClaimType } from '@/api/administration/claim-type';
+
+  const { t } = useI18n();
 
   // 声明类型选项
   const claimTypeOptions = reactive<IClaimType[]>([]);
@@ -238,7 +243,7 @@
 
   // 弹窗
   const modalVisible = ref(false);
-  const modalTitle = ref('新增身份资源');
+  const modalTitle = ref('');
   const isEdit = ref(false);
   const formRef = ref<any>(null);
   const formData = reactive<Partial<IIdentityResource>>({
@@ -252,14 +257,14 @@
     userClaims: [],
   });
 
-  const columns = [
-    { title: '名称', dataIndex: 'name', width: 120 },
-    { title: '显示名', dataIndex: 'displayName', width: 160 },
-    { title: '声明', slotName: 'userClaims' },
-    { title: '启用', slotName: 'enabled', width: 70, align: 'center' },
-    { title: '必须同意', slotName: 'required', width: 100, align: 'center' },
-    { title: '操作', slotName: 'optional', width: 140, align: 'center' },
-  ];
+  const columns = computed(() => [
+    { title: t('identityResource.column.name'), dataIndex: 'name', width: 120 },
+    { title: t('identityResource.column.displayName'), dataIndex: 'displayName', width: 160 },
+    { title: t('identityResource.column.userClaims'), slotName: 'userClaims' },
+    { title: t('identityResource.column.enabled'), slotName: 'enabled', width: 70, align: 'center' },
+    { title: t('identityResource.column.required'), slotName: 'required', width: 100, align: 'center' },
+    { title: t('common.actions'), slotName: 'optional', width: 100, align: 'center' },
+  ]);
 
   // 加载数据
   async function loadData() {
@@ -315,13 +320,13 @@
   function handleCreate() {
     resetForm();
     isEdit.value = false;
-    modalTitle.value = '新增身份资源';
+    modalTitle.value = t('identityResource.modal.add');
     modalVisible.value = true;
   }
 
   function handleEdit(record: IIdentityResource) {
     isEdit.value = true;
-    modalTitle.value = '编辑身份资源';
+    modalTitle.value = t('identityResource.modal.edit');
     formData.id = record.id;
     formData.name = record.name;
     formData.displayName = record.displayName;
@@ -340,29 +345,29 @@
 
   async function handleModalOk(done: (close: boolean) => void) {
     if (!formData.name || !formData.displayName) {
-      Message.warning('请填写必填项');
+      Message.warning(t('identityResource.validation.required'));
       done(false);
       return;
     }
     try {
       if (isEdit.value && formData.id) {
         await identityResourceApi.update(formData.id, formData);
-        Message.success('更新成功');
+        Message.success(t('identityResource.message.updateSuccess'));
       } else {
         await identityResourceApi.create(formData);
-        Message.success('新增成功');
+        Message.success(t('identityResource.message.createSuccess'));
       }
       loadData();
       done(true);
     } catch (e: any) {
-      Message.error(e?.message || '操作失败');
+      Message.error(e?.message || t('identityResource.message.operationFailed'));
       done(false);
     }
   }
 
   async function handleDelete(record: IIdentityResource) {
     await identityResourceApi.remove(record.id);
-    Message.success('删除成功');
+    Message.success(t('identityResource.message.deleteSuccess'));
     loadData();
   }
 

@@ -13,12 +13,12 @@
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
             <a-form-item
               field="name"
-              label="作用域名称"
+              :label="$t('scope.name')"
               class="form-item-block"
             >
               <a-input
                 v-model="searchForm.name"
-                placeholder="请输入作用域名称"
+                :placeholder="$t('scope.name.placeholder')"
                 allow-clear
               >
                 <template #prefix>
@@ -30,12 +30,12 @@
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
             <a-form-item
               field="displayName"
-              label="显示名称"
+              :label="$t('scope.displayName')"
               class="form-item-block"
             >
               <a-input
                 v-model="searchForm.displayName"
-                placeholder="请输入显示名称"
+                :placeholder="$t('scope.displayName.placeholder')"
                 allow-clear
               >
                 <template #prefix>
@@ -55,15 +55,15 @@
             <a-space :size="12">
               <a-button type="primary" @click="handleSearch">
                 <template #icon><icon-search /></template>
-                查询
+                {{ $t('common.search') }}
               </a-button>
               <a-button @click="handleReset">
                 <template #icon><icon-refresh /></template>
-                重置
+                {{ $t('common.reset') }}
               </a-button>
               <a-button type="primary" status="success" @click="handleAdd">
                 <template #icon><icon-plus /></template>
-                新增
+                {{ $t('common.add') }}
               </a-button>
             </a-space>
           </a-col>
@@ -107,29 +107,32 @@
           {{ formatDateTime(record.createdAt) }}
         </template>
 
-        <template #operations="{ record }">
+        <template #actions="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">
-              <template #icon><icon-eye /></template>
-              {{ $t('common.detail') }}
-            </a-button>
-            <a-button
-              type="text"
-              size="small"
-              status="warning"
-              @click="handleEdit(record)"
-            >
-              <template #icon><icon-edit /></template>
-              {{ $t('common.edit') }}
-            </a-button>
+            <a-tooltip :content="$t('common.detail')">
+              <a-button type="text" size="small" @click="handleView(record)">
+                <template #icon><icon-eye /></template>
+              </a-button>
+            </a-tooltip>
+            <a-tooltip :content="$t('common.edit')">
+              <a-button
+                type="text"
+                size="small"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
               :content="$t('common.deleteConfirm')"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
-                {{ $t('common.delete') }}
-              </a-button>
+              <a-tooltip :content="$t('common.delete')">
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -148,40 +151,40 @@
       @cancel="handleCancel"
     >
       <a-form :model="formData" :rules="formRules" layout="vertical">
-        <a-form-item label="作用域名称" field="name">
+        <a-form-item :label="$t('scope.name')" field="name">
           <a-input
             v-model="formData.name"
-            placeholder="请输入作用域名称（如：openid, profile, api）"
+            :placeholder="$t('scope.name.example')"
             :disabled="isEdit"
           />
         </a-form-item>
 
-        <a-form-item label="显示名称" field="displayName">
+        <a-form-item :label="$t('scope.displayName')" field="displayName">
           <a-input
             v-model="formData.displayName"
-            placeholder="请输入显示名称"
+            :placeholder="$t('scope.displayName.placeholder')"
           />
         </a-form-item>
 
-        <a-form-item label="描述" field="description">
+        <a-form-item :label="$t('scope.description')" field="description">
           <a-textarea
             v-model="formData.description"
-            placeholder="请输入描述"
+            :placeholder="$t('scope.description.placeholder')"
             :auto-size="{ minRows: 3, maxRows: 6 }"
           />
         </a-form-item>
 
-        <a-form-item label="关联资源" field="resources">
+        <a-form-item :label="$t('scope.resources')" field="resources">
           <a-select
             v-model="formData.resources"
-            placeholder="选择关联的API资源"
+            :placeholder="$t('scope.resources.placeholder')"
             multiple
             allow-clear
             allow-search
           >
-            <a-option value="api">API</a-option>
-            <a-option value="user-api">用户API</a-option>
-            <a-option value="admin-api">管理API</a-option>
+            <a-option value="api">{{ $t('scope.resource.api') }}</a-option>
+            <a-option value="user-api">{{ $t('scope.resource.userApi') }}</a-option>
+            <a-option value="admin-api">{{ $t('scope.resource.adminApi') }}</a-option>
           </a-select>
         </a-form-item>
       </a-form>
@@ -192,28 +195,28 @@
       v-model:visible="detailVisible"
       :footer="false"
       width="560px"
-      title="作用域详情"
+      :title="$t('scope.detail')"
     >
       <div class="detail-content">
         <div class="detail-row">
-          <span class="label">作用域名称</span>
+          <span class="label">{{ $t('scope.name') }}</span>
           <span class="value">
             <a-tag color="blue" size="small">{{ currentRecord?.name }}</a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">显示名称</span>
+          <span class="label">{{ $t('scope.displayName') }}</span>
           <span class="value">{{ currentRecord?.displayName }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">描述</span>
+          <span class="label">{{ $t('scope.description') }}</span>
           <span class="value">{{ currentRecord?.description || '-' }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">关联资源</span>
+          <span class="label">{{ $t('scope.resources') }}</span>
           <span class="value">
             <template v-if="currentRecord?.resources?.length">
               <a-space wrap :size="4">
@@ -232,14 +235,14 @@
         </div>
 
         <div class="detail-row">
-          <span class="label">创建时间</span>
+          <span class="label">{{ $t('common.createdAt') }}</span>
           <span class="value">{{
             formatDateTime(currentRecord?.createdAt)
           }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">更新时间</span>
+          <span class="label">{{ $t('common.updatedAt') }}</span>
           <span class="value">{{
             formatDateTime(currentRecord?.updatedAt) || '-'
           }}</span>
@@ -250,8 +253,9 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted } from 'vue';
+  import { ref, reactive, onMounted, computed } from 'vue';
   import { Message } from '@arco-design/web-vue';
+  import { useI18n } from 'vue-i18n';
   import {
     scope,
     type IScope,
@@ -259,6 +263,8 @@
     type ICreateScopeDto,
   } from '@/api/openiddict/scope';
   import { formatDateTime } from '@/utils/date';
+
+  const { t } = useI18n();
 
   // 搜索表单
   const searchForm = reactive<IScopeQuery>({
@@ -276,32 +282,36 @@
   });
 
   // 表格列定义
-  const columns = [
-    { title: '作用域名称', dataIndex: 'name', width: 150 },
-    { title: '显示名称', dataIndex: 'displayName', width: 150 },
-    { title: '描述', dataIndex: 'description' },
+  const columns = computed(() => [
+    { title: t('scope.name'), dataIndex: 'name', width: 150 },
+    { title: t('scope.displayName'), dataIndex: 'displayName', width: 150 },
+    { title: t('scope.description'), dataIndex: 'description' },
     {
-      title: '关联资源',
+      title: t('scope.resources'),
       dataIndex: 'resources',
       slotName: 'resources',
       width: 200,
     },
     {
-      title: '创建时间',
+      title: t('common.createdAt'),
       dataIndex: 'createdAt',
       slotName: 'createdAt',
       width: 180,
     },
-    { title: '操作', slotName: 'operations', width: 180, align: 'center', fixed: 'right' },
-  ];
+    { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center', fixed: 'right' },
+  ]);
 
   // 对话框状态
   const modalVisible = ref(false);
-  const modalTitle = ref('新增作用域');
   const isEdit = ref(false);
   const detailVisible = ref(false);
   const currentRecord = ref<IScope | null>(null);
   const submitting = ref(false);
+
+  // 对话框标题
+  const modalTitle = computed(() =>
+    isEdit.value ? t('scope.edit') : t('scope.add')
+  );
 
   // 表单数据
   const formData = reactive<ICreateScopeDto>({
@@ -312,10 +322,10 @@
   });
 
   // 表单验证规则
-  const formRules = {
-    name: [{ required: true, message: '请输入作用域名称' }],
-    displayName: [{ required: true, message: '请输入显示名称' }],
-  };
+  const formRules = computed(() => ({
+    name: [{ required: true, message: t('scope.name.required') }],
+    displayName: [{ required: true, message: t('scope.displayName.required') }],
+  }));
 
   // 加载数据
   const loadData = async () => {
@@ -329,7 +339,7 @@
       tableData.value = result.items;
       pagination.total = result.totalCount;
     } catch (error) {
-      Message.error('加载数据失败');
+      Message.error(t('common.loadFailed'));
       console.error(error);
     } finally {
       loading.value = false;
@@ -372,7 +382,6 @@
   // 新增
   const handleAdd = () => {
     isEdit.value = false;
-    modalTitle.value = '新增作用域';
     resetForm();
     modalVisible.value = true;
   };
@@ -380,7 +389,6 @@
   // 编辑
   const handleEdit = (record: IScope) => {
     isEdit.value = true;
-    modalTitle.value = '编辑作用域';
     currentRecord.value = record;
 
     // 填充表单
@@ -403,11 +411,11 @@
     try {
       if (record.id) {
         await scope.delete(record.id);
-        Message.success('删除成功');
+        Message.success(t('common.deleteSuccess'));
         loadData();
       }
     } catch (error) {
-      Message.error('删除失败');
+      Message.error(t('common.deleteFailed'));
       console.error(error);
     }
   };
@@ -422,16 +430,16 @@
           ...formData,
           id: currentRecord.value.id,
         });
-        Message.success('更新成功');
+        Message.success(t('common.updateSuccess'));
       } else {
         await scope.create(formData);
-        Message.success('创建成功');
+        Message.success(t('common.createSuccess'));
       }
 
       modalVisible.value = false;
       loadData();
     } catch (error) {
-      Message.error(isEdit.value ? '更新失败' : '创建失败');
+      Message.error(isEdit.value ? t('common.updateFailed') : t('common.createFailed'));
       console.error(error);
     } finally {
       submitting.value = false;
@@ -450,6 +458,11 @@
 </script>
 
 <style scoped lang="less">
+  // 表格标题不加粗
+  :deep(.arco-table-th) {
+    font-weight: normal !important;
+  }
+
   .container {
     padding: 20px;
 

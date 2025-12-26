@@ -48,4 +48,15 @@ export default {
   'permission.message.deleteSuccess': 'Deleted successfully',
   'permission.message.deleteConfirm': 'Are you sure to delete this permission?',
   'permission.message.deleteWarning': 'System permissions cannot be deleted',
+
+  'permission.modal.create': 'Create Permission',
+  'permission.modal.edit': 'Edit Permission',
+  'permission.modal.viewGrouped': 'View Permissions by Resource',
+  'permission.form.resource.required': 'Please enter resource type',
+  'permission.form.action.required': 'Please enter action type',
+  'permission.form.code.required': 'Please enter permission code',
+  'permission.form.code.format': 'Format: resource:action',
+  'permission.form.code.suggest': 'Suggested format',
+  'permission.form.name.required': 'Please enter permission name',
+  'permission.form.category.required': 'Please select category',
 };

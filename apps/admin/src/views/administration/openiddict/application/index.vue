@@ -13,12 +13,12 @@
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
             <a-form-item
               field="clientId"
-              label="客户端ID"
+              :label="$t('application.form.clientId')"
               class="form-item-block"
             >
               <a-input
                 v-model="searchForm.clientId"
-                placeholder="请输入客户端ID"
+                :placeholder="$t('application.form.clientId.placeholder')"
                 allow-clear
               >
                 <template #prefix>
@@ -30,12 +30,12 @@
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
             <a-form-item
               field="displayName"
-              label="显示名称"
+              :label="$t('application.form.displayName')"
               class="form-item-block"
             >
               <a-input
                 v-model="searchForm.displayName"
-                placeholder="请输入显示名称"
+                :placeholder="$t('application.form.displayName.placeholder')"
                 allow-clear
               >
                 <template #prefix>
@@ -45,18 +45,18 @@
             </a-form-item>
           </a-col>
           <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="6">
-            <a-form-item field="type" label="类型" class="form-item-block">
+            <a-form-item field="type" :label="$t('application.form.type')" class="form-item-block">
               <a-select
                 v-model="searchForm.type"
-                placeholder="请选择类型"
+                :placeholder="$t('application.form.type.placeholder')"
                 allow-clear
               >
                 <template #prefix>
                   <icon-safe />
                 </template>
-                <a-option value="">全部</a-option>
-                <a-option value="confidential">Confidential (机密)</a-option>
-                <a-option value="public">Public (公共)</a-option>
+                <a-option value="">{{ $t('application.form.type.all') }}</a-option>
+                <a-option value="confidential">{{ $t('application.form.type.confidential') }}</a-option>
+                <a-option value="public">{{ $t('application.form.type.public') }}</a-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -64,15 +64,15 @@
             <a-space :size="12">
               <a-button type="primary" @click="handleSearch">
                 <template #icon><icon-search /></template>
-                查询
+                {{ $t('application.button.search') }}
               </a-button>
               <a-button @click="handleReset">
                 <template #icon><icon-refresh /></template>
-                重置
+                {{ $t('application.button.reset') }}
               </a-button>
               <a-button type="primary" status="success" @click="handleAdd">
                 <template #icon><icon-plus /></template>
-                新增
+                {{ $t('application.button.add') }}
               </a-button>
             </a-space>
           </a-col>
@@ -98,7 +98,7 @@
       >
         <template #type="{ record }">
           <a-tag :color="record.type === 'confidential' ? 'blue' : 'green'">
-            {{ record.type === 'confidential' ? '机密' : '公共' }}
+            {{ record.type === 'confidential' ? $t('application.form.type.confidential') : $t('application.form.type.public') }}
           </a-tag>
         </template>
 
@@ -106,10 +106,10 @@
           <a-tag>
             {{
               record.consentType === 'explicit'
-                ? '显式'
+                ? $t('application.consentType.explicit')
                 : record.consentType === 'implicit'
-                ? '隐式'
-                : '系统'
+                ? $t('application.consentType.implicit')
+                : $t('application.consentType.systematic')
             }}
           </a-tag>
         </template>
@@ -134,29 +134,32 @@
           {{ formatDateTime(record.createdAt) }}
         </template>
 
-        <template #operations="{ record }">
+        <template #actions="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">
-              <template #icon><icon-eye /></template>
-              {{ $t('common.detail') }}
-            </a-button>
-            <a-button
-              type="text"
-              size="small"
-              status="warning"
-              @click="handleEdit(record)"
-            >
-              <template #icon><icon-edit /></template>
-              {{ $t('common.edit') }}
-            </a-button>
+            <a-tooltip :content="$t('common.detail')">
+              <a-button type="text" size="small" @click="handleView(record)">
+                <template #icon><icon-eye /></template>
+              </a-button>
+            </a-tooltip>
+            <a-tooltip :content="$t('common.edit')">
+              <a-button
+                type="text"
+                size="small"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
               :content="$t('common.deleteConfirm')"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
-                {{ $t('common.delete') }}
-              </a-button>
+              <a-tooltip :content="$t('common.delete')">
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -174,19 +177,19 @@
       <a-form :model="formData" :rules="formRules" layout="vertical">
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="客户端ID" field="clientId">
+            <a-form-item :label="$t('application.form.clientId')" field="clientId">
               <a-input
                 v-model="formData.clientId"
-                placeholder="请输入客户端ID"
+                :placeholder="$t('application.form.clientId.placeholder')"
                 :disabled="isEdit"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="显示名称" field="displayName">
+            <a-form-item :label="$t('application.form.displayName')" field="displayName">
               <a-input
                 v-model="formData.displayName"
-                placeholder="请输入显示名称"
+                :placeholder="$t('application.form.displayName.placeholder')"
               />
             </a-form-item>
           </a-col>
@@ -194,19 +197,19 @@
 
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="客户端类型" field="type">
-              <a-select v-model="formData.type" placeholder="请选择">
-                <a-option value="confidential">Confidential (机密)</a-option>
-                <a-option value="public">Public (公共)</a-option>
+            <a-form-item :label="$t('application.form.clientType')" field="type">
+              <a-select v-model="formData.type" :placeholder="$t('application.form.clientType.placeholder')">
+                <a-option value="confidential">{{ $t('application.form.type.confidential') }}</a-option>
+                <a-option value="public">{{ $t('application.form.type.public') }}</a-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="同意类型" field="consentType">
-              <a-select v-model="formData.consentType" placeholder="请选择">
-                <a-option value="explicit">Explicit (显式)</a-option>
-                <a-option value="implicit">Implicit (隐式)</a-option>
-                <a-option value="systematic">Systematic (系统)</a-option>
+            <a-form-item :label="$t('application.form.consentType')" field="consentType">
+              <a-select v-model="formData.consentType" :placeholder="$t('application.form.consentType.placeholder')">
+                <a-option value="explicit">{{ $t('application.consentType.explicit') }}</a-option>
+                <a-option value="implicit">{{ $t('application.consentType.implicit') }}</a-option>
+                <a-option value="systematic">{{ $t('application.consentType.systematic') }}</a-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -214,31 +217,25 @@
 
         <a-form-item
           v-if="formData.type === 'confidential'"
-          label="客户端密钥"
+          :label="$t('application.form.clientSecret')"
           field="clientSecret"
         >
           <a-input-password
             v-model="formData.clientSecret"
-            placeholder="请输入客户端密钥"
+            :placeholder="$t('application.form.clientSecret.placeholder')"
           />
         </a-form-item>
 
-        <a-form-item label="授权流程" field="permissions">
+        <a-form-item :label="$t('application.form.grantTypes')" field="permissions">
           <a-checkbox-group v-model="selectedGrantTypes">
-            <a-checkbox value="password">密码模式 (Password)</a-checkbox>
-            <a-checkbox value="client_credentials"
-              >客户端凭证 (Client Credentials)</a-checkbox
-            >
-            <a-checkbox value="authorization_code"
-              >授权码模式 (Authorization Code)</a-checkbox
-            >
-            <a-checkbox value="refresh_token"
-              >刷新令牌 (Refresh Token)</a-checkbox
-            >
+            <a-checkbox value="password">{{ $t('application.form.grantTypes.password') }}</a-checkbox>
+            <a-checkbox value="client_credentials">{{ $t('application.form.grantTypes.clientCredentials') }}</a-checkbox>
+            <a-checkbox value="authorization_code">{{ $t('application.form.grantTypes.authorizationCode') }}</a-checkbox>
+            <a-checkbox value="refresh_token">{{ $t('application.form.grantTypes.refreshToken') }}</a-checkbox>
           </a-checkbox-group>
         </a-form-item>
 
-        <a-form-item label="作用域 (Scopes)" field="scopes">
+        <a-form-item :label="$t('application.form.scopes')" field="scopes">
           <a-checkbox-group v-model="selectedScopes">
             <a-checkbox value="openid">OpenID</a-checkbox>
             <a-checkbox value="profile">Profile</a-checkbox>
@@ -248,18 +245,18 @@
           </a-checkbox-group>
         </a-form-item>
 
-        <a-form-item label="重定向URI" field="redirectUris">
+        <a-form-item :label="$t('application.form.redirectUris')" field="redirectUris">
           <a-textarea
             v-model="redirectUrisText"
-            placeholder="每行一个URI，例如：&#10;http://localhost:5173/callback"
+            :placeholder="$t('application.form.redirectUris.placeholder')"
             :auto-size="{ minRows: 3, maxRows: 6 }"
           />
         </a-form-item>
 
-        <a-form-item label="登出重定向URI" field="postLogoutRedirectUris">
+        <a-form-item :label="$t('application.form.postLogoutRedirectUris')" field="postLogoutRedirectUris">
           <a-textarea
             v-model="postLogoutRedirectUrisText"
-            placeholder="每行一个URI，例如：&#10;http://localhost:5173/login"
+            :placeholder="$t('application.form.postLogoutRedirectUris.placeholder')"
             :auto-size="{ minRows: 2, maxRows: 4 }"
           />
         </a-form-item>
@@ -269,40 +266,40 @@
     <!-- 查看详情对话框 -->
     <a-modal
       v-model:visible="detailVisible"
-      title="应用程序详情"
+      :title="$t('application.modal.detail')"
       width="600px"
       :footer="false"
     >
       <div class="detail-content">
         <div class="detail-row">
-          <span class="label">客户端ID</span>
+          <span class="label">{{ $t('application.detail.clientId') }}</span>
           <span class="value">{{ currentRecord?.clientId }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">显示名称</span>
+          <span class="label">{{ $t('application.detail.displayName') }}</span>
           <span class="value">{{ currentRecord?.displayName }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">客户端类型</span>
+          <span class="label">{{ $t('application.detail.clientType') }}</span>
           <span class="value">
             <a-tag
               :color="currentRecord?.type === 'confidential' ? 'blue' : 'green'"
               size="small"
             >
-              {{ currentRecord?.type === 'confidential' ? '机密' : '公共' }}
+              {{ currentRecord?.type === 'confidential' ? $t('application.form.type.confidential') : $t('application.form.type.public') }}
             </a-tag>
           </span>
         </div>
 
         <div class="detail-row">
-          <span class="label">同意类型</span>
+          <span class="label">{{ $t('application.detail.consentType') }}</span>
           <span class="value">{{ currentRecord?.consentType }}</span>
         </div>
 
         <div class="detail-row">
-          <span class="label">权限列表</span>
+          <span class="label">{{ $t('application.detail.permissions') }}</span>
           <span class="value">
             <a-space wrap :size="4">
               <a-tag
@@ -318,7 +315,7 @@
         </div>
 
         <div class="detail-row">
-          <span class="label">重定向URI</span>
+          <span class="label">{{ $t('application.detail.redirectUris') }}</span>
           <span class="value">
             <div v-if="currentRecord?.redirectUris?.length">
               <div
@@ -334,7 +331,7 @@
         </div>
 
         <div class="detail-row">
-          <span class="label">登出URI</span>
+          <span class="label">{{ $t('application.detail.postLogoutRedirectUris') }}</span>
           <span class="value">
             <div v-if="currentRecord?.postLogoutRedirectUris?.length">
               <div
@@ -350,7 +347,7 @@
         </div>
 
         <div class="detail-row">
-          <span class="label">创建时间</span>
+          <span class="label">{{ $t('application.detail.createdAt') }}</span>
           <span class="value">{{
             formatDateTime(currentRecord?.createdAt)
           }}</span>
@@ -361,7 +358,8 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted } from 'vue';
+  import { ref, reactive, onMounted, computed } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { Message } from '@arco-design/web-vue';
   import {
     application,
@@ -378,6 +376,8 @@
     type: '',
   });
 
+  const { t } = useI18n();
+
   // 表格数据
   const tableData = ref<IApplication[]>([]);
   const loading = ref(false);
@@ -388,34 +388,34 @@
   });
 
   // 表格列定义
-  const columns = [
-    { title: '客户端ID', dataIndex: 'clientId', width: 100, ellipsis: true, tooltip: true },
-    { title: '显示名称', dataIndex: 'displayName', width: 110, ellipsis: true, tooltip: true },
-    { title: '类型', dataIndex: 'type', slotName: 'type', width: 55 },
+  const columns = computed(() => [
+    { title: t('application.column.clientId'), dataIndex: 'clientId', width: 100, ellipsis: true, tooltip: true },
+    { title: t('application.column.displayName'), dataIndex: 'displayName', width: 110, ellipsis: true, tooltip: true },
+    { title: t('application.column.type'), dataIndex: 'type', slotName: 'type', width: 55 },
     {
-      title: '同意类型',
+      title: t('application.column.consentType'),
       dataIndex: 'consentType',
       slotName: 'consentType',
       width: 65,
     },
     {
-      title: '权限',
+      title: t('application.column.permissions'),
       dataIndex: 'permissions',
       slotName: 'permissions',
       width: 200,
     },
     {
-      title: '创建时间',
+      title: t('application.column.createdAt'),
       dataIndex: 'createdAt',
       slotName: 'createdAt',
       width: 145,
     },
-    { title: '操作', slotName: 'operations', width: 145, align: 'center' },
-  ];
+    { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
+  ]);
 
   // 对话框状态
   const modalVisible = ref(false);
-  const modalTitle = ref('新增应用程序');
+  const modalTitle = ref('');
   const isEdit = ref(false);
   const detailVisible = ref(false);
   const currentRecord = ref<IApplication | null>(null);
@@ -439,11 +439,11 @@
   const postLogoutRedirectUrisText = ref('');
 
   // 表单验证规则
-  const formRules = {
-    clientId: [{ required: true, message: '请输入客户端ID' }],
-    displayName: [{ required: true, message: '请输入显示名称' }],
-    type: [{ required: true, message: '请选择客户端类型' }],
-  };
+  const formRules = computed(() => ({
+    clientId: [{ required: true, message: t('application.form.clientId.required') }],
+    displayName: [{ required: true, message: t('application.form.displayName.required') }],
+    type: [{ required: true, message: t('application.form.type.required') }],
+  }));
 
   // ========== 辅助函数（定义在使用之前） ==========
 
@@ -499,9 +499,9 @@
 
   // 格式化权限显示
   const formatPermission = (perm: string): string => {
-    if (perm.startsWith('gt:')) return `授权:${perm.substring(3)}`;
-    if (perm.startsWith('ept:')) return `端点:${perm.substring(4)}`;
-    if (perm.startsWith('scp:')) return `作用域:${perm.substring(4)}`;
+    if (perm.startsWith('gt:')) return `${t('application.permission.grantType')}:${perm.substring(3)}`;
+    if (perm.startsWith('ept:')) return `${t('application.permission.endpoint')}:${perm.substring(4)}`;
+    if (perm.startsWith('scp:')) return `${t('application.permission.scope')}:${perm.substring(4)}`;
     return perm;
   };
 
@@ -517,7 +517,7 @@
       tableData.value = result.items;
       pagination.total = result.totalCount;
     } catch (error) {
-      Message.error('加载数据失败');
+      Message.error(t('application.message.loadFailed'));
     } finally {
       loading.value = false;
     }
@@ -552,7 +552,7 @@
   // 新增
   const handleAdd = () => {
     isEdit.value = false;
-    modalTitle.value = '新增应用程序';
+    modalTitle.value = t('application.modal.add');
     resetForm();
     modalVisible.value = true;
   };
@@ -560,7 +560,7 @@
   // 编辑
   const handleEdit = (record: IApplication) => {
     isEdit.value = true;
-    modalTitle.value = '编辑应用程序';
+    modalTitle.value = t('application.modal.edit');
     currentRecord.value = record;
 
     // 填充表单
@@ -592,11 +592,11 @@
     try {
       if (record.id) {
         await application.delete(record.id);
-        Message.success('删除成功');
+        Message.success(t('application.message.deleteSuccess'));
         loadData();
       }
     } catch (error) {
-      Message.error('删除失败');
+      Message.error(t('common.deleteFailed'));
       console.error(error);
     }
   };
@@ -620,16 +620,16 @@
           ...formData,
           id: currentRecord.value.id,
         });
-        Message.success('更新成功');
+        Message.success(t('application.message.updateSuccess'));
       } else {
         await application.create(formData);
-        Message.success('创建成功');
+        Message.success(t('application.message.createSuccess'));
       }
 
       modalVisible.value = false;
       loadData();
     } catch (error) {
-      Message.error(isEdit.value ? '更新失败' : '创建失败');
+      Message.error(isEdit.value ? t('common.updateFailed') : t('common.createFailed'));
       console.error(error);
     }
   };
@@ -646,6 +646,11 @@
 </script>
 
 <style scoped lang="less">
+  // 表格标题不加粗
+  :deep(.arco-table-th) {
+    font-weight: normal !important;
+  }
+
   .container {
     padding: 20px;
 

@@ -39,4 +39,22 @@ export default {
     'System roles cannot be modified or deleted',
   'role.message.superAdminRoleCannotModify':
     'super_admin role can only be modified by super administrator',
+  'role.action.permissions': 'Permissions',
+  'role.action.systemRole': 'System Role',
+  'role.action.systemRoleNoDelete': 'System role cannot be deleted',
+  'role.permission.allPermissions': 'All Permissions',
+
+  // Permission assignment modal
+  'role.permission.assignTitle': 'Assign Permissions - {roleName}',
+  'role.permission.searchPlaceholder': 'Search permissions...',
+  'role.permission.available': 'Available Permissions',
+  'role.permission.assigned': 'Assigned Permissions',
+  'role.permission.loadFailed': 'Failed to load permissions',
+  'role.permission.assignSuccess': 'Permissions assigned successfully',
+  'role.permission.assignFailed': 'Failed to assign permissions',
+  'role.message.systemRoleNoDelete': 'System role cannot be deleted',
+
+  // Modal buttons
+  'role.modal.ok': 'OK',
+  'role.modal.cancel': 'Cancel',
 };

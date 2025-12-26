@@ -63,17 +63,17 @@
 
         <template #maxUsers="{ record }">
           <span v-if="record.maxUsers">{{ record.maxUsers }}</span>
-          <span v-else class="text-gray">无限制</span>
+          <span v-else class="text-gray">{{ $t('tenant.status.unlimited') }}</span>
         </template>
 
         <template #isActive="{ record }">
           <a-tag v-if="record.isActive" color="arcoblue" size="small">
             <template #icon><icon-check-circle-fill /></template>
-            启用
+            {{ $t('tenant.status.active') }}
           </a-tag>
           <a-tag v-else color="red" size="small">
             <template #icon><icon-close-circle-fill /></template>
-            禁用
+            {{ $t('tenant.status.inactive') }}
           </a-tag>
         </template>
 
@@ -81,34 +81,36 @@
           {{ formatDateTime(record.createdAt) }}
         </template>
 
-        <template #operations="{ record }">
+        <template #actions="{ record }">
           <a-space>
-            <a-button type="text" size="small" @click="handleView(record)">
-              <template #icon><icon-eye /></template>
-              查看
-            </a-button>
-            <a-button
-              type="text"
-              size="small"
-              status="warning"
-              @click="handleEdit(record)"
-            >
-              <template #icon><icon-edit /></template>
-              编辑
-            </a-button>
+            <a-tooltip :content="$t('tenant.action.view')">
+              <a-button type="text" size="small" @click="handleView(record)">
+                <template #icon><icon-eye /></template>
+              </a-button>
+            </a-tooltip>
+            <a-tooltip :content="$t('tenant.action.edit')">
+              <a-button
+                type="text"
+                size="small"
+                status="warning"
+                @click="handleEdit(record)"
+              >
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
             <a-dropdown>
               <a-button type="text" size="small">
                 <template #icon><icon-more /></template>
               </a-button>
               <template #content>
                 <a-doption @click="handleToggleActive(record, !record.isActive)">
-                  <icon-swap /> {{ record.isActive ? '禁用' : '启用' }}
+                  <icon-swap /> {{ record.isActive ? $t('tenant.action.disable') : $t('tenant.action.enable') }}
                 </a-doption>
                 <a-doption
                   style="color: rgb(var(--red-6))"
                   @click="handleDelete(record)"
                 >
-                  <icon-delete /> 删除
+                  <icon-delete /> {{ $t('tenant.action.delete') }}
                 </a-doption>
               </template>
             </a-dropdown>
@@ -268,19 +270,19 @@
 
         <div class="detail-row">
           <span class="label">{{ $t('tenant.column.maxUsers') }}</span>
-          <span class="value">{{ viewRecord?.maxUsers || '无限制' }}</span>
+          <span class="value">{{ viewRecord?.maxUsers || $t('tenant.status.unlimited') }}</span>
         </div>
 
         <div class="detail-row">
           <span class="label">{{ $t('tenant.form.maxStorageMB') }}</span>
-          <span class="value">{{ viewRecord?.maxStorageMB ? `${viewRecord.maxStorageMB} MB` : '无限制' }}</span>
+          <span class="value">{{ viewRecord?.maxStorageMB ? `${viewRecord.maxStorageMB} MB` : $t('tenant.status.unlimited') }}</span>
         </div>
 
         <div class="detail-row">
           <span class="label">{{ $t('tenant.column.isActive') }}</span>
           <span class="value">
-            <a-tag v-if="viewRecord?.isActive" color="green" size="small">启用</a-tag>
-            <a-tag v-else color="red" size="small">禁用</a-tag>
+            <a-tag v-if="viewRecord?.isActive" color="green" size="small">{{ $t('tenant.status.active') }}</a-tag>
+            <a-tag v-else color="red" size="small">{{ $t('tenant.status.inactive') }}</a-tag>
           </span>
         </div>
 
@@ -384,8 +386,8 @@
       width: 150,
     },
     {
-      title: t('tenant.column.operations'),
-      slotName: 'operations',
+      title: t('common.actions'),
+      slotName: 'actions',
       width: 180,
       align: 'center',
       fixed: 'right',
@@ -418,15 +420,15 @@
   // 表单验证规则
   const formRules = {
     code: [
-      { required: true, message: '请输入租户代码' },
-      { match: /^[a-z0-9_-]+$/, message: '只能包含小写字母、数字、下划线和横杠' },
-      { minLength: 2, maxLength: 50, message: '长度为2-50个字符' },
+      { required: true, message: t('tenant.validation.codeRequired') },
+      { match: /^[a-z0-9_-]+$/, message: t('tenant.validation.codePattern') },
+      { minLength: 2, maxLength: 50, message: t('tenant.validation.codeLength') },
     ],
     name: [
-      { required: true, message: '请输入租户名称' },
-      { maxLength: 100, message: '最多100个字符' },
+      { required: true, message: t('tenant.validation.nameRequired') },
+      { maxLength: 100, message: t('tenant.validation.nameMaxLength') },
     ],
-    email: [{ type: 'email', message: '请输入有效的邮箱地址' }],
+    email: [{ type: 'email', message: t('tenant.validation.emailInvalid') }],
   };
 
   // 获取订阅计划颜色
@@ -459,7 +461,7 @@
       tableData.value = response?.list || [];
       pagination.total = response?.pagination?.total || 0;
     } catch (error) {
-      Message.error('获取租户列表失败');
+      Message.error(t('tenant.message.loadFailed'));
     } finally {
       loading.value = false;
     }
@@ -556,7 +558,7 @@
       modalVisible.value = false;
       fetchData();
     } catch (error: any) {
-      Message.error(error.response?.data?.message || '操作失败');
+      Message.error(error.response?.data?.message || t('tenant.message.operationFailed'));
     } finally {
       submitting.value = false;
     }
@@ -571,10 +573,10 @@
   // 删除租户
   const handleDelete = async (record: Tenant) => {
     Modal.warning({
-      title: '确认删除',
-      content: `确定要删除租户「${record.name}」吗？此操作不可恢复。`,
-      okText: '删除',
-      cancelText: '取消',
+      title: t('tenant.modal.delete.title'),
+      content: t('tenant.modal.delete.content', { name: record.name }),
+      okText: t('tenant.action.delete'),
+      cancelText: t('common.cancel'),
       hideCancel: false,
       onOk: async () => {
         try {
@@ -582,7 +584,7 @@
           Message.success(t('tenant.message.deleteSuccess'));
           fetchData();
         } catch (error) {
-          Message.error('删除失败');
+          Message.error(t('tenant.message.deleteFailed'));
         }
       },
     });
@@ -597,7 +599,7 @@
       );
       fetchData();
     } catch (error) {
-      Message.error('操作失败');
+      Message.error(t('tenant.message.operationFailed'));
     }
   };
 
@@ -607,6 +609,11 @@
 </script>
 
 <style lang="less" scoped>
+  // 表格标题不加粗
+  :deep(.arco-table-th) {
+    font-weight: normal !important;
+  }
+
   .text-gray {
     color: var(--color-text-3);
   }

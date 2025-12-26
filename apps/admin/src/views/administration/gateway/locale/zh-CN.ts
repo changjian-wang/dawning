@@ -24,8 +24,10 @@ export default {
   'gateway.cluster.description': '描述',
   'gateway.cluster.descriptionPlaceholder': '请输入集群描述',
   'gateway.cluster.destinations': '目标地址',
+  'gateway.cluster.destinationCount': '个目标',
   'gateway.cluster.destinationsPlaceholder':
     'JSON格式，如: {"dest1":{"Address":"http://localhost:5000"}}',
+  'gateway.cluster.destinationsFormat': 'JSON格式，例如: [{"destinationId": "dest1", "address": "http://localhost:5000"}]',
   'gateway.cluster.destinationsRequired': '请输入目标地址',
   'gateway.cluster.isEnabled': '启用状态',
 
@@ -74,6 +76,7 @@ export default {
   'gateway.route.matchPathPlaceholder': '路径模式，如: /api/{**catch-all}',
   'gateway.route.matchPathRequired': '请输入匹配路径',
   'gateway.route.matchMethods': '匹配方法',
+  'gateway.route.matchMethodsAll': '全部',
   'gateway.route.matchMethodsPlaceholder': '留空则匹配所有方法',
   'gateway.route.order': '优先级',
   'gateway.route.orderPlaceholder': '数值越小优先级越高',
@@ -82,7 +85,13 @@ export default {
   // 策略设置
   'gateway.route.policies': '策略设置',
   'gateway.route.authorizationPolicy': '授权策略',
+  'gateway.route.authorizationPolicy.none': '无',
+  'gateway.route.authorizationPolicy.requireAuthenticatedUser': '需要认证用户',
+  'gateway.route.authorizationPolicy.requireAdmin': '需要管理员',
   'gateway.route.rateLimiterPolicy': '限流策略',
+  'gateway.route.rateLimiterPolicy.none': '无',
+  'gateway.route.rateLimiterPolicy.fixedWindow': '固定窗口',
+  'gateway.route.rateLimiterPolicy.slidingWindow': '滑动窗口',
   'gateway.route.timeoutSeconds': '超时时间(秒)',
 
   // 路径转换
@@ -101,6 +110,10 @@ export default {
   'rateLimit.policyName': '策略名称',
   'rateLimit.displayName': '显示名称',
   'rateLimit.policyType': '策略类型',
+  'rateLimit.policyType.fixedWindow': '固定窗口',
+  'rateLimit.policyType.slidingWindow': '滑动窗口',
+  'rateLimit.policyType.tokenBucket': '令牌桶',
+  'rateLimit.policyType.concurrency': '并发限制',
   'rateLimit.permitLimit': '请求限制',
   'rateLimit.windowSeconds': '时间窗口(秒)',
   'rateLimit.segments': '窗口分段数',
@@ -110,6 +123,7 @@ export default {
   'rateLimit.description': '描述',
   'rateLimit.operations': '操作',
   'rateLimit.ipAddress': 'IP 地址',
+  'rateLimit.ipAddressPlaceholder': '192.168.1.1 或 192.168.1.0/24',
   'rateLimit.ruleType': '规则类型',
   'rateLimit.blacklist': '黑名单',
   'rateLimit.whitelist': '白名单',

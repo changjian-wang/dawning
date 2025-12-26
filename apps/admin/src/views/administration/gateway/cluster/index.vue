@@ -81,7 +81,7 @@
         <template #destinations="{ record }">
           <a-popover trigger="click" position="bottom">
             <a-button type="text" size="small">
-              {{ getDestinationCount(record.destinations) }} 个目标
+              {{ getDestinationCount(record.destinations) }} {{ $t('gateway.cluster.destinationCount') }}
             </a-button>
             <template #content>
               <div style="max-width: 400px">
@@ -94,7 +94,7 @@
         </template>
         <template #healthCheck="{ record }">
           <a-tag :color="record.healthCheckEnabled ? 'green' : 'gray'">
-            {{ record.healthCheckEnabled ? '启用' : '禁用' }}
+            {{ record.healthCheckEnabled ? $t('gateway.enabled') : $t('gateway.disabled') }}
           </a-tag>
         </template>
         <template #isEnabled="{ record }">
@@ -103,20 +103,22 @@
             @change="(val) => handleToggleEnabled(record, val as boolean)"
           />
         </template>
-        <template #operations="{ record }">
+        <template #actions="{ record }">
           <a-space>
-            <a-button type="text" size="small" status="warning" @click="handleEdit(record)">
-              <template #icon><icon-edit /></template>
-              {{ $t('common.edit') }}
-            </a-button>
+            <a-tooltip :content="$t('common.edit')">
+              <a-button type="text" size="small" status="warning" @click="handleEdit(record)">
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
             <a-popconfirm
               :content="$t('common.deleteConfirm')"
               @ok="handleDelete(record)"
             >
-              <a-button type="text" size="small" status="danger">
-                <template #icon><icon-delete /></template>
-                {{ $t('common.delete') }}
-              </a-button>
+              <a-tooltip :content="$t('common.delete')">
+                <a-button type="text" size="small" status="danger">
+                  <template #icon><icon-delete /></template>
+                </a-button>
+              </a-tooltip>
             </a-popconfirm>
           </a-space>
         </template>
@@ -210,8 +212,7 @@
           />
           <template #extra>
             <span style="color: #86909c; font-size: 12px">
-              JSON格式，例如: [{"destinationId": "dest1", "address":
-              "http://localhost:5000"}]
+              {{ $t('gateway.cluster.destinationsFormat') }}
             </span>
           </template>
         </a-form-item>
@@ -353,7 +354,7 @@
   }));
 
   // 表格列配置
-  const columns: TableColumnData[] = [
+  const columns = computed(() => [
     {
       title: t('gateway.cluster.clusterId'),
       slotName: 'clusterId',
@@ -376,8 +377,8 @@
       width: 100,
     },
     { title: t('gateway.status'), slotName: 'isEnabled', width: 80 },
-    { title: t('common.operations'), slotName: 'operations', width: 140, align: 'center' },
-  ];
+    { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
+  ]);
 
   // 弹窗相关
   const modalVisible = ref(false);

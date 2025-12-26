@@ -1221,4 +1221,9 @@
   });
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  // 表格标题不加粗
+  :deep(.arco-table-th) {
+    font-weight: normal !important;
+  }
+</style>

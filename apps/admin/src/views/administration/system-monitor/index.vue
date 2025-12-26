@@ -10,7 +10,7 @@
         <a-col :xs="24" :sm="12" :md="6">
           <a-card class="stat-card">
             <div class="custom-statistic">
-              <div class="statistic-title">系统状态</div>
+              <div class="statistic-title">{{ $t('systemMonitor.systemStatus') }}</div>
               <div class="statistic-value" :style="{ color: statusColor }">
                 <icon-check-circle-fill v-if="isHealthy" />
                 <icon-close-circle-fill v-else />
@@ -22,7 +22,7 @@
         <a-col :xs="24" :sm="12" :md="6">
           <a-card class="stat-card">
             <div class="custom-statistic">
-              <div class="statistic-title">运行时间</div>
+              <div class="statistic-title">{{ $t('systemMonitor.uptime') }}</div>
               <div class="statistic-value">{{ uptime }}</div>
             </div>
           </a-card>
@@ -30,7 +30,7 @@
         <a-col :xs="24" :sm="12" :md="6">
           <a-card class="stat-card">
             <div class="custom-statistic">
-              <div class="statistic-title">内存使用</div>
+              <div class="statistic-title">{{ $t('systemMonitor.memoryUsage') }}</div>
               <div class="statistic-value">{{ memoryUsage }}</div>
             </div>
           </a-card>
@@ -38,7 +38,7 @@
         <a-col :xs="24" :sm="12" :md="6">
           <a-card class="stat-card">
             <div class="custom-statistic">
-              <div class="statistic-title">线程数</div>
+              <div class="statistic-title">{{ $t('systemMonitor.threadCount') }}</div>
               <div class="statistic-value">{{ threadCount }}</div>
             </div>
           </a-card>
@@ -46,11 +46,11 @@
       </a-row>
 
       <!-- 健康检查详情 -->
-      <a-card class="general-card" title="服务健康检查">
+      <a-card class="general-card" :title="$t('systemMonitor.healthCheck')">
         <template #extra>
           <a-button type="text" :loading="loading" @click="refreshAll">
             <template #icon><icon-refresh /></template>
-            刷新
+            {{ $t('systemMonitor.refresh') }}
           </a-button>
         </template>
 
@@ -82,39 +82,39 @@
       <!-- 性能指标 -->
       <a-row :gutter="16" style="margin-top: 16px">
         <a-col :xs="24" :md="12">
-          <a-card class="general-card" title="内存详情">
+          <a-card class="general-card" :title="$t('systemMonitor.memoryDetails')">
             <a-descriptions :column="1" bordered size="small">
-              <a-descriptions-item label="工作集内存">
+              <a-descriptions-item :label="$t('systemMonitor.memory.workingSet')">
                 {{ metrics?.memory?.workingSet || '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="私有内存">
+              <a-descriptions-item :label="$t('systemMonitor.memory.privateMemory')">
                 {{ metrics?.memory?.privateMemory || '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="虚拟内存">
+              <a-descriptions-item :label="$t('systemMonitor.memory.virtualMemory')">
                 {{ metrics?.memory?.virtualMemory || '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="GC 内存">
+              <a-descriptions-item :label="$t('systemMonitor.memory.gcMemory')">
                 {{ metrics?.memory?.gcMemory || '-' }}
               </a-descriptions-item>
             </a-descriptions>
           </a-card>
         </a-col>
         <a-col :xs="24" :md="12">
-          <a-card class="general-card" title="CPU & 垃圾回收">
+          <a-card class="general-card" :title="$t('systemMonitor.cpuGc')">
             <a-descriptions :column="1" bordered size="small">
-              <a-descriptions-item label="总处理器时间">
+              <a-descriptions-item :label="$t('systemMonitor.cpu.totalProcessorTime')">
                 {{ metrics?.cpu?.totalProcessorTime || '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="用户处理器时间">
+              <a-descriptions-item :label="$t('systemMonitor.cpu.userProcessorTime')">
                 {{ metrics?.cpu?.userProcessorTime || '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="Gen0 回收次数">
+              <a-descriptions-item :label="$t('systemMonitor.gc.gen0Collections')">
                 {{ metrics?.gc?.gen0Collections ?? '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="Gen1 回收次数">
+              <a-descriptions-item :label="$t('systemMonitor.gc.gen1Collections')">
                 {{ metrics?.gc?.gen1Collections ?? '-' }}
               </a-descriptions-item>
-              <a-descriptions-item label="Gen2 回收次数">
+              <a-descriptions-item :label="$t('systemMonitor.gc.gen2Collections')">
                 {{ metrics?.gc?.gen2Collections ?? '-' }}
               </a-descriptions-item>
             </a-descriptions>
@@ -123,7 +123,7 @@
       </a-row>
 
       <!-- 服务端点检查 -->
-      <a-card class="general-card" title="服务端点" style="margin-top: 16px">
+      <a-card class="general-card" :title="$t('systemMonitor.serviceEndpoints')" style="margin-top: 16px">
         <a-table :columns="serviceColumns" :data="services" :pagination="false">
           <template #status="{ record }">
             <a-tag
@@ -134,7 +134,7 @@
                 <icon-check-circle-fill v-if="record.status === 'healthy'" />
                 <icon-close-circle-fill v-else />
               </template>
-              {{ record.status === 'healthy' ? '正常' : '异常' }}
+              {{ record.status === 'healthy' ? $t('systemMonitor.status.healthy') : $t('systemMonitor.status.unhealthy') }}
             </a-tag>
           </template>
           <template #responseTime="{ record }">
@@ -152,7 +152,7 @@
               @click="checkSingleService(record)"
             >
               <template #icon><icon-sync /></template>
-              检查
+              {{ $t('systemMonitor.check') }}
             </a-button>
           </template>
         </a-table>
@@ -164,12 +164,15 @@
 <script lang="ts" setup>
   import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
+  import { useI18n } from 'vue-i18n';
   import {
     healthApi,
     type DetailedHealthStatus,
     type Metrics,
     type ServiceStatus,
   } from '@/api/administration/health';
+
+  const { t } = useI18n();
 
   const loading = ref(false);
   const detailedHealth = ref<DetailedHealthStatus | null>(null);
@@ -188,36 +191,36 @@
   const threadCount = computed(() => metrics.value?.threads?.count ?? '-');
 
   // 健康检查表格列
-  const healthColumns = reactive([
-    { title: '检查项', dataIndex: 'name', width: 150 },
-    { title: '状态', dataIndex: 'status', slotName: 'status', width: 120 },
+  const healthColumns = computed(() => [
+    { title: t('systemMonitor.column.checkItem'), dataIndex: 'name', width: 180 },
+    { title: t('systemMonitor.column.status'), dataIndex: 'status', slotName: 'status', width: 90 },
     {
-      title: '响应时间',
+      title: t('systemMonitor.column.responseTime'),
       dataIndex: 'responseTime',
       slotName: 'responseTime',
-      width: 120,
+      width: 150,
     },
-    { title: '详情', dataIndex: 'detail' },
+    { title: t('systemMonitor.column.detail'), dataIndex: 'detail' },
   ]);
 
   // 服务端点表格列
-  const serviceColumns = reactive([
-    { title: '服务名称', dataIndex: 'name', width: 150 },
-    { title: 'URL', dataIndex: 'url' },
-    { title: '状态', dataIndex: 'status', slotName: 'status', width: 100 },
+  const serviceColumns = computed(() => [
+    { title: t('systemMonitor.column.serviceName'), dataIndex: 'name', width: 140 },
+    { title: 'URL', dataIndex: 'url', width: 200 },
+    { title: t('systemMonitor.column.status'), dataIndex: 'status', slotName: 'status', width: 100 },
     {
-      title: '响应时间',
+      title: t('systemMonitor.column.responseTime'),
       dataIndex: 'responseTime',
       slotName: 'responseTime',
-      width: 120,
+      width: 110,
     },
     {
-      title: '最后检查',
+      title: t('systemMonitor.column.lastChecked'),
       dataIndex: 'lastChecked',
       slotName: 'lastChecked',
-      width: 180,
+      width: 170,
     },
-    { title: '操作', slotName: 'optional', width: 100 },
+    { title: t('common.actions'), slotName: 'optional', width: 100 },
   ]);
 
   // 健康检查数据
@@ -227,35 +230,35 @@
     const { api, database, memory } = detailedHealth.value.checks;
     return [
       {
-        name: 'API 服务',
+        name: t('systemMonitor.service.apiService'),
         status: api?.status || 'Unknown',
         responseTime: api?.responseTime,
-        detail: api?.error || '正常运行',
+        detail: api?.error || t('systemMonitor.detail.runningNormally'),
       },
       {
-        name: '数据库连接',
+        name: t('systemMonitor.service.databaseConnection'),
         status: database?.status || 'Unknown',
         responseTime: database?.responseTime,
-        detail: database?.error || '连接正常',
+        detail: database?.error || t('systemMonitor.detail.connectionNormal'),
       },
       {
-        name: '内存状态',
+        name: t('systemMonitor.service.memoryStatus'),
         status: memory?.status || 'Unknown',
         responseTime: undefined,
         detail: memory?.workingSet
-          ? `当前: ${memory.workingSet}, 阈值: ${memory.threshold}`
-          : memory?.error || '正常',
+          ? `${t('systemMonitor.detail.current')}: ${memory.workingSet}, ${t('systemMonitor.detail.threshold')}: ${memory.threshold}`
+          : memory?.error || t('systemMonitor.detail.normal'),
       },
     ];
   });
 
   // 预定义的服务端点
-  const defaultServices = [
+  const defaultServices = computed(() => [
     { name: 'Identity API', url: '/api/health' },
-    { name: 'Health - 详细', url: '/api/health/detailed' },
-    { name: 'Health - 就绪', url: '/api/health/ready' },
-    { name: 'Health - 存活', url: '/api/health/live' },
-  ];
+    { name: t('systemMonitor.service.healthDetailed'), url: '/api/health/detailed' },
+    { name: t('systemMonitor.service.healthReady'), url: '/api/health/ready' },
+    { name: t('systemMonitor.service.healthLive'), url: '/api/health/live' },
+  ]);
 
   // 获取状态颜色
   function getStatusColor(status: string): string {
@@ -290,7 +293,7 @@
   // 检查所有服务端点
   async function checkAllServices() {
     const results = await Promise.all(
-      defaultServices.map((s) => healthApi.checkService(s.name, s.url))
+      defaultServices.value.map((s) => healthApi.checkService(s.name, s.url))
     );
     services.value = results;
   }
@@ -319,7 +322,7 @@
     if (index !== -1) {
       const result = await healthApi.checkService(service.name, service.url);
       services.value[index] = result;
-      Message.success(`${service.name} 检查完成`);
+      Message.success(t('systemMonitor.message.checkComplete', { name: service.name }));
     }
   }
 

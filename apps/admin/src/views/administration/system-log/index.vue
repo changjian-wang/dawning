@@ -169,13 +169,14 @@
           {{ formatDateTime(record.createdAt) }}
         </template>
 
-        <template #operations="{ record }">
-          <a-button type="text" size="small" @click="handleDetail(record)">
-            <template #icon>
-              <icon-eye />
-            </template>
-            {{ $t('common.detail') }}
-          </a-button>
+        <template #actions="{ record }">
+          <a-tooltip :content="$t('common.detail')">
+            <a-button type="text" size="small" @click="handleDetail(record)">
+              <template #icon>
+                <icon-eye />
+              </template>
+            </a-button>
+          </a-tooltip>
         </template>
       </a-table>
     </a-card>
@@ -369,8 +370,8 @@
     },
     {
       title: t('common.actions'),
-      slotName: 'operations',
-      width: 100,
+      slotName: 'actions',
+      width: 80,
       fixed: 'right' as const,
     },
   ]);

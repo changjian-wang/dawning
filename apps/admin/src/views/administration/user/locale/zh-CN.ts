@@ -2,8 +2,12 @@ export default {
   'menu.administration.user': '用户管理',
   'user.management.title': '用户管理',
   'user.form.userName': '用户名',
+  'user.form.userName.placeholder': '请输入用户名',
   'user.form.email': '邮箱',
+  'user.form.email.placeholder': '请输入邮箱',
   'user.form.phoneNumber': '手机号',
+  'user.form.role': '角色',
+  'user.form.role.placeholder': '请选择角色',
   'user.form.password': '密码',
   'user.form.emailConfirmed': '邮箱已验证',
   'user.form.phoneNumberConfirmed': '手机已验证',
@@ -13,13 +17,18 @@ export default {
   'user.form.accessFailedCount': '失败次数',
 
   'user.column.userName': '用户名',
+  'user.column.displayName': '显示名称',
   'user.column.email': '邮箱',
   'user.column.phoneNumber': '手机号',
   'user.column.emailConfirmed': '邮箱验证',
   'user.column.phoneNumberConfirmed': '手机验证',
   'user.column.twoFactorEnabled': '两步验证',
   'user.column.lockoutEnabled': '账户状态',
+  'user.column.role': '角色',
+  'user.column.roles': '角色',
+  'user.column.isActive': '账户状态',
   'user.column.createdAt': '创建时间',
+  'user.column.action': '操作',
   'user.column.action': '操作',
 
   'user.action.add': '新增用户',
@@ -29,6 +38,31 @@ export default {
   'user.action.resetPassword': '重置密码',
   'user.action.lock': '锁定账户',
   'user.action.unlock': '解锁账户',
+
+  'user.modal.create.title': '新增用户',
+  'user.modal.edit.title': '编辑用户',
+  'user.modal.detail.title': '用户详情',
+
+  'user.form.displayName': '显示名称',
+  'user.form.displayName.placeholder': '请输入显示名称',
+  'user.form.phoneNumber.placeholder': '请输入手机号',
+  'user.form.password.placeholder': '请输入密码',
+  'user.form.role.admin': '管理员',
+  'user.form.role.user': '普通用户',
+  'user.form.accountStatus': '账户状态',
+  'user.form.remark': '备注',
+  'user.form.remark.placeholder': '请输入备注',
+  'user.form.emailConfirmed.yes': '是',
+  'user.form.emailConfirmed.no': '否',
+  'user.form.phoneConfirmed.yes': '是',
+  'user.form.phoneConfirmed.no': '否',
+  'user.form.lastLogin': '最后登录',
+  'user.form.createdAt': '创建时间',
+  'user.form.updatedAt': '更新时间',
+
+  'user.button.export': '导出',
+  'user.button.exportCsv': '导出 CSV',
+  'user.button.exportExcel': '导出 Excel',
 
   'user.message.createSuccess': '创建成功',
   'user.message.createFailed': '创建失败',
@@ -42,6 +76,9 @@ export default {
   'user.message.lockFailed': '锁定失败',
   'user.message.unlockSuccess': '解锁成功',
   'user.message.unlockFailed': '解锁失败',
+  'user.message.batchDeleteConfirm': '确定要删除选中的 {count} 个用户吗？',
+  'user.message.batchDeleteSuccess': '批量删除成功',
+  'user.message.selected': '已选择 {count} 项',
 
   'user.confirm.delete': '确定要删除用户 "{userName}" 吗？此操作不可恢复。',
   'user.confirm.lock': '确定要锁定用户 "{userName}" 吗？',
@@ -53,4 +90,99 @@ export default {
   'user.status.unverified': '未验证',
   'user.status.enabled': '启用',
   'user.status.disabled': '未启用',
+
+  'user.role.admin': '管理员',
+  'user.role.user': '普通用户',
+  'user.role.manager': '管理者',
+
+  'user.batch.selected': '已选择 {count} 项',
+  'user.batch.clearSelection': '取消选择',
+  'user.batch.enable': '批量启用',
+  'user.batch.disable': '批量禁用',
+  'user.batch.delete': '批量删除',
+
+  'user.action.view': '查看',
+  'user.action.edit': '编辑',
+  'user.action.roles': '角色',
+  'user.action.resetPassword': '重置密码',
+  'user.action.delete': '删除',
+  'user.action.systemUser': '系统用户',
+
+  // Modal buttons
+  'user.modal.ok': '确定',
+  'user.modal.cancel': '取消',
+
+  // Delete confirmation
+  'user.delete.title': '确认删除',
+  'user.delete.content': '确定要删除用户 "{username}" 吗？此操作不可恢复。',
+  'user.delete.success': '删除成功',
+  'user.delete.failed': '删除失败',
+  'user.delete.adminProtected': '系统管理员账号不能删除',
+
+  // Batch operations
+  'user.batch.deleteTitle': '批量删除确认',
+  'user.batch.deleteContent': '确定要删除选中的 {count} 个用户吗？此操作不可恢复。',
+  'user.batch.deleteSuccess': '成功删除 {count} 个用户',
+  'user.batch.deleteFailed': '{count} 个用户删除失败',
+  'user.batch.deleteFailed.all': '批量删除失败',
+  'user.batch.noUsers': '没有可删除的用户',
+  'user.batch.selectUsersToDelete': '请先选择要删除的用户',
+
+  'user.batch.enableTitle': '批量启用确认',
+  'user.batch.enableContent': '确定要启用选中的 {count} 个用户吗？',
+  'user.batch.enableSuccess': '成功启用 {count} 个用户',
+  'user.batch.enableFailed': '{count} 个用户启用失败',
+  'user.batch.enableFailed.all': '批量启用失败',
+  'user.batch.selectUsersToEnable': '请先选择要启用的用户',
+
+  'user.batch.disableTitle': '批量禁用确认',
+  'user.batch.disableContent': '确定要禁用选中的 {count} 个用户吗？',
+  'user.batch.disableSuccess': '成功禁用 {count} 个用户',
+  'user.batch.disableFailed': '{count} 个用户禁用失败',
+  'user.batch.disableFailed.all': '批量禁用失败',
+  'user.batch.noUsersToDisable': '没有可禁用的用户',
+  'user.batch.selectUsersToDisable': '请先选择要禁用的用户',
+  'user.batch.adminProtected': '系统管理员账号不能禁用，已自动排除 {count} 个',
+
+  // 重置密码
+  'user.resetPassword.title': '重置密码',
+  'user.resetPassword.newPassword': '新密码',
+  'user.resetPassword.placeholder': '请输入新密码（至少6个字符）',
+  'user.resetPassword.minLength': '密码至少6个字符',
+  'user.resetPassword.success': '密码重置成功',
+  'user.resetPassword.failed': '密码重置失败',
+
+  // 角色分配
+  'user.role.assignTitle': '分配角色 - {username}',
+  'user.role.searchPlaceholder': '搜索角色...',
+  'user.role.available': '可分配角色',
+  'user.role.assigned': '已分配角色',
+  'user.role.loadFailed': '加载角色列表失败',
+  'user.role.noChange': '没有变化',
+  'user.role.assignSuccess': '角色分配成功',
+  'user.role.assignFailed': '角色分配失败',
+
+  // 表单验证
+  'user.validation.usernameRequired': '用户名不能为空',
+  'user.validation.usernameMinLength': '用户名至少3个字符',
+  'user.validation.passwordRequired': '密码不能为空',
+  'user.validation.passwordMinLength': '密码至少6个字符',
+
+  // 操作消息
+  'user.message.loadFailed': '加载数据失败: {error}',
+  'user.message.exporting': '正在导出...',
+  'user.message.exportSuccess': '导出成功',
+  'user.message.exportFailed': '导出失败',
+
+  // 导出列标题
+  'user.export.username': '用户名',
+  'user.export.email': '邮箱',
+  'user.export.phoneNumber': '手机号',
+  'user.export.displayName': '显示名称',
+  'user.export.status': '状态',
+  'user.export.statusEnabled': '启用',
+  'user.export.statusDisabled': '禁用',
+  'user.export.createdAt': '创建时间',
+  'user.export.lastLogin': '最后登录',
+  'user.export.filename': '用户列表',
 };

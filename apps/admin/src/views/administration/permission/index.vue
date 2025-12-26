@@ -103,7 +103,7 @@
           </template>
           <template #isSystem="{ record }">
             <a-tag :color="record.isSystem ? 'orange' : 'gray'">
-              {{ record.isSystem ? '系统' : '自定义' }}
+              {{ record.isSystem ? $t('permission.system.yes') : $t('permission.system.no') }}
             </a-tag>
           </template>
           <template #isActive="{ record }">
@@ -119,29 +119,31 @@
           <template #createdAt="{ record }">
             {{ formatDateTime(record.createdAt) }}
           </template>
-          <template #operations="{ record }">
+          <template #actions="{ record }">
             <a-space>
-              <a-button
-                type="text"
-                size="small"
-                status="warning"
-                @click="handleEdit(record)"
-              >
-                <template #icon><icon-edit /></template>
-                {{ $t('common.edit') }}
-              </a-button>
+              <a-tooltip :content="$t('common.edit')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="warning"
+                  @click="handleEdit(record)"
+                >
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
               <a-popconfirm
                 :content="$t('common.deleteConfirm')"
                 @ok="handleDelete(record)"
               >
-                <a-button
-                  type="text"
-                  size="small"
-                  status="danger"
-                >
-                  <template #icon><icon-delete /></template>
-                  {{ $t('common.delete') }}
-                </a-button>
+                <a-tooltip :content="$t('common.delete')">
+                  <a-button
+                    type="text"
+                    size="small"
+                    status="danger"
+                  >
+                    <template #icon><icon-delete /></template>
+                  </a-button>
+                </a-tooltip>
               </a-popconfirm>
             </a-space>
           </template>
@@ -151,7 +153,7 @@
       <!-- 创建/编辑对话框 -->
       <a-modal
         v-model:visible="modalVisible"
-        :title="isEdit ? '编辑权限' : '创建权限'"
+        :title="isEdit ? $t('permission.modal.edit') : $t('permission.modal.create')"
         width="600px"
         :ok-loading="submitLoading"
         @before-ok="handleBeforeOk"
@@ -162,12 +164,12 @@
             <a-col :span="12">
               <a-form-item
                 field="resource"
-                label="资源类型"
-                :rules="[{ required: true, message: '请输入资源类型' }]"
+                :label="$t('permission.form.resource')"
+                :rules="[{ required: true, message: $t('permission.form.resource.required') }]"
               >
                 <a-input
                   v-model="formData.resource"
-                  placeholder="例如: user, role, client"
+                  :placeholder="$t('permission.form.resource.placeholder')"
                   :disabled="isEdit"
                 />
               </a-form-item>
@@ -175,12 +177,12 @@
             <a-col :span="12">
               <a-form-item
                 field="action"
-                label="操作类型"
-                :rules="[{ required: true, message: '请输入操作类型' }]"
+                :label="$t('permission.form.action')"
+                :rules="[{ required: true, message: $t('permission.form.action.required') }]"
               >
                 <a-input
                   v-model="formData.action"
-                  placeholder="例如: create, read, update"
+                  :placeholder="$t('permission.form.action.placeholder')"
                   :disabled="isEdit"
                 />
               </a-form-item>
@@ -188,17 +190,17 @@
           </a-row>
           <a-form-item
             field="code"
-            label="权限代码"
-            :rules="[{ required: true, message: '请输入权限代码' }]"
+            :label="$t('permission.form.code')"
+            :rules="[{ required: true, message: $t('permission.form.code.required') }]"
           >
             <a-input
               v-model="formData.code"
-              placeholder="格式: resource:action"
+              :placeholder="$t('permission.form.code.format')"
               :disabled="isEdit"
             />
             <template #extra>
               <div style="color: var(--color-text-3)">
-                建议格式: {{ formData.resource || 'resource' }}:{{
+                {{ $t('permission.form.code.suggest') }}: {{ formData.resource || 'resource' }}:{{
                   formData.action || 'action'
                 }}
               </div>
@@ -206,15 +208,15 @@
           </a-form-item>
           <a-form-item
             field="name"
-            label="权限名称"
-            :rules="[{ required: true, message: '请输入权限名称' }]"
+            :label="$t('permission.form.name')"
+            :rules="[{ required: true, message: $t('permission.form.name.required') }]"
           >
-            <a-input v-model="formData.name" placeholder="例如: 创建用户" />
+            <a-input v-model="formData.name" :placeholder="$t('permission.form.name.placeholder')" />
           </a-form-item>
-          <a-form-item field="description" label="描述">
+          <a-form-item field="description" :label="$t('permission.form.description')">
             <a-textarea
               v-model="formData.description"
-              placeholder="权限描述"
+              :placeholder="$t('permission.form.description.placeholder')"
               :max-length="500"
               show-word-limit
             />
@@ -223,18 +225,18 @@
             <a-col :span="12">
               <a-form-item
                 field="category"
-                label="分类"
-                :rules="[{ required: true, message: '请选择分类' }]"
+                :label="$t('permission.form.category')"
+                :rules="[{ required: true, message: $t('permission.form.category.required') }]"
               >
-                <a-select v-model="formData.category" placeholder="选择分类">
-                  <a-option value="administration">Administration</a-option>
-                  <a-option value="openiddict">OpenIddict</a-option>
-                  <a-option value="system">System</a-option>
+                <a-select v-model="formData.category" :placeholder="$t('permission.form.category.placeholder')">
+                  <a-option value="administration">{{ $t('permission.category.administration') }}</a-option>
+                  <a-option value="openiddict">{{ $t('permission.category.openiddict') }}</a-option>
+                  <a-option value="system">{{ $t('permission.category.system') }}</a-option>
                 </a-select>
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item field="displayOrder" label="显示顺序">
+              <a-form-item field="displayOrder" :label="$t('permission.form.displayOrder')">
                 <a-input-number
                   v-model="formData.displayOrder"
                   :min="0"
@@ -244,10 +246,10 @@
               </a-form-item>
             </a-col>
           </a-row>
-          <a-form-item field="isActive" label="状态">
+          <a-form-item field="isActive" :label="$t('permission.form.isActive')">
             <a-switch v-model="formData.isActive">
-              <template #checked>启用</template>
-              <template #unchecked>禁用</template>
+              <template #checked>{{ $t('permission.status.active') }}</template>
+              <template #unchecked>{{ $t('permission.status.inactive') }}</template>
             </a-switch>
           </a-form-item>
         </a-form>
@@ -256,7 +258,7 @@
       <!-- 分组查看对话框 -->
       <a-modal
         v-model:visible="groupedModalVisible"
-        title="按资源分组查看权限"
+        :title="$t('permission.modal.viewGrouped')"
         width="900px"
         :footer="false"
         @cancel="groupedModalVisible = false"
@@ -300,6 +302,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive, computed, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
     getPermissionList,
@@ -316,6 +319,8 @@
     type PermissionGroup,
   } from '@/api/administration/permission';
   import dayjs from 'dayjs';
+
+  const { t } = useI18n();
 
   // 搜索表单
   const searchForm = reactive<PermissionQueryParams>({
@@ -344,60 +349,55 @@
   const categoryOptions = ref<string[]>([]);
 
   // 表格列定义
-  const columns = [
+  const columns = computed(() => [
     {
-      title: '权限代码',
+      title: t('permission.columns.code'),
       dataIndex: 'code',
       slotName: 'code',
       width: 180,
     },
     {
-      title: '权限名称',
+      title: t('permission.columns.name'),
       dataIndex: 'name',
       width: 150,
     },
     {
-      title: '资源',
+      title: t('permission.columns.resource'),
       dataIndex: 'resource',
       slotName: 'resource',
       width: 120,
     },
     {
-      title: '操作',
+      title: t('permission.columns.action'),
       dataIndex: 'action',
       width: 100,
     },
     {
-      title: '分类',
+      title: t('permission.columns.category'),
       dataIndex: 'category',
       slotName: 'category',
       width: 120,
     },
     {
-      title: '类型',
+      title: t('permission.columns.isSystem'),
       dataIndex: 'isSystem',
       slotName: 'isSystem',
       width: 90,
     },
     {
-      title: '状态',
+      title: t('permission.columns.isActive'),
       dataIndex: 'isActive',
       slotName: 'isActive',
       width: 90,
     },
     {
-      title: '顺序',
-      dataIndex: 'displayOrder',
+      title: t('common.actions'),
+      slotName: 'actions',
       width: 80,
-    },
-    {
-      title: '操作',
-      slotName: 'operations',
-      width: 140,
       align: 'center',
       fixed: 'right',
     },
-  ];
+  ]);
 
   // 分组查看的列定义
   const groupedColumns = [
@@ -638,6 +638,11 @@
 
 <style scoped lang="less">
   .permission-management {
+    // 表格标题不加粗
+    :deep(.arco-table-th) {
+      font-weight: normal !important;
+    }
+
     .container {
       padding: 0 20px 20px 20px;
     }
