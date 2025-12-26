@@ -49,6 +49,9 @@ export default {
   'claimType.placeholder.input': 'Please enter...',
   'claimType.placeholder.select': 'Please select...',
 
+  // Info page
+  'claimType.info.title': 'Basic Information',
+
   // Validation
   'claimType.validation.nameRequired': 'Name is required',
 

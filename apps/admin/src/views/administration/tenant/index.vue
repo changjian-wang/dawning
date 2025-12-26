@@ -27,7 +27,7 @@
           </a-select>
         </a-col>
         <a-col :span="10" style="text-align: right">
-          <a-button type="primary" @click="handleCreate">
+          <a-button type="primary" size="small" @click="handleCreate">
             <template #icon><icon-plus /></template>
             {{ $t('tenant.button.create') }}
           </a-button>

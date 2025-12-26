@@ -46,7 +46,7 @@ export default {
   'systemMonitor.column.serviceName': 'Service Name',
   'systemMonitor.column.url': 'URL',
   'systemMonitor.column.lastChecked': 'Last Checked',
-  'systemMonitor.column.operations': 'Operations',
+  'systemMonitor.column.operations': 'Actions',
   'systemMonitor.check': 'Check',
   'systemMonitor.status.healthy': 'Healthy',
   'systemMonitor.status.unhealthy': 'Unhealthy',

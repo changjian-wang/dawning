@@ -7,7 +7,7 @@ export default {
   'role.columns.isActive': 'Status',
   'role.columns.permissions': 'Permissions',
   'role.columns.createdAt': 'Created At',
-  'role.columns.operations': 'Operations',
+  'role.columns.operations': 'Actions',
   'role.button.create': 'Create Role',
   'role.button.edit': 'Edit',
   'role.button.delete': 'Delete',

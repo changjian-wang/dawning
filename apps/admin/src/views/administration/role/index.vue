@@ -57,15 +57,15 @@
               class="action-col"
             >
               <a-space :size="12">
-                <a-button type="primary" @click="search">
+                <a-button type="primary" size="small" @click="search">
                   <template #icon><icon-search /></template>
                   {{ $t('searchTable.form.search') }}
                 </a-button>
-                <a-button @click="reset">
+                <a-button size="small" @click="reset">
                   <template #icon><icon-refresh /></template>
                   {{ $t('searchTable.form.reset') }}
                 </a-button>
-                <a-button type="primary" status="success" @click="handleCreate">
+                <a-button type="primary" size="small" status="success" @click="handleCreate">
                   <template #icon><icon-plus /></template>
                   {{ $t('role.button.create') }}
                 </a-button>

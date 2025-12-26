@@ -31,12 +31,27 @@ export default {
   'auditLog.action.AssignPermissions': '分配权限',
   'auditLog.action.RemovePermissions': '移除权限',
 
+  // 操作类型（下拉选项）
+  'auditLog.actionType.createAlertRule': '创建告警规则',
+  'auditLog.actionType.updateAlertRule': '更新告警规则',
+  'auditLog.actionType.deleteAlertRule': '删除告警规则',
+  'auditLog.actionType.toggleAlertRule': '启停告警规则',
+  'auditLog.actionType.createPermission': '创建权限',
+  'auditLog.actionType.updatePermission': '更新权限',
+  'auditLog.actionType.deletePermission': '删除权限',
+  'auditLog.actionType.assignPermissions': '分配权限',
+  'auditLog.actionType.removePermissions': '移除权限',
+  'auditLog.actionType.setConfig': '设置配置',
+  'auditLog.actionType.batchUpdateConfig': '批量更新配置',
+  'auditLog.actionType.deleteConfig': '删除配置',
+
   // 实体类型
   'auditLog.entityType.User': '用户',
   'auditLog.entityType.Role': '角色',
   'auditLog.entityType.Permission': '权限',
   'auditLog.entityType.Application': '应用',
   'auditLog.entityType.Scope': '作用域',
+  'auditLog.entityType.AlertRule': '告警规则',
   'auditLog.entityType.ClaimType': '声明类型',
   'auditLog.entityType.SystemConfig': '系统配置',
 

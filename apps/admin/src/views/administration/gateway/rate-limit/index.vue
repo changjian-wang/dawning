@@ -5,7 +5,7 @@
         <!-- 限流策略 Tab -->
         <a-tab-pane key="policies" :title="$t('rateLimit.policies')">
           <div class="toolbar">
-            <a-button type="primary" @click="handleAddPolicy">
+            <a-button type="primary" size="small" @click="handleAddPolicy">
               <template #icon><icon-plus /></template>
               {{ $t('rateLimit.addPolicy') }}
             </a-button>
@@ -81,7 +81,7 @@
                   $t('rateLimit.whitelist')
                 }}</a-option>
               </a-select>
-              <a-button type="primary" @click="handleAddIpRule">
+              <a-button type="primary" size="small" @click="handleAddIpRule">
                 <template #icon><icon-plus /></template>
                 {{ $t('rateLimit.addIpRule') }}
               </a-button>

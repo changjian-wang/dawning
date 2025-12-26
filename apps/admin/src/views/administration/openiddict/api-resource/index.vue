@@ -57,15 +57,15 @@
           </a-col>
           <a-col :xs="24" :sm="12" :md="24" :lg="6" :xl="6" class="action-col">
             <a-space :size="12">
-              <a-button type="primary" @click="handleSearch">
+              <a-button type="primary" size="small" @click="handleSearch">
                 <template #icon><icon-search /></template>
                 {{ $t('apiResource.button.search') }}
               </a-button>
-              <a-button @click="handleReset">
+              <a-button size="small" @click="handleReset">
                 <template #icon><icon-refresh /></template>
                 {{ $t('apiResource.button.reset') }}
               </a-button>
-              <a-button type="primary" status="success" @click="handleCreate">
+              <a-button type="primary" size="small" status="success" @click="handleCreate">
                 <template #icon><icon-plus /></template>
                 {{ $t('apiResource.button.add') }}
               </a-button>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <Breadcrumb :items="['认证授权', '客户端', '基本信息']" />
+    <Breadcrumb :items="['menu.administration.openiddict', 'menu.administration.openiddict.client', 'client.info.title']" />
 
     <a-form
       ref="formRef"
@@ -11,140 +11,110 @@
     >
       <a-card class="general-card">
         <template #title>
-          {{ '基本信息' }}
+          {{ $t('client.info.title') }}
         </template>
         <a-row :gutter="80">
           <a-col :span="24">
-            <a-form-item label="可编辑">
+            <a-form-item :label="$t('client.form.editable')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="客户端ID" aria-labelledby="ClientID">
+            <a-form-item :label="$t('client.form.clientId')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="客户端显示名称" aria-labelledby="ClientName">
+            <a-form-item :label="$t('client.form.displayName')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="描述" aria-labelledby="Description">
+            <a-form-item :label="$t('client.form.description')">
               <a-textarea
-                placeholder="Please enter something"
+                :placeholder="$t('client.form.name.placeholder')"
                 :auto-size="{ minRows: 2, maxRows: 5 }"
                 allow-clear
               />
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="客户端URI" aria-labelledby="ClientUri">
+            <a-form-item :label="$t('client.form.clientUri')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="商标URI" aria-labelledby="LogoUri">
+            <a-form-item :label="$t('client.form.logoUri')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="需要同意弹窗" aria-labelledby="RequireConsent">
+            <a-form-item :label="$t('client.form.requireConsent')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="允许记住同意"
-              aria-labelledby="AllowRememberConsent"
-            >
+            <a-form-item :label="$t('client.form.allowRememberConsent')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="同意有效期" aria-labelledby="ConsentLifetime">
+            <a-form-item :label="$t('client.form.consentLifetime')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="需要请求对象"
-              aria-labelledby="RequireRequestObject"
-            >
+            <a-form-item :label="$t('client.form.requireRequestObject')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="需要PKCE" aria-labelledby="RequirePkce">
+            <a-form-item :label="$t('client.form.requirePkce')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="允许明文PKCE"
-              aria-labelledby="AllowPlainTextPkce"
-            >
+            <a-form-item :label="$t('client.form.allowPlainTextPkce')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="ID令牌中始终包含用户声明"
-              aria-labelledby="AlwaysIncludeUserClaimsInIdToken"
-            >
+            <a-form-item :label="$t('client.form.alwaysIncludeUserClaimsInIdToken')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="允许通过浏览器接收访问令牌"
-              aria-labelledby="AllowAccessTokensViaBrowser"
-            >
+            <a-form-item :label="$t('client.form.allowAccessTokensViaBrowser')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="允许离线访问"
-              aria-labelledby="AllowOfflineAccess"
-            >
+            <a-form-item :label="$t('client.form.allowOfflineAccess')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="刷新令牌时更新访问令牌声明"
-              aria-labelledby="UpdateAccessTokenClaimsOnRefresh"
-            >
+            <a-form-item :label="$t('client.form.updateAccessTokenClaimsOnRefresh')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="始终发送客户端声明"
-              aria-labelledby="AlwaysSendClientClaims"
-            >
+            <a-form-item :label="$t('client.form.alwaysSendClientClaims')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="配对主题盐"
-              aria-labelledby="PairWiseSubjectSalt"
-            >
+            <a-form-item :label="$t('client.form.pairWiseSubjectSalt')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="单点登录有效期"
-              aria-labelledby="UserSsoLifetime"
-            >
+            <a-form-item :label="$t('client.form.userSsoLifetime')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item label="用户代码类型" aria-labelledby="User Code Type">
+            <a-form-item :label="$t('client.form.userCodeType')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
@@ -152,38 +122,26 @@
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ '身份验证/注销' }}
+          {{ $t('client.info.authLogout') }}
         </template>
         <a-row :gutter="80">
           <a-col :span="24">
-            <a-form-item
-              label="前端通道注销URI"
-              aria-labelledby="FrontChannelLogoutUri"
-            >
+            <a-form-item :label="$t('client.form.frontChannelLogoutUri')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="允许前端通道注销会话"
-              aria-labelledby="FrontChannelLogoutSessionRequired"
-            >
+            <a-form-item :label="$t('client.form.frontChannelLogoutSessionRequired')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="后端通道注销URI"
-              aria-labelledby="BackChannelLogoutUri"
-            >
+            <a-form-item :label="$t('client.form.backChannelLogoutUri')">
               <a-input v-model="form.value"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-item
-              label="允许后端通道注销会话"
-              aria-labelledby="BackChannelLogoutSessionRequired"
-            >
+            <a-form-item :label="$t('client.form.backChannelLogoutSessionRequired')">
               <a-checkbox v-model="form.isTrue"></a-checkbox>
             </a-form-item>
           </a-col>
@@ -191,25 +149,25 @@
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ '客户端密钥' }}
+          {{ $t('client.info.secrets') }}
         </template>
         <a-row :gutter="80">
           <a-col :span="20">
             <a-row :gutter="80">
               <a-col :span="12">
-                <a-form-item label="密钥值">
+                <a-form-item :label="$t('client.form.secretValue')">
                   <a-input v-model="form.value"></a-input>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="密钥过期时间">
+                <a-form-item :label="$t('client.form.secretExpiration')">
                   <a-date-picker v-model="form.value" style="width: 100%" />
                 </a-form-item>
               </a-col>
               <a-col :span="24">
-                <a-form-item label="密钥描述">
+                <a-form-item :label="$t('client.form.secretDescription')">
                   <a-textarea
-                    placeholder="请输入密钥描述"
+                    :placeholder="$t('client.form.secretDescriptionPlaceholder')"
                     :auto-size="{ minRows: 2, maxRows: 5 }"
                     allow-clear
                   />
@@ -221,59 +179,60 @@
             <div>
               <a-button type="outline" status="danger">
                 <template #icon>
-                  <icon-plus />
+                  <icon-delete />
                 </template>
-                删除
+                {{ $t('common.delete') }}
               </a-button>
             </div>
           </a-col>
           <a-col :span="24" style="text-align: center">
             <a-button type="primary">
-              <template #icon> <icon-plus /> </template>添加
+              <template #icon> <icon-plus /> </template>
+              {{ $t('common.add') }}
             </a-button>
           </a-col>
         </a-row>
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ '资源' }}
+          {{ $t('client.info.resources') }}
         </template>
         <a-row :gutter="80"> </a-row>
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ 'Tokens' }}
+          {{ $t('client.info.tokens') }}
         </template>
         <a-row :gutter="80"> </a-row>
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ 'Claims' }}
+          {{ $t('client.info.claims') }}
         </template>
         <a-row :gutter="80"> </a-row>
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ 'Grant Types' }}
+          {{ $t('client.info.grantTypes') }}
         </template>
         <a-row :gutter="80"> </a-row>
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ 'Restrictions' }}
+          {{ $t('client.info.restrictions') }}
         </template>
         <a-row :gutter="80"> </a-row>
       </a-card>
       <a-card class="general-card">
         <template #title>
-          {{ '属性' }}
+          {{ $t('client.info.properties') }}
         </template>
         <a-row :gutter="80"> </a-row>
       </a-card>
       <a-card :style="{ textAlign: 'center' }">
         <a-space>
-          <a-button type="primary">Submit</a-button>
-          <a-button type="text">Reset</a-button>
+          <a-button type="primary">{{ $t('common.submit') }}</a-button>
+          <a-button type="text">{{ $t('common.reset') }}</a-button>
         </a-space>
       </a-card>
     </a-form>

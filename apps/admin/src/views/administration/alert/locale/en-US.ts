@@ -25,7 +25,7 @@ export default {
   'alert.column.severity': 'Severity',
   'alert.column.enabled': 'Enabled',
   'alert.column.lastTriggered': 'Last Triggered',
-  'alert.column.operations': 'Operations',
+  'alert.column.operations': 'Actions',
 
   // Table columns - History
   'alert.column.status': 'Status',

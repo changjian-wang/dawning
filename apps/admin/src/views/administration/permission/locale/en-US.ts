@@ -36,6 +36,8 @@ export default {
 
   'permission.status.active': 'Active',
   'permission.status.inactive': 'Inactive',
+  'permission.status.enabled': 'Enabled',
+  'permission.status.disabled': 'Disabled',
   'permission.system.yes': 'System',
   'permission.system.no': 'Custom',
 

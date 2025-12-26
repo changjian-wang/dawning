@@ -13,6 +13,7 @@ import localeApiResource from '@/views/administration/openiddict/api-resource/lo
 import localeIdentityResource from '@/views/administration/openiddict/identity-resource/locale/en-US';
 import localeAuthorization from '@/views/administration/openiddict/authorization/locale/en-US';
 import localeOpenIddict from '@/views/administration/openiddict/locale/en-US';
+import localeClient from '@/views/administration/openiddict/client/locale/en-US';
 import localeClaimType from '@/views/administration/claim-type/locale/en-US';
 import localeAuditLog from '@/views/administration/audit-log/locale/en-US';
 import localeSystemLog from '@/views/administration/system-log/locale/en-US';
@@ -36,6 +37,7 @@ export default {
   'common.confirm': 'Confirm',
   'common.cancel': 'Cancel',
   'common.save': 'Save',
+  'common.submit': 'Submit',
   'common.detail': 'Detail',
   'common.deleteConfirm': 'Are you sure you want to delete?',
   'common.all': 'All',
@@ -93,6 +95,7 @@ export default {
   ...localeApiResource,
   ...localeIdentityResource,
   ...localeAuthorization,
+  ...localeClient,
   ...localeClaimType,
   ...localeAuditLog,
   ...localeSystemLog,

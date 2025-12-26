@@ -1,20 +1,20 @@
 <template>
   <div class="client">
     <div class="container">
-      <Breadcrumb :items="['menu.form', 'menu.administration.ids.client']" />
+      <Breadcrumb :items="['menu.administration.openiddict', 'menu.administration.openiddict.client']" />
       <a-card class="general-card">
         <template #title>
-          {{ $t('page.title.search.box') }}
+          {{ $t('client.title') }}
         </template>
         <a-row :gutter="12">
           <a-col :span="6">
-            <a-form-item label="名称">
-              <a-input placeholder="请输入..."></a-input>
+            <a-form-item :label="$t('client.form.name')">
+              <a-input :placeholder="$t('client.form.name.placeholder')"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="6">
-            <a-form-item label="类型">
-              <a-select placeholder="请选择...">
+            <a-form-item :label="$t('client.form.type')">
+              <a-select :placeholder="$t('client.form.type.placeholder')">
                 <a-option>String</a-option>
                 <a-option>Int</a-option>
                 <a-option>DateTime</a-option>
@@ -25,21 +25,22 @@
           </a-col>
           <a-col :flex="30" style="text-align: right">
             <a-space direction="horizontal" :size="18">
-              <a-button type="primary" @click="() => {}">
+              <a-button type="primary" size="small" @click="() => {}">
                 <template #icon>
                   <icon-search />
                 </template>
-                {{ '查询' }}
+                {{ $t('common.search') }}
               </a-button>
-              <a-button @click="() => {}">
+              <a-button size="small" @click="() => {}">
                 <template #icon>
                   <icon-refresh />
                 </template>
-                {{ '重置' }}
+                {{ $t('common.reset') }}
               </a-button>
               <a-button
                 type="primary"
-                class="add"
+                size="small"
+                status="success"
                 @click="
                   () => {
                     $router.push('client/add');
@@ -49,35 +50,39 @@
                 <template #icon>
                   <icon-plus />
                 </template>
+                {{ $t('common.add') }}
               </a-button>
             </a-space>
           </a-col>
         </a-row>
         <a-divider style="margin-top: 0"></a-divider>
         <a-table :columns="columns" :data="data" :bordered="false">
-          <template #optional="{ record }">
+          <template #actions="{ record }">
             <a-space>
-              <a-button type="text" size="small" @click="() => {}">
-                <template #icon><icon-eye /></template>
-                查看
-              </a-button>
-              <a-button
-                type="text"
-                size="small"
-                status="warning"
-                @click="() => {}"
-              >
-                <template #icon><icon-edit /></template>
-                编辑
-              </a-button>
+              <a-tooltip :content="$t('client.action.view')">
+                <a-button type="text" size="small" @click="() => {}">
+                  <template #icon><icon-eye /></template>
+                </a-button>
+              </a-tooltip>
+              <a-tooltip :content="$t('client.action.edit')">
+                <a-button
+                  type="text"
+                  size="small"
+                  status="warning"
+                  @click="() => {}"
+                >
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
               <a-popconfirm
-                content="确定要删除此客户端吗？"
+                :content="$t('client.action.deleteConfirm')"
                 @ok="() => {}"
               >
-                <a-button type="text" size="small" status="danger">
-                  <template #icon><icon-delete /></template>
-                  删除
-                </a-button>
+                <a-tooltip :content="$t('client.action.delete')">
+                  <a-button type="text" size="small" status="danger">
+                    <template #icon><icon-delete /></template>
+                  </a-button>
+                </a-tooltip>
               </a-popconfirm>
             </a-space>
           </template>
@@ -88,23 +93,23 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref } from 'vue';
+  import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
 
-  const formData = ref<any>({});
-  const formRef = ref<any>();
+  const { t } = useI18n();
 
   const columns = [
     {
-      title: '客户端Id',
+      title: t('client.column.clientId'),
       dataIndex: 'clientId',
     },
     {
-      title: '客户端名称',
+      title: t('client.column.clientName'),
       dataIndex: 'clientName',
     },
     {
-      title: '操作',
-      slotName: 'optional',
+      title: t('client.column.actions'),
+      slotName: 'actions',
     },
   ];
   const data = ref([]);

@@ -22,7 +22,7 @@ export default {
   'tenant.column.maxUsers': 'Max Users',
   'tenant.column.isActive': 'Status',
   'tenant.column.createdAt': 'Created At',
-  'tenant.column.operations': 'Operations',
+  'tenant.column.operations': 'Actions',
 
   // Form
   'tenant.form.code': 'Tenant Code',

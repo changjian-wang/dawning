@@ -36,6 +36,8 @@ export default {
 
   'permission.status.active': '启用',
   'permission.status.inactive': '禁用',
+  'permission.status.enabled': '启用',
+  'permission.status.disabled': '禁用',
   'permission.system.yes': '系统',
   'permission.system.no': '自定义',
 

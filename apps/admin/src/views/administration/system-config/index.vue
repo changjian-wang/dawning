@@ -3,11 +3,11 @@
     <a-card class="general-card" :title="$t('menu.systemConfig')">
       <template #extra>
         <a-space>
-          <a-button type="primary" @click="handleInitDefaults">
+          <a-button type="primary" size="small" @click="handleInitDefaults">
             <template #icon><icon-refresh /></template>
             {{ $t('systemConfig.initDefaults') }}
           </a-button>
-          <a-button type="primary" status="success" @click="handleAddConfig">
+          <a-button type="primary" size="small" status="success" @click="handleAddConfig">
             <template #icon><icon-plus /></template>
             {{ $t('systemConfig.addConfig') }}
           </a-button>
@@ -88,6 +88,7 @@
                   <a-button
                     v-if="!config.isReadonly"
                     type="text"
+                    size="small"
                     status="danger"
                     @click="handleDeleteConfig(config)"
                   >

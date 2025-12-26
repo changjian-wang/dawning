@@ -20,7 +20,7 @@ export default {
   'identityResource.column.userClaims': 'Claims',
   'identityResource.column.enabled': 'Enabled',
   'identityResource.column.required': 'Required',
-  'identityResource.column.operations': 'Operations',
+  'identityResource.column.operations': 'Actions',
 
   // Modal
   'identityResource.modal.add': 'Add Identity Resource',

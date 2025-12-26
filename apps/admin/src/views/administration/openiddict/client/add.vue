@@ -1,7 +1,7 @@
 <template>
   <div class="client-add">
     <div class="container">
-      <Breadcrumb :items="['认证授权', '客户端', '新增信息']" />
+      <Breadcrumb :items="[$t('client.breadcrumb.auth'), $t('client.breadcrumb.client'), $t('client.breadcrumb.add')]" />
       <a-form
         ref="formRef"
         class="form"
@@ -12,12 +12,12 @@
         @submit="handleSubmit"
       >
         <a-tabs v-model:active-key="activeKey" :default-active-key="1">
-          <a-tab-pane :key="1" title="基本信息" @click="handleTabClick(1)">
+          <a-tab-pane :key="1" :title="$t('client.tab.basicInfo')" @click="handleTabClick(1)">
             <a-card class="general-card">
               <a-row :gutter="80">
                 <a-col :span="24">
                   <a-form-item
-                    label="客户端ID"
+                    :label="$t('client.form.clientId')"
                     field="clientId"
                     aria-labelledby="Client ID"
                     required
@@ -39,7 +39,7 @@
                 </a-col>
                 <a-col :span="24">
                   <a-form-item
-                    label="显示名称"
+                    :label="$t('client.form.displayName')"
                     field="clientName"
                     aria-labelledby="Client Name"
                     required
@@ -51,7 +51,7 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="客户端URI" aria-labelledby="Client URI">
+                  <a-form-item :label="$t('client.form.clientUri')" aria-labelledby="Client URI">
                     <a-input v-model="form.clientUri"></a-input>
                   </a-form-item>
                 </a-col>
@@ -62,20 +62,20 @@
                 </a-col>
                 <a-col :span="24">
                   <a-form-item
-                    label="登录回调URI"
+                    :label="$t('client.form.loginCallbackUri')"
                     field="loginUri"
                     required
                     aria-labelledby="Login URI"
                   >
                     <a-input
                       v-model="form.loginUri"
-                      placeholder="输入登录后回调的URI"
+                      :placeholder="$t('client.placeholder.loginCallbackUri')"
                       validate-trigger="blur"
                     />
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="描述" aria-labelledby="Description">
+                  <a-form-item :label="$t('client.form.description')" aria-labelledby="Description">
                     <a-textarea
                       v-model="form.description"
                       :auto-size="{ minRows: 2, maxRows: 5 }"
@@ -88,13 +88,13 @@
           </a-tab-pane>
           <a-tab-pane
             :key="2"
-            title="安全凭证与认证"
+            :title="$t('client.tab.securityAuth')"
             @click="handleTabClick(2)"
           >
             <a-card class="general-card">
               <a-row :gutter="80">
                 <a-col :span="24">
-                  <a-form-item label="需要密钥">
+                  <a-form-item :label="$t('client.form.requireSecret')">
                     <a-switch v-model="form.requireClientSecret">
                       <template #checked-icon>
                         <icon-check />
@@ -106,7 +106,7 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="强制要求PKCE">
+                  <a-form-item :label="$t('client.form.requirePkce')">
                     <a-switch v-model="form.requirePkce">
                       <template #checked-icon>
                         <icon-check />
@@ -118,10 +118,10 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="允许明文PKCE">
+                  <a-form-item :label="$t('client.form.allowPlainTextPkce')">
                     <a-switch v-model="form.allowPlainTextPkce">
                       <template #checked-icon>
-                        <a-tooltip content="不推荐">
+                        <a-tooltip :content="$t('client.tooltip.notRecommended')">
                           <icon-check />
                         </a-tooltip>
                       </template>
@@ -132,7 +132,7 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="授权类型">
+                  <a-form-item :label="$t('client.form.grantTypes')">
                     <a-select
                       v-model="form.allowedGrantTypes"
                       default-value="hybrid"
@@ -157,8 +157,8 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="身份令牌签名算法">
-                    <a-select placeholder="请选择">
+                  <a-form-item :label="$t('client.form.idTokenSigningAlgorithm')">
+                    <a-select :placeholder="$t('client.placeholder.select')">
                       <a-option>ES256</a-option>
                       <a-option>ES384</a-option>
                       <a-option>ES512</a-option>
@@ -205,13 +205,13 @@
                         <template #icon>
                           <icon-plus />
                         </template>
-                        添加CORS
+                        {{ $t('client.button.addCors') }}
                       </a-tag>
                     </a-space>
                   </a-form-item>
                 </a-col>
               </a-row>
-              <a-divider orientation="center">密钥</a-divider>
+              <a-divider orientation="center">{{ $t('client.section.secrets') }}</a-divider>
               <a-form
                 ref="secretFormRef"
                 class="form"
@@ -221,8 +221,8 @@
               >
                 <a-row :gutter="80">
                   <a-col :span="12">
-                    <a-form-item label="类型">
-                      <a-select v-model="secretForm.type" placeholder="请选择">
+                    <a-form-item :label="$t('client.form.type')">
+                      <a-select v-model="secretForm.type" :placeholder="$t('client.placeholder.select')">
                         <a-option>Shared Secret</a-option>
                         <a-option disabled>X509 Certificate Base64</a-option>
                         <a-option disabled>X509 Name</a-option>
@@ -231,7 +231,7 @@
                     </a-form-item>
                   </a-col>
                   <a-col :span="12">
-                    <a-form-item label="密钥过期时间">
+                    <a-form-item :label="$t('client.form.secretExpiration')">
                       <a-date-picker
                         v-model="secretForm.expiration"
                         :disabled-date="
@@ -241,10 +241,10 @@
                     </a-form-item>
                   </a-col>
                   <a-col :span="24">
-                    <a-form-item label="密钥值">
+                    <a-form-item :label="$t('client.form.secretValue')">
                       <a-input
                         v-model="secretForm.value"
-                        placeholder="密钥值"
+                        :placeholder="$t('client.form.secretValue')"
                       ></a-input>
                       <a-button
                         :style="{ marginLeft: '10px' }"
@@ -257,10 +257,10 @@
                     </a-form-item>
                   </a-col>
                   <a-col :span="24">
-                    <a-form-item label="密钥描述">
+                    <a-form-item :label="$t('client.form.secretDescription')">
                       <a-textarea
                         v-model="secretForm.description"
-                        placeholder="请输入密钥描述"
+                        :placeholder="$t('client.form.secretDescriptionPlaceholder')"
                         :auto-size="{ minRows: 2, maxRows: 5 }"
                         allow-clear
                       />
@@ -279,14 +279,14 @@
                   <template #icon>
                     <icon-plus />
                   </template>
-                  <span>添加</span>
+                  <span>{{ $t('common.add') }}</span>
                 </a-button>
               </a-space>
               <a-table :columns="secretColumns" :data="form.clientSecrets">
                 <template #optional="{ rowIndex }">
                   <a-space>
                     <a-popconfirm
-                      content="确定删除?"
+                      :content="$t('client.confirm.delete')"
                       @ok="handleDeleteSecret(rowIndex)"
                     >
                       <a-button>
@@ -302,17 +302,17 @@
           </a-tab-pane>
           <a-tab-pane
             :key="3"
-            title="令牌生命周期与策略"
+            :title="$t('client.tab.tokenLifecycle')"
             @click="handleTabClick(3)"
           >
             <a-card class="general-card">
               <a-row :gutter="80">
                 <a-col :span="12">
-                  <a-form-item label="身份令牌有效期">
+                  <a-form-item :label="$t('client.form.idTokenLifetime')">
                     <a-space>
                       <a-input-number
                         v-model="form.identityTokenLifetime"
-                        placeholder="请输入有效时间"
+                        :placeholder="$t('client.placeholder.lifetime')"
                         :default-value="300"
                         :min="0"
                         :step="30"
@@ -324,7 +324,7 @@
                               form.identityTokenLifetime = 300;
                             }
                           "
-                          >5分钟</a-button
+                          >{{ $t('client.time.5min') }}</a-button
                         >
                         <a-button
                           @click="
@@ -332,18 +332,18 @@
                               form.identityTokenLifetime = 600;
                             }
                           "
-                          >10分钟</a-button
+                          >{{ $t('client.time.10min') }}</a-button
                         >
                       </a-button-group>
                     </a-space>
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
-                  <a-form-item label="访问令牌有效期">
+                  <a-form-item :label="$t('client.form.accessTokenLifetime')">
                     <a-space>
                       <a-input-number
                         v-model="form.accessTokenLifetime"
-                        placeholder="请输入有效时间"
+                        :placeholder="$t('client.placeholder.lifetime')"
                         :default-value="900"
                         :min="0"
                         :step="60"
@@ -355,7 +355,7 @@
                               form.accessTokenLifetime = 900;
                             }
                           "
-                          >15分钟</a-button
+                          >{{ $t('client.time.15min') }}</a-button
                         >
                         <a-button
                           @click="
@@ -363,7 +363,7 @@
                               form.accessTokenLifetime = 1800;
                             }
                           "
-                          >30分钟</a-button
+                          >{{ $t('client.time.30min') }}</a-button
                         >
                         <a-button
                           @click="
@@ -371,7 +371,7 @@
                               form.accessTokenLifetime = 3600;
                             }
                           "
-                          >1小时</a-button
+                          >{{ $t('client.time.1hour') }}</a-button
                         >
                         <a-button
                           @click="
@@ -379,18 +379,18 @@
                               form.accessTokenLifetime = 18000;
                             }
                           "
-                          >5小时</a-button
+                          >{{ $t('client.time.5hour') }}</a-button
                         >
                       </a-button-group>
                     </a-space>
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
-                  <a-form-item label="授权码有效期">
+                  <a-form-item :label="$t('client.form.authCodeLifetime')">
                     <a-space>
                       <a-input-number
                         v-model="form.authorizationCodeLifetime"
-                        placeholder="请输入有效时间"
+                        :placeholder="$t('client.placeholder.lifetime')"
                         :default-value="300"
                         :min="0"
                         :step="60"
@@ -402,7 +402,7 @@
                               form.authorizationCodeLifetime = 300;
                             }
                           "
-                          >5分钟</a-button
+                          >{{ $t('client.time.5min') }}</a-button
                         >
                         <a-button
                           @click="
@@ -410,18 +410,18 @@
                               form.authorizationCodeLifetime = 600;
                             }
                           "
-                          >10分钟</a-button
+                          >{{ $t('client.time.10min') }}</a-button
                         >
                       </a-button-group>
                     </a-space>
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
-                  <a-form-item label="刷新令牌绝对有效期">
+                  <a-form-item :label="$t('client.form.refreshTokenAbsoluteLifetime')">
                     <a-space>
                       <a-input-number
                         v-model="form.absoluteRefreshTokenLifetime"
-                        placeholder="请输入有效时间"
+                        :placeholder="$t('client.placeholder.lifetime')"
                         :default-value="86400"
                         :min="0"
                         :step="86400"
@@ -433,7 +433,7 @@
                               form.absoluteRefreshTokenLifetime = 86400;
                             }
                           "
-                          >1天</a-button
+                          >{{ $t('client.time.1day') }}</a-button
                         >
                         <a-button
                           @click="
@@ -441,7 +441,7 @@
                               form.absoluteRefreshTokenLifetime = 1296000;
                             }
                           "
-                          >15天</a-button
+                          >{{ $t('client.time.15day') }}</a-button
                         >
                         <a-button
                           @click="
@@ -449,14 +449,14 @@
                               form.absoluteRefreshTokenLifetime = 2592000;
                             }
                           "
-                          >30天</a-button
+                          >{{ $t('client.time.30day') }}</a-button
                         >
                       </a-button-group>
                     </a-space>
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
-                  <a-form-item label="开启令牌滑动过期模式">
+                  <a-form-item :label="$t('client.form.enableSlidingExpiration')">
                     <a-switch
                       v-model="form.refreshTokenExpiration"
                       checked-value="0"
@@ -474,12 +474,12 @@
                 <a-col :span="12">
                   <a-form-item
                     v-if="form.refreshTokenExpiration == 0"
-                    label="刷新令牌滑动有效期"
+                    :label="$t('client.form.refreshTokenSlidingLifetime')"
                   >
                     <a-space>
                       <a-input-number
                         v-model="form.slidingRefreshTokenLifetime"
-                        placeholder="请输入有效时间"
+                        :placeholder="$t('client.placeholder.lifetime')"
                         :default-value="900"
                         :min="0"
                         :step="60"
@@ -491,7 +491,7 @@
                               form.slidingRefreshTokenLifetime = 900;
                             }
                           "
-                          >15分钟</a-button
+                          >{{ $t('client.time.15min') }}</a-button
                         >
                         <a-button
                           @click="
@@ -499,7 +499,7 @@
                               form.slidingRefreshTokenLifetime = 1800;
                             }
                           "
-                          >30分钟</a-button
+                          >{{ $t('client.time.30min') }}</a-button
                         >
                         <a-button
                           @click="
@@ -507,7 +507,7 @@
                               form.slidingRefreshTokenLifetime = 3600;
                             }
                           "
-                          >1小时</a-button
+                          >{{ $t('client.time.1hour') }}</a-button
                         >
                         <a-button
                           @click="
@@ -515,14 +515,14 @@
                               form.slidingRefreshTokenLifetime = 18000;
                             }
                           "
-                          >5小时</a-button
+                          >{{ $t('client.time.5hour') }}</a-button
                         >
                       </a-button-group>
                     </a-space>
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
-                  <a-form-item label="刷新令牌使用方式">
+                  <a-form-item :label="$t('client.form.refreshTokenUsage')">
                     <a-space>
                       <a-radio-group
                         v-model="form.refreshTokenUsage"
@@ -535,7 +535,7 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="12">
-                  <a-form-item label="访问令牌类型">
+                  <a-form-item :label="$t('client.form.accessTokenType')">
                     <a-space>
                       <a-radio-group
                         v-model="form.accessTokenType"
@@ -552,21 +552,21 @@
           </a-tab-pane>
           <a-tab-pane
             :key="4"
-            title="会话管理与登录注销"
+            :title="$t('client.tab.sessionManagement')"
             @click="handleTabClick(4)"
           >
             <a-card class="general-card">
               <a-row :gutter="80">
                 <a-col :span="24">
-                  <a-form-item label="前端通道注销URI">
+                  <a-form-item :label="$t('client.form.frontChannelLogoutUri')">
                     <a-input
                       v-model="form.frontChannelLogoutUri"
-                      placeholder="前端通道注销URI"
+                      :placeholder="$t('client.form.frontChannelLogoutUri')"
                     />
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="开启前端注销会话">
+                  <a-form-item :label="$t('client.form.enableFrontChannelLogoutSession')">
                     <a-switch v-model="form.frontChannelLogoutSessionRequired">
                       <template #checked-icon>
                         <icon-check />
@@ -578,15 +578,15 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="后端通道注销URI">
+                  <a-form-item :label="$t('client.form.backChannelLogoutUri')">
                     <a-input
                       v-model="form.backChannelLogoutUri"
-                      placeholder="后端通道注销URI"
+                      :placeholder="$t('client.form.backChannelLogoutUri')"
                     />
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="开启后端注销会话">
+                  <a-form-item :label="$t('client.form.enableBackChannelLogoutSession')">
                     <a-switch v-model="form.backChannelLogoutSessionRequired">
                       <template #checked-icon>
                         <icon-check />
@@ -598,7 +598,7 @@
                   </a-form-item>
                 </a-col>
               </a-row>
-              <a-divider orientation="center">登录/注销URIs</a-divider>
+              <a-divider orientation="center">{{ $t('client.section.loginLogoutUris') }}</a-divider>
               <a-space
                 style="width: 100%; justify-content: right; margin-bottom: 1em"
               >
@@ -609,7 +609,7 @@
                       visibleWithAddURI = true;
                     }
                   "
-                  >新增URI</a-button
+                  >{{ $t('client.button.addUri') }}</a-button
                 >
               </a-space>
               <a-table
@@ -651,7 +651,7 @@
                       </template>
                     </a-button>
                     <a-popconfirm
-                      content="确定删除?"
+                      :content="$t('client.confirm.delete')"
                       @ok="handleRemoveRedirectUri(rowIndex)"
                     >
                       <a-button>
@@ -667,13 +667,13 @@
           </a-tab-pane>
           <a-tab-pane
             :key="5"
-            title="用户声明与数据控制"
+            :title="$t('client.tab.userClaims')"
             @click="handleTabClick(5)"
           >
             <a-card class="general-card">
               <a-row :gutter="80">
                 <a-col :span="24">
-                  <a-form-item label="始终发送客户端声明">
+                  <a-form-item :label="$t('client.form.alwaysSendClientClaims')">
                     <a-switch v-model="form.alwaysSendClientClaims">
                       <template #checked-icon>
                         <icon-check />
@@ -685,7 +685,7 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="始终包含用户声明于ID Token">
+                  <a-form-item :label="$t('client.form.alwaysIncludeUserClaimsInIdToken')">
                     <a-switch v-model="form.alwaysIncludeUserClaimsInIdToken">
                       <template #checked-icon>
                         <icon-check />
@@ -697,18 +697,18 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="声明前缀">
+                  <a-form-item :label="$t('client.form.claimsPrefix')">
                     <a-input
                       v-model="form.clientClaimsPrefix"
-                      placeholder="输入前缀"
+                      :placeholder="$t('client.placeholder.prefix')"
                     />
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="配对主体盐值">
+                  <a-form-item :label="$t('client.form.pairWiseSubjectSalt')">
                     <a-input
                       v-model="form.pairWiseSubjectSalt"
-                      placeholder="输入客户端-服务端配对盐值"
+                      :placeholder="$t('client.placeholder.pairWiseSubjectSalt')"
                     />
                     <a-button
                       :style="{ marginLeft: '10px' }"
@@ -721,19 +721,19 @@
                   </a-form-item>
                 </a-col>
               </a-row>
-              <a-divider orientation="center">声明</a-divider>
+              <a-divider orientation="center">{{ $t('client.section.claims') }}</a-divider>
               <a-space
                 style="width: 100%; justify-content: right; margin-bottom: 1em"
               >
                 <a-button type="primary" @click="visibleWithAddClaim = true"
-                  >新增</a-button
+                  >{{ $t('common.add') }}</a-button
                 >
               </a-space>
               <a-table :columns="claimColumns" :data="form.claims">
                 <template #optional="{ rowIndex }">
                   <a-space>
                     <a-popconfirm
-                      content="确定删除?"
+                      :content="$t('client.confirm.delete')"
                       @ok="handleDeleteClaim(rowIndex)"
                     >
                       <a-button>
@@ -749,13 +749,13 @@
           </a-tab-pane>
           <a-tab-pane
             :key="6"
-            title="用户交互与同意"
+            :title="$t('client.tab.userConsent')"
             @click="handleTabClick(6)"
           >
             <a-card class="general-card">
               <a-row :gutter="80">
                 <a-col :span="24">
-                  <a-form-item label="强制用户授权同意">
+                  <a-form-item :label="$t('client.form.requireConsent')">
                     <a-switch v-model="form.requireConsent">
                       <template #checked-icon>
                         <icon-check />
@@ -767,7 +767,7 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="允许记住同意状态">
+                  <a-form-item :label="$t('client.form.allowRememberConsent')">
                     <a-switch
                       v-model="form.allowRememberConsent"
                       :disabled="!form.requireConsent"
@@ -782,11 +782,11 @@
                   </a-form-item>
                 </a-col>
                 <a-col :span="24">
-                  <a-form-item label="同意状态有效期">
+                  <a-form-item :label="$t('client.form.consentLifetime')">
                     <a-space>
                       <a-input-number
                         v-model="form.consentLifetime"
-                        placeholder="请输入有效时间"
+                        :placeholder="$t('client.placeholder.lifetime')"
                         :default-value="0"
                         :min="0"
                         :step="604800"
@@ -799,7 +799,7 @@
                               form.consentLifetime = 604800;
                             }
                           "
-                          >7天</a-button
+                          >{{ $t('client.time.7day') }}</a-button
                         >
                         <a-button
                           @click="
@@ -807,7 +807,7 @@
                               form.consentLifetime = 2629743;
                             }
                           "
-                          >30天</a-button
+                          >{{ $t('client.time.30day') }}</a-button
                         >
                         <a-button
                           @click="
@@ -815,7 +815,7 @@
                               form.consentLifetime = 2592000;
                             }
                           "
-                          >365天</a-button
+                          >{{ $t('client.time.365day') }}</a-button
                         >
                         <a-button
                           @click="
@@ -823,7 +823,7 @@
                               form.consentLifetime = 0;
                             }
                           "
-                          >无限期</a-button
+                          >{{ $t('client.button.noExpiration') }}</a-button
                         >
                       </a-button-group>
                     </a-space>
@@ -838,11 +838,11 @@
           <a-row :gutter="80">
             <a-col :span="24">
               <a-space style="width: 100%; justify-content: center">
-                <a-button html-type="submit" type="primary" :loading="submitting" :disabled="submitting">提交</a-button>
+                <a-button html-type="submit" type="primary" :loading="submitting" :disabled="submitting">{{ $t('common.submit') }}</a-button>
                 <a-button
                   :disabled="submitting"
                   @click="() => ($refs.formRef as FormInstance).resetFields()"
-                  >重置</a-button
+                  >{{ $t('common.reset') }}</a-button
                 >
               </a-space>
             </a-col>
@@ -854,7 +854,7 @@
     <!-- Modals -->
     <div class="add-uri">
       <a-modal v-model:visible="visibleWithAddURI" width="800px">
-        <template #title> 新增URI </template>
+        <template #title> {{ $t('client.modal.addUri') }} </template>
         <a-form
           class="form"
           layout="horizontal"
@@ -867,12 +867,12 @@
                 <a-form-item label="URI">
                   <a-input
                     v-model="redirectUriForm.uri"
-                    placeholder="输入URI, 如https://docs.aluneth.com/signin-oidc"
+                    :placeholder="$t('client.placeholder.uri')"
                   ></a-input>
                 </a-form-item>
               </a-col>
               <a-col :span="24">
-                <a-form-item label="登录/注销">
+                <a-form-item :label="$t('client.form.loginLogout')">
                   <a-switch
                     v-model="redirectUriForm.type"
                     checked-color="#14C9C9"
@@ -892,7 +892,7 @@
 
         <template #footer>
           <a-space>
-            <a-button @click="visibleWithAddURI = false">取消</a-button>
+            <a-button @click="visibleWithAddURI = false">{{ $t('common.cancel') }}</a-button>
             <a-button
               type="primary"
               :disabled="
@@ -906,7 +906,7 @@
               "
               @click="handleAddRedirectUri"
             >
-              提交
+              {{ $t('common.submit') }}
             </a-button>
           </a-space>
         </template>
@@ -927,8 +927,8 @@
           <a-card class="general-card">
             <a-row :gutter="80">
               <a-col :span="24">
-                <a-form-item label="声明类型">
-                  <a-select v-model="claimForm.type" placeholder="请选择类型">
+                <a-form-item :label="$t('client.form.claimType')">
+                  <a-select v-model="claimForm.type" :placeholder="$t('client.placeholder.selectType')">
                     <a-option
                       v-for="(item, index) in claimTypeOptions"
                       :key="index"
@@ -939,10 +939,10 @@
                 </a-form-item>
               </a-col>
               <a-col :span="24">
-                <a-form-item label="声明值">
+                <a-form-item :label="$t('client.form.claimValue')">
                   <a-input
                     v-model="claimForm.value"
-                    placeholder="输入声明的值"
+                    :placeholder="$t('client.placeholder.claimValue')"
                   />
                 </a-form-item>
               </a-col>

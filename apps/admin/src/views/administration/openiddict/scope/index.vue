@@ -53,15 +53,15 @@
             class="action-col"
           >
             <a-space :size="12">
-              <a-button type="primary" @click="handleSearch">
+              <a-button type="primary" size="small" @click="handleSearch">
                 <template #icon><icon-search /></template>
                 {{ $t('common.search') }}
               </a-button>
-              <a-button @click="handleReset">
+              <a-button size="small" @click="handleReset">
                 <template #icon><icon-refresh /></template>
                 {{ $t('common.reset') }}
               </a-button>
-              <a-button type="primary" status="success" @click="handleAdd">
+              <a-button type="primary" size="small" status="success" @click="handleAdd">
                 <template #icon><icon-plus /></template>
                 {{ $t('common.add') }}
               </a-button>

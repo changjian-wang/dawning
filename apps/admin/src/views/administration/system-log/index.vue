@@ -42,13 +42,13 @@
         </a-col>
         <a-col :span="6">
           <a-space>
-            <a-button type="primary" @click="handleSearch">
+            <a-button type="primary" size="small" @click="handleSearch">
               <template #icon>
                 <icon-search />
               </template>
               {{ $t('common.search') }}
             </a-button>
-            <a-button @click="handleReset">
+            <a-button size="small" @click="handleReset">
               <template #icon>
                 <icon-refresh />
               </template>
@@ -98,7 +98,7 @@
       <a-row v-if="isSuperAdmin" style="margin-bottom: 16px">
         <a-col :span="12">
           <a-space>
-            <a-button type="primary" status="danger" @click="handleCleanup">
+            <a-button type="primary" size="small" status="danger" @click="handleCleanup">
               <template #icon>
                 <icon-delete />
               </template>

@@ -44,15 +44,15 @@
         </a-col>
         <a-col :span="10">
           <a-space>
-            <a-button type="primary" @click="handleSearch">
+            <a-button type="primary" size="small" @click="handleSearch">
               <template #icon><icon-search /></template>
               {{ $t('common.search') }}
             </a-button>
-            <a-button @click="handleReset">
+            <a-button size="small" @click="handleReset">
               <template #icon><icon-refresh /></template>
               {{ $t('common.reset') }}
             </a-button>
-            <a-button type="primary" status="success" @click="handleCreate">
+            <a-button type="primary" size="small" status="success" @click="handleCreate">
               <template #icon><icon-plus /></template>
               {{ $t('common.create') }}
             </a-button>

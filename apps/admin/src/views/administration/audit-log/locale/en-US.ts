@@ -31,12 +31,27 @@ export default {
   'auditLog.action.AssignPermissions': 'Assign Permissions',
   'auditLog.action.RemovePermissions': 'Remove Permissions',
 
+  // Action types (dropdown options)
+  'auditLog.actionType.createAlertRule': 'Create Alert Rule',
+  'auditLog.actionType.updateAlertRule': 'Update Alert Rule',
+  'auditLog.actionType.deleteAlertRule': 'Delete Alert Rule',
+  'auditLog.actionType.toggleAlertRule': 'Toggle Alert Rule',
+  'auditLog.actionType.createPermission': 'Create Permission',
+  'auditLog.actionType.updatePermission': 'Update Permission',
+  'auditLog.actionType.deletePermission': 'Delete Permission',
+  'auditLog.actionType.assignPermissions': 'Assign Permissions',
+  'auditLog.actionType.removePermissions': 'Remove Permissions',
+  'auditLog.actionType.setConfig': 'Set Config',
+  'auditLog.actionType.batchUpdateConfig': 'Batch Update Config',
+  'auditLog.actionType.deleteConfig': 'Delete Config',
+
   // Entity types
   'auditLog.entityType.User': 'User',
   'auditLog.entityType.Role': 'Role',
   'auditLog.entityType.Permission': 'Permission',
   'auditLog.entityType.Application': 'Application',
   'auditLog.entityType.Scope': 'Scope',
+  'auditLog.entityType.AlertRule': 'Alert Rule',
   'auditLog.entityType.ClaimType': 'Claim Type',
   'auditLog.entityType.SystemConfig': 'System Config',
 

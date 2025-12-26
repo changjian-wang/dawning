@@ -21,7 +21,7 @@ export default {
   'authorization.column.type': 'Type',
   'authorization.column.scopes': 'Scopes',
   'authorization.column.createdAt': 'Created At',
-  'authorization.column.operations': 'Operations',
+  'authorization.column.operations': 'Actions',
 
   // Operations
   'authorization.action.detail': 'Detail',

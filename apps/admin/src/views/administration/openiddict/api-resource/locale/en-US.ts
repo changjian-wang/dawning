@@ -18,7 +18,7 @@ export default {
   'apiResource.column.name': 'Name',
   'apiResource.column.displayName': 'Display Name',
   'apiResource.column.enabled': 'Enabled',
-  'apiResource.column.operations': 'Operations',
+  'apiResource.column.operations': 'Actions',
 
   // Modal
   'apiResource.modal.add': 'Add API Resource',

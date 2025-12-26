@@ -12,7 +12,7 @@ export default {
   'scope.resources.placeholder': 'Select associated API resources',
   'scope.createdAt': 'Created At',
   'scope.updatedAt': 'Updated At',
-  'scope.operations': 'Operations',
+  'scope.operations': 'Actions',
   'scope.add': 'Add Scope',
   'scope.edit': 'Edit Scope',
   'scope.detail': 'Scope Detail',

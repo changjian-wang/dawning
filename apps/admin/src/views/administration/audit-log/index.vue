@@ -49,18 +49,42 @@
                     <a-option value="ResetPassword">{{
                       $t('auditLog.action.ResetPassword')
                     }}</a-option>
-                    <a-option value="CreateAlertRule">创建告警规则</a-option>
-                    <a-option value="UpdateAlertRule">更新告警规则</a-option>
-                    <a-option value="DeleteAlertRule">删除告警规则</a-option>
-                    <a-option value="SetAlertRuleEnabled">启停告警规则</a-option>
-                    <a-option value="CreatePermission">创建权限</a-option>
-                    <a-option value="UpdatePermission">更新权限</a-option>
-                    <a-option value="DeletePermission">删除权限</a-option>
-                    <a-option value="AssignPermissions">分配权限</a-option>
-                    <a-option value="RemovePermissions">移除权限</a-option>
-                    <a-option value="SetConfig">设置配置</a-option>
-                    <a-option value="BatchUpdateConfig">批量更新配置</a-option>
-                    <a-option value="DeleteConfig">删除配置</a-option>
+                    <a-option value="CreateAlertRule">{{
+                      $t('auditLog.actionType.createAlertRule')
+                    }}</a-option>
+                    <a-option value="UpdateAlertRule">{{
+                      $t('auditLog.actionType.updateAlertRule')
+                    }}</a-option>
+                    <a-option value="DeleteAlertRule">{{
+                      $t('auditLog.actionType.deleteAlertRule')
+                    }}</a-option>
+                    <a-option value="SetAlertRuleEnabled">{{
+                      $t('auditLog.actionType.toggleAlertRule')
+                    }}</a-option>
+                    <a-option value="CreatePermission">{{
+                      $t('auditLog.actionType.createPermission')
+                    }}</a-option>
+                    <a-option value="UpdatePermission">{{
+                      $t('auditLog.actionType.updatePermission')
+                    }}</a-option>
+                    <a-option value="DeletePermission">{{
+                      $t('auditLog.actionType.deletePermission')
+                    }}</a-option>
+                    <a-option value="AssignPermissions">{{
+                      $t('auditLog.actionType.assignPermissions')
+                    }}</a-option>
+                    <a-option value="RemovePermissions">{{
+                      $t('auditLog.actionType.removePermissions')
+                    }}</a-option>
+                    <a-option value="SetConfig">{{
+                      $t('auditLog.actionType.setConfig')
+                    }}</a-option>
+                    <a-option value="BatchUpdateConfig">{{
+                      $t('auditLog.actionType.batchUpdateConfig')
+                    }}</a-option>
+                    <a-option value="DeleteConfig">{{
+                      $t('auditLog.actionType.deleteConfig')
+                    }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -87,10 +111,18 @@
                     <a-option value="Scope">{{
                       $t('auditLog.entityType.Scope')
                     }}</a-option>
-                    <a-option value="AlertRule">告警规则</a-option>
-                    <a-option value="Permission">权限</a-option>
-                    <a-option value="ClaimType">声明类型</a-option>
-                    <a-option value="SystemConfig">系统配置</a-option>
+                    <a-option value="AlertRule">{{
+                      $t('auditLog.entityType.AlertRule')
+                    }}</a-option>
+                    <a-option value="Permission">{{
+                      $t('auditLog.entityType.Permission')
+                    }}</a-option>
+                    <a-option value="ClaimType">{{
+                      $t('auditLog.entityType.ClaimType')
+                    }}</a-option>
+                    <a-option value="SystemConfig">{{
+                      $t('auditLog.entityType.SystemConfig')
+                    }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -126,16 +158,16 @@
               <a-col :span="8">
                 <a-form-item>
                   <a-space>
-                    <a-button type="primary" @click="handleSearch">
+                    <a-button type="primary" size="small" @click="handleSearch">
                       <template #icon><icon-search /></template>
                       {{ $t('auditLog.form.search') }}
                     </a-button>
-                    <a-button @click="handleReset">
+                    <a-button size="small" @click="handleReset">
                       <template #icon><icon-refresh /></template>
                       {{ $t('auditLog.form.reset') }}
                     </a-button>
                     <a-dropdown>
-                      <a-button>
+                      <a-button size="small">
                         <template #icon><icon-download /></template>
                         {{ $t('auditLog.form.export') }}
                       </a-button>

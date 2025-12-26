@@ -13,6 +13,7 @@ import localeApiResource from '@/views/administration/openiddict/api-resource/lo
 import localeIdentityResource from '@/views/administration/openiddict/identity-resource/locale/zh-CN';
 import localeAuthorization from '@/views/administration/openiddict/authorization/locale/zh-CN';
 import localeOpenIddict from '@/views/administration/openiddict/locale/zh-CN';
+import localeClient from '@/views/administration/openiddict/client/locale/zh-CN';
 import localeClaimType from '@/views/administration/claim-type/locale/zh-CN';
 import localeAuditLog from '@/views/administration/audit-log/locale/zh-CN';
 import localeSystemLog from '@/views/administration/system-log/locale/zh-CN';
@@ -93,6 +94,7 @@ export default {
   ...localeApiResource,
   ...localeIdentityResource,
   ...localeAuthorization,
+  ...localeClient,
   ...localeClaimType,
   ...localeAuditLog,
   ...localeSystemLog,

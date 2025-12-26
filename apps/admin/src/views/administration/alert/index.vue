@@ -55,11 +55,11 @@
         <!-- 告警规则 Tab -->
         <a-tab-pane key="rules" :title="$t('alert.tab.rules')">
           <div class="toolbar">
-            <a-button type="primary" @click="handleAddRule">
+            <a-button type="primary" size="small" @click="handleAddRule">
               <template #icon><icon-plus /></template>
               {{ $t('alert.addRule') }}
             </a-button>
-            <a-button :loading="checkLoading" @click="handleTriggerCheck">
+            <a-button size="small" :loading="checkLoading" @click="handleTriggerCheck">
               <template #icon><icon-thunderbolt /></template>
               {{ $t('alert.manualCheck') }}
             </a-button>

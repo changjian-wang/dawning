@@ -133,8 +133,8 @@
         </a-tabs>
         <div style="margin-top: 20px; text-align: right">
           <a-space>
-            <a-button @click="handleCancel">取消</a-button>
-            <a-button type="primary" html-type="submit">提交</a-button>
+            <a-button @click="handleCancel">{{ $t('common.cancel') }}</a-button>
+            <a-button type="primary" html-type="submit">{{ $t('common.submit') }}</a-button>
           </a-space>
         </div>
       </a-form>

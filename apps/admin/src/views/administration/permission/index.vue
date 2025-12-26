@@ -59,15 +59,15 @@
               class="action-col"
             >
               <a-space :size="12">
-                <a-button type="primary" @click="search">
+                <a-button type="primary" size="small" @click="search">
                   <template #icon><icon-search /></template>
                   {{ $t('searchTable.form.search') }}
                 </a-button>
-                <a-button @click="reset">
+                <a-button size="small" @click="reset">
                   <template #icon><icon-refresh /></template>
                   {{ $t('searchTable.form.reset') }}
                 </a-button>
-                <a-button type="primary" status="success" @click="handleCreate">
+                <a-button type="primary" size="small" status="success" @click="handleCreate">
                   <template #icon><icon-plus /></template>
                   {{ $t('permission.button.create') }}
                 </a-button>
@@ -285,10 +285,12 @@
                   <a-tag color="blue" size="small">{{ record.code }}</a-tag>
                 </template>
                 <template #isActive="{ record }">
-                  <a-tag v-if="record.isActive" color="green" size="small"
-                    >启用</a-tag
-                  >
-                  <a-tag v-else color="red" size="small">禁用</a-tag>
+                  <a-tag v-if="record.isActive" color="green" size="small">
+                    {{ $t('permission.status.enabled') }}
+                  </a-tag>
+                  <a-tag v-else color="red" size="small">{{
+                    $t('permission.status.disabled')
+                  }}</a-tag>
                 </template>
               </a-table>
             </a-collapse-item>

@@ -1,7 +1,7 @@
 <template>
   <div class="claim-type-info">
     <div class="container">
-      <Breadcrumb :items="['认证授权', '声明类型', '基本信息']" />
+      <Breadcrumb :items=\"[$t('menu.administration.openiddict'), $t('menu.administration.claim.type'), $t('claimType.info.title')]\" />
       <a-form
         ref="formRef"
         class="form"
@@ -11,25 +11,25 @@
       >
         <a-card class="general-card">
           <template #title>
-            {{ '基本信息' }}
+            {{ $t('claimType.info.title') }}
           </template>
           <a-row :gutter="80">
             <a-col :span="8">
-              <a-form-item label="名称">
-                <a-input v-model="form.name" placeholder="请输入..."></a-input>
+              <a-form-item :label="$t('claimType.form.name')">
+                <a-input v-model="form.name" :placeholder="$t('claimType.placeholder.input')"></a-input>
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="显示名称">
+              <a-form-item :label="$t('claimType.form.displayName')">
                 <a-input
                   v-model="form.displayName"
-                  placeholder="请输入..."
+                  :placeholder="$t('claimType.placeholder.input')"
                 ></a-input>
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="类型">
-                <a-select v-model="form.type" placeholder="请选择...">
+              <a-form-item :label="$t('claimType.form.type')">
+                <a-select v-model="form.type" :placeholder="$t('claimType.placeholder.select')">
                   <a-option>String</a-option>
                   <a-option>Int</a-option>
                   <a-option>DateTime</a-option>
@@ -39,18 +39,18 @@
               </a-form-item>
             </a-col>
             <a-col>
-              <a-form-item label="说明">
+              <a-form-item :label="$t('claimType.form.description')">
                 <a-textarea
                   v-model="form.description"
-                  placeholder="请输入..."
+                  :placeholder="$t('claimType.placeholder.input')"
                 />
               </a-form-item>
             </a-col>
             <a-col>
-              <a-form-item label="是否必要">
+              <a-form-item :label="$t('claimType.form.required')">
                 <a-checkbox v-model="form.required"></a-checkbox>
               </a-form-item>
-              <a-form-item label="用户可编辑">
+              <a-form-item :label="$t('claimType.form.nonEditable')">
                 <a-checkbox v-model="form.nonEditable"></a-checkbox>
               </a-form-item>
             </a-col>
@@ -59,7 +59,7 @@
         <a-card class="general-card card-footer">
           <a-space>
             <a-button class="reset">
-              {{ '重置' }}
+              {{ $t('common.reset') }}
             </a-button>
             <a-button
               class="submit"
@@ -67,7 +67,7 @@
               :loading="false"
               @click="handleSubmit"
             >
-              {{ '提交' }}
+              {{ $t('common.submit') }}
             </a-button>
           </a-space>
         </a-card>
