@@ -46,9 +46,9 @@ export function queryContentData() {
   return axios.get<ContentDataRecord[]>('/api/dashboard/content-data');
 }
 
-export function queryRecentActivities(type?: string) {
+export function queryRecentActivities(params?: { type?: string; limit?: number }) {
   return axios.get<ActivityItem[]>('/api/dashboard/recent-activities', {
-    params: { type },
+    params,
   });
 }
 

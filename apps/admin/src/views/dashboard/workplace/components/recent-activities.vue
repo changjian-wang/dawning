@@ -40,8 +40,8 @@
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data } = await queryRecentActivities({ limit: 5 });
-      renderList.value = data || [];
+      const { data } = await queryRecentActivities();
+      renderList.value = (data || []).slice(0, 5);
     } catch (err) {
       // Handle error
     } finally {
