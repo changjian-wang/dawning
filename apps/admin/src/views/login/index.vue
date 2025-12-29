@@ -2,10 +2,10 @@
   <div class="container">
     <div class="logo">
       <img
-        alt="logo"
-        src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image"
+        alt="Dawning"
+        :src="logoUrl"
+        class="logo-full"
       />
-      <div class="logo-text">Arco Design Pro</div>
     </div>
     <LoginBanner />
     <div class="content">
@@ -20,6 +20,7 @@
 </template>
 
 <script lang="ts" setup>
+  import logoUrl from '@/assets/images/logo-full.svg?url';
   import Footer from '@/components/footer/index.vue';
   import LoginBanner from './components/banner.vue';
   import LoginForm from './components/login-form.vue';
@@ -60,11 +61,8 @@
     display: inline-flex;
     align-items: center;
 
-    &-text {
-      margin-right: 4px;
-      margin-left: 4px;
-      color: var(--color-fill-1);
-      font-size: 20px;
+    .logo-full {
+      width: auto;
     }
   }
 </style>

@@ -2,17 +2,7 @@
   <div class="navbar">
     <div class="left-side">
       <a-space>
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="arrowGradient" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#165DFF"/>
-              <stop offset="100%" stop-color="#6AA1FF"/>
-            </linearGradient>
-          </defs>
-          <path d="M16 2 L28 28 L20 28 L16 18 L12 28 L4 28 Z" fill="url(#arrowGradient)"/>
-          <path d="M16 12 L13 20 L16 20 L19 20 Z" fill="white"/>
-        </svg>
-        <span class="brand-title">Dawning</span>
+        <img :src="logoUrl" alt="Dawning" class="navbar-logo" />
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
           style="font-size: 22px; cursor: pointer"
@@ -217,6 +207,7 @@
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
   import Menu from '@/components/menu/index.vue';
+  import logoUrl from '@/assets/images/logo-full.svg?url';
   import MessageBox from '../message-box/index.vue';
 
   const appStore = useAppStore();
@@ -303,7 +294,11 @@
   .left-side {
     display: flex;
     align-items: center;
-    padding-left: 20px;
+  }
+
+  .navbar-logo {
+    height: auto;
+    width: auto;
   }
 
   .brand-title {
