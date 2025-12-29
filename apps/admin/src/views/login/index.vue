@@ -33,7 +33,7 @@
 
     .banner {
       width: 550px;
-      background: linear-gradient(163.85deg, #1d2129 0%, #00308f 100%);
+      background: linear-gradient(163.85deg, #1e1e2f 0%, #3d2a4f 100%);
     }
 
     .content {
