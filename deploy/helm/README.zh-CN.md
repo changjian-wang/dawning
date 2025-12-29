@@ -1,5 +1,9 @@
 # Dawning Gateway - Helm Chart
 
+<p align="center">
+  <img src="../../apps/admin/src/assets/images/logo-full.svg" alt="Dawning Logo" width="320" />
+</p>
+
 本 Helm Chart 用于将 Dawning Gateway 管理系统部署到 Kubernetes 集群。
 
 ## 前置要求

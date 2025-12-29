@@ -1,5 +1,9 @@
 # Dawning SDK
 
+<p align="center">
+  <img src="../apps/admin/src/assets/images/logo-full.svg" alt="Dawning Logo" width="320" />
+</p>
+
 Dawning 项目的公共组件库，提供微服务开发的通用功能。
 
 ## 安装

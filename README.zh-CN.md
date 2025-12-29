@@ -1,5 +1,9 @@
 # Dawning Identity Gateway
 
+<p align="center">
+  <img src="apps/admin/src/assets/images/logo-full.svg" alt="Dawning Logo" width="320" />
+</p>
+
 <div align="center">
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet)
