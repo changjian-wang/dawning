@@ -109,18 +109,20 @@
   .operation-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 8px;
   }
 
   .operation-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 16px 8px;
+    padding: 12px 4px;
     background: var(--color-fill-1);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
+    min-width: 0;
+    overflow: hidden;
 
     &:hover {
       background: var(--color-fill-2);
@@ -133,21 +135,24 @@
   }
 
   .operation-icon {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    font-size: 22px;
-    margin-bottom: 8px;
+    border-radius: 10px;
+    font-size: 20px;
+    margin-bottom: 6px;
     transition: transform 0.2s;
+    flex-shrink: 0;
   }
 
   .operation-label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--color-text-2);
     text-align: center;
-    white-space: nowrap;
+    word-break: break-word;
+    line-height: 1.3;
+    max-width: 100%;
   }
 </style>
