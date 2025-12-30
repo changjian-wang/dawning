@@ -21,6 +21,9 @@ data:
   # 环境配置
   ASPNETCORE_ENVIRONMENT: {{ .Values.global.environment | quote }}
   
+  # 证书配置 - 使用开发证书以简化部署
+  OpenIddict__UseDevelopmentCertificate: "true"
+  
   {{- range $key, $value := .Values.configMap.data }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}

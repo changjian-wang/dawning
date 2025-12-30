@@ -250,3 +250,9 @@ secrets:
   # 如果为空，将自动生成
   jwtSecret: ""
   openIddictKey: ""
+
+# ===== 证书配置 =====
+certificates:
+  enabled: true
+  # 证书密码
+  password: "DawningCert@2024"
