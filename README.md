@@ -257,6 +257,24 @@ helm uninstall dawning -n dawning-dev
 kubectl delete namespace dawning-dev
 ```
 
+### Production Deployment
+
+For production with custom domain:
+
+```bash
+# 1. Edit values-prod.yaml - update domain and database settings
+#    - ingress.hosts[0].host: admin.yourdomain.com
+#    - database.external.host: your-db-host.com
+
+# 2. Deploy with production values
+helm install dawning deploy/helm/dawning -n dawning-prod --create-namespace -f deploy/helm/dawning/values-prod.yaml --set database.external.password=YOUR_DB_PASSWORD
+
+# 3. Configure DNS
+#    Add A record pointing to your Ingress Controller external IP
+```
+
+See [values-prod.yaml](deploy/helm/dawning/values-prod.yaml) for full production configuration options.
+
 ## 🔗 Business System Integration
 
 Other business systems can easily integrate with unified authentication via Dawning SDK:

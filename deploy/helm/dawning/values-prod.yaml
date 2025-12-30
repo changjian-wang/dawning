@@ -1,7 +1,22 @@
 # =============================================
 # Dawning Gateway - 生产环境配置
 # =============================================
-# 使用: helm install dawning ./helm/dawning -f ./helm/dawning/values-prod.yaml -n dawning --create-namespace
+# 
+# 使用方法:
+#   1. 复制此文件并修改域名和数据库配置
+#   2. 部署命令:
+#      helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-prod.yaml -n dawning-prod --create-namespace
+#
+# 自定义域名:
+#   - 修改 ingress.hosts[0].host 和 ingress.tls[0].hosts[0] 为您的域名
+#   - 在 DNS 服务商添加 A 记录指向 K8s Ingress Controller 外部 IP
+#   - 如使用 cert-manager，确保已安装并配置 ClusterIssuer
+#
+# 数据库密码安全传入:
+#   helm install dawning ./deploy/helm/dawning -f values-prod.yaml \
+#     --set database.external.password=YOUR_DB_PASSWORD \
+#     --set secrets.jwtSecret=YOUR_JWT_SECRET \
+#     -n dawning-prod
 
 global:
   namespace: dawning

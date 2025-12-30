@@ -151,7 +151,7 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
   
   hosts:
-    - host: dawning.example.com
+    - host: localhost
       paths:
         - path: /
           pathType: Prefix

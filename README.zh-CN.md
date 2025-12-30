@@ -257,6 +257,24 @@ helm uninstall dawning -n dawning-dev
 kubectl delete namespace dawning-dev
 ```
 
+### 生产环境部署
+
+使用自定义域名部署生产环境：
+
+```bash
+# 1. 编辑 values-prod.yaml - 更新域名和数据库配置
+#    - ingress.hosts[0].host: admin.yourdomain.com
+#    - database.external.host: your-db-host.com
+
+# 2. 使用生产配置部署
+helm install dawning deploy/helm/dawning -n dawning-prod --create-namespace -f deploy/helm/dawning/values-prod.yaml --set database.external.password=YOUR_DB_PASSWORD
+
+# 3. 配置 DNS
+#    在 DNS 服务商添加 A 记录指向 K8s Ingress Controller 外部 IP
+```
+
+完整生产配置参见 [values-prod.yaml](deploy/helm/dawning/values-prod.yaml)。
+
 ## 🔗 业务系统接入
 
 其他业务系统可以通过 Dawning SDK 轻松接入统一认证：
