@@ -16,7 +16,7 @@ identityApi:
   replicaCount: 2
   
   image:
-    repository: dawning/identity-api
+    repository: aluneth/dawning-identity-api
     tag: "latest"
     pullPolicy: IfNotPresent
   
@@ -64,7 +64,7 @@ gatewayApi:
   replicaCount: 2
   
   image:
-    repository: dawning/gateway-api
+    repository: aluneth/dawning-gateway-api
     tag: "latest"
     pullPolicy: IfNotPresent
   
@@ -111,7 +111,7 @@ adminFrontend:
   replicaCount: 2
   
   image:
-    repository: dawning/admin-frontend
+    repository: aluneth/dawning-admin-frontend
     tag: "latest"
     pullPolicy: IfNotPresent
   

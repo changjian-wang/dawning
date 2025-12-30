@@ -59,12 +59,12 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("admin", policy => policy.RequireRole("admin"));
 });
 
-// ===== 限流 =====
+// ===== 限流策略 =====
 builder.Services.AddRateLimiter(options =>
 {
-    //
+    // 固定窗口限流：每分钟 100 个请求
     options.AddFixedWindowLimiter(
-        "FixedWindowPolicy",
+        "fixed-window",
         config =>
         {
             config.PermitLimit = 100;
@@ -78,9 +78,9 @@ builder.Services.AddRateLimiter(options =>
         }
     );
 
-    //
+    // 滑动窗口限流：每分钟 100 个请求，分 6 段
     options.AddSlidingWindowLimiter(
-        "SlidingWindowPolicy",
+        "sliding-window",
         config =>
         {
             config.PermitLimit = 100;
@@ -94,6 +94,49 @@ builder.Services.AddRateLimiter(options =>
             config.QueueLimit = 50;
         }
     );
+
+    // 令牌桶限流：持续补充令牌
+    options.AddTokenBucketLimiter(
+        "token-bucket",
+        config =>
+        {
+            config.TokenLimit = 100;
+            config.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+            config.TokensPerPeriod = 20;
+            config.QueueProcessingOrder = System
+                .Threading
+                .RateLimiting
+                .QueueProcessingOrder
+                .OldestFirst;
+            config.QueueLimit = 50;
+        }
+    );
+
+    // 并发限流：最多 50 个并发请求
+    options.AddConcurrencyLimiter(
+        "concurrency",
+        config =>
+        {
+            config.PermitLimit = 50;
+            config.QueueProcessingOrder = System
+                .Threading
+                .RateLimiting
+                .QueueProcessingOrder
+                .OldestFirst;
+            config.QueueLimit = 25;
+        }
+    );
+
+    // 限流响应
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsync(
+            "{\"error\":\"Too many requests. Please try again later.\"}",
+            cancellationToken
+        );
+    };
 });
 
 // ===== CORS =====

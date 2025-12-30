@@ -1,33 +1,49 @@
 # =============================================
 # Dawning Identity API - Multi-stage Dockerfile
+# Build from repository root: docker build -t dawning-identity-api -f apps/gateway/src/Dawning.Identity.Api/Dockerfile .
 # =============================================
 
 # ===== Build Stage =====
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy solution and project files first (better layer caching)
-COPY ["Dawning.Gateway.sln", "./"]
-COPY ["src/Dawning.Identity.Api/Dawning.Identity.Api.csproj", "src/Dawning.Identity.Api/"]
-COPY ["src/Dawning.Identity.Application/Dawning.Identity.Application.csproj", "src/Dawning.Identity.Application/"]
-COPY ["src/Dawning.Identity.Domain/Dawning.Identity.Domain.csproj", "src/Dawning.Identity.Domain/"]
-COPY ["src/Dawning.Identity.Domain.Core/Dawning.Identity.Domain.Core.csproj", "src/Dawning.Identity.Domain.Core/"]
-COPY ["src/Dawning.Identity.Infra.Data/Dawning.Identity.Infra.Data.csproj", "src/Dawning.Identity.Infra.Data/"]
-COPY ["src/Dawning.Identity.Infra.CrossCutting.IoC/Dawning.Identity.Infra.CrossCutting.IoC.csproj", "src/Dawning.Identity.Infra.CrossCutting.IoC/"]
-COPY ["src/Dawning.Identity.Infra.CrossCutting.Mapping/Dawning.Identity.Infra.CrossCutting.Mapping.csproj", "src/Dawning.Identity.Infra.CrossCutting.Mapping/"]
-COPY ["src/Shared/Dawning.Shared.Authentication/Dawning.Shared.Authentication.csproj", "src/Shared/Dawning.Shared.Authentication/"]
-COPY ["src/Shared/Dawning.Shared.Core/Dawning.Shared.Core.csproj", "src/Shared/Dawning.Shared.Core/"]
-COPY ["src/Shared/Dawning.Shared.Dapper.Contrib/Dawning.Shared.Dapper.Contrib.csproj", "src/Shared/Dawning.Shared.Dapper.Contrib/"]
-COPY ["src/Shared/Dawning.Shared.Logging/Dawning.Shared.Logging.csproj", "src/Shared/Dawning.Shared.Logging/"]
+# Copy Directory.Build.props files (for version and framework settings)
+COPY ["sdk/Directory.Build.props", "sdk/"]
+COPY ["apps/gateway/Directory.Build.props", "apps/gateway/"]
+
+# Copy SDK projects (dependencies)
+COPY ["sdk/Dawning.Identity/Dawning.Identity.csproj", "sdk/Dawning.Identity/"]
+COPY ["sdk/Dawning.Core/Dawning.Core.csproj", "sdk/Dawning.Core/"]
+COPY ["sdk/Dawning.Extensions/Dawning.Extensions.csproj", "sdk/Dawning.Extensions/"]
+COPY ["sdk/Dawning.Caching/Dawning.Caching.csproj", "sdk/Dawning.Caching/"]
+COPY ["sdk/Dawning.Logging/Dawning.Logging.csproj", "sdk/Dawning.Logging/"]
+COPY ["sdk/Dawning.ORM.Dapper/Dawning.ORM.Dapper.csproj", "sdk/Dawning.ORM.Dapper/"]
+COPY ["sdk/Dawning.Messaging/Dawning.Messaging.csproj", "sdk/Dawning.Messaging/"]
+COPY ["sdk/Dawning.Resilience/Dawning.Resilience.csproj", "sdk/Dawning.Resilience/"]
+
+# Copy gateway solution and project files
+COPY ["apps/gateway/Dawning.Gateway.sln", "apps/gateway/"]
+COPY ["apps/gateway/src/Dawning.Identity.Api/Dawning.Identity.Api.csproj", "apps/gateway/src/Dawning.Identity.Api/"]
+COPY ["apps/gateway/src/Dawning.Identity.Application/Dawning.Identity.Application.csproj", "apps/gateway/src/Dawning.Identity.Application/"]
+COPY ["apps/gateway/src/Dawning.Identity.Domain/Dawning.Identity.Domain.csproj", "apps/gateway/src/Dawning.Identity.Domain/"]
+COPY ["apps/gateway/src/Dawning.Identity.Domain.Core/Dawning.Identity.Domain.Core.csproj", "apps/gateway/src/Dawning.Identity.Domain.Core/"]
+COPY ["apps/gateway/src/Dawning.Identity.Infra.Data/Dawning.Identity.Infra.Data.csproj", "apps/gateway/src/Dawning.Identity.Infra.Data/"]
+COPY ["apps/gateway/src/Dawning.Identity.Infra.CrossCutting.IoC/Dawning.Identity.Infra.CrossCutting.IoC.csproj", "apps/gateway/src/Dawning.Identity.Infra.CrossCutting.IoC/"]
+COPY ["apps/gateway/src/Dawning.Identity.Infra.CrossCutting.Mapping/Dawning.Identity.Infra.CrossCutting.Mapping.csproj", "apps/gateway/src/Dawning.Identity.Infra.CrossCutting.Mapping/"]
+COPY ["apps/gateway/src/Dawning.Identity.Infra.Messaging/Dawning.Identity.Infra.Messaging.csproj", "apps/gateway/src/Dawning.Identity.Infra.Messaging/"]
+
+# Copy nuget.config if exists
+COPY ["nuget.config", "./"]
 
 # Restore dependencies
-RUN dotnet restore "src/Dawning.Identity.Api/Dawning.Identity.Api.csproj"
+RUN dotnet restore "apps/gateway/src/Dawning.Identity.Api/Dawning.Identity.Api.csproj"
 
 # Copy all source code
-COPY . .
+COPY ["sdk/", "sdk/"]
+COPY ["apps/gateway/", "apps/gateway/"]
 
 # Build the application
-WORKDIR "/src/src/Dawning.Identity.Api"
+WORKDIR "/src/apps/gateway/src/Dawning.Identity.Api"
 RUN dotnet build "Dawning.Identity.Api.csproj" -c Release -o /app/build
 
 # ===== Publish Stage =====
@@ -55,7 +71,6 @@ USER dawning
 
 # Expose ports
 EXPOSE 5001
-EXPOSE 5000
 
 # Environment variables
 ENV ASPNETCORE_URLS=http://+:5001

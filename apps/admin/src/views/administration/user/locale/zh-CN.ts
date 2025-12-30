@@ -29,15 +29,16 @@ export default {
   'user.column.isActive': '账户状态',
   'user.column.createdAt': '创建时间',
   'user.column.action': '操作',
-  'user.column.action': '操作',
 
   'user.action.add': '新增用户',
-  'user.action.edit': '编辑用户',
-  'user.action.view': '查看详情',
-  'user.action.delete': '删除用户',
+  'user.action.view': '查看',
+  'user.action.edit': '编辑',
+  'user.action.delete': '删除',
   'user.action.resetPassword': '重置密码',
   'user.action.lock': '锁定账户',
   'user.action.unlock': '解锁账户',
+  'user.action.roles': '角色',
+  'user.action.systemUser': '系统用户',
 
   'user.modal.create.title': '新增用户',
   'user.modal.edit.title': '编辑用户',
@@ -100,13 +101,6 @@ export default {
   'user.batch.enable': '批量启用',
   'user.batch.disable': '批量禁用',
   'user.batch.delete': '批量删除',
-
-  'user.action.view': '查看',
-  'user.action.edit': '编辑',
-  'user.action.roles': '角色',
-  'user.action.resetPassword': '重置密码',
-  'user.action.delete': '删除',
-  'user.action.systemUser': '系统用户',
 
   // Modal buttons
   'user.modal.ok': '确定',

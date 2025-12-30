@@ -1,7 +1,7 @@
 <template>
   <div class="claim-type-info">
     <div class="container">
-      <Breadcrumb :items=\"[$t('menu.administration.openiddict'), $t('menu.administration.claim.type'), $t('claimType.info.title')]\" />
+      <Breadcrumb :items="[$t('menu.administration.openiddict'), $t('menu.administration.claim.type'), $t('claimType.info.title')]" />
       <a-form
         ref="formRef"
         class="form"
