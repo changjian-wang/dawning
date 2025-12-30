@@ -183,18 +183,17 @@ docker-compose down -v
 
 ## ☸️ Kubernetes Deployment
 
-### Install Helm
+### Prerequisites
 
-**Windows (choose one):**
+- Kubernetes 1.25+ cluster (Docker Desktop / Kind / Minikube)
+- Helm 3.10+
+- kubectl configured
+
+### 1. Install Helm
+
+**Windows:**
 ```powershell
-# Using Winget (recommended)
 winget install Helm.Helm
-
-# Using Chocolatey (requires admin)
-choco install kubernetes-helm
-
-# Using Scoop
-scoop install helm
 ```
 
 **macOS:**
@@ -207,27 +206,61 @@ brew install helm
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
-### Deploy to Kubernetes
+### 2. Install Ingress Controller
 
 ```bash
-# Add Bitnami repository
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+# Docker Desktop / Kind
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
-# Navigate to helm chart directory
-cd deploy/helm/dawning
+# Wait for ready
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+```
 
-# Development deployment (--dependency-update will auto-download dependencies)
-helm install dawning . -f values-dev.yaml -n dawning-dev --create-namespace --dependency-update
+### 3. Sync Database Schema
 
-# Production deployment
-helm install dawning . -f values-prod.yaml -n dawning --create-namespace --dependency-update
+```powershell
+cd deploy/scripts
+.\sync-schema.ps1
+```
 
-# Upgrade existing deployment
-helm upgrade dawning . -f values-prod.yaml -n dawning --dependency-update
+### 4. Deploy
+
+```bash
+# Create namespace
+kubectl create namespace dawning-dev
+
+# Install (local development)
+helm install dawning deploy/helm/dawning \
+  --namespace dawning-dev \
+  --set "ingress.hosts[0].host=localhost" \
+  --set "ingress.hosts[0].paths[0].path=/" \
+  --set "ingress.hosts[0].paths[0].pathType=Prefix" \
+  --set "ingress.hosts[0].paths[0].service=admin-frontend" \
+  --set identityApi.replicaCount=1
+
+# Wait for ready
+kubectl wait --for=condition=ready pod --all -n dawning-dev --timeout=180s
+```
+
+### 5. Access
+
+After deployment, visit: **http://localhost**
+
+### Common Commands
+
+```bash
+# Check pod status
+kubectl get pods -n dawning-dev
+
+# View logs
+kubectl logs -f deployment/dawning-identity-api -n dawning-dev
+
+# Upgrade
+helm upgrade dawning deploy/helm/dawning -n dawning-dev --reuse-values
 
 # Uninstall
-helm uninstall dawning -n dawning
+helm uninstall dawning -n dawning-dev
+kubectl delete namespace dawning-dev
 ```
 
 ## 🔗 Business System Integration

@@ -183,18 +183,17 @@ docker-compose down -v
 
 ## ☸️ Kubernetes 部署
 
-### 安装 Helm
+### 前置条件
 
-**Windows（任选一种）：**
+- Kubernetes 1.25+ 集群 (Docker Desktop / Kind / Minikube)
+- Helm 3.10+
+- kubectl 已配置
+
+### 1. 安装 Helm
+
+**Windows：**
 ```powershell
-# 使用 Winget（推荐）
 winget install Helm.Helm
-
-# 使用 Chocolatey（需管理员权限）
-choco install kubernetes-helm
-
-# 使用 Scoop
-scoop install helm
 ```
 
 **macOS：**
@@ -207,27 +206,61 @@ brew install helm
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
-### 部署到 Kubernetes
+### 2. 安装 Ingress Controller
 
 ```bash
-# 添加 Bitnami 仓库
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+# Docker Desktop / Kind
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
-# 进入 Helm Chart 目录
-cd deploy/helm/dawning
+# 等待就绪
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+```
 
-# 开发环境部署（--dependency-update 会自动下载依赖）
-helm install dawning . -f values-dev.yaml -n dawning-dev --create-namespace --dependency-update
+### 3. 同步数据库 Schema
 
-# 生产环境部署
-helm install dawning . -f values-prod.yaml -n dawning --create-namespace --dependency-update
+```powershell
+cd deploy/scripts
+.\sync-schema.ps1
+```
 
-# 升级现有部署
-helm upgrade dawning . -f values-prod.yaml -n dawning --dependency-update
+### 4. 部署
+
+```bash
+# 创建命名空间
+kubectl create namespace dawning-dev
+
+# 安装（本地开发）
+helm install dawning deploy/helm/dawning \
+  --namespace dawning-dev \
+  --set "ingress.hosts[0].host=localhost" \
+  --set "ingress.hosts[0].paths[0].path=/" \
+  --set "ingress.hosts[0].paths[0].pathType=Prefix" \
+  --set "ingress.hosts[0].paths[0].service=admin-frontend" \
+  --set identityApi.replicaCount=1
+
+# 等待就绪
+kubectl wait --for=condition=ready pod --all -n dawning-dev --timeout=180s
+```
+
+### 5. 访问
+
+部署完成后访问：**http://localhost**
+
+### 常用命令
+
+```bash
+# 查看 Pod 状态
+kubectl get pods -n dawning-dev
+
+# 查看日志
+kubectl logs -f deployment/dawning-identity-api -n dawning-dev
+
+# 升级
+helm upgrade dawning deploy/helm/dawning -n dawning-dev --reuse-values
 
 # 卸载
-helm uninstall dawning -n dawning
+helm uninstall dawning -n dawning-dev
+kubectl delete namespace dawning-dev
 ```
 
 ## 🔗 业务系统接入
