@@ -1,0 +1,132 @@
+{{- if .Values.mysql.enabled }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "dawning.fullname" . }}-mysql
+  labels:
+    {{- include "dawning.labels" . | nindent 4 }}
+type: Opaque
+data:
+  mysql-root-password: {{ .Values.mysql.auth.rootPassword | default "dawning_root_2024" | b64enc | quote }}
+  mysql-password: {{ .Values.mysql.auth.password | default "dawning_password_2024" | b64enc | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dawning.fullname" . }}-mysql-init
+  labels:
+    {{- include "dawning.labels" . | nindent 4 }}
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS `{{ .Values.mysql.auth.database | default "dawning_identity" }}`;
+    CREATE USER IF NOT EXISTS '{{ .Values.mysql.auth.username | default "dawning" }}'@'%' IDENTIFIED BY '{{ .Values.mysql.auth.password | default "dawning_password_2024" }}';
+    GRANT ALL PRIVILEGES ON `{{ .Values.mysql.auth.database | default "dawning_identity" }}`.* TO '{{ .Values.mysql.auth.username | default "dawning" }}'@'%';
+    FLUSH PRIVILEGES;
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dawning.fullname" . }}-mysql
+  labels:
+    {{- include "dawning.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mysql
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: mysql
+      protocol: TCP
+      name: mysql
+  selector:
+    app.kubernetes.io/component: mysql
+    app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "dawning.fullname" . }}-mysql
+  labels:
+    {{- include "dawning.labels" . | nindent 4 }}
+    app.kubernetes.io/component: mysql
+spec:
+  serviceName: {{ include "dawning.fullname" . }}-mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: mysql
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: mysql
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dawning.fullname" . }}-mysql
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              value: {{ .Values.mysql.auth.database | default "dawning_identity" | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.mysql.auth.username | default "dawning" | quote }}
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "dawning.fullname" . }}-mysql
+                  key: mysql-password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: {{ include "dawning.fullname" . }}-mysql-init
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: {{ .Values.mysql.primary.persistence.size | default "2Gi" }}
+{{- end }}

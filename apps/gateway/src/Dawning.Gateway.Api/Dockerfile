@@ -49,8 +49,8 @@ RUN dotnet publish "Dawning.Gateway.Api.csproj" -c Release -o /app/publish /p:Us
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Create non-root user for security
-RUN groupadd -r dawning && useradd -r -g dawning dawning
+# Create non-root user for security with home directory
+RUN groupadd -r dawning && useradd -r -g dawning -d /home/dawning -m dawning
 
 # Install curl for healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
@@ -58,8 +58,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 # Copy published application
 COPY --from=publish /app/publish .
 
-# Create logs directory
-RUN mkdir -p /app/Logs && chown -R dawning:dawning /app
+# Create logs directory and ensure proper permissions
+RUN mkdir -p /app/Logs && chown -R dawning:dawning /app && chown -R dawning:dawning /home/dawning
 
 # Switch to non-root user
 USER dawning

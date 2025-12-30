@@ -18,7 +18,7 @@ identityApi:
   image:
     repository: aluneth/dawning-identity-api
     tag: "latest"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   
   service:
     type: ClusterIP
@@ -66,7 +66,7 @@ gatewayApi:
   image:
     repository: aluneth/dawning-gateway-api
     tag: "latest"
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   
   service:
     type: ClusterIP

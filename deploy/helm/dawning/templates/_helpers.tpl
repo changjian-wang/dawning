@@ -94,7 +94,7 @@ Database connection string
 {{- if .Values.database.external.enabled }}
 {{- .Values.database.external.host }}
 {{- else }}
-{{- printf "%s-mysql" .Release.Name }}
+{{- printf "%s-mysql" (include "dawning.fullname" .) }}
 {{- end }}
 {{- end }}
 
@@ -129,7 +129,7 @@ Redis connection
 {{- if .Values.cache.external.enabled }}
 {{- .Values.cache.external.host }}
 {{- else }}
-{{- printf "%s-redis-master" .Release.Name }}
+{{- printf "%s-redis" (include "dawning.fullname" .) }}
 {{- end }}
 {{- end }}
 
@@ -148,7 +148,7 @@ Kafka connection
 {{- if .Values.messaging.external.enabled }}
 {{- .Values.messaging.external.bootstrapServers }}
 {{- else }}
-{{- printf "%s-kafka:9092" .Release.Name }}
+{{- printf "%s-kafka:9092" (include "dawning.fullname" .) }}
 {{- end }}
 {{- end }}
 

@@ -118,9 +118,10 @@ function shouldRetry(error: AxiosError, retryCount: number): boolean {
   return RETRY_CONFIG.retryStatusCodes.includes(error.response.status);
 }
 
-// 设置基础URL
-if (import.meta.env.VITE_API_BASE_URL) {
-  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+// 设置基础URL（空字符串表示使用相对路径）
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+if (apiBaseUrl && apiBaseUrl.trim() !== '') {
+  axios.defaults.baseURL = apiBaseUrl;
 }
 
 // Token 刷新相关

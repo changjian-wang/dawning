@@ -45,6 +45,18 @@ spec:
               value: "$(KAFKA_BOOTSTRAP_SERVERS)"
             - name: IdentityApi__BaseUrl
               value: "http://{{ include "dawning.fullname" . }}-identity-api:{{ .Values.identityApi.service.port }}"
+            # YARP Reverse Proxy Configuration
+            - name: ReverseProxy__Clusters__identity-cluster__Destinations__destination1__Address
+              value: "http://{{ include "dawning.fullname" . }}-identity-api:{{ .Values.identityApi.service.port }}"
+            - name: JwtBearerOptions__Authority
+              value: "http://{{ include "dawning.fullname" . }}-identity-api:{{ .Values.identityApi.service.port }}"
+            - name: JwtBearerOptions__Issuer
+              value: "http://{{ include "dawning.fullname" . }}-identity-api:{{ .Values.identityApi.service.port }}"
+            # Identity Service URL for health checks
+            - name: Identity__Authority
+              value: "http://{{ include "dawning.fullname" . }}-identity-api:{{ .Values.identityApi.service.port }}"
+            - name: Identity__Issuer
+              value: "http://{{ include "dawning.fullname" . }}-identity-api:{{ .Values.identityApi.service.port }}"
           envFrom:
             - configMapRef:
                 name: {{ include "dawning.fullname" . }}-config
