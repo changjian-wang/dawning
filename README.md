@@ -183,18 +183,51 @@ docker-compose down -v
 
 ## ☸️ Kubernetes Deployment
 
+### Install Helm
+
+**Windows (choose one):**
+```powershell
+# Using Winget (recommended)
+winget install Helm.Helm
+
+# Using Chocolatey (requires admin)
+choco install kubernetes-helm
+
+# Using Scoop
+scoop install helm
+```
+
+**macOS:**
+```bash
+brew install helm
+```
+
+**Linux:**
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+### Deploy to Kubernetes
+
 ```bash
 # Add Bitnami repository
 helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
 
-# Update dependencies
-cd deploy/helm/dawning && helm dependency update
+# Navigate to helm chart directory
+cd deploy/helm/dawning
 
-# Development deployment
-helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-dev.yaml -n dawning-dev --create-namespace
+# Development deployment (--dependency-update will auto-download dependencies)
+helm install dawning . -f values-dev.yaml -n dawning-dev --create-namespace --dependency-update
 
 # Production deployment
-helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-prod.yaml -n dawning --create-namespace
+helm install dawning . -f values-prod.yaml -n dawning --create-namespace --dependency-update
+
+# Upgrade existing deployment
+helm upgrade dawning . -f values-prod.yaml -n dawning --dependency-update
+
+# Uninstall
+helm uninstall dawning -n dawning
 ```
 
 ## 🔗 Business System Integration

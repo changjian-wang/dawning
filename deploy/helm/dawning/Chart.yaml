@@ -20,14 +20,14 @@ sources:
 # 基础设施依赖（可选，生产环境建议使用云托管服务）
 dependencies:
   - name: mysql
-    version: "9.x.x"
+    version: "9.23.0"
     repository: "https://charts.bitnami.com/bitnami"
     condition: mysql.enabled
   - name: redis
-    version: "18.x.x"
+    version: "18.19.4"
     repository: "https://charts.bitnami.com/bitnami"
     condition: redis.enabled
   - name: kafka
-    version: "26.x.x"
+    version: "26.11.4"
     repository: "https://charts.bitnami.com/bitnami"
     condition: kafka.enabled

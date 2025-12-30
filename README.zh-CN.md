@@ -183,18 +183,51 @@ docker-compose down -v
 
 ## ☸️ Kubernetes 部署
 
+### 安装 Helm
+
+**Windows（任选一种）：**
+```powershell
+# 使用 Winget（推荐）
+winget install Helm.Helm
+
+# 使用 Chocolatey（需管理员权限）
+choco install kubernetes-helm
+
+# 使用 Scoop
+scoop install helm
+```
+
+**macOS：**
+```bash
+brew install helm
+```
+
+**Linux：**
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+### 部署到 Kubernetes
+
 ```bash
 # 添加 Bitnami 仓库
 helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
 
-# 更新依赖
-cd deploy/helm/dawning && helm dependency update
+# 进入 Helm Chart 目录
+cd deploy/helm/dawning
 
-# 开发环境部署
-helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-dev.yaml -n dawning-dev --create-namespace
+# 开发环境部署（--dependency-update 会自动下载依赖）
+helm install dawning . -f values-dev.yaml -n dawning-dev --create-namespace --dependency-update
 
 # 生产环境部署
-helm install dawning ./deploy/helm/dawning -f ./deploy/helm/dawning/values-prod.yaml -n dawning --create-namespace
+helm install dawning . -f values-prod.yaml -n dawning --create-namespace --dependency-update
+
+# 升级现有部署
+helm upgrade dawning . -f values-prod.yaml -n dawning --dependency-update
+
+# 卸载
+helm uninstall dawning -n dawning
 ```
 
 ## 🔗 业务系统接入
