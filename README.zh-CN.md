@@ -229,14 +229,8 @@ cd deploy/scripts
 # 创建命名空间
 kubectl create namespace dawning-dev
 
-# 安装（本地开发）
-helm install dawning deploy/helm/dawning \
-  --namespace dawning-dev \
-  --set "ingress.hosts[0].host=localhost" \
-  --set "ingress.hosts[0].paths[0].path=/" \
-  --set "ingress.hosts[0].paths[0].pathType=Prefix" \
-  --set "ingress.hosts[0].paths[0].service=admin-frontend" \
-  --set identityApi.replicaCount=1
+# 安装（本地开发）- 从项目根目录运行
+helm install dawning deploy/helm/dawning --namespace dawning-dev --set "ingress.hosts[0].host=localhost" --set "ingress.hosts[0].paths[0].path=/" --set "ingress.hosts[0].paths[0].pathType=Prefix" --set "ingress.hosts[0].paths[0].service=admin-frontend" --set identityApi.replicaCount=1
 
 # 等待就绪
 kubectl wait --for=condition=ready pod --all -n dawning-dev --timeout=180s
