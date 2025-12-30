@@ -143,8 +143,8 @@ services:
   # ===== Identity API Service =====
   identity-api:
     build:
-      context: ../../apps/gateway
-      dockerfile: src/Dawning.Identity.Api/Dockerfile
+      context: ../..
+      dockerfile: apps/gateway/src/Dawning.Identity.Api/Dockerfile
     container_name: dawning-identity-api
     restart: unless-stopped
     depends_on:
@@ -181,8 +181,8 @@ services:
   # ===== Gateway API Service =====
   gateway-api:
     build:
-      context: ../../apps/gateway
-      dockerfile: src/Dawning.Gateway.Api/Dockerfile
+      context: ../..
+      dockerfile: apps/gateway/src/Dawning.Gateway.Api/Dockerfile
     container_name: dawning-gateway-api
     restart: unless-stopped
     depends_on:
@@ -199,7 +199,7 @@ services:
       - Redis__Connection=redis:6379
       - Identity__Authority=http://identity-api:5001
       - Identity__Issuer=http://identity-api:5001
-      - Gateway__UseDatabase=true
+      - Gateway__UseDatabase=false
       - TZ=Asia/Shanghai
     ports:
       - "${GATEWAY_API_PORT:-5000}:5000"
@@ -217,8 +217,8 @@ services:
   # ===== Admin Frontend =====
   admin-frontend:
     build:
-      context: ../../apps/admin
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: apps/admin/Dockerfile
     container_name: dawning-admin-frontend
     restart: unless-stopped
     depends_on:
@@ -227,9 +227,9 @@ services:
       gateway-api:
         condition: service_healthy
     ports:
-      - "${FRONTEND_PORT:-80}:80"
+      - "${FRONTEND_PORT:-8088}:80"
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
       interval: 30s
       timeout: 10s
       retries: 3

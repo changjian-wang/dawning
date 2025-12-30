@@ -10,13 +10,16 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # Copy package files first (better layer caching)
-COPY package.json pnpm-lock.yaml ./
+COPY apps/admin/package.json apps/admin/pnpm-lock.yaml ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY . .
+# Copy source code (exclude node_modules by listing specific directories)
+COPY apps/admin/src/ ./src/
+COPY apps/admin/config/ ./config/
+COPY apps/admin/index.html apps/admin/tsconfig.json apps/admin/components.d.ts ./
+COPY apps/admin/.env.production ./
 
 # Build the application
 RUN pnpm build
@@ -32,7 +35,7 @@ RUN rm -rf ./*
 COPY --from=build /app/dist .
 
 # Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/admin/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S dawning && \

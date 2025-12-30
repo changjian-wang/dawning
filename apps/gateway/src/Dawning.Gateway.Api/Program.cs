@@ -1,4 +1,6 @@
 using Dawning.Gateway.Api.Configuration;
+using Dawning.Identity.Infra.CrossCutting.IoC;
+using Dawning.Identity.Infra.Data.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
@@ -15,6 +17,17 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+// ===== 数据库连接 =====
+var connectionString = builder.Configuration.GetConnectionString("MySQL");
+if (!string.IsNullOrWhiteSpace(connectionString))
+{
+    builder.Services.AddScoped(provider => new DbContext(connectionString));
+    Log.Information("Database connection configured");
+}
+
+// ===== 注册应用服务 (依赖注入) =====
+builder.Services.AddApplicationServices();
 
 // ===== YARP =====
 var useDatabase = builder.Configuration.GetValue<bool>("Gateway:UseDatabase");

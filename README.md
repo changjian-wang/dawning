@@ -13,7 +13,6 @@
 ![Redis](https://img.shields.io/badge/Redis-7.x-DC382D?logo=redis&logoColor=white)
 ![Kafka](https://img.shields.io/badge/Kafka-3.x-231F20?logo=apachekafka)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Helm-326CE5?logo=kubernetes)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 **Enterprise-grade Unified Identity Authentication & API Gateway Management Platform**
@@ -38,7 +37,7 @@ Dawning Identity Gateway is a modern identity authentication and API gateway man
 - 🚀 **High Performance** - Dapper ORM with optimized query builder
 - 🌐 **API Gateway** - YARP-based reverse proxy with dynamic routing
 - 🔗 **Multi-system Integration** - Unified authentication for other business systems
-- 🐳 **Container Deployment** - Docker Compose one-click deployment, Helm Chart for K8s
+- 🐳 **Container Deployment** - Docker Compose one-click deployment
 
 ## 🏗️ Tech Stack
 
@@ -88,12 +87,6 @@ dawning/
 ├── sdk/                             # Dawning SDK Components
 ├── deploy/
 │   ├── docker/                      # Docker Compose Configuration
-│   ├── helm/                        # Kubernetes Helm Chart
-│   │   └── dawning/
-│   │       ├── Chart.yaml
-│   │       ├── values.yaml          # Default Configuration
-│   │       ├── values-dev.yaml      # Development Environment
-│   │       └── values-prod.yaml     # Production Environment
 │   └── scripts/                     # Deployment Scripts
 ├── docs/                            # Project Documentation
 └── .github/workflows/               # CI/CD Configuration
@@ -181,100 +174,6 @@ docker-compose down
 docker-compose down -v
 ```
 
-## ☸️ Kubernetes Deployment
-
-### Prerequisites
-
-- Kubernetes 1.25+ cluster (Docker Desktop / Kind / Minikube)
-- Helm 3.10+
-- kubectl configured
-
-### 1. Install Helm
-
-**Windows:**
-```powershell
-winget install Helm.Helm
-```
-
-**macOS:**
-```bash
-brew install helm
-```
-
-**Linux:**
-```bash
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-```
-
-### 2. Install Ingress Controller
-
-```bash
-# Docker Desktop / Kind
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-
-# Wait for ready
-kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
-```
-
-### 3. Sync Database Schema
-
-```powershell
-cd deploy/scripts
-.\sync-schema.ps1
-```
-
-### 4. Deploy
-
-```bash
-# Create namespace
-kubectl create namespace dawning-dev
-
-# Install (local development) - run from project root directory
-helm install dawning deploy/helm/dawning --namespace dawning-dev --set "ingress.hosts[0].host=localhost" --set "ingress.hosts[0].paths[0].path=/" --set "ingress.hosts[0].paths[0].pathType=Prefix" --set "ingress.hosts[0].paths[0].service=admin-frontend" --set identityApi.replicaCount=1
-
-# Wait for ready
-kubectl wait --for=condition=ready pod --all -n dawning-dev --timeout=180s
-```
-
-### 5. Access
-
-After deployment, visit: **http://localhost**
-
-### Common Commands
-
-```bash
-# Check pod status
-kubectl get pods -n dawning-dev
-
-# View logs
-kubectl logs -f deployment/dawning-identity-api -n dawning-dev
-
-# Upgrade
-helm upgrade dawning deploy/helm/dawning -n dawning-dev --reuse-values
-
-# Uninstall
-helm uninstall dawning -n dawning-dev
-kubectl delete namespace dawning-dev
-```
-
-### Production Deployment
-
-For production with custom domain:
-
-```bash
-# 1. Edit values-prod.yaml - update domain and database settings
-#    - ingress.hosts[0].host: admin.yourdomain.com
-#    - database.external.host: your-db-host.com
-
-# 2. Deploy with production values
-helm install dawning deploy/helm/dawning -n dawning-prod --create-namespace -f deploy/helm/dawning/values-prod.yaml --set database.external.password=YOUR_DB_PASSWORD
-
-# 3. Configure DNS
-#    Add A record pointing to your Ingress Controller external IP
-```
-
-See [values-prod.yaml](deploy/helm/dawning/values-prod.yaml) for full production configuration options.
-
 ## 🔗 Business System Integration
 
 Other business systems can easily integrate with unified authentication via Dawning SDK:
@@ -329,7 +228,6 @@ Access Swagger UI after starting the backend:
 | [Identity API](apps/gateway/docs/IDENTITY_API.md) | OAuth2/OIDC endpoint documentation |
 | [Developer Guide](docs/DEVELOPER_GUIDE.md) | Development standards and conventions |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment |
-| [Helm Deployment](deploy/helm/README.md) | Kubernetes deployment guide |
 | [User Guide](docs/USER_GUIDE.md) | Admin panel usage instructions |
 
 ## 🔧 Configuration
