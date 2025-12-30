@@ -6,6 +6,7 @@ USE dawning_identity;
 -- Create roles table
 CREATE TABLE IF NOT EXISTS `roles` (
   `id` CHAR(36) NOT NULL COMMENT 'Role ID (GUID)',
+  `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
   `name` VARCHAR(50) NOT NULL COMMENT 'Role name (unique identifier, e.g., admin, user, manager)',
   `display_name` VARCHAR(100) NOT NULL COMMENT 'Role display name',
   `description` VARCHAR(500) DEFAULT NULL COMMENT 'Role description',
@@ -22,7 +23,8 @@ CREATE TABLE IF NOT EXISTS `roles` (
   UNIQUE KEY `uk_roles_name` (`name`),
   KEY `idx_roles_is_active` (`is_active`),
   KEY `idx_roles_timestamp` (`timestamp`),
-  KEY `idx_roles_deleted_at` (`deleted_at`)
+  KEY `idx_roles_deleted_at` (`deleted_at`),
+  KEY `idx_roles_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Roles table';
 
 -- Insert system predefined roles

@@ -1,6 +1,7 @@
 -- Create system logs table
 CREATE TABLE IF NOT EXISTS `system_logs` (
     `id` CHAR(36) NOT NULL COMMENT 'Log unique identifier (GUID)',
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `level` VARCHAR(20) NOT NULL COMMENT 'Log level (Info, Warning, Error)',
     `message` TEXT NOT NULL COMMENT 'Log message',
     `exception` TEXT NULL COMMENT 'Exception information (exception type and message)',
@@ -21,7 +22,8 @@ CREATE TABLE IF NOT EXISTS `system_logs` (
     INDEX `idx_timestamp` (`timestamp` DESC),
     INDEX `idx_user_id` (`user_id` ASC),
     INDEX `idx_username` (`username` ASC),
-    INDEX `idx_level_created` (`level`, `created_at` DESC)
+    INDEX `idx_level_created` (`level`, `created_at` DESC),
+    INDEX `idx_system_logs_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='System logs table (application logs and exceptions)';
 
 -- Create monthly partitions (example: January-December 2025)

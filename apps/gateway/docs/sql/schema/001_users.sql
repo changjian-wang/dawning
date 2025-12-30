@@ -1,6 +1,7 @@
 -- Create users table
 CREATE TABLE IF NOT EXISTS `users` (
     `id` CHAR(36) NOT NULL COMMENT 'User unique identifier (GUID)',
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `username` VARCHAR(50) NOT NULL COMMENT 'Username (login name)',
     `password_hash` VARCHAR(255) NOT NULL COMMENT 'Password hash',
     `email` VARCHAR(100) NULL COMMENT 'Email',
@@ -31,7 +32,8 @@ CREATE TABLE IF NOT EXISTS `users` (
     INDEX `idx_is_system` (`is_system` ASC),
     INDEX `idx_is_deleted` (`is_deleted` ASC),
     INDEX `idx_created_at` (`created_at` DESC),
-    INDEX `idx_timestamp` (`timestamp` DESC)
+    INDEX `idx_timestamp` (`timestamp` DESC),
+    INDEX `idx_users_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Users table';
 
 -- Insert initial admin user (password: Admin@123)

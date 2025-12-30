@@ -7,6 +7,7 @@
 -- Alert rules table
 CREATE TABLE IF NOT EXISTS `alert_rules` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `name` VARCHAR(100) NOT NULL COMMENT 'Rule name',
     `description` VARCHAR(500) NULL COMMENT 'Rule description',
     `metric_type` VARCHAR(50) NOT NULL COMMENT 'Metric type: cpu, memory, response_time, error_rate, request_count',
@@ -24,12 +25,14 @@ CREATE TABLE IF NOT EXISTS `alert_rules` (
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX `idx_alert_rules_metric_type` (`metric_type`),
     INDEX `idx_alert_rules_is_enabled` (`is_enabled`),
-    INDEX `idx_alert_rules_severity` (`severity`)
+    INDEX `idx_alert_rules_severity` (`severity`),
+    INDEX `idx_alert_rules_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Alert rules table';
 
 -- Alert history table
 CREATE TABLE IF NOT EXISTS `alert_history` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `rule_id` BIGINT UNSIGNED NOT NULL COMMENT 'Alert rule ID',
     `rule_name` VARCHAR(100) NOT NULL COMMENT 'Rule name (denormalized)',
     `metric_type` VARCHAR(50) NOT NULL COMMENT 'Metric type',
@@ -49,6 +52,7 @@ CREATE TABLE IF NOT EXISTS `alert_history` (
     INDEX `idx_alert_history_status` (`status`),
     INDEX `idx_alert_history_severity` (`severity`),
     INDEX `idx_alert_history_triggered_at` (`triggered_at`),
+    INDEX `idx_alert_history_tenant_id` (`tenant_id`),
     CONSTRAINT `fk_alert_history_rule` FOREIGN KEY (`rule_id`) REFERENCES `alert_rules`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Alert history table';
 

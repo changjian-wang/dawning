@@ -86,6 +86,9 @@ foreach ($File in $SqlFiles) {
     # 移除 DROP TABLE 语句（初始化时不需要删除表）
     $FileContent = $FileContent -replace "(?mi)^\s*DROP\s+TABLE\s+IF\s+EXISTS\s+[`'\w]+\s*;\s*$", ""
     
+    # 将 INSERT INTO 转换为 INSERT IGNORE INTO（避免重复数据错误）
+    $FileContent = $FileContent -replace "(?mi)INSERT\s+INTO\s+", "INSERT IGNORE INTO "
+    
     # 添加文件分隔注释
     $Content += @"
 

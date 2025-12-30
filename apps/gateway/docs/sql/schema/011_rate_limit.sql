@@ -5,6 +5,7 @@
 -- Rate limit policies table
 CREATE TABLE IF NOT EXISTS `rate_limit_policies` (
     `id` CHAR(36) NOT NULL,
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `name` VARCHAR(100) NOT NULL,
     `display_name` VARCHAR(200),
     `policy_type` VARCHAR(50) NOT NULL DEFAULT 'fixed-window',
@@ -19,12 +20,14 @@ CREATE TABLE IF NOT EXISTS `rate_limit_policies` (
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_rate_limit_policy_name` (`name`)
+    UNIQUE KEY `uk_rate_limit_policy_name` (`name`),
+    KEY `idx_rate_limit_policies_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- IP access rules table
 CREATE TABLE IF NOT EXISTS `ip_access_rules` (
     `id` CHAR(36) NOT NULL,
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `ip_address` VARCHAR(50) NOT NULL,
     `rule_type` VARCHAR(20) NOT NULL DEFAULT 'blacklist',
     `description` TEXT,
@@ -36,7 +39,8 @@ CREATE TABLE IF NOT EXISTS `ip_access_rules` (
     PRIMARY KEY (`id`),
     KEY `idx_ip_access_rule_type` (`rule_type`),
     KEY `idx_ip_access_enabled` (`is_enabled`),
-    KEY `idx_ip_access_expires` (`expires_at`)
+    KEY `idx_ip_access_expires` (`expires_at`),
+    KEY `idx_ip_access_rules_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default rate limit policies

@@ -79,7 +79,6 @@ WHERE NOT EXISTS (
     SELECT 1 FROM system_configs 
     WHERE name = 'Backup' AND `key` = 'CompressBackups'
 );
-);
 
 INSERT INTO system_configs (id, name, `key`, value, description, non_editable, timestamp, created_at)
 SELECT UUID(), 'Backup', 'AutoBackupIncludeLogs', 'false', 'Whether automatic backup includes log tables', 0, UNIX_TIMESTAMP(NOW(3)) * 1000, NOW()

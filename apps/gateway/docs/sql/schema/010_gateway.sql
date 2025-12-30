@@ -5,6 +5,7 @@
 -- Gateway clusters table (must be created first since routes table references clusters)
 CREATE TABLE IF NOT EXISTS gateway_clusters (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    tenant_id CHAR(36) NULL,
     cluster_id VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
     description TEXT,
@@ -27,12 +28,15 @@ CREATE TABLE IF NOT EXISTS gateway_clusters (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_by VARCHAR(100)
+    updated_by VARCHAR(100),
+    INDEX idx_gateway_clusters_is_enabled (is_enabled),
+    INDEX idx_gateway_clusters_tenant_id (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gateway cluster configuration table';
 
 -- Gateway routes table
 CREATE TABLE IF NOT EXISTS gateway_routes (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+    tenant_id CHAR(36) NULL,
     route_id VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(200) NOT NULL,
     description TEXT,
@@ -56,14 +60,12 @@ CREATE TABLE IF NOT EXISTS gateway_routes (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
     created_by VARCHAR(100),
-    updated_by VARCHAR(100)
+    updated_by VARCHAR(100),
+    INDEX idx_gateway_routes_cluster_id (cluster_id),
+    INDEX idx_gateway_routes_is_enabled (is_enabled),
+    INDEX idx_gateway_routes_sort_order (sort_order),
+    INDEX idx_gateway_routes_tenant_id (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gateway route configuration table';
-
--- Create indexes
-CREATE INDEX IF NOT EXISTS idx_gateway_routes_cluster_id ON gateway_routes(cluster_id);
-CREATE INDEX IF NOT EXISTS idx_gateway_routes_is_enabled ON gateway_routes(is_enabled);
-CREATE INDEX IF NOT EXISTS idx_gateway_routes_sort_order ON gateway_routes(sort_order);
-CREATE INDEX IF NOT EXISTS idx_gateway_clusters_is_enabled ON gateway_clusters(is_enabled);
 
 -- Insert default gateway cluster (Identity Service)
 INSERT INTO gateway_clusters (cluster_id, name, description, destinations, load_balancing_policy, health_check_enabled, health_check_path, is_enabled)

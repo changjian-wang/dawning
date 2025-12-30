@@ -8,6 +8,7 @@
 -- Create permissions table
 CREATE TABLE IF NOT EXISTS permissions (
     id CHAR(36) PRIMARY KEY,
+    tenant_id CHAR(36) NULL,                      -- Tenant ID
     code VARCHAR(100) NOT NULL UNIQUE,           -- Permission code, format: resource:action (e.g., user:create, role:update)
     name VARCHAR(100) NOT NULL,                   -- Permission name
     description TEXT,                             -- Permission description
@@ -21,14 +22,13 @@ CREATE TABLE IF NOT EXISTS permissions (
     created_by CHAR(36),
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     updated_by CHAR(36),
-    timestamp BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP() * 1000)
+    timestamp BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP() * 1000),
+    INDEX idx_permissions_code (code),
+    INDEX idx_permissions_resource (resource),
+    INDEX idx_permissions_category (category),
+    INDEX idx_permissions_is_active (is_active),
+    INDEX idx_permissions_tenant_id (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Create indexes
-CREATE INDEX idx_permissions_code ON permissions(code);
-CREATE INDEX idx_permissions_resource ON permissions(resource);
-CREATE INDEX idx_permissions_category ON permissions(category);
-CREATE INDEX idx_permissions_is_active ON permissions(is_active);
 
 -- Create role permissions association table
 CREATE TABLE IF NOT EXISTS role_permissions (
@@ -37,12 +37,10 @@ CREATE TABLE IF NOT EXISTS role_permissions (
     permission_id CHAR(36) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_by CHAR(36),
-    CONSTRAINT uk_role_permission UNIQUE (role_id, permission_id)
+    CONSTRAINT uk_role_permission UNIQUE (role_id, permission_id),
+    INDEX idx_role_permissions_role_id (role_id),
+    INDEX idx_role_permissions_permission_id (permission_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Create indexes
-CREATE INDEX idx_role_permissions_role_id ON role_permissions(role_id);
-CREATE INDEX idx_role_permissions_permission_id ON role_permissions(permission_id);
 
 -- Insert system default permissions (using UUID())
 INSERT INTO permissions (id, code, name, description, resource, action, category, is_system, display_order) VALUES

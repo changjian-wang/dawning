@@ -8,6 +8,7 @@
 -- Request logs table
 CREATE TABLE IF NOT EXISTS request_logs (
     id CHAR(36) NOT NULL PRIMARY KEY,
+    tenant_id CHAR(36) NULL,
     request_id VARCHAR(100) NULL,
     method VARCHAR(10) NOT NULL,
     path VARCHAR(2048) NOT NULL,
@@ -34,7 +35,8 @@ CREATE TABLE IF NOT EXISTS request_logs (
     
     -- Composite indexes for common queries
     INDEX idx_request_logs_time_status (request_time, status_code),
-    INDEX idx_request_logs_time_path (request_time, path(255))
+    INDEX idx_request_logs_time_path (request_time, path(255)),
+    INDEX idx_request_logs_tenant_id (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Add table comment

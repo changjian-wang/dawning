@@ -1,7 +1,8 @@
 -- ============================================
 -- V8: Multi-tenancy Support
 -- Created: 2025-12-23
--- Description: Add multi-tenancy support, including tenant table and tenant_id field for existing tables
+-- Description: Add multi-tenancy support with tenants table
+-- Note: tenant_id columns have been added directly to each table's CREATE statement
 -- ============================================
 
 -- 1. Create tenants table
@@ -34,96 +35,22 @@ CREATE TABLE IF NOT EXISTS `tenants` (
     KEY `idx_tenants_timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tenants table';
 
--- 2. Add tenant_id field to existing tables (optional, enable as needed)
--- Note: Following operations may take a long time, please execute during maintenance window
-
--- 2.1 Users table
-ALTER TABLE `users` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_users_tenant_id` (`tenant_id`);
-
--- 2.2 Roles table
-ALTER TABLE `roles` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_roles_tenant_id` (`tenant_id`);
-
--- 2.3 Permissions table
-ALTER TABLE `permissions` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_permissions_tenant_id` (`tenant_id`);
-
--- 2.4 System configs table
-ALTER TABLE `system_configs` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_system_configs_tenant_id` (`tenant_id`);
-
--- 2.5 Audit logs table
-ALTER TABLE `audit_logs` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_audit_logs_tenant_id` (`tenant_id`);
-
--- 2.6 System logs table
-ALTER TABLE `system_logs` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_system_logs_tenant_id` (`tenant_id`);
-
--- 2.7 Alert rules table
-ALTER TABLE `alert_rules` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_alert_rules_tenant_id` (`tenant_id`);
-
--- 2.8 Alert history table
-ALTER TABLE `alert_history` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_alert_history_tenant_id` (`tenant_id`);
-
--- 2.9 Request logs table
-ALTER TABLE `request_logs` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_request_logs_tenant_id` (`tenant_id`);
-
--- 2.10 Gateway routes table
-ALTER TABLE `gateway_routes` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_gateway_routes_tenant_id` (`tenant_id`);
-
--- 2.11 Gateway clusters table
-ALTER TABLE `gateway_clusters` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_gateway_clusters_tenant_id` (`tenant_id`);
-
--- 2.12 Rate limit policies table
-ALTER TABLE `rate_limit_policies` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_rate_limit_policies_tenant_id` (`tenant_id`);
-
--- 2.13 IP access rules table
-ALTER TABLE `ip_access_rules` 
-ADD COLUMN `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID' AFTER `id`,
-ADD INDEX `idx_ip_access_rules_tenant_id` (`tenant_id`);
-
--- 3. Create default tenant (primary tenant)
-INSERT INTO `tenants` (`id`, `code`, `name`, `description`, `is_active`, `plan`, `created_at`)
+-- 2. Create default tenant (primary tenant for localhost)
+INSERT INTO `tenants` (`id`, `code`, `name`, `description`, `domain`, `is_active`, `plan`, `timestamp`, `created_at`)
 VALUES (
-    UUID(),
+    '00000000-0000-0000-0000-000000000001',
     'default',
     'Default Tenant',
     'System default tenant for host administrators and public data',
+    'localhost',
     1,
     'enterprise',
+    UNIX_TIMESTAMP() * 1000,
     NOW()
 );
 
--- 4. Associate existing data to default tenant (optional)
--- Uncomment the following statements to migrate existing data to default tenant
--- SET @default_tenant_id = (SELECT id FROM tenants WHERE code = 'default');
--- UPDATE users SET tenant_id = @default_tenant_id WHERE tenant_id IS NULL;
--- UPDATE roles SET tenant_id = @default_tenant_id WHERE tenant_id IS NULL;
--- UPDATE permissions SET tenant_id = @default_tenant_id WHERE tenant_id IS NULL;
--- ... similar for other tables
-
--- 5. Add tenant-related permissions
-INSERT INTO `permissions` (`id`, `code`, `name`, `description`, `resource`, `action`, `category`, `is_active`, `sort_order`)
+-- 3. Add tenant-related permissions
+INSERT INTO `permissions` (`id`, `code`, `name`, `description`, `resource`, `action`, `category`, `is_system`, `display_order`)
 VALUES 
     (UUID(), 'tenant:create', 'Create Tenant', 'Allows creating new tenants', 'tenant', 'create', 'multitenancy', 1, 700),
     (UUID(), 'tenant:read', 'View Tenant', 'Allows viewing tenant list and details', 'tenant', 'read', 'multitenancy', 1, 701),
@@ -134,18 +61,5 @@ VALUES
 -- ============================================
 -- Rollback script (execute these statements if rollback needed)
 -- ============================================
--- DROP TABLE IF EXISTS `tenants`;
--- ALTER TABLE `users` DROP COLUMN `tenant_id`, DROP INDEX `idx_users_tenant_id`;
--- ALTER TABLE `roles` DROP COLUMN `tenant_id`, DROP INDEX `idx_roles_tenant_id`;
--- ALTER TABLE `permissions` DROP COLUMN `tenant_id`, DROP INDEX `idx_permissions_tenant_id`;
--- ALTER TABLE `system_configs` DROP COLUMN `tenant_id`, DROP INDEX `idx_system_configs_tenant_id`;
--- ALTER TABLE `audit_logs` DROP COLUMN `tenant_id`, DROP INDEX `idx_audit_logs_tenant_id`;
--- ALTER TABLE `system_logs` DROP COLUMN `tenant_id`, DROP INDEX `idx_system_logs_tenant_id`;
--- ALTER TABLE `alert_rules` DROP COLUMN `tenant_id`, DROP INDEX `idx_alert_rules_tenant_id`;
--- ALTER TABLE `alert_history` DROP COLUMN `tenant_id`, DROP INDEX `idx_alert_history_tenant_id`;
--- ALTER TABLE `request_logs` DROP COLUMN `tenant_id`, DROP INDEX `idx_request_logs_tenant_id`;
--- ALTER TABLE `gateway_routes` DROP COLUMN `tenant_id`, DROP INDEX `idx_gateway_routes_tenant_id`;
--- ALTER TABLE `gateway_clusters` DROP COLUMN `tenant_id`, DROP INDEX `idx_gateway_clusters_tenant_id`;
--- ALTER TABLE `rate_limit_policies` DROP COLUMN `tenant_id`, DROP INDEX `idx_rate_limit_policies_tenant_id`;
--- ALTER TABLE `ip_access_rules` DROP COLUMN `tenant_id`, DROP INDEX `idx_ip_access_rules_tenant_id`;
 -- DELETE FROM `permissions` WHERE `category` = 'multitenancy';
+-- DROP TABLE IF EXISTS `tenants`;

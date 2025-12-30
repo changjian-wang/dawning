@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS `system_configs`;
 
 CREATE TABLE `system_configs` (
     `id` CHAR(36) NOT NULL COMMENT 'Primary key (GUID)',
+    `tenant_id` CHAR(36) NULL COMMENT 'Tenant ID',
     `name` VARCHAR(200) NOT NULL COMMENT 'Config group name',
     `key` VARCHAR(200) NOT NULL COMMENT 'Config key',
     `value` TEXT NULL COMMENT 'Config value',
@@ -49,7 +50,8 @@ CREATE TABLE `system_configs` (
     INDEX `idx_key` (`key`),
     INDEX `idx_name_key` (`name`, `key`),
     INDEX `idx_timestamp` (`timestamp`),
-    INDEX `idx_created_at` (`created_at`)
+    INDEX `idx_created_at` (`created_at`),
+    INDEX `idx_system_configs_tenant_id` (`tenant_id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='System config table';
 
 -- ====================================================

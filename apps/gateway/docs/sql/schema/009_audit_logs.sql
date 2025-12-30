@@ -6,6 +6,7 @@ USE dawning_identity;
 -- Create audit logs table
 CREATE TABLE IF NOT EXISTS `audit_logs` (
   `id` CHAR(36) NOT NULL COMMENT 'Audit log ID (GUID)',
+  `tenant_id` CHAR(36) DEFAULT NULL COMMENT 'Tenant ID',
   `user_id` CHAR(36) DEFAULT NULL COMMENT 'Operating user ID',
   `username` VARCHAR(100) DEFAULT NULL COMMENT 'Operating username',
   `action` VARCHAR(100) NOT NULL COMMENT 'Action type (Create, Update, Delete, Login, Logout, etc.)',
@@ -28,7 +29,8 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   KEY `idx_audit_logs_entity_id` (`entity_id`),
   KEY `idx_audit_logs_created_at` (`created_at`),
   KEY `idx_audit_logs_timestamp` (`timestamp`),
-  KEY `idx_audit_logs_ip_address` (`ip_address`)
+  KEY `idx_audit_logs_ip_address` (`ip_address`),
+  KEY `idx_audit_logs_tenant_id` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Audit logs table';
 
 -- Display creation results
