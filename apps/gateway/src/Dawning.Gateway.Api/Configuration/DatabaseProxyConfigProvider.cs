@@ -5,7 +5,7 @@ using Yarp.ReverseProxy.Configuration;
 namespace Dawning.Gateway.Api.Configuration;
 
 /// <summary>
-/// YARP 配置提供程序 - 从数据库加载路由和集群配置
+/// YARP configuration provider - loads route and cluster configuration from database
 /// </summary>
 public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
 {
@@ -33,7 +33,7 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
     public IProxyConfig GetConfig() => _config;
 
     /// <summary>
-    /// 从数据库加载配置
+    /// Load configuration from database
     /// </summary>
     public async Task LoadConfigAsync()
     {
@@ -60,7 +60,7 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
     }
 
     /// <summary>
-    /// 重新加载配置（用于配置更新后触发）
+    /// Reload configuration (triggered after configuration update)
     /// </summary>
     public async Task ReloadConfigAsync()
     {
@@ -84,7 +84,7 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
                 new CancellationChangeToken(_changeTokenSource.Token)
             );
 
-            // 触发配置变更
+            // Trigger configuration change
             oldTokenSource.Cancel();
             oldTokenSource.Dispose();
         }
@@ -98,7 +98,7 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
 }
 
 /// <summary>
-/// 数据库配置快照
+/// Database configuration snapshot
 /// </summary>
 public class DatabaseProxyConfig : IProxyConfig
 {

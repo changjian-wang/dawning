@@ -7,15 +7,15 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Middleware
 {
     /// <summary>
-    /// 性能监控中间件
-    /// 监控API响应时间和性能指标
+    /// Performance monitoring middleware
+    /// Monitors API response time and performance metrics
     /// </summary>
     public class PerformanceMonitoringMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<PerformanceMonitoringMiddleware> _logger;
-        private const int SlowRequestThresholdMs = 3000; // 3秒
-        private const int VerySlowRequestThresholdMs = 10000; // 10秒
+        private const int SlowRequestThresholdMs = 3000; // 3 seconds
+        private const int VerySlowRequestThresholdMs = 10000; // 10 seconds
 
         public PerformanceMonitoringMiddleware(
             RequestDelegate next,
@@ -41,7 +41,7 @@ namespace Dawning.Identity.Api.Middleware
                 stopwatch.Stop();
                 var elapsedMs = stopwatch.ElapsedMilliseconds;
 
-                // 记录性能指标
+                // Record performance metrics
                 if (elapsedMs > VerySlowRequestThresholdMs)
                 {
                     _logger.LogError(
@@ -73,7 +73,7 @@ namespace Dawning.Identity.Api.Middleware
                     );
                 }
 
-                // 只在响应未开始时添加性能头
+                // Only add performance header if response hasn't started
                 if (!context.Response.HasStarted)
                 {
                     context.Response.Headers.Append("X-Response-Time-Ms", elapsedMs.ToString());
@@ -83,7 +83,7 @@ namespace Dawning.Identity.Api.Middleware
     }
 
     /// <summary>
-    /// 性能指标收集器
+    /// Performance metrics collector
     /// </summary>
     public class PerformanceMetrics
     {

@@ -7,7 +7,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace Dawning.Identity.Api.Data
 {
     /// <summary>
-    /// 数据库种子数据初始化
+    /// Database seed data initialization
     /// </summary>
     public class DatabaseSeeder
     {
@@ -30,7 +30,7 @@ namespace Dawning.Identity.Api.Data
         }
 
         /// <summary>
-        /// 初始化种子数据
+        /// Initialize seed data
         /// </summary>
         public async Task SeedAsync()
         {
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Api.Data
         }
 
         /// <summary>
-        /// 初始化作用域
+        /// Initialize scopes
         /// </summary>
         private async Task SeedScopesAsync()
         {
@@ -118,11 +118,11 @@ namespace Dawning.Identity.Api.Data
         }
 
         /// <summary>
-        /// 初始化应用程序
+        /// Initialize applications
         /// </summary>
         private async Task SeedApplicationsAsync()
         {
-            // Dawning Admin 前端应用
+            // Dawning Admin frontend application
             var adminClientId = "dawning-admin";
             var existingAdminApp = await _applicationService.GetByClientIdAsync(adminClientId);
 
@@ -132,21 +132,21 @@ namespace Dawning.Identity.Api.Data
                 {
                     Id = Guid.NewGuid(),
                     ClientId = adminClientId,
-                    ClientSecret = null, // 公共客户端不需要密钥（SPA应用）
+                    ClientSecret = null, // Public client doesn't need secret (SPA application)
                     DisplayName = "Dawning Admin",
-                    Type = ClientTypes.Public, // SPA 应用使用 Public 类型
-                    ConsentType = ConsentTypes.Implicit, // 隐式同意
+                    Type = ClientTypes.Public, // SPA application uses Public type
+                    ConsentType = ConsentTypes.Implicit, // Implicit consent
                     Permissions = new List<string>
                     {
-                        // 授权类型
+                        // Grant types
                         Permissions.GrantTypes.Password,
                         Permissions.GrantTypes.RefreshToken,
                         Permissions.GrantTypes.AuthorizationCode,
-                        // 端点
+                        // Endpoints
                         Permissions.Endpoints.Token,
                         Permissions.Endpoints.Authorization,
                         Permissions.Endpoints.Logout,
-                        // 作用域
+                        // Scopes
                         Permissions.Prefixes.Scope + Scopes.OpenId,
                         Permissions.Prefixes.Scope + Scopes.Profile,
                         Permissions.Prefixes.Scope + Scopes.Email,
@@ -179,7 +179,7 @@ namespace Dawning.Identity.Api.Data
                 _logger.LogInformation("Application '{ClientId}' already exists", adminClientId);
             }
 
-            // API 服务（用于服务间调用）
+            // API service (for service-to-service calls)
             var apiClientId = "dawning-api";
             var existingApiApp = await _applicationService.GetByClientIdAsync(apiClientId);
 
@@ -189,18 +189,18 @@ namespace Dawning.Identity.Api.Data
                 {
                     Id = Guid.NewGuid(),
                     ClientId = apiClientId,
-                    ClientSecret = PasswordHasher.Hash("dawning-api-secret"), // 使用 PBKDF2 哈希
+                    ClientSecret = PasswordHasher.Hash("dawning-api-secret"), // Using PBKDF2 hash
                     DisplayName = "Dawning API",
-                    Type = ClientTypes.Confidential, // 服务端应用使用 Confidential 类型
+                    Type = ClientTypes.Confidential, // Server-side application uses Confidential type
                     ConsentType = ConsentTypes.Implicit,
                     Permissions = new List<string>
                     {
-                        // 授权类型
+                        // Grant types
                         Permissions.GrantTypes.ClientCredentials,
-                        // 端点
+                        // Endpoints
                         Permissions.Endpoints.Token,
                         Permissions.Endpoints.Introspection,
-                        // 作用域
+                        // Scopes
                         Permissions.Prefixes.Scope + "api",
                     },
                     RedirectUris = new List<string>(),
@@ -221,11 +221,11 @@ namespace Dawning.Identity.Api.Data
         }
 
         /// <summary>
-        /// 初始化默认用户
+        /// Initialize default users
         /// </summary>
         private async Task SeedUsersAsync()
         {
-            // 检查系统中是否已存在任何用户
+            // Check if any users already exist in system
             var allUsersModel = new Dawning.Identity.Domain.Models.Administration.UserModel();
 
             var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);

@@ -104,11 +104,11 @@ namespace Dawning.Identity.Api.Controllers
                 }
             }
 
-            return Ok(new { message = "其他会话已撤销", revokedCount });
+            return Ok(new { message = "Other sessions revoked", revokedCount });
         }
 
         /// <summary>
-        /// 撤销当前用户的所有令牌（登出所有设备）
+        /// Revoke all tokens for current user (logout from all devices)
         /// </summary>
         [HttpPost("revoke-all")]
         [ProducesResponseType(200)]
@@ -120,7 +120,7 @@ namespace Dawning.Identity.Api.Controllers
 
             var count = await _tokenService.RevokeAllUserTokensAsync(userId.Value);
 
-            // 同时加入用户黑名单
+            // Also add user to blacklist
             if (_blacklistService != null)
             {
                 await _blacklistService.BlacklistUserTokensAsync(
@@ -129,11 +129,11 @@ namespace Dawning.Identity.Api.Controllers
                 );
             }
 
-            return Ok(new { message = "所有令牌已撤销", revokedCount = count });
+            return Ok(new { message = "All tokens revoked", revokedCount = count });
         }
 
         /// <summary>
-        /// 获取登录策略设置
+        /// Get login policy settings
         /// </summary>
         [HttpGet("policy")]
         [ProducesResponseType(typeof(LoginPolicySettings), 200)]
@@ -144,9 +144,9 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 管理员：撤销指定用户的所有令牌
+        /// Admin: Revoke all tokens for specified user
         /// </summary>
-        /// <param name="userId">用户ID</param>
+        /// <param name="userId">User ID</param>
         [HttpPost("admin/revoke/{userId:guid}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(200)]
@@ -163,13 +163,13 @@ namespace Dawning.Identity.Api.Controllers
                 );
             }
 
-            return Ok(new { message = $"用户 {userId} 的所有令牌已撤销", revokedCount = count });
+            return Ok(new { message = $"All tokens for user {userId} have been revoked", revokedCount = count });
         }
 
         /// <summary>
-        /// 管理员：获取指定用户的会话列表
+        /// Admin: Get session list for specified user
         /// </summary>
-        /// <param name="userId">用户ID</param>
+        /// <param name="userId">User ID</param>
         [HttpGet("admin/sessions/{userId:guid}")]
         [Authorize(Roles = "admin")]
         [ProducesResponseType(typeof(IEnumerable<UserSessionDto>), 200)]
@@ -179,7 +179,7 @@ namespace Dawning.Identity.Api.Controllers
             return Ok(sessions);
         }
 
-        #region 辅助方法
+        #region Helper Methods
 
         private Guid? GetCurrentUserId()
         {
@@ -200,12 +200,12 @@ namespace Dawning.Identity.Api.Controllers
 
         private string GetCurrentDeviceId()
         {
-            // 从请求头获取设备ID，或生成一个基于用户代理的标识
+            // Get device ID from request header, or generate an identifier based on user agent
             var deviceId = Request.Headers["X-Device-Id"].FirstOrDefault();
             if (!string.IsNullOrEmpty(deviceId))
                 return deviceId;
 
-            // 使用用户代理作为回退
+            // Use user agent as fallback
             var userAgent = Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
             return Convert
                 .ToBase64String(

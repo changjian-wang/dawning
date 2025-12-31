@@ -13,8 +13,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Middleware
 {
     /// <summary>
-    /// API 响应缓存中间件
-    /// 支持通过 CacheResponseAttribute 控制缓存行为
+    /// API response caching middleware
+    /// Supports cache behavior control via CacheResponseAttribute
     /// </summary>
     public class ResponseCacheMiddleware
     {
@@ -33,35 +33,35 @@ namespace Dawning.Identity.Api.Middleware
 
         public async Task InvokeAsync(HttpContext context, ICacheService? cacheService = null)
         {
-            // 只缓存 GET 请求
+            // Only cache GET requests
             if (context.Request.Method != HttpMethods.Get || cacheService == null)
             {
                 await _next(context);
                 return;
             }
 
-            // 获取端点的缓存特性
+            // Get endpoint's cache attribute
             var endpoint = context.GetEndpoint();
             var cacheAttribute = endpoint?.Metadata.GetMetadata<CacheResponseAttribute>();
             var noCacheAttribute = endpoint?.Metadata.GetMetadata<NoCacheAttribute>();
 
-            // 检查是否禁用缓存
+            // Check if cache is disabled
             if (noCacheAttribute != null || cacheAttribute == null)
             {
                 await _next(context);
                 return;
             }
 
-            // 生成缓存键
+            // Generate cache key
             var cacheKey = GenerateCacheKey(context, cacheAttribute);
 
-            // 尝试从缓存获取
+            // Try to get from cache
             var cachedResponse = await cacheService.GetAsync<CachedResponse>(cacheKey);
             if (cachedResponse != null)
             {
                 _logger.LogDebug("Cache hit for: {Path}", context.Request.Path);
 
-                // 添加缓存头
+                // Add cache header
                 context.Response.Headers.Append("X-Cache", "HIT");
                 context.Response.ContentType = cachedResponse.ContentType;
                 context.Response.StatusCode = cachedResponse.StatusCode;
@@ -72,7 +72,7 @@ namespace Dawning.Identity.Api.Middleware
 
             _logger.LogDebug("Cache miss for: {Path}", context.Request.Path);
 
-            // 缓存未命中，执行请求并缓存结果
+            // Cache miss, execute request and cache result
             var originalBodyStream = context.Response.Body;
 
             using var memoryStream = new MemoryStream();
@@ -82,7 +82,7 @@ namespace Dawning.Identity.Api.Middleware
             {
                 await _next(context);
 
-                // 只缓存成功的响应
+                // Only cache successful responses
                 if (context.Response.StatusCode >= 200 && context.Response.StatusCode < 300)
                 {
                     memoryStream.Seek(0, SeekOrigin.Begin);

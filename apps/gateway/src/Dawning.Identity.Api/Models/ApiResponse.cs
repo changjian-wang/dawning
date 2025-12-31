@@ -37,7 +37,7 @@ namespace Dawning.Identity.Api.Models
         }
 
         /// <summary>
-        /// 成功响应（带分页）- 返回包含分页信息的数据结构
+        /// Success response (with pagination) - Returns data structure with pagination info
         /// </summary>
         public static ApiResponse<object> SuccessPaged<TItem>(
             IEnumerable<TItem> items,
@@ -65,7 +65,7 @@ namespace Dawning.Identity.Api.Models
         }
 
         /// <summary>
-        /// 错误响应
+        /// Error response
         /// </summary>
         public static ApiResponse<T> Error(int code, string message, T? data = default)
         {
@@ -79,15 +79,15 @@ namespace Dawning.Identity.Api.Models
     }
 
     /// <summary>
-    /// 无数据的API响应
+    /// API response without data
     /// </summary>
     public class ApiResponse : ApiResponse<object>
     {
         /// <summary>
-        /// 生成一个表示成功响应的ApiResponse对象，不包含数据。
+        /// Generates an ApiResponse object representing success, without data.
         /// </summary>
-        /// <param name="message">响应消息，默认为"Success"</param>
-        /// <returns>返回一个表示成功的ApiResponse实例</returns>
+        /// <param name="message">Response message, default is "Success"</param>
+        /// <returns>Returns an ApiResponse instance representing success</returns>
         public static ApiResponse Success(string message = "Success")
         {
             return new ApiResponse
@@ -99,11 +99,11 @@ namespace Dawning.Identity.Api.Models
         }
 
         /// <summary>
-        /// 生成一个表示错误响应的ApiResponse对象，不包含数据。
+        /// Generates an ApiResponse object representing error, without data.
         /// </summary>
-        /// <param name="code">错误代码</param>
-        /// <param name="message">错误消息</param>
-        /// <returns>返回一个表示错误的ApiResponse实例</returns>
+        /// <param name="code">Error code</param>
+        /// <param name="message">Error message</param>
+        /// <returns>Returns an ApiResponse instance representing error</returns>
         public static ApiResponse Error(int code, string message)
         {
             return new ApiResponse

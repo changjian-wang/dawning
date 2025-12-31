@@ -56,10 +56,10 @@ namespace Dawning.Identity.Api.Services
         {
             try
             {
-                // 发送给订阅了 alerts 频道的用户
+                // Send to users subscribed to alerts channel
                 await _hubContext.Clients.Group("channel_alerts").SendAsync("AlertReceived", alert);
 
-                // 同时发送给管理员
+                // Also send to administrators
                 await _hubContext.Clients.Group("role_admin").SendAsync("AlertReceived", alert);
 
                 await _hubContext

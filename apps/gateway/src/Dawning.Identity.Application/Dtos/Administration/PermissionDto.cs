@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Dawning.Identity.Application.Dtos.Administration
 {
     /// <summary>
-    /// 权限DTO
+    /// Permission DTO
     /// </summary>
     public class PermissionDto
     {
@@ -26,7 +26,7 @@ namespace Dawning.Identity.Application.Dtos.Administration
     }
 
     /// <summary>
-    /// 创建权限DTO
+    /// Create permission DTO
     /// </summary>
     public class CreatePermissionDto
     {
@@ -41,7 +41,7 @@ namespace Dawning.Identity.Application.Dtos.Administration
     }
 
     /// <summary>
-    /// 更新权限DTO
+    /// Update permission DTO
     /// </summary>
     public class UpdatePermissionDto
     {
@@ -53,7 +53,7 @@ namespace Dawning.Identity.Application.Dtos.Administration
     }
 
     /// <summary>
-    /// 角色权限DTO
+    /// Role permission DTO
     /// </summary>
     public class RolePermissionDto
     {
@@ -62,7 +62,7 @@ namespace Dawning.Identity.Application.Dtos.Administration
     }
 
     /// <summary>
-    /// 权限分组DTO（按资源分组）
+    /// Permission group DTO (grouped by resource)
     /// </summary>
     public class PermissionGroupDto
     {

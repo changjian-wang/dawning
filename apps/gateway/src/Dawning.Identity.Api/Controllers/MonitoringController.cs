@@ -161,30 +161,30 @@ namespace Dawning.Identity.Api.Controllers
             var oneMinuteAgo = now.AddMinutes(-1);
             var oneHourAgo = now.AddHours(-1);
 
-            // 获取最近1分钟的统计
+            // Get statistics from recent 1 minute
             var recentStats = await _requestLoggingService.GetStatisticsAsync(oneMinuteAgo, now);
 
-            // 获取最近1小时的统计
+            // Get statistics from recent 1 hour
             var hourlyStats = await _requestLoggingService.GetStatisticsAsync(oneHourAgo, now);
 
             var process = Process.GetCurrentProcess();
 
             var data = new RealtimeMonitoringData
             {
-                // 请求指标
+                // Request metrics
                 RequestsPerMinute = recentStats.TotalRequests,
                 RequestsPerHour = hourlyStats.TotalRequests,
                 ErrorsPerMinute = recentStats.ClientErrors + recentStats.ServerErrors,
                 ErrorsPerHour = hourlyStats.ClientErrors + hourlyStats.ServerErrors,
                 AverageResponseTimeMs = recentStats.AverageResponseTimeMs,
 
-                // 系统指标
+                // System metrics
                 MemoryUsageMb = process.WorkingSet64 / (1024.0 * 1024.0),
                 ManagedMemoryMb = GC.GetTotalMemory(false) / (1024.0 * 1024.0),
                 ThreadCount = process.Threads.Count,
                 Uptime = DateTime.Now - process.StartTime,
 
-                // 时间戳
+                // Timestamp
                 Timestamp = now,
             };
 

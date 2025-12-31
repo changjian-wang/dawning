@@ -57,7 +57,7 @@ namespace Dawning.Identity.Api.Middleware
         {
             try
             {
-                // 从 HttpContext 获取 ISystemLogService
+                // Get ISystemLogService from HttpContext
                 var systemLogService = context.RequestServices.GetService<ISystemLogService>();
                 if (systemLogService != null)
                 {

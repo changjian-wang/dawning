@@ -107,13 +107,13 @@ namespace Dawning.Identity.Api.Services
         {
             try
             {
-                // 推送到对应级别的频道
+                // Push to corresponding level channel
                 var levelChannel = GetLevelChannel(entry.Level);
 
-                // 推送到所有日志频道
+                // Push to all logs channel
                 await _hubContext.Clients.Group("channel_logs_all").SendAsync("LogEntry", entry);
 
-                // 推送到特定级别频道
+                // Push to specific level channel
                 if (!string.IsNullOrEmpty(levelChannel))
                 {
                     await _hubContext
@@ -146,7 +146,7 @@ namespace Dawning.Identity.Api.Services
                 "error" or "critical" or "fatal" => "logs_error",
                 "warning" or "warn" => "logs_warning",
                 "information" or "info" => "logs_info",
-                "debug" or "trace" => null, // Debug/Trace 只推送到 logs_all
+                "debug" or "trace" => null, // Debug/Trace only push to logs_all
                 _ => null,
             };
         }

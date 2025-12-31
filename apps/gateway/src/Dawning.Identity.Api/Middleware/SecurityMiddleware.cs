@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Antiforgery;
 namespace Dawning.Identity.Api.Middleware
 {
     /// <summary>
-    /// 安全头中间件 - 添加安全相关的 HTTP 响应头
+    /// Security headers middleware - Adds security-related HTTP response headers
     /// </summary>
     public class SecurityHeadersMiddleware
     {
@@ -16,25 +16,25 @@ namespace Dawning.Identity.Api.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // 添加安全响应头
+            // Add security response headers
             var headers = context.Response.Headers;
 
-            // X-Content-Type-Options: 防止 MIME 类型嗅探
+            // X-Content-Type-Options: Prevent MIME type sniffing
             headers["X-Content-Type-Options"] = "nosniff";
 
-            // X-Frame-Options: 防止点击劫持
+            // X-Frame-Options: Prevent clickjacking
             headers["X-Frame-Options"] = "DENY";
 
-            // X-XSS-Protection: 启用 XSS 过滤器（旧浏览器支持）
+            // X-XSS-Protection: Enable XSS filter (legacy browser support)
             headers["X-XSS-Protection"] = "1; mode=block";
 
-            // Referrer-Policy: 控制 Referrer 信息发送
+            // Referrer-Policy: Control Referrer information sending
             headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
 
-            // Permissions-Policy: 限制浏览器功能
+            // Permissions-Policy: Limit browser features
             headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()";
 
-            // Content-Security-Policy: 内容安全策略（仅用于 Swagger UI 等页面）
+            // Content-Security-Policy: Content security policy (only for Swagger UI and similar pages)
             if (
                 context.Request.Path.StartsWithSegments("/swagger")
                 || context.Request.Path == "/"
@@ -55,7 +55,7 @@ namespace Dawning.Identity.Api.Middleware
     }
 
     /// <summary>
-    /// CSRF Token 端点中间件 - 为需要 Cookie 认证的场景提供 CSRF Token
+    /// CSRF Token endpoint middleware - Provides CSRF Token for scenarios requiring Cookie authentication
     /// </summary>
     public class CsrfTokenMiddleware
     {
@@ -70,7 +70,7 @@ namespace Dawning.Identity.Api.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // 为 GET 请求生成 CSRF Token（用于前端 SPA 获取）
+            // Generate CSRF Token for GET requests (for frontend SPA to retrieve)
             if (
                 _antiforgery != null
                 && context.Request.Method == HttpMethods.Get
@@ -92,12 +92,12 @@ namespace Dawning.Identity.Api.Middleware
     }
 
     /// <summary>
-    /// 安全中间件扩展方法
+    /// Security middleware extension methods
     /// </summary>
     public static class SecurityMiddlewareExtensions
     {
         /// <summary>
-        /// 添加安全头中间件
+        /// Add security headers middleware
         /// </summary>
         public static IApplicationBuilder UseSecurityHeaders(this IApplicationBuilder app)
         {
@@ -105,7 +105,7 @@ namespace Dawning.Identity.Api.Middleware
         }
 
         /// <summary>
-        /// 添加 CSRF Token 中间件
+        /// Add CSRF Token middleware
         /// </summary>
         public static IApplicationBuilder UseCsrfToken(this IApplicationBuilder app)
         {
@@ -113,7 +113,7 @@ namespace Dawning.Identity.Api.Middleware
         }
 
         /// <summary>
-        /// 配置 Antiforgery 服务
+        /// Configure Antiforgery service
         /// </summary>
         public static IServiceCollection AddCsrfProtection(this IServiceCollection services)
         {

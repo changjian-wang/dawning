@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 namespace Dawning.Identity.Api.Helpers
 {
     /// <summary>
-    /// 审计日志辅助类
+    /// Audit log helper class
     /// </summary>
     public class AuditLogHelper
     {
@@ -26,7 +26,7 @@ namespace Dawning.Identity.Api.Helpers
         }
 
         /// <summary>
-        /// 记录审计日志
+        /// Record audit log
         /// </summary>
         public async Task LogAsync(
             string action,
@@ -69,13 +69,13 @@ namespace Dawning.Identity.Api.Helpers
             }
             catch (Exception ex)
             {
-                // 记录日志但不抛出异常，避免影响主流程
+                // Log but don't throw exception, to avoid affecting the main flow
                 Console.WriteLine($"Failed to log audit: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// 获取用户ID
+        /// Get user ID
         /// </summary>
         private static Guid? GetUserId(ClaimsPrincipal user)
         {
@@ -88,7 +88,7 @@ namespace Dawning.Identity.Api.Helpers
         }
 
         /// <summary>
-        /// 获取用户名
+        /// Get username
         /// </summary>
         private static string? GetUsername(ClaimsPrincipal user)
         {
@@ -98,30 +98,30 @@ namespace Dawning.Identity.Api.Helpers
         }
 
         /// <summary>
-        /// 获取IP地址
+        /// Get IP address
         /// </summary>
         private static string? GetIpAddress(HttpContext context)
         {
-            // 优先获取X-Forwarded-For（用于反向代理场景）
+            // Prefer X-Forwarded-For (for reverse proxy scenarios)
             var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
             if (!string.IsNullOrEmpty(forwardedFor))
             {
                 return forwardedFor.Split(',')[0].Trim();
             }
 
-            // 获取X-Real-IP
+            // Get X-Real-IP
             var realIp = context.Request.Headers["X-Real-IP"].FirstOrDefault();
             if (!string.IsNullOrEmpty(realIp))
             {
                 return realIp;
             }
 
-            // 最后获取RemoteIpAddress
+            // Finally get RemoteIpAddress
             return context.Connection.RemoteIpAddress?.ToString();
         }
 
         /// <summary>
-        /// 获取用户代理
+        /// Get user agent
         /// </summary>
         private static string? GetUserAgent(HttpContext context)
         {

@@ -101,9 +101,9 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取备份配置
+        /// Get backup configuration
         /// </summary>
-        /// <returns>备份配置</returns>
+        /// <returns>Backup configuration</returns>
         [HttpGet("config")]
         public async Task<ActionResult<BackupConfiguration>> GetConfiguration()
         {
@@ -112,21 +112,21 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 更新备份配置
+        /// Update backup configuration
         /// </summary>
-        /// <param name="config">新配置</param>
-        /// <returns>更新结果</returns>
+        /// <param name="config">New configuration</param>
+        /// <returns>Update result</returns>
         [HttpPut("config")]
         public async Task<ActionResult> UpdateConfiguration([FromBody] BackupConfiguration config)
         {
             await _backupService.UpdateConfigurationAsync(config);
-            return Ok(new { message = "备份配置已更新" });
+            return Ok(new { message = "Backup configuration has been updated" });
         }
 
         /// <summary>
-        /// 获取备份存储信息
+        /// Get backup storage information
         /// </summary>
-        /// <returns>存储信息</returns>
+        /// <returns>Storage information</returns>
         [HttpGet("storage-info")]
         public async Task<ActionResult> GetStorageInfo()
         {

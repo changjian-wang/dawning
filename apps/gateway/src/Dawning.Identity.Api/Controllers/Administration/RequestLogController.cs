@@ -67,7 +67,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         {
             try
             {
-                // 验证参数
+                // Validate parameters
                 if (page < 1)
                     page = 1;
                 if (pageSize < 1)

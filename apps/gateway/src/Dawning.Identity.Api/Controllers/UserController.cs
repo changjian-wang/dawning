@@ -110,7 +110,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取用户列表（分页）
+        /// Get user list (paginated)
         /// </summary>
         [HttpGet]
         [Authorize(Roles = "admin,super_admin,user_manager,auditor")]
@@ -161,7 +161,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取用户列表（Cursor 分页）
+        /// Get user list (cursor pagination)
         /// </summary>
         [HttpGet("cursor")]
         [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
@@ -215,7 +215,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 根据ID获取用户详情
+        /// Get user details by ID
         /// </summary>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
@@ -240,7 +240,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 创建用户
+        /// Create user
         /// </summary>
         [HttpPost]
         [Authorize(Roles = "admin,super_admin,user_manager")]
@@ -250,7 +250,7 @@ namespace Dawning.Identity.Api.Controllers
         {
             try
             {
-                // 获取当前操作者ID
+                // Get current operator ID
                 var operatorId = GetCurrentUserId();
 
                 var user = await _userService.CreateAsync(dto, operatorId);
@@ -292,7 +292,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 更新用户
+        /// Update user
         /// </summary>
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "admin,super_admin,user_manager")]
@@ -302,12 +302,12 @@ namespace Dawning.Identity.Api.Controllers
         {
             try
             {
-                dto.Id = id; // 确保ID匹配
+                dto.Id = id; // Ensure ID matches
 
-                // 获取当前操作者ID
+                // Get current operator ID
                 var operatorId = GetCurrentUserId();
 
-                // 获取更新前的用户信息
+                // Get user info before update
                 var oldUser = await _userRepository.GetAsync(id);
                 var oldValues =
                     oldUser != null
@@ -355,7 +355,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 删除用户
+        /// Delete user
         /// </summary>
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "admin,super_admin,user_manager")]
@@ -365,10 +365,10 @@ namespace Dawning.Identity.Api.Controllers
         {
             try
             {
-                // 获取当前操作者ID
+                // Get current operator ID
                 var operatorId = GetCurrentUserId();
 
-                // 获取被删除的用户信息
+                // Get deleted user info
                 var user = await _userRepository.GetAsync(id);
                 var userInfo = user != null ? new { user.Username, user.Email } : null;
 
@@ -400,7 +400,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 批量删除用户
+        /// Batch delete users
         /// </summary>
         [HttpDelete("batch")]
         [Authorize(Roles = "admin,super_admin,user_manager")]
@@ -454,7 +454,7 @@ namespace Dawning.Identity.Api.Controllers
                             failedCount = failedIds.Count,
                             failedIds,
                         },
-                        $"成功删除 {successCount} 个用户"
+                        $"Successfully deleted {successCount} users"
                     )
                 );
             }
@@ -466,7 +466,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 批量启用/禁用用户
+        /// Batch enable/disable users
         /// </summary>
         [HttpPost("batch/status")]
         [Authorize(Roles = "admin,super_admin,user_manager")]
@@ -494,7 +494,7 @@ namespace Dawning.Identity.Api.Controllers
                         var user = await _userRepository.GetAsync(id);
                         if (user != null)
                         {
-                            // 保护系统用户，禁止禁用
+                            // Protect system users, prevent disabling
                             if (!request.IsActive && user.IsSystem)
                             {
                                 failedIds.Add(id);
@@ -541,7 +541,7 @@ namespace Dawning.Identity.Api.Controllers
                             failedCount = failedIds.Count,
                             failedIds,
                         },
-                        $"成功{(request.IsActive ? "启用" : "禁用")} {successCount} 个用户"
+                        $"Successfully {(request.IsActive ? "enabled" : "disabled")} {successCount} users"
                     )
                 );
             }
@@ -553,7 +553,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 修改密码
+        /// Change password
         /// </summary>
         [HttpPost("change-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -589,7 +589,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 重置密码（管理员功能）
+        /// Reset password (admin function)
         /// </summary>
         [HttpPost("{id:guid}/reset-password")]
         [Authorize(Roles = "admin,super_admin,user_manager")]
@@ -607,10 +607,10 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("Password reset for user: {UserId}", id);
 
-                // 获取用户信息
+                // Get user info
                 var user = await _userRepository.GetAsync(id);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "ResetPassword",
                     entityType: "User",
@@ -633,7 +633,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 检查用户名是否存在
+        /// Check if username exists
         /// </summary>
         [HttpGet("check-username")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -655,7 +655,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 检查邮箱是否存在
+        /// Check if email exists
         /// </summary>
         [HttpGet("check-email")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
@@ -677,12 +677,12 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 强制重置管理员账号（仅开发环境）
+        /// Force reset admin account (development environment only)
         /// </summary>
         /// <remarks>
-        /// 警告：该接口仅用于开发环境！
-        /// 会删除所有现有用户并创建新的admin账号。
-        /// 生产环境请移除此端点！
+        /// Warning: This endpoint is only for development environment!
+        /// It will delete all existing users and create a new admin account.
+        /// Please remove this endpoint in production!
         /// </remarks>
         [HttpPost("dev-reset-admin")]
         [AllowAnonymous]
@@ -746,12 +746,12 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 初始化超级管理员账号（只能调用一次）
+        /// Initialize super admin account (can only be called once)
         /// </summary>
         /// <remarks>
-        /// 该接口用于系统首次部署时创建初始超级管理员账号。
-        /// 如果系统中已存在任何用户，该接口将返回错误。
-        /// 默认账号密码：admin/admin，角色：super_admin（超级管理员）
+        /// This endpoint is used to create the initial super admin account during first system deployment.
+        /// If any users already exist in the system, this endpoint will return an error.
+        /// Default credentials: admin/admin, role: super_admin (Super Administrator)
         /// </remarks>
         [HttpPost("initialize-admin")]
         [AllowAnonymous]
@@ -764,7 +764,7 @@ namespace Dawning.Identity.Api.Controllers
             {
                 _logger.LogInformation("Attempting to initialize admin account");
 
-                // 检查系统中是否已存在任何用户
+                // Check if any users already exist in the system
                 var allUsersModel = new UserModel();
                 var existingUsers = await _userService.GetPagedListAsync(allUsersModel, 1, 1);
 
@@ -779,21 +779,21 @@ namespace Dawning.Identity.Api.Controllers
                     );
                 }
 
-                // 创建初始超级管理员账号
+                // Create initial super admin account
                 var createUserDto = new CreateUserDto
                 {
                     Username = "admin",
                     Password = "Admin@123",
                     Email = "admin@dawning.com",
-                    DisplayName = "超级管理员",
+                    DisplayName = "Super Administrator",
                     Role = "super_admin",
                     IsActive = true,
-                    IsSystem = true, // 标记为系统用户，不可删除/禁用
+                    IsSystem = true, // Mark as system user, cannot be deleted/disabled
                 };
 
                 var admin = await _userService.CreateAsync(createUserDto, null);
 
-                // 查找并分配 super_admin 角色
+                // Find and assign super_admin role
                 var superAdminRole = await _roleService.GetByNameAsync("super_admin");
                 if (superAdminRole?.Id != null)
                 {
@@ -837,11 +837,11 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 修复 admin 用户的角色分配（临时接口）
+        /// Fix admin user role assignment (temporary endpoint)
         /// </summary>
         /// <remarks>
-        /// 给 admin 用户分配 super_admin 角色。
-        /// 这是一个一次性修复接口，用于修复早期创建的 admin 用户没有角色分配的问题。
+        /// Assigns super_admin role to admin user.
+        /// This is a one-time fix endpoint for admin users created earlier without role assignment.
         /// </remarks>
         [HttpPost("fix-admin-roles")]
         [AllowAnonymous]
@@ -910,7 +910,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取用户的角色列表
+        /// Get user role list
         /// </summary>
         [HttpGet("{id:guid}/roles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -930,7 +930,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取用户详情（含角色）
+        /// Get user details (with roles)
         /// </summary>
         [HttpGet("{id:guid}/with-roles")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -955,7 +955,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 为用户分配角色
+        /// Assign roles to user
         /// </summary>
         [HttpPost("{id:guid}/roles")]
         [Authorize(Roles = "admin,super_admin")]
@@ -988,7 +988,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 移除用户的角色
+        /// Remove user role
         /// </summary>
         [HttpDelete("{userId:guid}/roles/{roleId:guid}")]
         [Authorize(Roles = "admin,super_admin")]
@@ -1019,10 +1019,10 @@ namespace Dawning.Identity.Api.Controllers
             }
         }
 
-        #region 辅助方法
+        #region Helper Methods
 
         /// <summary>
-        /// 获取当前登录用户ID
+        /// Get current logged-in user ID
         /// </summary>
         private Guid? GetCurrentUserId()
         {
@@ -1034,31 +1034,31 @@ namespace Dawning.Identity.Api.Controllers
         #endregion
     }
 
-    #region 请求模型
+    #region Request Models
 
     /// <summary>
-    /// 批量用户ID请求
+    /// Batch user IDs request
     /// </summary>
     public class BatchUserIdsRequest
     {
         /// <summary>
-        /// 用户ID列表
+        /// User ID list
         /// </summary>
         public List<Guid> Ids { get; set; } = new();
     }
 
     /// <summary>
-    /// 批量更新状态请求
+    /// Batch update status request
     /// </summary>
     public class BatchUpdateStatusRequest
     {
         /// <summary>
-        /// 用户ID列表
+        /// User ID list
         /// </summary>
         public List<Guid> Ids { get; set; } = new();
 
         /// <summary>
-        /// 是否启用
+        /// Whether to enable
         /// </summary>
         public bool IsActive { get; set; }
     }

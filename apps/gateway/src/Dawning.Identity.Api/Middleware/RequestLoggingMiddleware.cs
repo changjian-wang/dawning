@@ -12,8 +12,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Middleware
 {
     /// <summary>
-    /// 请求日志中间件
-    /// 记录所有HTTP请求的详细信息到日志文件和数据库
+    /// Request logging middleware
+    /// Records detailed information of all HTTP requests to log files and database
     /// </summary>
     public class RequestLoggingMiddleware
     {
@@ -21,7 +21,7 @@ namespace Dawning.Identity.Api.Middleware
         private readonly ILogger<RequestLoggingMiddleware> _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        // 要忽略的路径前缀
+        // Path prefixes to ignore
         private static readonly string[] IgnorePaths = new[]
         {
             "/health",
@@ -44,7 +44,7 @@ namespace Dawning.Identity.Api.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            // 跳过某些路径
+            // Skip certain paths
             if (ShouldIgnore(context.Request.Path))
             {
                 await _next(context);
@@ -56,11 +56,11 @@ namespace Dawning.Identity.Api.Middleware
             var requestTime = DateTime.UtcNow;
             string? exception = null;
 
-            // 记录请求信息到日志文件
+            // Record request info to log file
             var requestInfo = FormatRequest(context.Request, requestId);
             _logger.LogInformation(requestInfo);
 
-            // 使用 OnStarting 回调安全地添加响应头
+            // Use OnStarting callback to safely add response headers
             context.Response.OnStarting(() =>
             {
                 if (!context.Response.Headers.ContainsKey("X-Request-Id"))
@@ -72,12 +72,12 @@ namespace Dawning.Identity.Api.Middleware
 
             try
             {
-                // 直接执行下一个中间件，不拦截响应体
+                // Execute next middleware directly, don't intercept response body
                 await _next(context);
 
                 stopwatch.Stop();
 
-                // 记录响应基本信息（不读取响应体）
+                // Record response basic info (don't read response body)
                 var responseInfo =
                     $"[Response {requestId}] Status: {context.Response.StatusCode}, Time: {stopwatch.ElapsedMilliseconds}ms";
 
@@ -151,7 +151,7 @@ namespace Dawning.Identity.Api.Middleware
                     }
                     catch (Exception ex)
                     {
-                        // 日志写入失败不应影响主流程，只记录到文件日志
+                        // Log write failure should not affect main flow, only record to file log
                         _logger.LogError(ex, "Failed to log request to database (async)");
                     }
                 });
@@ -174,7 +174,7 @@ namespace Dawning.Identity.Api.Middleware
         }
 
         /// <summary>
-        /// 日志上下文，用于异步记录
+        /// Log context for async recording
         /// </summary>
         private class LogContext
         {

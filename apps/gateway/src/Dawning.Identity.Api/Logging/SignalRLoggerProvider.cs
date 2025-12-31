@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Logging
 {
     /// <summary>
-    /// SignalR 日志提供器 - 将日志推送到 SignalR Hub
+    /// SignalR logger provider - Pushes logs to SignalR Hub
     /// </summary>
     public class SignalRLoggerProvider : ILoggerProvider
     {
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Api.Logging
     }
 
     /// <summary>
-    /// SignalR 日志记录器
+    /// SignalR logger
     /// </summary>
     public class SignalRLogger : ILogger
     {
@@ -46,7 +46,7 @@ namespace Dawning.Identity.Api.Logging
         private readonly IServiceProvider _serviceProvider;
         private readonly LogLevel _minLevel;
 
-        // 排除的类别（避免循环日志）
+        // Excluded categories (to avoid circular logging)
         private static readonly HashSet<string> ExcludedCategories = new(
             StringComparer.OrdinalIgnoreCase
         )
@@ -77,11 +77,11 @@ namespace Dawning.Identity.Api.Logging
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            // 检查日志级别
+            // Check log level
             if (logLevel < _minLevel)
                 return false;
 
-            // 排除特定类别避免循环
+            // Exclude specific categories to avoid circular logging
             foreach (var excluded in ExcludedCategories)
             {
                 if (_categoryName.StartsWith(excluded, StringComparison.OrdinalIgnoreCase))
@@ -104,7 +104,7 @@ namespace Dawning.Identity.Api.Logging
 
             try
             {
-                // 使用 fire-and-forget 模式推送日志
+                // Use fire-and-forget pattern to push logs
                 _ = Task.Run(async () =>
                 {
                     try
@@ -130,34 +130,34 @@ namespace Dawning.Identity.Api.Logging
                     }
                     catch
                     {
-                        // 忽略推送失败，避免影响正常日志流程
+                        // Ignore push failures to avoid affecting normal logging flow
                     }
                 });
             }
             catch
             {
-                // 忽略任何错误
+                // Ignore any errors
             }
         }
 
         private static string? GetRequestId()
         {
-            // 尝试从 AsyncLocal 或 Activity 获取请求ID
+            // Try to get request ID from AsyncLocal or Activity
             return System.Diagnostics.Activity.Current?.Id;
         }
     }
 
     /// <summary>
-    /// SignalR 日志扩展方法
+    /// SignalR logger extension methods
     /// </summary>
     public static class SignalRLoggerExtensions
     {
         /// <summary>
-        /// 添加 SignalR 日志提供器
+        /// Add SignalR logger provider
         /// </summary>
-        /// <param name="builder">日志构建器</param>
-        /// <param name="serviceProvider">服务提供器</param>
-        /// <param name="minLevel">最小日志级别（默认 Information）</param>
+        /// <param name="builder">Logging builder</param>
+        /// <param name="serviceProvider">Service provider</param>
+        /// <param name="minLevel">Minimum log level (default Information)</param>
         public static ILoggingBuilder AddSignalRLogger(
             this ILoggingBuilder builder,
             IServiceProvider serviceProvider,

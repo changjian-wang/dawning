@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Gateway
 {
     /// <summary>
-    /// 限流策略管理控制器
+    /// Rate limit policy management controller
     /// </summary>
     [ApiVersion("1.0")]
     [Route("api/rate-limit")]
@@ -25,7 +25,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         #region Rate Limit Policies
 
         /// <summary>
-        /// 获取所有限流策略
+        /// Get all rate limit policies
         /// </summary>
         [HttpGet("policies")]
         public async Task<IActionResult> GetAllPolicies()
@@ -35,7 +35,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 获取限流策略详情
+        /// Get rate limit policy details
         /// </summary>
         [HttpGet("policies/{id}")]
         public async Task<IActionResult> GetPolicy(Guid id)
@@ -48,13 +48,13 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 创建限流策略
+        /// Create rate limit policy
         /// </summary>
         [HttpPost("policies")]
         [Authorize(Policy = "SystemAdmin")]
         public async Task<IActionResult> CreatePolicy([FromBody] CreateRateLimitPolicyDto dto)
         {
-            // 检查名称是否已存在
+            // Check if name already exists
             var existing = await _rateLimitService.GetPolicyByNameAsync(dto.Name);
             if (existing != null)
                 return BadRequest(new { success = false, message = "Policy name already exists" });
@@ -64,7 +64,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 更新限流策略
+        /// Update rate limit policy
         /// </summary>
         [HttpPut("policies/{id}")]
         [Authorize(Policy = "SystemAdmin")]
@@ -79,7 +79,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 删除限流策略
+        /// Delete rate limit policy
         /// </summary>
         [HttpDelete("policies/{id}")]
         [Authorize(Policy = "SystemAdmin")]
@@ -94,7 +94,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         #region IP Access Rules
 
         /// <summary>
-        /// 获取 IP 访问规则列表（分页）
+        /// Get IP access rules list (paginated)
         /// </summary>
         [HttpGet("ip-rules")]
         public async Task<IActionResult> GetIpRules(
@@ -127,7 +127,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 获取 IP 规则详情
+        /// Get IP rule details
         /// </summary>
         [HttpGet("ip-rules/{id}")]
         public async Task<IActionResult> GetIpRule(Guid id)
@@ -140,7 +140,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 获取活跃的黑名单
+        /// Get active blacklist
         /// </summary>
         [HttpGet("ip-rules/blacklist")]
         public async Task<IActionResult> GetBlacklist()
@@ -150,7 +150,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 获取活跃的白名单
+        /// Get active whitelist
         /// </summary>
         [HttpGet("ip-rules/whitelist")]
         public async Task<IActionResult> GetWhitelist()
@@ -160,7 +160,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 创建 IP 规则
+        /// Create IP rule
         /// </summary>
         [HttpPost("ip-rules")]
         [Authorize(Policy = "SystemAdmin")]
@@ -172,7 +172,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 更新 IP 规则
+        /// Update IP rule
         /// </summary>
         [HttpPut("ip-rules/{id}")]
         [Authorize(Policy = "SystemAdmin")]
@@ -184,7 +184,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 删除 IP 规则
+        /// Delete IP rule
         /// </summary>
         [HttpDelete("ip-rules/{id}")]
         [Authorize(Policy = "SystemAdmin")]
@@ -195,7 +195,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 检查 IP 是否在黑名单中
+        /// Check if IP is in blacklist
         /// </summary>
         [HttpGet("check-blacklist")]
         public async Task<IActionResult> CheckBlacklist([FromQuery] string ip)
@@ -205,7 +205,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 检查 IP 是否在白名单中
+        /// Check if IP is in whitelist
         /// </summary>
         [HttpGet("check-whitelist")]
         public async Task<IActionResult> CheckWhitelist([FromQuery] string ip)

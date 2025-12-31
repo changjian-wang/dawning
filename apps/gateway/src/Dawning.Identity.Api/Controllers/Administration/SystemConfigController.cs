@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// 系统配置控制器
+    /// System configuration controller
     /// </summary>
     [ApiVersion("1.0")]
     [Route("api/system-config")]
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取所有配置分组
+        /// Get all configuration groups
         /// </summary>
         [HttpGet("groups")]
         public async Task<IActionResult> GetGroups()
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取分组下的配置
+        /// Get configurations under a group
         /// </summary>
         [HttpGet("group/{group}")]
         public async Task<IActionResult> GetByGroup(string group)
@@ -48,7 +48,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取配置值
+        /// Get configuration value
         /// </summary>
         [HttpGet("{group}/{key}")]
         public async Task<IActionResult> GetValue(string group, string key)
@@ -58,7 +58,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 设置配置值
+        /// Set configuration value
         /// </summary>
         [HttpPost("{group}/{key}")]
         [Authorize(Policy = "SystemAdmin")]
@@ -81,7 +81,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "SetConfig",
                     "SystemConfig",
                     Guid.Empty,
-                    $"设置配置: {group}.{key}",
+                    $"Set configuration: {group}.{key}",
                     null,
                     new
                     {
@@ -96,7 +96,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 批量更新配置
+        /// Batch update configurations
         /// </summary>
         [HttpPost("batch")]
         [Authorize(Policy = "SystemAdmin")]
@@ -111,7 +111,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "BatchUpdateConfig",
                     "SystemConfig",
                     Guid.Empty,
-                    $"批量更新配置，数量: {configCount}",
+                    $"Batch updated configurations, count: {configCount}",
                     null,
                     new { ConfigCount = configCount }
                 );
@@ -121,7 +121,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除配置
+        /// Delete configuration
         /// </summary>
         [HttpDelete("{group}/{key}")]
         [Authorize(Policy = "SystemAdmin")]
@@ -135,7 +135,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "DeleteConfig",
                     "SystemConfig",
                     Guid.Empty,
-                    $"删除配置: {group}.{key}"
+                    $"Deleted configuration: {group}.{key}"
                 );
             }
 
@@ -143,7 +143,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取配置更新时间戳（用于热更新检测）
+        /// Get configuration update timestamp (for hot reload detection)
         /// </summary>
         [HttpGet("timestamp")]
         public async Task<IActionResult> GetTimestamp()

@@ -8,8 +8,8 @@ using MySql.Data.MySqlClient;
 namespace Dawning.Examples
 {
     /// <summary>
-    /// QueryBuilder 实际使用示例
-    /// 涵盖常见业务场景，帮助发现可优化之处
+    /// QueryBuilder practical usage examples
+    /// Covers common business scenarios to help identify optimization opportunities
     /// </summary>
     public class QueryBuilderExamples
     {
@@ -20,10 +20,10 @@ namespace Dawning.Examples
             _connection = connection;
         }
 
-        #region 场景1：简单条件查询
+        #region Scenario 1: Simple Condition Queries
 
         /// <summary>
-        /// 场景1A：单条件查询（最基础）
+        /// Scenario 1A: Single condition query (most basic)
         /// </summary>
         public List<User> GetActiveUsers()
         {
@@ -36,27 +36,27 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景1B：多条件 AND 查询
+        /// Scenario 1B: Multiple condition AND query
         /// </summary>
         public List<User> GetActiveAdminUsers()
         {
             return _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
-                .Where(x => x.Role == "Admin") // 🤔 是否需要支持链式 AND？
+                .Where(x => x.Role == "Admin") // 🤔 Should we support chained AND?
                 .OrderBy(x => x.Username)
                 .AsList()
                 .ToList();
         }
 
         /// <summary>
-        /// 场景1C：可选条件查询
+        /// Scenario 1C: Optional condition query
         /// </summary>
         public List<User> SearchUsers(string? keyword, bool? isActive, string? role)
         {
             var builder = _connection.Builder<User>();
 
-            // 🤔 这种写法是否够优雅？
+            // 🤔 Is this pattern elegant enough?
             if (!string.IsNullOrEmpty(keyword))
             {
                 builder.Where(x => x.Username.Contains(keyword) || x.Email.Contains(keyword));
@@ -77,14 +77,14 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景2：复杂条件查询
+        #region Scenario 2: Complex Condition Queries
 
         /// <summary>
-        /// 场景2A：OR 条件查询
+        /// Scenario 2A: OR condition query
         /// </summary>
         public List<User> GetAdminOrSuperUsers()
         {
-            // ✅ 当前写法
+            // ✅ Current implementation
             return _connection
                 .Builder<User>()
                 .Where(x => x.Role == "Admin" || x.Role == "SuperAdmin")
@@ -94,11 +94,11 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景2B：IN 查询（集合）
+        /// Scenario 2B: IN query (collection)
         /// </summary>
         public List<User> GetUsersByRoles(List<string> roles)
         {
-            // ✅ 当前写法
+            // ✅ Current implementation
             return _connection
                 .Builder<User>()
                 .Where(x => roles.Contains(x.Role))
@@ -109,11 +109,11 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景2C：NOT IN 查询
+        /// Scenario 2C: NOT IN query
         /// </summary>
         public List<User> GetUsersExcludingRoles(List<string> excludedRoles)
         {
-            // ✅ 当前写法
+            // ✅ Current implementation
             return _connection
                 .Builder<User>()
                 .Where(x => !excludedRoles.Contains(x.Role))
@@ -123,7 +123,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景2D：范围查询
+        /// Scenario 2D: Range query
         /// </summary>
         public List<User> GetUsersByAgeRange(int minAge, int maxAge)
         {
@@ -135,7 +135,7 @@ namespace Dawning.Examples
                 .AsList()
                 .ToList();
 
-            // 🤔 是否需要支持 BETWEEN 语法？
+            // 🤔 Should we support BETWEEN syntax?
             // return _connection.Builder<User>()
             //     .WhereBetween(x => x.Age, minAge, maxAge)
             //     .OrderBy(x => x.Age)
@@ -144,7 +144,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景2E：日期范围查询
+        /// Scenario 2E: Date range query
         /// </summary>
         public List<User> GetUsersByDateRange(DateTime startDate, DateTime endDate)
         {
@@ -159,10 +159,10 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景3：分页查询
+        #region Scenario 3: Pagination Queries
 
         /// <summary>
-        /// 场景3A：标准分页（需要总数）
+        /// Scenario 3A: Standard pagination (requires total count)
         /// </summary>
         public PagedResult<User> GetUsersPaged(int page, int pageSize)
         {
@@ -174,7 +174,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景3B：轻量级分页（不需要总数）
+        /// Scenario 3B: Lightweight pagination (no total count needed)
         /// </summary>
         public List<User> GetUsersLightPaged(int page, int pageSize)
         {
@@ -189,7 +189,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景3C：移动端"加载更多"
+        /// Scenario 3C: Mobile "load more"
         /// </summary>
         public List<User> LoadMoreUsers(int lastLoadedCount, int batchSize)
         {
@@ -204,7 +204,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景3D：Top N 查询
+        /// Scenario 3D: Top N query
         /// </summary>
         public List<User> GetTopUsers(int count)
         {
@@ -219,10 +219,10 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景4：单条记录查询
+        #region Scenario 4: Single Record Queries
 
         /// <summary>
-        /// 场景4A：根据条件获取第一条
+        /// Scenario 4A: Get first record by condition
         /// </summary>
         public User? GetLatestUser()
         {
@@ -234,7 +234,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景4B：根据唯一键查询
+        /// Scenario 4B: Query by unique key
         /// </summary>
         public User? GetUserByUsername(string username)
         {
@@ -242,7 +242,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景4C：查询并验证存在性
+        /// Scenario 4C: Query and verify existence
         /// </summary>
         public User GetRequiredUser(Guid userId)
         {
@@ -258,10 +258,10 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景5：计数与存在性检查
+        #region Scenario 5: Count and Existence Checks
 
         /// <summary>
-        /// 场景5A：统计符合条件的记录数
+        /// Scenario 5A: Count records matching condition
         /// </summary>
         public long GetActiveUserCount()
         {
@@ -269,7 +269,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景5B：检查数据是否存在
+        /// Scenario 5B: Check if data exists
         /// </summary>
         public bool IsUsernameExists(string username)
         {
@@ -277,7 +277,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景5C：检查数据是否不存在
+        /// Scenario 5C: Check if data does not exist
         /// </summary>
         public bool IsEmailAvailable(string email)
         {
@@ -285,27 +285,27 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景5D：业务逻辑验证
+        /// Scenario 5D: Business logic validation
         /// </summary>
         public void ValidateUserCreation(string username, string email)
         {
             if (_connection.Builder<User>().Where(x => x.Username == username).Any())
             {
-                throw new Exception("用户名已存在");
+                throw new Exception("Username already exists");
             }
 
             if (_connection.Builder<User>().Where(x => x.Email == email).Any())
             {
-                throw new Exception("邮箱已被使用");
+                throw new Exception("Email is already in use");
             }
         }
 
         #endregion
 
-        #region 场景6：复杂排序
+        #region Scenario 6: Complex Sorting
 
         /// <summary>
-        /// 场景6A：多列排序
+        /// Scenario 6A: Multi-column sorting
         /// </summary>
         public List<User> GetUsersSortedByDepartmentAndSalary()
         {
@@ -320,27 +320,27 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景6B：动态排序
+        /// Scenario 6B: Dynamic sorting
         /// </summary>
         public List<User> GetUsersDynamicSort(string sortBy, bool ascending)
         {
-            // ✅ 新方法：直接使用字符串排序（更简洁）
+            // ✅ New approach: Use string sorting directly (cleaner)
             return _connection
                 .Builder<User>()
                 .Where(x => !x.IsDeleted)
-                .OrderBy(sortBy, ascending) // 字符串排序，自动验证列名
+                .OrderBy(sortBy, ascending) // String sorting, automatically validates column name
                 .AsList()
                 .ToList();
 
-            // 📝 支持的写法：
-            // 1. OrderBy("Username", true)      - 按用户名升序
-            // 2. OrderBy("CreatedAt", false)    - 按创建时间降序
-            // 3. OrderBy("Email")               - 默认升序
-            // 4. ThenBy("Id", true)             - 二次排序
+            // 📝 Supported patterns:
+            // 1. OrderBy("Username", true)      - Sort by username ascending
+            // 2. OrderBy("CreatedAt", false)    - Sort by creation time descending
+            // 3. OrderBy("Email")               - Default ascending
+            // 4. ThenBy("Id", true)             - Secondary sort
         }
 
         /// <summary>
-        /// 场景6C：复杂动态排序（多列）
+        /// Scenario 6C: Complex dynamic sorting (multi-column)
         /// </summary>
         public List<User> GetUsersDynamicMultiSort(
             string primarySort,
@@ -352,17 +352,17 @@ namespace Dawning.Examples
                 .Builder<User>()
                 .Where(x => !x.IsDeleted)
                 .OrderBy(primarySort, ascending)
-                .ThenBy(secondarySort, true) // 二次排序也支持字符串
+                .ThenBy(secondarySort, true) // Secondary sort also supports string
                 .AsList()
                 .ToList();
         }
 
         #endregion
 
-        #region 场景7：字符串模糊查询
+        #region Scenario 7: String Fuzzy Queries
 
         /// <summary>
-        /// 场景7A：前缀匹配
+        /// Scenario 7A: Prefix matching
         /// </summary>
         public List<User> SearchUsersByPrefix(string prefix)
         {
@@ -376,7 +376,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景7B：后缀匹配
+        /// Scenario 7B: Suffix matching
         /// </summary>
         public List<User> SearchUsersByEmailDomain(string domain)
         {
@@ -389,7 +389,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景7C：包含匹配（模糊查询）
+        /// Scenario 7C: Contains matching (fuzzy query)
         /// </summary>
         public List<User> SearchUsersByKeyword(string keyword)
         {
@@ -408,10 +408,10 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景8：NULL 值处理
+        #region Scenario 8: NULL Value Handling
 
         /// <summary>
-        /// 场景8A：查询 NULL 值
+        /// Scenario 8A: Query NULL values
         /// </summary>
         public List<User> GetUsersWithoutEmail()
         {
@@ -424,7 +424,7 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景8B：查询非 NULL 值
+        /// Scenario 8B: Query non-NULL values
         /// </summary>
         public List<User> GetUsersWithEmail()
         {
@@ -437,13 +437,13 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景8C：可选参数的 NULL 处理
+        /// Scenario 8C: Optional parameter NULL handling
         /// </summary>
         public List<User> SearchUsersWithOptionalEmail(string? email)
         {
             var builder = _connection.Builder<User>().Where(x => !x.IsDeleted);
 
-            // 🤔 这种写法比较冗长
+            // 🤔 This pattern is quite verbose
             if (!string.IsNullOrEmpty(email))
             {
                 builder.Where(x => x.Email == email);
@@ -451,7 +451,7 @@ namespace Dawning.Examples
 
             return builder.OrderByDescending(x => x.CreatedAt).AsList().ToList();
 
-            // 💡 当前可以简化为：
+            // 💡 Can be simplified to:
             // return _connection.Builder<User>()
             //     .Where(x => !x.IsDeleted)
             //     .WhereIf(!string.IsNullOrEmpty(email), x => x.Email == email)
@@ -462,32 +462,32 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景9：性能优化场景
+        #region Scenario 9: Performance Optimization
 
         /// <summary>
-        /// 场景9A：只需要 ID 列表
+        /// Scenario 9A: Only need ID list
         /// </summary>
         public List<Guid> GetActiveUserIds()
         {
-            // ✅ 新方法：直接投影到 ID 列（性能更好）
+            // ✅ New approach: Project directly to ID column (better performance)
             return _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
-                .Select(x => x.Id) // 只查询 Id 列
+                .Select(x => x.Id) // Query only Id column
                 .AsList()
-                .Select(x => x.Id) // 映射到 Guid 列表
+                .Select(x => x.Id) // Map to Guid list
                 .ToList();
 
-            // 📝 生成的 SQL：
+            // 📝 Generated SQL:
             // SELECT Id FROM Users WHERE IsActive = @IsActive
         }
 
         /// <summary>
-        /// 场景9B：只需要部分字段
+        /// Scenario 9B: Only need partial fields
         /// </summary>
         public List<UserSummary> GetUserSummaries()
         {
-            // ✅ 新方法：投影到多个字段（减少数据传输）
+            // ✅ New approach: Project to multiple fields (reduce data transfer)
             var users = _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
@@ -496,7 +496,7 @@ namespace Dawning.Examples
                     x.Id,
                     x.Username,
                     x.Email,
-                }) // 只查询需要的字段
+                }) // Query only needed fields
                 .AsList();
 
             return users
@@ -508,30 +508,30 @@ namespace Dawning.Examples
                 })
                 .ToList();
 
-            // 📝 生成的 SQL：
+            // 📝 Generated SQL:
             // SELECT Id, Username, Email FROM Users WHERE IsActive = @IsActive
         }
 
         /// <summary>
-        /// 场景9C：字符串方式指定列（动态场景）
+        /// Scenario 9C: Specify columns using strings (dynamic scenario)
         /// </summary>
         public List<User> GetUsersWithSpecificColumns(List<string> columnNames)
         {
             return _connection
                 .Builder<User>()
                 .Where(x => !x.IsDeleted)
-                .Select(columnNames.ToArray()) // 动态指定列名
+                .Select(columnNames.ToArray()) // Dynamically specify column names
                 .OrderByDescending(x => x.CreatedAt)
                 .Take(100)
                 .AsList()
                 .ToList();
 
-            // 示例：columnNames = ["Id", "Username", "Email"]
-            // 生成：SELECT Id, Username, Email FROM Users WHERE ...
+            // Example: columnNames = ["Id", "Username", "Email"]
+            // Generates: SELECT Id, Username, Email FROM Users WHERE ...
         }
 
         /// <summary>
-        /// 场景9C：分页时同时需要计数
+        /// Scenario 9C: Need count along with pagination
         /// </summary>
         public (List<User> Users, long TotalCount) GetUsersWithCount(int page, int pageSize)
         {
@@ -540,27 +540,27 @@ namespace Dawning.Examples
                 .Where(x => !x.IsDeleted)
                 .OrderByDescending(x => x.CreatedAt);
 
-            // 🤔 需要创建两次 Builder，能否优化？
+            // 🤔 Need to create Builder twice, can this be optimized?
             var count = builder.Count();
             var users = builder.Skip((page - 1) * pageSize).Take(pageSize).AsList().ToList();
 
             return (users, count);
 
-            // ✅ 或者直接使用 AsPagedList（更推荐）
+            // ✅ Or use AsPagedList directly (recommended)
             // var result = builder.AsPagedList(page, pageSize);
             // return (result.Values.ToList(), result.TotalItems);
         }
 
         #endregion
 
-        #region 场景10：去重查询
+        #region Scenario 10: Distinct Queries
 
         /// <summary>
-        /// 场景10A：获取所有不同的角色
+        /// Scenario 10A: Get all distinct roles
         /// </summary>
         public List<string> GetAllDistinctRoles()
         {
-            // ✅ 使用 Distinct 去重
+            // ✅ Use Distinct for deduplication
             return _connection
                 .Builder<User>()
                 .Where(x => !x.IsDeleted)
@@ -570,19 +570,19 @@ namespace Dawning.Examples
                 .Select(x => x.Role)
                 .ToList();
 
-            // 📝 生成的 SQL：
+            // 📝 Generated SQL:
             // SELECT DISTINCT Role FROM Users WHERE IsDeleted = @IsDeleted
         }
 
         /// <summary>
-        /// 场景10B：获取所有部门（去重）
+        /// Scenario 10B: Get all departments (distinct)
         /// </summary>
         public List<string> GetAllDepartments()
         {
             return _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
-                .Select("DepartmentId") // 字符串方式
+                .Select("DepartmentId") // String method
                 .Distinct()
                 .AsList()
                 .Select(x => x.DepartmentId)
@@ -590,11 +590,11 @@ namespace Dawning.Examples
         }
 
         /// <summary>
-        /// 场景10C：获取活跃用户的邮箱域名（去重）
+        /// Scenario 10C: Get distinct email domains from active users
         /// </summary>
         public List<string> GetDistinctEmailDomains()
         {
-            // 需要在应用层处理，因为 SQL 不支持复杂表达式的 DISTINCT
+            // Need to handle in application layer since SQL doesn't support DISTINCT on complex expressions
             var emails = _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
@@ -613,10 +613,10 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景11：事务中使用
+        #region Scenario 11: Using in Transactions
 
         /// <summary>
-        /// 场景10：事务中的批量操作
+        /// Scenario 11: Batch operations in transaction
         /// </summary>
         public void TransferUsersToNewDepartment(List<Guid> userIds, string newDepartment)
         {
@@ -624,21 +624,21 @@ namespace Dawning.Examples
             {
                 try
                 {
-                    // 1. 查询需要更新的用户
+                    // 1. Query users to update
                     var users = _connection
                         .Builder<User>()
                         .Where(x => userIds.Contains(x.Id))
                         .AsList()
                         .ToList();
 
-                    // 2. 更新部门
+                    // 2. Update department
                     foreach (var user in users)
                     {
                         user.DepartmentId = newDepartment;
                         _connection.Update(user, transaction);
                     }
 
-                    // 3. 验证更新结果
+                    // 3. Verify update results
                     var updatedCount = _connection
                         .Builder<User>()
                         .Where(x => userIds.Contains(x.Id))
@@ -647,7 +647,7 @@ namespace Dawning.Examples
 
                     if (updatedCount != userIds.Count)
                     {
-                        throw new Exception("部分用户更新失败");
+                        throw new Exception("Some users failed to update");
                     }
 
                     transaction.Commit();
@@ -662,16 +662,16 @@ namespace Dawning.Examples
 
         #endregion
 
-        #region 场景12：复杂业务逻辑（推荐架构）
+        #region Scenario 12: Complex Business Logic (Recommended Architecture)
 
         /// <summary>
-        /// 场景12A：用户订单统计（分离查询 + C# 聚合）
+        /// Scenario 12A: User order statistics (separate queries + C# aggregation)
         /// </summary>
         public List<UserOrderStats> GetUserOrderStatistics()
         {
-            // ✅ 推荐：分离查询 + C# 内存聚合（性能更好）
+            // ✅ Recommended: Separate queries + C# in-memory aggregation (better performance)
 
-            // 1. 查询用户（QueryBuilder，简单高效）
+            // 1. Query users (QueryBuilder, simple and efficient)
             var users = _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
@@ -681,7 +681,7 @@ namespace Dawning.Examples
 
             var userIds = users.Select(x => x.Id).ToList();
 
-            // 2. 查询订单（QueryBuilder + IN，带索引查询）
+            // 2. Query orders (QueryBuilder + IN, indexed query)
             var orders = _connection
                 .Builder<Order>()
                 .Where(x => userIds.Contains(x.UserId))
@@ -690,7 +690,7 @@ namespace Dawning.Examples
                 .AsList()
                 .ToList();
 
-            // 3. C# 内存聚合（LINQ，微秒级性能）
+            // 3. C# in-memory aggregation (LINQ, microsecond-level performance)
             var orderStats = orders
                 .GroupBy(o => o.UserId)
                 .ToDictionary(
@@ -698,7 +698,7 @@ namespace Dawning.Examples
                     g => new { Count = g.Count(), Total = g.Sum(o => o.Amount) }
                 );
 
-            // 4. 内存关联（O(1) 字典查找）
+            // 4. In-memory association (O(1) dictionary lookup)
             return users
                 .Select(u => new UserOrderStats
                 {
@@ -709,20 +709,20 @@ namespace Dawning.Examples
                 })
                 .ToList();
 
-            // 📊 性能对比：
-            // ❌ SQL JOIN + GROUP BY: 10-30 秒（100万用户）
-            // ✅ 分离查询 + C# 聚合: 2-5 秒
-            // ✅ 分离查询 + Redis 缓存: 0.1-0.5 秒
+            // 📊 Performance comparison:
+            // ❌ SQL JOIN + GROUP BY: 10-30 seconds (1 million users)
+            // ✅ Separate queries + C# aggregation: 2-5 seconds
+            // ✅ Separate queries + Redis cache: 0.1-0.5 seconds
         }
 
         /// <summary>
-        /// 场景12B：多表关联（分离查询 + C# 关联）
+        /// Scenario 12B: Multi-table association (separate queries + C# association)
         /// </summary>
         public List<UserWithDepartment> GetUsersWithDepartments()
         {
-            // ✅ 推荐：分离查询 + C# 内存关联（可缓存，易扩展）
+            // ✅ Recommended: Separate queries + C# in-memory association (cacheable, extensible)
 
-            // 1. 查询用户
+            // 1. Query users
             var users = _connection
                 .Builder<User>()
                 .Where(x => x.IsActive)
@@ -735,17 +735,17 @@ namespace Dawning.Examples
                 .AsList()
                 .ToList();
 
-            // 2. 获取部门ID列表
+            // 2. Get department ID list
             var departmentIds = users.Select(x => x.DepartmentId).Distinct().ToList();
 
-            // 3. 查询部门（一次批量查询）
+            // 3. Query departments (single batch query)
             var departments = _connection
                 .Builder<Department>()
                 .Where(x => departmentIds.Contains(x.Id))
                 .AsList()
-                .ToDictionary(x => x.Id); // 转为字典，O(1) 查找
+                .ToDictionary(x => x.Id); // Convert to dictionary, O(1) lookup
 
-            // 4. C# 内存关联（高效）
+            // 4. C# in-memory association (efficient)
             return users
                 .Select(u => new UserWithDepartment
                 {
@@ -757,21 +757,21 @@ namespace Dawning.Examples
                 })
                 .ToList();
 
-            // 优势：
-            // ✅ 两次简单查询（带索引，极快）
-            // ✅ 可独立缓存用户和部门
-            // ✅ 支持分库分表
-            // ✅ 易于维护和调试
+            // Advantages:
+            // ✅ Two simple queries (indexed, very fast)
+            // ✅ Can independently cache users and departments
+            // ✅ Supports database sharding
+            // ✅ Easy to maintain and debug
         }
 
         /// <summary>
-        /// 场景12C：角色用户统计（C# 分组）
+        /// Scenario 12C: Role user statistics (C# grouping)
         /// </summary>
         public Dictionary<string, int> GetUserCountByRole()
         {
-            // ✅ 推荐：查询数据 + C# 分组（比 SQL GROUP BY 更灵活）
+            // ✅ Recommended: Query data + C# grouping (more flexible than SQL GROUP BY)
 
-            // 1. 查询所有用户的角色（只查询需要的列）
+            // 1. Query all user roles (only needed columns)
             var roles = _connection
                 .Builder<User>()
                 .Where(x => !x.IsDeleted)
@@ -780,12 +780,12 @@ namespace Dawning.Examples
                 .Select(x => x.Role)
                 .ToList();
 
-            // 2. C# 内存分组统计（LINQ，性能极高）
+            // 2. C# in-memory grouping statistics (LINQ, extremely high performance)
             var result = roles.GroupBy(r => r).ToDictionary(g => g.Key, g => g.Count());
 
             return result;
 
-            // 📝 如果需要更复杂的统计：
+            // 📝 For more complex statistics:
             // var stats = users
             //     .GroupBy(u => u.Role)
             //     .Select(g => new RoleStats
@@ -795,17 +795,17 @@ namespace Dawning.Examples
             //         ActiveCount = g.Count(u => u.IsActive),
             //         AvgAge = g.Average(u => u.Age)
             //     })
-            //     .Where(s => s.UserCount > 10)  // 类似 HAVING
+            //     .Where(s => s.UserCount > 10)  // Similar to HAVING
             //     .OrderByDescending(s => s.UserCount)
             //     .ToList();
         }
 
         #endregion
 
-        #region 场景13：大数据量处理（分页批量处理）
+        #region Scenario 13: Large Data Processing (Paginated Batch Processing)
 
         /// <summary>
-        /// 场景13：处理大数据集（避免内存溢出）
+        /// Scenario 13: Process large datasets (avoid memory overflow)
         /// </summary>
         public async Task ProcessLargeDatasetAsync()
         {
@@ -815,152 +815,152 @@ namespace Dawning.Examples
 
             while (true)
             {
-                // ✅ 使用 Skip/Take 分页查询
+                // ✅ Use Skip/Take for paginated queries
                 var batch = _connection
                     .Builder<User>()
                     .Where(x => x.IsActive)
                     .Where(x => !x.IsDeleted)
-                    .OrderBy(x => x.Id) // 保证顺序一致性
+                    .OrderBy(x => x.Id) // Ensure order consistency
                     .Select(x => new
                     {
                         x.Id,
                         x.Email,
                         x.Username,
-                    }) // 只查询需要的列
+                    }) // Query only needed columns
                     .Skip(skipCount)
                     .Take(batchSize)
                     .AsList();
 
                 if (batch.Count == 0)
-                    break; // 没有更多数据
+                    break; // No more data
 
-                // 处理当前批次
+                // Process current batch
                 foreach (var user in batch)
                 {
-                    // 执行业务逻辑（如：发送邮件、更新数据等）
+                    // Execute business logic (e.g., send email, update data, etc.)
                     await ProcessUserAsync(user.Id, user.Email);
                     processedCount++;
                 }
 
                 skipCount += batchSize;
 
-                // 日志记录
-                Console.WriteLine($"已处理 {processedCount} 条数据");
+                // Log progress
+                Console.WriteLine($"Processed {processedCount} records");
             }
 
-            // 📝 性能说明：
-            // - 每次只加载 1000 条到内存
-            // - Select 减少数据传输（假设 User 表有 20 个字段，只查 3 个字段 = 85% 减少）
-            // - OrderBy 保证分页一致性
-            // - 适合处理百万级数据
+            // 📝 Performance notes:
+            // - Load only 1000 records to memory each time
+            // - Select reduces data transfer (e.g., User table has 20 fields, querying 3 = 85% reduction)
+            // - OrderBy ensures pagination consistency
+            // - Suitable for processing millions of records
         }
 
         private Task ProcessUserAsync(Guid userId, string email)
         {
-            // 模拟业务处理
+            // Simulate business processing
             return Task.CompletedTask;
         }
 
         #endregion
 
-        #region 场景13：性能优化案例（真实场景）
+        #region Scenario 14: Performance Optimization Cases (Real Scenarios)
 
         /*
-         * 📊 使用体验分析与优化建议
+         * 📊 Usage Experience Analysis and Optimization Suggestions
          *
-         * ✅ 当前已实现的功能（完整度 95%）：
-         * 1. Where/WhereIf - 灵活的条件构建
-         * 2. OrderBy/ThenBy - 多列排序支持（表达式 + 字符串）✨ NEW
-         * 3. FirstOrDefault - 高效单条查询
-         * 4. Count/Any/None - 高效计数判断
-         * 5. Take/Skip - 灵活分页控制
-         * 6. Select - 列投影支持（减少数据传输）✨ NEW
-         * 7. Distinct - 去重查询 ✨ NEW
-         * 8. NULL 值处理 - 自动转换 IS NULL
-         * 9. LIKE 转义 - 自动处理特殊字符
-         * 10. 参数化查询 - 防 SQL 注入
-         * 11. 多数据库兼容 - 6 种数据库适配
+         * ✅ Currently Implemented Features (95% Complete):
+         * 1. Where/WhereIf - Flexible condition building
+         * 2. OrderBy/ThenBy - Multi-column sorting support (expression + string) ✨ NEW
+         * 3. FirstOrDefault - Efficient single record query
+         * 4. Count/Any/None - Efficient counting and existence checks
+         * 5. Take/Skip - Flexible pagination control
+         * 6. Select - Column projection support (reduces data transfer) ✨ NEW
+         * 7. Distinct - Deduplication query ✨ NEW
+         * 8. NULL value handling - Automatic conversion to IS NULL
+         * 9. LIKE escaping - Automatic handling of special characters
+         * 10. Parameterized queries - SQL injection prevention
+         * 11. Multi-database compatibility - 6 database adapters
          *
-         * 🎯 本次新增功能：
+         * 🎯 New Features Added:
          *
-         * ⭐⭐⭐ 高优先级（已实现）：
-         * 1. ✅ 动态排序字符串支持
-         *    - OrderBy("Username", true) - 按字符串排序
-         *    - ThenBy("CreatedAt", false) - 字符串二次排序
-         *    - 自动验证列名是否存在
-         *    - 支持 [Column] 特性映射
+         * ⭐⭐⭐ High Priority (Implemented):
+         * 1. ✅ Dynamic sorting with strings
+         *    - OrderBy("Username", true) - Sort by string
+         *    - ThenBy("CreatedAt", false) - String secondary sort
+         *    - Auto-validates column name existence
+         *    - Supports [Column] attribute mapping
          *
-         * 2. ✅ Select 投影支持
-         *    - Select(x => x.Id) - 单列投影
-         *    - Select(x => new { x.Id, x.Name }) - 多列投影
-         *    - Select("Id", "Username") - 字符串方式
-         *    - 减少网络传输，提升性能
+         * 2. ✅ Select projection support
+         *    - Select(x => x.Id) - Single column projection
+         *    - Select(x => new { x.Id, x.Name }) - Multi-column projection
+         *    - Select("Id", "Username") - String method
+         *    - Reduces network transfer, improves performance
          *
-         * 3. ✅ Distinct 去重
-         *    - Distinct() - 去除重复行
-         *    - 配合 Select 使用获取唯一值列表
-         *    - 生成 SELECT DISTINCT
+         * 3. ✅ Distinct deduplication
+         *    - Distinct() - Remove duplicate rows
+         *    - Use with Select to get unique value list
+         *    - Generates SELECT DISTINCT
          *
-         * ⭐⭐ 中优先级（可选，未实现）：
-         * 4. ❌ BETWEEN 语法糖
-         *    - 场景：日期/数字范围查询
-         *    - 建议：WhereBetween(x => x.Age, 18, 65)
-         *    - 当前方案：两次 Where 也很清晰
+         * ⭐⭐ Medium Priority (Optional, Not Implemented):
+         * 4. ❌ BETWEEN syntax sugar
+         *    - Scenario: Date/number range queries
+         *    - Suggestion: WhereBetween(x => x.Age, 18, 65)
+         *    - Current approach: Two Where clauses are also clear
          *
-         * 5. ❌ IN 多值简化
-         *    - 当前已有：Where(x => list.Contains(x.Role)) ✅
-         *    - 可选增强：WhereIn(x => x.Status, "Active", "Pending")
-         *    - 优先级低，现有方案已足够
+         * 5. ❌ IN multi-value simplification
+         *    - Already available: Where(x => list.Contains(x.Role)) ✅
+         *    - Optional enhancement: WhereIn(x => x.Status, "Active", "Pending")
+         *    - Low priority, existing solution is sufficient
          *
-         * ⭐ 低优先级（延后或不实现）：
-         * 6. ❌ GroupBy 分组 - 复杂度高，建议用原生 SQL
-         * 7. ❌ 聚合函数（Sum/Max/Min/Avg）- 建议用原生 SQL
-         * 8. ❌ Join 关联查询 - 复杂度极高，建议用原生 SQL
-         * 9. ❌ Having 条件 - 依赖 GroupBy，优先级低
+         * ⭐ Low Priority (Postpone or Skip):
+         * 6. ❌ GroupBy grouping - High complexity, recommend raw SQL
+         * 7. ❌ Aggregate functions (Sum/Max/Min/Avg) - Recommend raw SQL
+         * 8. ❌ Join association queries - Very high complexity, recommend raw SQL
+         * 9. ❌ Having conditions - Depends on GroupBy, low priority
          *
-         * 💡 性能优化建议：
-         * 1. ✅ Count() 比 AsList().Count() 快 100+ 倍
-         * 2. ✅ FirstOrDefault() 比 AsList().FirstOrDefault() 快 10+ 倍
-         * 3. ✅ Any() 比 Count() > 0 更快（内部用 COUNT）
-         * 4. ✅ Take() 比 AsList().Take() 更节省内存
-         * 5. ✅ Select() 比查询全部列后过滤快（减少数据传输）✨ NEW
-         * 6. ✅ Distinct() 在数据库层去重比应用层快 ✨ NEW
-         * 7. AsPagedList 适合传统分页，Skip/Take 适合无限滚动
+         * 💡 Performance Optimization Suggestions:
+         * 1. ✅ Count() is 100+ times faster than AsList().Count()
+         * 2. ✅ FirstOrDefault() is 10+ times faster than AsList().FirstOrDefault()
+         * 3. ✅ Any() is faster than Count() > 0 (uses COUNT internally)
+         * 4. ✅ Take() saves more memory than AsList().Take()
+         * 5. ✅ Select() is faster than querying all columns and filtering (reduces data transfer) ✨ NEW
+         * 6. ✅ Distinct() at database layer is faster than application layer ✨ NEW
+         * 7. AsPagedList suits traditional pagination, Skip/Take suits infinite scroll
          *
-         * 🎯 功能完整度评估：
-         * - ✅ 基础 CRUD：100%
-         * - ✅ 条件查询：100%（支持所有常用操作符）
-         * - ✅ 排序功能：100%（表达式 + 字符串 + 多列）✨
-         * - ✅ 分页功能：100%（OFFSET + Cursor + Skip/Take）
-         * - ✅ 投影查询：100%（Select + Distinct）✨
-         * - ✅ 聚合统计：80%（Count/Any/None，其他用原生 SQL）
-         * - ❌ 分组聚合：0%（建议保持原生 SQL）
-         * - ❌ 多表关联：0%（建议保持原生 SQL）
+         * 🎯 Feature Completeness Assessment:
+         * - ✅ Basic CRUD: 100%
+         * - ✅ Condition queries: 100% (supports all common operators)
+         * - ✅ Sorting: 100% (expression + string + multi-column) ✨
+         * - ✅ Pagination: 100% (OFFSET + Cursor + Skip/Take)
+         * - ✅ Projection queries: 100% (Select + Distinct) ✨
+         * - ✅ Aggregate statistics: 80% (Count/Any/None, others use raw SQL)
+         * - ❌ Group aggregation: 0% (recommend keeping raw SQL)
+         * - ❌ Multi-table joins: 0% (recommend keeping raw SQL)
          *
-         * 📈 覆盖场景统计：
-         * - 单表查询：95% 场景覆盖（除 GroupBy/Join）
-         * - 日常开发：99% 需求满足
-         * - 复杂查询：建议混合使用（QueryBuilder + 原生 SQL）
+         * 📈 Scenario Coverage:
+         * - Single table queries: 95% coverage (except GroupBy/Join)
+         * - Daily development: 99% requirements met
+         * - Complex queries: Recommend mixed use (QueryBuilder + raw SQL)
          *
-         * 🏆 核心价值：
-         * - 类型安全 + IntelliSense 支持
-         * - SQL 注入防护
-         * - 多数据库兼容（6 种）
-         * - 性能接近原生 SQL
-         * - 代码简洁易维护
-         * - 学习成本低（类 LINQ 语法）
+         * 🏆 Core Value:
+         * - Type safety + IntelliSense support
+         * - SQL injection protection
+         * - Multi-database compatibility (6 types)
+         * - Performance close to raw SQL
+         * - Clean and maintainable code
+         * - Low learning curve (LINQ-like syntax)
          *
-         * 💬 使用建议：
-         * 1. 简单查询：优先使用 QueryBuilder（代码更清晰）
-         * 2. 复杂分析：使用原生 SQL + Dapper（灵活性更高）
-         * 3. 混合使用：QueryBuilder 构建条件 + 原生 SQL 统计
-         * 4. 性能关键：Select 指定列 + Distinct 去重 + Count 统计
+         * 💬 Usage Suggestions:
+         * 1. Simple queries: Prefer QueryBuilder (cleaner code)
+         * 2. Complex analysis: Use raw SQL + Dapper (more flexible)
+         * 3. Mixed use: QueryBuilder for conditions + raw SQL for statistics
+         * 4. Performance critical: Select specific columns + Distinct + Count
          */
 
         #endregion
     }
 
-    #region 示例实体类
+    #region Example Entity Classes
 
     public class User
     {

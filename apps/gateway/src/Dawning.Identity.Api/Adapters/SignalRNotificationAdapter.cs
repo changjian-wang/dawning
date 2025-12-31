@@ -27,7 +27,7 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
     {
         try
         {
-            // 转换为 SignalR 通知模型
+            // Convert to SignalR notification model
             var notification = new AlertNotification
             {
                 Id = alert.Id,
@@ -44,12 +44,12 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 Data = alert.Data,
             };
 
-            // 发送给订阅了 alerts 频道的用户
+            // Send to users subscribed to alerts channel
             await _hubContext
                 .Clients.Group("channel_alerts")
                 .SendAsync("AlertReceived", notification);
 
-            // 同时发送给管理员
+            // Also send to administrators
             await _hubContext.Clients.Group("role_admin").SendAsync("AlertReceived", notification);
 
             await _hubContext
@@ -145,10 +145,10 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
     {
         try
         {
-            // 推送到所有订阅了日志频道的客户端
+            // Push to all clients subscribed to log channel
             await _hubContext.Clients.Group("channel_logs_all").SendAsync("LogEntry", logEntry);
 
-            // 根据日志级别推送到特定频道
+            // Push to specific channel based on log level
             var levelChannel = GetLevelChannel(logEntry.Level);
             if (!string.IsNullOrEmpty(levelChannel))
             {

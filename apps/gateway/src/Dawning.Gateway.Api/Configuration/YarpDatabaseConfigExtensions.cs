@@ -4,17 +4,17 @@ using Yarp.ReverseProxy.Configuration;
 namespace Dawning.Gateway.Api.Configuration;
 
 /// <summary>
-/// YARP 数据库配置扩展方法
+/// YARP database configuration extension methods
 /// </summary>
 public static class YarpDatabaseConfigExtensions
 {
     /// <summary>
-    /// 添加数据库配置提供程序
+    /// Add database configuration provider
     /// </summary>
     public static IReverseProxyBuilder LoadFromDatabase(this IReverseProxyBuilder builder)
     {
-        // 注册配置提供程序
-        // 注意：GatewayConfigService 和 Repository 由 NativeInjectorBootStrapper 自动注册
+        // Register configuration provider
+        // Note: GatewayConfigService and Repository are auto-registered by NativeInjectorBootStrapper
         builder.Services.AddSingleton<DatabaseProxyConfigProvider>();
         builder.Services.AddSingleton<IProxyConfigProvider>(sp =>
             sp.GetRequiredService<DatabaseProxyConfigProvider>()
@@ -24,7 +24,7 @@ public static class YarpDatabaseConfigExtensions
     }
 
     /// <summary>
-    /// 初始化数据库配置（在应用启动时调用）
+    /// Initialize database configuration (called at application startup)
     /// </summary>
     public static async Task<IApplicationBuilder> InitializeDatabaseProxyConfigAsync(
         this IApplicationBuilder app
@@ -37,7 +37,7 @@ public static class YarpDatabaseConfigExtensions
     }
 
     /// <summary>
-    /// 映射配置重载端点
+    /// Map configuration reload endpoint
     /// </summary>
     public static IEndpointRouteBuilder MapProxyConfigReloadEndpoint(
         this IEndpointRouteBuilder endpoints,

@@ -98,9 +98,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 根据ID获取系统日志详情
+        /// Get system log details by ID
         /// </summary>
-        /// <param name="id">日志ID</param>
+        /// <param name="id">Log ID</param>
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
@@ -138,9 +138,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除指定日期之前的日志（超级管理员功能）
+        /// Delete logs before specified date (super admin function)
         /// </summary>
-        /// <param name="beforeDate">截止日期</param>
+        /// <param name="beforeDate">Cutoff date</param>
         [HttpDelete("cleanup")]
         [Authorize(Roles = "super_admin")]
         public async Task<IActionResult> Cleanup([FromQuery] DateTime beforeDate)

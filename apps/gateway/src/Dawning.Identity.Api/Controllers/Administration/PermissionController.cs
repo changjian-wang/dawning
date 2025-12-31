@@ -96,7 +96,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取所有权限
+        /// Get all permissions
         /// </summary>
         [HttpGet("all")]
         [RequirePermission("permission.read")]
@@ -107,7 +107,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取分组权限（按资源分组）
+        /// Get grouped permissions (grouped by resource)
         /// </summary>
         [HttpGet("grouped")]
         public async Task<IActionResult> GetGroupedPermissionsAsync()
@@ -117,7 +117,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取所有资源类型
+        /// Get all resource types
         /// </summary>
         [HttpGet("resources")]
         public async Task<IActionResult> GetResourceTypesAsync()
@@ -127,7 +127,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取所有分类
+        /// Get all categories
         /// </summary>
         [HttpGet("categories")]
         public async Task<IActionResult> GetCategoriesAsync()
@@ -137,7 +137,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取角色的权限
+        /// Get permissions for a role
         /// </summary>
         [HttpGet("role/{roleId}")]
         public async Task<IActionResult> GetByRoleIdAsync(Guid roleId)
@@ -147,7 +147,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 创建权限
+        /// Create permission
         /// </summary>
         [HttpPost]
         [RequirePermission("permission.create")]
@@ -162,12 +162,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "CreatePermission",
                     "Permission",
                     permission.Id,
-                    $"创建权限: {dto.Code}",
+                    $"Created permission: {dto.Code}",
                     null,
                     dto
                 );
 
-                return Ok(ApiResponse<object>.Success(permission, "权限创建成功"));
+                return Ok(ApiResponse<object>.Success(permission, "Permission created successfully"));
             }
             catch (InvalidOperationException ex)
             {
@@ -176,7 +176,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 更新权限
+        /// Update permission
         /// </summary>
         [HttpPut("{id:guid}")]
         [RequirePermission("permission.update")]
@@ -184,7 +184,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         {
             if (id != dto.Id)
             {
-                return BadRequest(ApiResponse.Error(40000, "ID 不匹配"));
+                return BadRequest(ApiResponse.Error(40000, "ID mismatch"));
             }
 
             try
@@ -196,12 +196,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "UpdatePermission",
                     "Permission",
                     id,
-                    $"更新权限: {dto.Name}",
+                    $"Updated permission: {dto.Name}",
                     null,
                     dto
                 );
 
-                return Ok(ApiResponse<object>.Success(permission, "权限更新成功"));
+                return Ok(ApiResponse<object>.Success(permission, "Permission updated successfully"));
             }
             catch (InvalidOperationException ex)
             {
@@ -210,7 +210,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除权限
+        /// Delete permission
         /// </summary>
         [HttpDelete("{id:guid}")]
         [RequirePermission("permission.delete")]
@@ -224,10 +224,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "DeletePermission",
                     "Permission",
                     id,
-                    $"删除权限: {id}"
+                    $"Deleted permission: {id}"
                 );
 
-                return Ok(ApiResponse.Success("权限删除成功"));
+                return Ok(ApiResponse.Success("Permission deleted successfully"));
             }
             catch (InvalidOperationException ex)
             {
@@ -236,7 +236,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 为角色分配权限
+        /// Assign permissions to role
         /// </summary>
         [HttpPost("role/{roleId}/assign")]
         [RequirePermission("role.permission.assign")]
@@ -258,12 +258,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "AssignPermissions",
                     "Role",
                     roleId,
-                    $"为角色分配权限，权限数量: {permissionIds.Count}",
+                    $"Assigned permissions to role, count: {permissionIds.Count}",
                     null,
                     new { PermissionIds = permissionIds }
                 );
 
-                return Ok(ApiResponse.Success("权限分配成功"));
+                return Ok(ApiResponse.Success("Permissions assigned successfully"));
             }
             catch (InvalidOperationException ex)
             {
@@ -272,7 +272,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 从角色移除权限
+        /// Remove permissions from role
         /// </summary>
         [HttpDelete("role/{roleId}/remove")]
         public async Task<IActionResult> RemovePermissionsFromRoleAsync(
@@ -288,12 +288,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
                     "RemovePermissions",
                     "Role",
                     roleId,
-                    $"从角色移除权限，权限数量: {permissionIds.Count}",
+                    $"Removed permissions from role, count: {permissionIds.Count}",
                     new { PermissionIds = permissionIds },
                     null
                 );
 
-                return Ok(ApiResponse.Success("权限移除成功"));
+                return Ok(ApiResponse.Success("Permissions removed successfully"));
             }
             catch (InvalidOperationException ex)
             {
@@ -302,7 +302,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 检查角色是否拥有权限
+        /// Check if role has permission
         /// </summary>
         [HttpGet("role/{roleId}/has/{permissionCode}")]
         public async Task<IActionResult> HasPermissionAsync(Guid roleId, string permissionCode)
@@ -312,7 +312,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取用户的所有权限代码
+        /// Get all permission codes for a user
         /// </summary>
         [HttpGet("user/{userId}/codes")]
         public async Task<IActionResult> GetUserPermissionCodesAsync(Guid userId)
@@ -322,7 +322,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取当前用户ID
+        /// Get current user ID
         /// </summary>
         private Guid? GetOperatorId()
         {

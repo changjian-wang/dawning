@@ -116,7 +116,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 存活检查（用于Kubernetes liveness probe）
+        /// Liveness check (for Kubernetes liveness probe)
         /// </summary>
         [HttpGet("live")]
         public IActionResult Live()
@@ -125,7 +125,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取性能指标
+        /// Get performance metrics
         /// </summary>
         [HttpGet("metrics")]
         public IActionResult Metrics()
@@ -178,7 +178,7 @@ namespace Dawning.Identity.Api.Controllers
             var stopwatch = Stopwatch.StartNew();
             try
             {
-                // 尝试简单的数据库查询
+                // Try a simple database query
                 var config = await _unitOfWork.SystemConfig.GetPagedListAsync(
                     new Dawning.Identity.Domain.Models.Administration.SystemConfigModel(),
                     1,

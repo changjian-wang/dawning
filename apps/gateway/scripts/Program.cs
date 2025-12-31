@@ -34,14 +34,14 @@ class Program
 
             Console.WriteLine($"SQL script executed successfully! ({result} statements)");
 
-            // 验证表是否创建成功
+            // Verify if table was created successfully
             var checkSql = "SELECT COUNT(*) FROM permissions WHERE is_system = 1";
             await using var checkCommand = new MySqlCommand(checkSql, connection);
             var count = Convert.ToInt32(await checkCommand.ExecuteScalarAsync());
 
             Console.WriteLine($"System permissions created: {count}");
 
-            // 验证角色权限分配
+            // Verify role permission assignments
             var rolePermSql = "SELECT COUNT(*) FROM role_permissions";
             await using var rolePermCommand = new MySqlCommand(rolePermSql, connection);
             var rolePermCount = Convert.ToInt32(await rolePermCommand.ExecuteScalarAsync());

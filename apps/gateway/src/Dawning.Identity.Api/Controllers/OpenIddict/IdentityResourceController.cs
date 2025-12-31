@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.OpenIddict
 {
     /// <summary>
-    /// 身份资源管理Controller
+    /// Identity resource management controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -30,7 +30,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 获取操作者ID
+        /// Get operator ID
         /// </summary>
         private Guid GetOperatorId()
         {
@@ -48,7 +48,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID获取身份资源
+        /// Get identity resource by ID
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
@@ -76,7 +76,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称获取身份资源
+        /// Get identity resource by name
         /// </summary>
         [HttpGet("by-name/{name}")]
         public async Task<IActionResult> GetByNameAsync(string name)
@@ -111,7 +111,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称列表获取身份资源
+        /// Get identity resources by name list
         /// </summary>
         [HttpPost("by-names")]
         public async Task<IActionResult> GetByNamesAsync([FromBody] IEnumerable<string> names)
@@ -147,7 +147,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paginated list
         /// </summary>
         [HttpPost("paged")]
         public async Task<IActionResult> GetPagedListAsync(
@@ -173,7 +173,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有身份资源
+        /// Get all identity resources
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetAllAsync()
@@ -199,7 +199,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 创建身份资源
+        /// Create identity resource
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> InsertAsync([FromBody] IdentityResourceDto dto)
@@ -213,7 +213,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
                     );
                 }
 
-                // 设置操作者ID
+                // Set operator ID
                 dto.OperatorId = GetOperatorId();
 
                 var result = await _service.InsertAsync(dto);
@@ -236,7 +236,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 更新身份资源
+        /// Update identity resource
         /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] IdentityResourceDto dto)
@@ -248,10 +248,10 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
                     return Ok(ApiResponse<bool>.Error(40003, "Invalid resource data"));
                 }
 
-                // 确保ID匹配
+                // Ensure ID matches
                 dto.Id = id;
 
-                // 设置操作者ID
+                // Set operator ID
                 dto.OperatorId = GetOperatorId();
 
                 var result = await _service.UpdateAsync(dto);
@@ -274,7 +274,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 删除身份资源
+        /// Delete identity resource
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id)

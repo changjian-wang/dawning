@@ -3,153 +3,153 @@ using System;
 namespace Dawning.Identity.Application.Dtos.Administration
 {
     /// <summary>
-    /// 审计日志DTO
+    /// Audit log DTO
     /// </summary>
     public class AuditLogDto
     {
         /// <summary>
-        /// 审计日志ID
+        /// Audit log ID
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 操作用户ID
+        /// Operator user ID
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 操作用户名
+        /// Operator username
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// 操作类型
+        /// Action type
         /// </summary>
         public string Action { get; set; } = string.Empty;
 
         /// <summary>
-        /// 实体类型
+        /// Entity type
         /// </summary>
         public string? EntityType { get; set; }
 
         /// <summary>
-        /// 实体ID
+        /// Entity ID
         /// </summary>
         public Guid? EntityId { get; set; }
 
         /// <summary>
-        /// 操作描述
+        /// Operation description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP address
         /// </summary>
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User agent
         /// </summary>
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// Request path
         /// </summary>
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 请求方法
+        /// Request method
         /// </summary>
         public string? RequestMethod { get; set; }
 
         /// <summary>
-        /// HTTP状态码
+        /// HTTP status code
         /// </summary>
         public int? StatusCode { get; set; }
 
         /// <summary>
-        /// 修改前的值
+        /// Values before modification
         /// </summary>
         public object? OldValues { get; set; }
 
         /// <summary>
-        /// 修改后的值
+        /// Values after modification
         /// </summary>
         public object? NewValues { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
     }
 
     /// <summary>
-    /// 创建审计日志DTO
+    /// Create audit log DTO
     /// </summary>
     public class CreateAuditLogDto
     {
         /// <summary>
-        /// 操作用户ID
+        /// Operator user ID
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 操作用户名
+        /// Operator username
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// 操作类型
+        /// Action type
         /// </summary>
         public string Action { get; set; } = string.Empty;
 
         /// <summary>
-        /// 实体类型
+        /// Entity type
         /// </summary>
         public string? EntityType { get; set; }
 
         /// <summary>
-        /// 实体ID
+        /// Entity ID
         /// </summary>
         public Guid? EntityId { get; set; }
 
         /// <summary>
-        /// 操作描述
+        /// Operation description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP address
         /// </summary>
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User agent
         /// </summary>
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// Request path
         /// </summary>
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 请求方法
+        /// Request method
         /// </summary>
         public string? RequestMethod { get; set; }
 
         /// <summary>
-        /// HTTP状态码
+        /// HTTP status code
         /// </summary>
         public int? StatusCode { get; set; }
 
         /// <summary>
-        /// 修改前的值
+        /// Values before modification
         /// </summary>
         public object? OldValues { get; set; }
 
         /// <summary>
-        /// 修改后的值
+        /// Values after modification
         /// </summary>
         public object? NewValues { get; set; }
     }
