@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Messaging.AzureServiceBus;
 
 /// <summary>
-/// Azure Service Bus 消息订阅者
+/// Azure Service Bus message subscriber
 /// </summary>
 public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
 {
@@ -22,7 +22,7 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
     };
 
     /// <summary>
-    /// 初始化 Azure Service Bus 订阅者
+    /// Initializes the Azure Service Bus subscriber
     /// </summary>
     public ServiceBusSubscriber(
         IOptions<MessagingOptions> options,
@@ -148,7 +148,7 @@ public class ServiceBusSubscriber : IMessageSubscriber, IAsyncDisposable
     }
 
     /// <summary>
-    /// 释放资源
+    /// Releases resources
     /// </summary>
     public async ValueTask DisposeAsync()
     {

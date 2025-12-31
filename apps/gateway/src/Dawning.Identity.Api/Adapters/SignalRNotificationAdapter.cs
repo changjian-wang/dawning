@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.SignalR;
 namespace Dawning.Identity.Api.Adapters;
 
 /// <summary>
-/// SignalR 实时通知适配器
-/// 将 Application 层的 IRealTimeNotificationService 适配到 SignalR Hub
+/// SignalR real-time notification adapter
+/// Adapts the Application layer's IRealTimeNotificationService to SignalR Hub
 /// </summary>
 public class SignalRNotificationAdapter : IRealTimeNotificationService
 {
@@ -56,11 +56,11 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 .Clients.Group("role_super_admin")
                 .SendAsync("AlertReceived", notification);
 
-            _logger.LogInformation("告警已推送: {Title} ({Severity})", alert.Title, alert.Severity);
+            _logger.LogInformation("Alert pushed: {Title} ({Severity})", alert.Title, alert.Severity);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "推送告警失败: {AlertId}", alert.Id);
+            _logger.LogError(ex, "Failed to push alert: {AlertId}", alert.Id);
         }
     }
 
@@ -83,11 +83,11 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
 
             await _hubContext.Clients.All.SendAsync("SystemMessage", notification);
 
-            _logger.LogInformation("系统消息已推送: {Title}", message.Title);
+            _logger.LogInformation("System message pushed: {Title}", message.Title);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "推送系统消息失败");
+            _logger.LogError(ex, "Failed to push system message");
         }
     }
 
@@ -109,11 +109,11 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 .Clients.Group($"user_{userId}")
                 .SendAsync("NotificationReceived", msg);
 
-            _logger.LogDebug("通知已推送给用户 {UserId}: {Title}", userId, notification.Title);
+            _logger.LogDebug("Notification pushed to user {UserId}: {Title}", userId, notification.Title);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "推送通知给用户 {UserId} 失败", userId);
+            _logger.LogError(ex, "Failed to push notification to user {UserId}", userId);
         }
     }
 
@@ -133,11 +133,11 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
 
             await _hubContext.Clients.Group($"role_{role}").SendAsync("NotificationReceived", msg);
 
-            _logger.LogDebug("通知已推送给角色 {Role}: {Title}", role, notification.Title);
+            _logger.LogDebug("Notification pushed to role {Role}: {Title}", role, notification.Title);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "推送通知给角色 {Role} 失败", role);
+            _logger.LogError(ex, "Failed to push notification to role {Role}", role);
         }
     }
 
@@ -158,19 +158,19 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
             }
 
             _logger.LogDebug(
-                "日志已推送: [{Level}] {Message}",
+                "Log pushed: [{Level}] {Message}",
                 logEntry.Level,
                 logEntry.Message.Length > 50 ? logEntry.Message[..50] + "..." : logEntry.Message
             );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "推送日志失败");
+            _logger.LogError(ex, "Failed to push log");
         }
     }
 
     /// <summary>
-    /// 获取日志级别对应的频道名
+    /// Get channel name corresponding to log level
     /// </summary>
     private static string? GetLevelChannel(string level)
     {

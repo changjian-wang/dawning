@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace Dawning.Extensions;
 
 /// <summary>
-/// JSON 序列化扩展方法
+/// JSON serialization extension methods
 /// </summary>
 public static class JsonExtensions
 {
@@ -27,7 +27,7 @@ public static class JsonExtensions
     };
 
     /// <summary>
-    /// 将对象序列化为 JSON 字符串
+    /// Serializes the object to a JSON string
     /// </summary>
     public static string ToJson<T>(this T obj, bool indented = false)
     {
@@ -39,7 +39,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 将对象序列化为 JSON 字符串（使用自定义选项）
+    /// Serializes the object to a JSON string (with custom options)
     /// </summary>
     public static string ToJson<T>(this T obj, JsonSerializerOptions options)
     {
@@ -50,7 +50,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 将 JSON 字符串反序列化为对象
+    /// Deserializes the JSON string to an object
     /// </summary>
     public static T? FromJson<T>(this string json)
     {
@@ -61,7 +61,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 将 JSON 字符串反序列化为对象（使用自定义选项）
+    /// Deserializes the JSON string to an object (with custom options)
     /// </summary>
     public static T? FromJson<T>(this string json, JsonSerializerOptions options)
     {
@@ -72,7 +72,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 尝试将 JSON 字符串反序列化为对象
+    /// Tries to deserialize the JSON string to an object
     /// </summary>
     public static bool TryFromJson<T>(this string json, out T? result)
     {
@@ -93,7 +93,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 深度克隆对象（通过 JSON 序列化/反序列化）
+    /// Deep clones the object (via JSON serialization/deserialization)
     /// </summary>
     public static T? DeepClone<T>(this T obj)
     {
@@ -105,7 +105,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 检查字符串是否是有效的 JSON
+    /// Checks if the string is valid JSON
     /// </summary>
     public static bool IsValidJson(this string? json)
     {
@@ -124,7 +124,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 将 JSON 字符串格式化（美化）
+    /// Formats (prettifies) the JSON string
     /// </summary>
     public static string? PrettyPrint(this string? json)
     {
@@ -143,7 +143,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 将 JSON 字符串压缩（移除空白）
+    /// Minifies the JSON string (removes whitespace)
     /// </summary>
     public static string? Minify(this string? json)
     {
@@ -162,7 +162,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 合并两个 JSON 对象
+    /// Merges two JSON objects
     /// </summary>
     public static string MergeJson(this string baseJson, string overrideJson)
     {
@@ -192,7 +192,7 @@ public static class JsonExtensions
     }
 
     /// <summary>
-    /// 从 JSON 字符串中获取指定路径的值
+    /// Gets the value at the specified path from a JSON string
     /// </summary>
     public static T? GetJsonValue<T>(this string json, string path)
     {

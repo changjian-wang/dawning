@@ -4,38 +4,38 @@ using Microsoft.AspNetCore.SignalR;
 namespace Dawning.Identity.Api.Services
 {
     /// <summary>
-    /// 实时通知服务接口
+    /// Real-time notification service interface
     /// </summary>
     public interface INotificationService
     {
         /// <summary>
-        /// 发送告警通知给管理员
+        /// Send alert notification to administrators
         /// </summary>
         Task SendAlertAsync(AlertNotification alert);
 
         /// <summary>
-        /// 发送系统消息给所有用户
+        /// Send system message to all users
         /// </summary>
         Task SendSystemMessageAsync(SystemMessage message);
 
         /// <summary>
-        /// 发送通知给特定用户
+        /// Send notification to specific user
         /// </summary>
         Task SendToUserAsync(Guid userId, Notification notification);
 
         /// <summary>
-        /// 发送通知给特定角色的用户
+        /// Send notification to users with specific role
         /// </summary>
         Task SendToRoleAsync(string role, Notification notification);
 
         /// <summary>
-        /// 发送通知给订阅了特定频道的用户
+        /// Send notification to users subscribed to specific channel
         /// </summary>
         Task SendToChannelAsync(string channel, Notification notification);
     }
 
     /// <summary>
-    /// 实时通知服务实现
+    /// Real-time notification service implementation
     /// </summary>
     public class NotificationService : INotificationService
     {
@@ -67,14 +67,14 @@ namespace Dawning.Identity.Api.Services
                     .SendAsync("AlertReceived", alert);
 
                 _logger.LogInformation(
-                    "告警通知已发送: {AlertType} - {Message}",
+                    "Alert notification sent: {AlertType} - {Message}",
                     alert.Type,
                     alert.Message
                 );
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "发送告警通知失败: {AlertId}", alert.Id);
+                _logger.LogError(ex, "Failed to send alert notification: {AlertId}", alert.Id);
             }
         }
 
@@ -84,11 +84,11 @@ namespace Dawning.Identity.Api.Services
             try
             {
                 await _hubContext.Clients.All.SendAsync("SystemMessage", message);
-                _logger.LogInformation("系统消息已发送: {Title}", message.Title);
+                _logger.LogInformation("System message sent: {Title}", message.Title);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "发送系统消息失败");
+                _logger.LogError(ex, "Failed to send system message");
             }
         }
 
@@ -101,11 +101,11 @@ namespace Dawning.Identity.Api.Services
                     .Clients.Group($"user_{userId}")
                     .SendAsync("NotificationReceived", notification);
 
-                _logger.LogDebug("通知已发送给用户 {UserId}: {Type}", userId, notification.Type);
+                _logger.LogDebug("Notification sent to user {UserId}: {Type}", userId, notification.Type);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "发送通知给用户 {UserId} 失败", userId);
+                _logger.LogError(ex, "Failed to send notification to user {UserId}", userId);
             }
         }
 
@@ -118,11 +118,11 @@ namespace Dawning.Identity.Api.Services
                     .Clients.Group($"role_{role}")
                     .SendAsync("NotificationReceived", notification);
 
-                _logger.LogDebug("通知已发送给角色 {Role}: {Type}", role, notification.Type);
+                _logger.LogDebug("Notification sent to role {Role}: {Type}", role, notification.Type);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "发送通知给角色 {Role} 失败", role);
+                _logger.LogError(ex, "Failed to send notification to role {Role}", role);
             }
         }
 
@@ -135,11 +135,11 @@ namespace Dawning.Identity.Api.Services
                     .Clients.Group($"channel_{channel}")
                     .SendAsync("NotificationReceived", notification);
 
-                _logger.LogDebug("通知已发送到频道 {Channel}: {Type}", channel, notification.Type);
+                _logger.LogDebug("Notification sent to channel {Channel}: {Type}", channel, notification.Type);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "发送通知到频道 {Channel} 失败", channel);
+                _logger.LogError(ex, "Failed to send notification to channel {Channel}", channel);
             }
         }
     }
@@ -147,94 +147,94 @@ namespace Dawning.Identity.Api.Services
     #region Notification Models
 
     /// <summary>
-    /// 基础通知
+    /// Base notification
     /// </summary>
     public class Notification
     {
         /// <summary>
-        /// 通知ID
+        /// Notification ID
         /// </summary>
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
-        /// 通知类型
+        /// Notification type
         /// </summary>
         public string Type { get; set; } = "info";
 
         /// <summary>
-        /// 通知标题
+        /// Notification title
         /// </summary>
         public string Title { get; set; } = string.Empty;
 
         /// <summary>
-        /// 通知内容
+        /// Notification content
         /// </summary>
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 附加数据
+        /// Additional data
         /// </summary>
         public Dictionary<string, object>? Data { get; set; }
     }
 
     /// <summary>
-    /// 告警通知
+    /// Alert notification
     /// </summary>
     public class AlertNotification : Notification
     {
         /// <summary>
-        /// 告警级别 (info, warning, error, critical)
+        /// Alert severity (info, warning, error, critical)
         /// </summary>
         public string Severity { get; set; } = "warning";
 
         /// <summary>
-        /// 告警规则ID
+        /// Alert rule ID
         /// </summary>
         public Guid? RuleId { get; set; }
 
         /// <summary>
-        /// 告警规则名称
+        /// Alert rule name
         /// </summary>
         public string? RuleName { get; set; }
 
         /// <summary>
-        /// 告警来源
+        /// Alert source
         /// </summary>
         public string? Source { get; set; }
 
         /// <summary>
-        /// 告警值
+        /// Alert value
         /// </summary>
         public decimal? Value { get; set; }
 
         /// <summary>
-        /// 阈值
+        /// Threshold
         /// </summary>
         public decimal? Threshold { get; set; }
     }
 
     /// <summary>
-    /// 系统消息
+    /// System message
     /// </summary>
     public class SystemMessage : Notification
     {
         /// <summary>
-        /// 是否需要用户确认
+        /// Whether user acknowledgment is required
         /// </summary>
         public bool RequireAcknowledge { get; set; }
 
         /// <summary>
-        /// 消息优先级 (low, normal, high, urgent)
+        /// Message priority (low, normal, high, urgent)
         /// </summary>
         public string Priority { get; set; } = "normal";
 
         /// <summary>
-        /// 过期时间（null表示永不过期）
+        /// Expiration time (null means never expires)
         /// </summary>
         public DateTime? ExpiresAt { get; set; }
     }

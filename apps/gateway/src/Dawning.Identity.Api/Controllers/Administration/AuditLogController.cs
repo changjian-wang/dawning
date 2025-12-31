@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// 审计日志管理控制器
+    /// Audit log management controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -33,7 +33,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 根据ID获取审计日志
+        /// Get audit log by ID
         /// </summary>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(AuditLogDto), StatusCodes.Status200OK)]
@@ -58,7 +58,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取审计日志列表（分页）
+        /// Get audit log list (paginated)
         /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

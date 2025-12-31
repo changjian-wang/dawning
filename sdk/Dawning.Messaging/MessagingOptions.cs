@@ -1,120 +1,120 @@
 namespace Dawning.Messaging;
 
 /// <summary>
-/// 消息配置选项
+/// Messaging configuration options
 /// </summary>
 public class MessagingOptions
 {
     /// <summary>
-    /// 配置节名称
+    /// Configuration section name
     /// </summary>
     public const string SectionName = "Messaging";
 
     /// <summary>
-    /// 消息提供程序类型
+    /// Messaging provider type
     /// </summary>
     public MessagingProvider Provider { get; set; } = MessagingProvider.RabbitMQ;
 
     /// <summary>
-    /// 默认交换机/主题名称
+    /// Default exchange/topic name
     /// </summary>
     public string DefaultExchange { get; set; } = "dawning.events";
 
     /// <summary>
-    /// 消息序列化格式
+    /// Message serialization format
     /// </summary>
     public SerializationFormat SerializationFormat { get; set; } = SerializationFormat.Json;
 
     /// <summary>
-    /// RabbitMQ 配置
+    /// RabbitMQ configuration
     /// </summary>
     public RabbitMQOptions RabbitMQ { get; set; } = new();
 
     /// <summary>
-    /// Azure Service Bus 配置
+    /// Azure Service Bus configuration
     /// </summary>
     public ServiceBusOptions ServiceBus { get; set; } = new();
 }
 
 /// <summary>
-/// RabbitMQ 配置选项
+/// RabbitMQ configuration options
 /// </summary>
 public class RabbitMQOptions
 {
     /// <summary>
-    /// 主机地址
+    /// Host address
     /// </summary>
     public string HostName { get; set; } = "localhost";
 
     /// <summary>
-    /// 端口
+    /// Port
     /// </summary>
     public int Port { get; set; } = 5672;
 
     /// <summary>
-    /// 用户名
+    /// Username
     /// </summary>
     public string UserName { get; set; } = "guest";
 
     /// <summary>
-    /// 密码
+    /// Password
     /// </summary>
     public string Password { get; set; } = "guest";
 
     /// <summary>
-    /// 虚拟主机
+    /// Virtual host
     /// </summary>
     public string VirtualHost { get; set; } = "/";
 
     /// <summary>
-    /// 交换机类型
+    /// Exchange type
     /// </summary>
     public string ExchangeType { get; set; } = "topic";
 
     /// <summary>
-    /// 是否持久化
+    /// Whether to persist
     /// </summary>
     public bool Durable { get; set; } = true;
 
     /// <summary>
-    /// 预取数量
+    /// Prefetch count
     /// </summary>
     public ushort PrefetchCount { get; set; } = 10;
 }
 
 /// <summary>
-/// Azure Service Bus 配置选项
+/// Azure Service Bus configuration options
 /// </summary>
 public class ServiceBusOptions
 {
     /// <summary>
-    /// 连接字符串
+    /// Connection string
     /// </summary>
     public string ConnectionString { get; set; } = string.Empty;
 
     /// <summary>
-    /// 主题名称
+    /// Topic name
     /// </summary>
     public string TopicName { get; set; } = "dawning-events";
 
     /// <summary>
-    /// 订阅名称
+    /// Subscription name
     /// </summary>
     public string SubscriptionName { get; set; } = "default";
 
     /// <summary>
-    /// 最大并发调用数
+    /// Maximum concurrent calls
     /// </summary>
     public int MaxConcurrentCalls { get; set; } = 10;
 
     /// <summary>
-    /// 自动完成消息
+    /// Auto complete messages
     /// </summary>
     public bool AutoCompleteMessages { get; set; } = true;
 }
 
 /// <summary>
-/// 消息提供程序类型
+/// Messaging provider type
 /// </summary>
 public enum MessagingProvider
 {
@@ -130,12 +130,12 @@ public enum MessagingProvider
 }
 
 /// <summary>
-/// 消息序列化格式
+/// Message serialization format
 /// </summary>
 public enum SerializationFormat
 {
     /// <summary>
-    /// JSON 格式
+    /// JSON format
     /// </summary>
     Json,
 }

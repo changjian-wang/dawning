@@ -5,7 +5,7 @@ using Dawning.Extensions;
 namespace Dawning.Benchmarks;
 
 /// <summary>
-/// JSON 扩展方法基准测试
+/// JSON extension methods benchmarks
 /// </summary>
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

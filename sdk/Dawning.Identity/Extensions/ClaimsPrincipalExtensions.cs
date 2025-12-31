@@ -4,12 +4,12 @@ using Dawning.Identity.Constants;
 namespace Dawning.Identity.Extensions;
 
 /// <summary>
-/// ClaimsPrincipal 扩展方法
+/// ClaimsPrincipal extension methods
 /// </summary>
 public static class ClaimsPrincipalExtensions
 {
     /// <summary>
-    /// 获取用户ID
+    /// Gets the user ID
     /// </summary>
     public static string? GetUserId(this ClaimsPrincipal principal)
     {
@@ -17,7 +17,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取用户ID (Guid)
+    /// Gets the user ID (Guid)
     /// </summary>
     public static Guid? GetUserIdAsGuid(this ClaimsPrincipal principal)
     {
@@ -26,7 +26,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取用户名
+    /// Gets the username
     /// </summary>
     public static string? GetUserName(this ClaimsPrincipal principal)
     {
@@ -35,7 +35,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取邮箱
+    /// Gets the email
     /// </summary>
     public static string? GetEmail(this ClaimsPrincipal principal)
     {
@@ -44,7 +44,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取所有角色
+    /// Gets all roles
     /// </summary>
     public static IEnumerable<string> GetRoles(this ClaimsPrincipal principal)
     {
@@ -56,7 +56,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 检查是否有指定角色
+    /// Checks if the user has the specified role
     /// </summary>
     public static bool HasRole(this ClaimsPrincipal principal, string role)
     {
@@ -64,7 +64,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 检查是否有任意一个角色
+    /// Checks if the user has any of the specified roles
     /// </summary>
     public static bool HasAnyRole(this ClaimsPrincipal principal, params string[] roles)
     {
@@ -73,7 +73,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取所有权限
+    /// Gets all permissions
     /// </summary>
     public static IEnumerable<string> GetPermissions(this ClaimsPrincipal principal)
     {
@@ -81,7 +81,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 检查是否有指定权限
+    /// Checks if the user has the specified permission
     /// </summary>
     public static bool HasPermission(this ClaimsPrincipal principal, string permission)
     {
@@ -89,7 +89,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 检查是否有任意一个权限
+    /// Checks if the user has any of the specified permissions
     /// </summary>
     public static bool HasAnyPermission(this ClaimsPrincipal principal, params string[] permissions)
     {
@@ -100,7 +100,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取租户ID
+    /// Gets the tenant ID
     /// </summary>
     public static string? GetTenantId(this ClaimsPrincipal principal)
     {
@@ -108,7 +108,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取租户ID (Guid)
+    /// Gets the tenant ID (Guid)
     /// </summary>
     public static Guid? GetTenantIdAsGuid(this ClaimsPrincipal principal)
     {
@@ -117,7 +117,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取租户编码
+    /// Gets the tenant code
     /// </summary>
     public static string? GetTenantCode(this ClaimsPrincipal principal)
     {
@@ -125,7 +125,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 是否为宿主管理员 (可访问所有租户)
+    /// Checks if the user is a host administrator (can access all tenants)
     /// </summary>
     public static bool IsHost(this ClaimsPrincipal principal)
     {
@@ -134,7 +134,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 是否为超级管理员
+    /// Checks if the user is a super administrator
     /// </summary>
     public static bool IsSuperAdmin(this ClaimsPrincipal principal)
     {
@@ -142,7 +142,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 是否为管理员 (包括超级管理员)
+    /// Checks if the user is an administrator (including super administrator)
     /// </summary>
     public static bool IsAdmin(this ClaimsPrincipal principal)
     {
@@ -150,7 +150,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取客户端ID
+    /// Gets the client ID
     /// </summary>
     public static string? GetClientId(this ClaimsPrincipal principal)
     {
@@ -158,7 +158,7 @@ public static class ClaimsPrincipalExtensions
     }
 
     /// <summary>
-    /// 获取所有作用域
+    /// Gets all scopes
     /// </summary>
     public static IEnumerable<string> GetScopes(this ClaimsPrincipal principal)
     {

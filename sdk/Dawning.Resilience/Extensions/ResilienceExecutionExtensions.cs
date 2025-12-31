@@ -3,12 +3,12 @@ using Polly;
 namespace Dawning.Resilience.Extensions;
 
 /// <summary>
-/// 弹性策略执行扩展方法
+/// Resilience policy execution extension methods
 /// </summary>
 public static class ResilienceExecutionExtensions
 {
     /// <summary>
-    /// 使用弹性策略执行操作
+    /// Executes an operation with resilience policy
     /// </summary>
     public static async Task<TResult> ExecuteAsync<TResult>(
         this ResiliencePipeline<TResult> pipeline,
@@ -20,7 +20,7 @@ public static class ResilienceExecutionExtensions
     }
 
     /// <summary>
-    /// 使用弹性策略执行操作
+    /// Executes an operation with resilience policy
     /// </summary>
     public static async Task ExecuteAsync(
         this ResiliencePipeline pipeline,
@@ -38,7 +38,7 @@ public static class ResilienceExecutionExtensions
     }
 
     /// <summary>
-    /// 使用弹性策略执行操作（带状态）
+    /// Executes an operation with resilience policy (with state)
     /// </summary>
     public static async Task<TResult> ExecuteAsync<TState, TResult>(
         this ResiliencePipeline<TResult> pipeline,
@@ -54,7 +54,7 @@ public static class ResilienceExecutionExtensions
     }
 
     /// <summary>
-    /// 使用弹性策略执行同步操作
+    /// Executes a synchronous operation with resilience policy
     /// </summary>
     public static TResult Execute<TResult>(
         this ResiliencePipeline<TResult> pipeline,
@@ -65,7 +65,7 @@ public static class ResilienceExecutionExtensions
     }
 
     /// <summary>
-    /// 使用弹性策略执行同步操作
+    /// Executes a synchronous operation with resilience policy
     /// </summary>
     public static void Execute(this ResiliencePipeline pipeline, Action operation)
     {

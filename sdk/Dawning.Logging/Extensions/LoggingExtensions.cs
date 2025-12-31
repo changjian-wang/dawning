@@ -5,15 +5,15 @@ using Serilog;
 namespace Dawning.Logging.Extensions;
 
 /// <summary>
-/// 日志扩展方法
+/// Logging extension methods
 /// </summary>
 public static class LoggingExtensions
 {
     /// <summary>
-    /// 使用 Dawning 统一日志配置
+    /// Uses Dawning unified logging configuration
     /// </summary>
     /// <param name="builder">Host builder</param>
-    /// <param name="applicationName">应用程序名称</param>
+    /// <param name="applicationName">Application name</param>
     /// <returns></returns>
     /// <example>
     /// <code>
@@ -33,10 +33,10 @@ public static class LoggingExtensions
     }
 
     /// <summary>
-    /// 使用 Dawning 统一日志配置 (带配置选项)
+    /// Uses Dawning unified logging configuration (with configuration options)
     /// </summary>
     /// <param name="builder">Host builder</param>
-    /// <param name="configure">配置回调</param>
+    /// <param name="configure">Configuration callback</param>
     /// <returns></returns>
     /// <example>
     /// <code>
@@ -66,10 +66,10 @@ public static class LoggingExtensions
     }
 
     /// <summary>
-    /// 创建启动日志器 (用于捕获启动错误)
+    /// Creates a bootstrap logger (for capturing startup errors)
     /// </summary>
-    /// <param name="applicationName">应用程序名称</param>
-    /// <returns>配置好的 Logger</returns>
+    /// <param name="applicationName">Application name</param>
+    /// <returns>Configured Logger</returns>
     /// <example>
     /// <code>
     /// Log.Logger = DawningLoggingExtensions.CreateBootstrapLogger("MyService");
@@ -102,7 +102,7 @@ public static class LoggingExtensions
     }
 
     /// <summary>
-    /// 配置日志记录器
+    /// Configures the logger
     /// </summary>
     private static void ConfigureLogger(
         LoggerConfiguration loggerConfiguration,
@@ -110,7 +110,7 @@ public static class LoggingExtensions
         IConfiguration configuration
     )
     {
-        // 基础配置
+        // Basic configuration
         loggerConfiguration
             .MinimumLevel.Is(options.ToSerilogLevel(options.MinimumLevel))
             .Enrich.FromLogContext()
@@ -119,16 +119,16 @@ public static class LoggingExtensions
             .Enrich.WithMachineName()
             .Enrich.WithThreadId();
 
-        // 配置命名空间覆盖
+        // Configure namespace overrides
         foreach (var (ns, level) in options.OverrideMinimumLevels)
         {
             loggerConfiguration.MinimumLevel.Override(ns, options.ToSerilogLevel(level));
         }
 
-        // 从配置文件读取额外配置 (可选)
+        // Read additional configuration from config file (optional)
         loggerConfiguration.ReadFrom.Configuration(configuration);
 
-        // 控制台输出
+        // Console output
         if (options.EnableConsole)
         {
             if (options.UseJsonFormat)
@@ -141,7 +141,7 @@ public static class LoggingExtensions
             }
         }
 
-        // 文件输出
+        // File output
         if (options.EnableFile)
         {
             var filePath = options.GetLogFilePath();

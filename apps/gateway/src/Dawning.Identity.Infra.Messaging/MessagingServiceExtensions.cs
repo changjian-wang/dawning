@@ -13,35 +13,35 @@ using StackExchange.Redis;
 namespace Dawning.Identity.Infra.Messaging;
 
 /// <summary>
-/// 消息服务依赖注入扩展
+/// Messaging service dependency injection extensions
 /// </summary>
 public static class MessagingServiceExtensions
 {
     /// <summary>
-    /// 添加完整的消息服务（MediatR + Kafka）
+    /// Add complete messaging services (MediatR + Kafka)
     /// </summary>
     public static IServiceCollection AddMessagingServices(
         this IServiceCollection services,
         IConfiguration configuration
     )
     {
-        // 配置 Kafka 选项
+        // Configure Kafka options
         services.Configure<KafkaOptions>(configuration.GetSection("Kafka"));
 
-        // 注册 MediatR 领域事件分发器
+        // Register MediatR domain event dispatcher
         services.AddMediatRDomainEventDispatcher();
 
-        // 注册集成事件总线 (Kafka)
+        // Register integration event bus (Kafka)
         services.AddKafkaIntegrationEventBus();
 
-        // 注册分布式锁
+        // Register distributed lock
         services.AddDistributedLock();
 
         return services;
     }
 
     /// <summary>
-    /// 添加 MediatR 领域事件分发器
+    /// Add MediatR domain event dispatcher
     /// </summary>
     public static IServiceCollection AddMediatRDomainEventDispatcher(
         this IServiceCollection services
@@ -52,7 +52,7 @@ public static class MessagingServiceExtensions
     }
 
     /// <summary>
-    /// 添加 Kafka 集成事件总线
+    /// Add Kafka integration event bus
     /// </summary>
     public static IServiceCollection AddKafkaIntegrationEventBus(this IServiceCollection services)
     {
@@ -85,7 +85,7 @@ public static class MessagingServiceExtensions
     }
 
     /// <summary>
-    /// 添加 Kafka 集成事件消费者
+    /// Add Kafka integration event consumers
     /// </summary>
     public static IServiceCollection AddKafkaIntegrationEventConsumers(
         this IServiceCollection services
@@ -102,7 +102,7 @@ public static class MessagingServiceExtensions
     }
 
     /// <summary>
-    /// 添加分布式锁服务
+    /// Add distributed lock service
     /// </summary>
     public static IServiceCollection AddDistributedLock(this IServiceCollection services)
     {

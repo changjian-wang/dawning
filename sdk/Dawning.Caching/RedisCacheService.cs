@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Caching;
 
 /// <summary>
-/// Redis 分布式缓存服务实现
+/// Redis distributed cache service implementation
 /// </summary>
 public class RedisCacheService : ICacheService
 {
@@ -18,7 +18,7 @@ public class RedisCacheService : ICacheService
     };
 
     /// <summary>
-    /// 初始化 Redis 缓存服务
+    /// Initialize Redis cache service
     /// </summary>
     public RedisCacheService(IDistributedCache cache, IOptions<CacheOptions> options)
     {
@@ -90,9 +90,9 @@ public class RedisCacheService : ICacheService
     /// <inheritdoc />
     public Task RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default)
     {
-        // Redis 的模式删除需要使用 StackExchange.Redis 直接操作
-        // IDistributedCache 接口不支持此功能
-        // 如需此功能，请直接注入 IConnectionMultiplexer
+        // Pattern-based deletion requires using StackExchange.Redis directly
+        // IDistributedCache interface does not support this functionality
+        // For this feature, please inject IConnectionMultiplexer directly
         throw new NotSupportedException(
             "Pattern-based removal requires direct Redis connection. Use IConnectionMultiplexer instead."
         );

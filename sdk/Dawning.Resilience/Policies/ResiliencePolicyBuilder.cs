@@ -8,7 +8,7 @@ using Polly.Timeout;
 namespace Dawning.Resilience.Policies;
 
 /// <summary>
-/// 弹性策略构建器
+/// Resilience policy builder
 /// </summary>
 public class ResiliencePolicyBuilder
 {
@@ -22,7 +22,7 @@ public class ResiliencePolicyBuilder
     }
 
     /// <summary>
-    /// 构建组合弹性策略管道
+    /// Builds a combined resilience strategy pipeline
     /// </summary>
     public ResiliencePipeline Build()
     {
@@ -47,7 +47,7 @@ public class ResiliencePolicyBuilder
     }
 
     /// <summary>
-    /// 构建泛型组合弹性策略管道
+    /// Builds a generic combined resilience strategy pipeline
     /// </summary>
     public ResiliencePipeline<TResult> Build<TResult>()
     {
@@ -85,10 +85,10 @@ public class ResiliencePolicyBuilder
             OnRetry = args =>
             {
                 _logger?.LogWarning(
-                    "重试第 {AttemptNumber} 次，延迟 {Delay}ms，异常: {Exception}",
+                    "Retry attempt {AttemptNumber}, delay {Delay}ms, exception: {Exception}",
                     args.AttemptNumber,
                     args.RetryDelay.TotalMilliseconds,
-                    args.Outcome.Exception?.Message ?? "无"
+                    args.Outcome.Exception?.Message ?? "None"
                 );
                 return default;
             },
@@ -109,10 +109,10 @@ public class ResiliencePolicyBuilder
             OnRetry = args =>
             {
                 _logger?.LogWarning(
-                    "重试第 {AttemptNumber} 次，延迟 {Delay}ms，异常: {Exception}",
+                    "Retry attempt {AttemptNumber}, delay {Delay}ms, exception: {Exception}",
                     args.AttemptNumber,
                     args.RetryDelay.TotalMilliseconds,
-                    args.Outcome.Exception?.Message ?? "无"
+                    args.Outcome.Exception?.Message ?? "None"
                 );
                 return default;
             },
@@ -132,20 +132,20 @@ public class ResiliencePolicyBuilder
             OnOpened = args =>
             {
                 _logger?.LogError(
-                    "熔断器已打开，持续 {BreakDuration} 秒，原因: {Exception}",
+                    "Circuit breaker opened, lasting {BreakDuration} seconds, reason: {Exception}",
                     _options.CircuitBreaker.BreakDurationSeconds,
-                    args.Outcome.Exception?.Message ?? "失败率过高"
+                    args.Outcome.Exception?.Message ?? "Failure rate too high"
                 );
                 return default;
             },
             OnClosed = _ =>
             {
-                _logger?.LogInformation("熔断器已关闭，恢复正常服务");
+                _logger?.LogInformation("Circuit breaker closed, normal service resumed");
                 return default;
             },
             OnHalfOpened = _ =>
             {
-                _logger?.LogInformation("熔断器半开状态，尝试恢复");
+                _logger?.LogInformation("Circuit breaker half-open state, attempting recovery");
                 return default;
             },
         };
@@ -164,20 +164,20 @@ public class ResiliencePolicyBuilder
             OnOpened = args =>
             {
                 _logger?.LogError(
-                    "熔断器已打开，持续 {BreakDuration} 秒，原因: {Exception}",
+                    "Circuit breaker opened, lasting {BreakDuration} seconds, reason: {Exception}",
                     _options.CircuitBreaker.BreakDurationSeconds,
-                    args.Outcome.Exception?.Message ?? "失败率过高"
+                    args.Outcome.Exception?.Message ?? "Failure rate too high"
                 );
                 return default;
             },
             OnClosed = _ =>
             {
-                _logger?.LogInformation("熔断器已关闭，恢复正常服务");
+                _logger?.LogInformation("Circuit breaker closed, normal service resumed");
                 return default;
             },
             OnHalfOpened = _ =>
             {
-                _logger?.LogInformation("熔断器半开状态，尝试恢复");
+                _logger?.LogInformation("Circuit breaker half-open state, attempting recovery");
                 return default;
             },
         };
@@ -190,7 +190,7 @@ public class ResiliencePolicyBuilder
             Timeout = TimeSpan.FromSeconds(_options.Timeout.TimeoutSeconds),
             OnTimeout = args =>
             {
-                _logger?.LogWarning("操作超时，超时时间: {Timeout} 秒", args.Timeout.TotalSeconds);
+                _logger?.LogWarning("Operation timed out, timeout: {Timeout} seconds", args.Timeout.TotalSeconds);
                 return default;
             },
         };

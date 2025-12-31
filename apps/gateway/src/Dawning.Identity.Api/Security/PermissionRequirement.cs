@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Authorization;
 namespace Dawning.Identity.Api.Security
 {
     /// <summary>
-    /// 权限需求，用于定义需要验证的权限
+    /// Permission requirement, used to define permissions to be validated
     /// </summary>
     public class PermissionRequirement : IAuthorizationRequirement
     {
         /// <summary>
-        /// 需要的权限代码
+        /// Required permission code
         /// </summary>
         public string Permission { get; }
 
         /// <summary>
-        /// 创建权限需求
+        /// Create permission requirement
         /// </summary>
-        /// <param name="permission">权限代码</param>
+        /// <param name="permission">Permission code</param>
         public PermissionRequirement(string permission)
         {
             Permission = permission;

@@ -1,24 +1,24 @@
 namespace Dawning.Extensions;
 
 /// <summary>
-/// 集合扩展方法
+/// Collection extension methods
 /// </summary>
 public static class CollectionExtensions
 {
     /// <summary>
-    /// 检查集合是否为 null 或空
+    /// Checks if the collection is null or empty
     /// </summary>
     public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source) =>
         source == null || !source.Any();
 
     /// <summary>
-    /// 如果集合为 null，返回空集合
+    /// Returns an empty collection if the source is null
     /// </summary>
     public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source) =>
         source ?? Enumerable.Empty<T>();
 
     /// <summary>
-    /// 对集合中的每个元素执行操作
+    /// Executes an action on each element in the collection
     /// </summary>
     public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
     {
@@ -32,7 +32,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 对集合中的每个元素执行操作（带索引）
+    /// Executes an action on each element in the collection (with index)
     /// </summary>
     public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
     {
@@ -47,7 +47,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 将集合分成指定大小的批次
+    /// Splits the collection into batches of the specified size
     /// </summary>
     public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> source, int batchSize)
     {
@@ -65,7 +65,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 获取集合中的不同元素（基于指定的键选择器）
+    /// Gets distinct elements from the collection based on a key selector
     /// </summary>
     public static IEnumerable<T> DistinctBy<T, TKey>(
         this IEnumerable<T> source,
@@ -86,7 +86,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 安全地获取字典值，如果键不存在则返回默认值
+    /// Safely gets a dictionary value, returns default if key doesn't exist
     /// </summary>
     public static TValue? GetValueOrDefault<TKey, TValue>(
         this IDictionary<TKey, TValue> dictionary,
@@ -99,7 +99,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 将集合转换为只读集合
+    /// Converts the collection to a read-only collection
     /// </summary>
     public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> source)
     {
@@ -108,7 +108,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 将集合打乱顺序
+    /// Shuffles the collection randomly
     /// </summary>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
@@ -117,7 +117,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 从集合中随机获取一个元素
+    /// Gets a random element from the collection
     /// </summary>
     public static T? RandomElement<T>(this IEnumerable<T> source)
     {
@@ -127,7 +127,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 合并两个字典，后者的值优先
+    /// Merges two dictionaries, with the second dictionary's values taking precedence
     /// </summary>
     public static Dictionary<TKey, TValue> Merge<TKey, TValue>(
         this IDictionary<TKey, TValue> first,
@@ -147,7 +147,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 将集合连接成字符串
+    /// Joins the collection into a string
     /// </summary>
     public static string JoinToString<T>(this IEnumerable<T> source, string separator = ", ")
     {
@@ -156,7 +156,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 添加元素到集合（如果不存在）
+    /// Adds an element to the collection if it doesn't already exist
     /// </summary>
     public static bool AddIfNotExists<T>(this ICollection<T> collection, T item)
     {
@@ -169,7 +169,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// 添加多个元素到集合
+    /// Adds multiple elements to the collection
     /// </summary>
     public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items)
     {

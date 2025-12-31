@@ -10,22 +10,22 @@ public class BusinessExceptionTests
     public void BusinessException_ShouldHaveDefaultStatusCode400()
     {
         // Act
-        var exception = new BusinessException("业务错误");
+        var exception = new BusinessException("Business error");
 
         // Assert
         exception.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        exception.Message.Should().Be("业务错误");
+        exception.Message.Should().Be("Business error");
     }
 
     [Fact]
     public void NotFoundException_ShouldHaveStatusCode404()
     {
         // Act
-        var exception = new NotFoundException("资源不存在");
+        var exception = new NotFoundException("Resource not found");
 
         // Assert
         exception.StatusCode.Should().Be(HttpStatusCode.NotFound);
-        exception.Message.Should().Be("资源不存在");
+        exception.Message.Should().Be("Resource not found");
     }
 
     [Fact]

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// ClaimType 管理控制器
+    /// ClaimType Management Controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 根据ID获取声明类型
+        /// Get claim type by ID
         /// </summary>
         [HttpGet("get/{id}")]
         public async Task<IActionResult> GetAsync(Guid id)
@@ -42,7 +42,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取声明类型分页列表
+        /// Get paged claim type list
         /// </summary>
         [HttpPost("get-paged-list")]
         public async Task<IActionResult> GetPagedListAsync(
@@ -61,7 +61,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取所有声明类型
+        /// Get all claim types
         /// </summary>
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAllAsync()
@@ -71,7 +71,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 创建声明类型
+        /// Create claim type
         /// </summary>
         [HttpPost("insert")]
         public async Task<IActionResult> InsertAsync([FromBody] ClaimTypeDto dto)
@@ -87,7 +87,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 "CreateClaimType",
                 "ClaimType",
                 dto.Id ?? Guid.Empty,
-                $"创建声明类型: {dto.Name}",
+                $"Created claim type: {dto.Name}",
                 null,
                 dto
             );
@@ -96,7 +96,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 更新声明类型
+        /// Update claim type
         /// </summary>
         [HttpPut("update")]
         public async Task<IActionResult> UpdateAsync([FromBody] ClaimTypeDto dto)
@@ -112,7 +112,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 "UpdateClaimType",
                 "ClaimType",
                 dto.Id.Value,
-                $"更新声明类型: {dto.Name}",
+                $"Updated claim type: {dto.Name}",
                 null,
                 dto
             );
@@ -121,7 +121,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除声明类型
+        /// Delete claim type
         /// </summary>
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteAsync(Guid id)
@@ -137,7 +137,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 "DeleteClaimType",
                 "ClaimType",
                 id,
-                $"删除声明类型: {id}"
+                $"Deleted claim type: {id}"
             );
 
             return Ok(ApiResponse<bool>.Success(result, "ClaimType deleted successfully"));

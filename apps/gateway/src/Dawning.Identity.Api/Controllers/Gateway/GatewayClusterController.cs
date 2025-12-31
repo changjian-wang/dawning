@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Gateway
 {
     /// <summary>
-    /// 网关集群管理控制器
+    /// Gateway Cluster Management Controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -31,7 +31,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 分页获取集群列表
+        /// Get paged cluster list
         /// </summary>
         [HttpGet("paged")]
         public async Task<IActionResult> GetPagedList(
@@ -68,16 +68,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取集群列表失败");
+                _logger.LogError(ex, "Failed to get cluster list");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取集群列表失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get cluster list: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 获取所有启用的集群（用于YARP配置）
+        /// Get all enabled clusters (for YARP configuration)
         /// </summary>
         [HttpGet("enabled")]
         [AllowAnonymous]
@@ -97,16 +97,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取启用的集群失败");
+                _logger.LogError(ex, "Failed to get enabled clusters");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取启用的集群失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get enabled clusters: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 获取集群选项（用于下拉选择）
+        /// Get cluster options (for dropdown selection)
         /// </summary>
         [HttpGet("options")]
         public async Task<IActionResult> GetOptions()
@@ -125,16 +125,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取集群选项失败");
+                _logger.LogError(ex, "Failed to get cluster options");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取集群选项失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get cluster options: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 根据ID获取集群
+        /// Get cluster by ID
         /// </summary>
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> Get(Guid id)
@@ -144,7 +144,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
                 var cluster = await _clusterService.GetAsync(id);
                 if (cluster == null)
                 {
-                    return NotFound(new { code = 40400, message = "集群不存在" });
+                    return NotFound(new { code = 40400, message = "Cluster not found" });
                 }
 
                 return Ok(
@@ -158,16 +158,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取集群详情失败");
+                _logger.LogError(ex, "Failed to get cluster details");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取集群详情失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get cluster details: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 创建集群
+        /// Create cluster
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateGatewayClusterDto dto)
@@ -181,7 +181,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
                     new
                     {
                         code = 20000,
-                        message = "创建成功",
+                        message = "Created successfully",
                         data = cluster,
                     }
                 );
@@ -192,16 +192,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "创建集群失败");
+                _logger.LogError(ex, "Failed to create cluster");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "创建集群失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to create cluster: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 更新集群
+        /// Update cluster
         /// </summary>
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateGatewayClusterDto dto)
@@ -210,7 +210,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             {
                 if (id != dto.Id)
                 {
-                    return BadRequest(new { code = 40000, message = "ID不匹配" });
+                    return BadRequest(new { code = 40000, message = "ID mismatch" });
                 }
 
                 var username = User.Identity?.Name;
@@ -218,14 +218,14 @@ namespace Dawning.Identity.Api.Controllers.Gateway
 
                 if (cluster == null)
                 {
-                    return NotFound(new { code = 40400, message = "集群不存在" });
+                    return NotFound(new { code = 40400, message = "Cluster not found" });
                 }
 
                 return Ok(
                     new
                     {
                         code = 20000,
-                        message = "更新成功",
+                        message = "Updated successfully",
                         data = cluster,
                     }
                 );
@@ -236,16 +236,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "更新集群失败");
+                _logger.LogError(ex, "Failed to update cluster");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "更新集群失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to update cluster: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 删除集群
+        /// Delete cluster
         /// </summary>
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
@@ -256,7 +256,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
 
                 if (!success)
                 {
-                    if (errorMessage?.Contains("不存在") == true)
+                    if (errorMessage?.Contains("not found") == true || errorMessage?.Contains("不存在") == true)
                     {
                         return NotFound(new { code = 40400, message = errorMessage });
                     }
@@ -264,20 +264,20 @@ namespace Dawning.Identity.Api.Controllers.Gateway
                     return BadRequest(new { code = 40000, message = errorMessage });
                 }
 
-                return Ok(new { code = 20000, message = "删除成功" });
+                return Ok(new { code = 20000, message = "Deleted successfully" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "删除集群失败");
+                _logger.LogError(ex, "Failed to delete cluster");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "删除集群失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to delete cluster: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 切换集群启用状态
+        /// Toggle cluster enabled status
         /// </summary>
         [HttpPatch("{id:guid}/toggle")]
         public async Task<IActionResult> ToggleEnabled(Guid id, [FromBody] ToggleEnabledDto dto)
@@ -289,17 +289,17 @@ namespace Dawning.Identity.Api.Controllers.Gateway
 
                 if (!result)
                 {
-                    return NotFound(new { code = 40400, message = "集群不存在" });
+                    return NotFound(new { code = 40400, message = "Cluster not found" });
                 }
 
-                return Ok(new { code = 20000, message = dto.IsEnabled ? "已启用" : "已禁用" });
+                return Ok(new { code = 20000, message = dto.IsEnabled ? "Enabled" : "Disabled" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "切换集群状态失败");
+                _logger.LogError(ex, "Failed to toggle cluster status");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "切换集群状态失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to toggle cluster status: " + ex.Message }
                 );
             }
         }

@@ -4,8 +4,8 @@ using Serilog.Context;
 namespace Dawning.Logging.Middleware;
 
 /// <summary>
-/// 日志上下文富化中间件
-/// 自动添加请求相关的日志属性
+/// Log context enrichment middleware
+/// Automatically adds request-related log properties
 /// </summary>
 public class LogEnrichmentMiddleware
 {
@@ -18,7 +18,7 @@ public class LogEnrichmentMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // 提取请求相关信息
+        // Extract request-related information
         var traceId = context.TraceIdentifier;
         var userId =
             context.User?.FindFirst("sub")?.Value
@@ -31,7 +31,7 @@ public class LogEnrichmentMiddleware
         var userAgent = context.Request.Headers.UserAgent.FirstOrDefault();
         var tenantId = context.User?.FindFirst("tenant_id")?.Value;
 
-        // 使用 Serilog 的 LogContext 添加属性
+        // Add properties using Serilog's LogContext
         using (LogContext.PushProperty("TraceId", traceId))
         using (LogContext.PushProperty("UserId", userId))
         using (LogContext.PushProperty("UserName", userName ?? ""))
@@ -46,15 +46,15 @@ public class LogEnrichmentMiddleware
     }
 
     /// <summary>
-    /// 获取客户端真实 IP
+    /// Gets the client's real IP address
     /// </summary>
     private static string GetClientIp(HttpContext context)
     {
-        // 优先从代理头获取
+        // Prefer getting from proxy headers first
         var forwardedFor = context.Request.Headers["X-Forwarded-For"].FirstOrDefault();
         if (!string.IsNullOrEmpty(forwardedFor))
         {
-            // X-Forwarded-For 可能包含多个 IP，取第一个
+            // X-Forwarded-For may contain multiple IPs, take the first one
             return forwardedFor.Split(',', StringSplitOptions.RemoveEmptyEntries)[0].Trim();
         }
 
@@ -64,7 +64,7 @@ public class LogEnrichmentMiddleware
             return realIp;
         }
 
-        // 回退到连接 IP
+        // Fall back to connection IP
         return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
     }
 }

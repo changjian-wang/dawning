@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// 请求日志管理控制器
+    /// Request Log Management Controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -32,21 +32,21 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取请求日志列表（分页）
+        /// Get request log list (paged)
         /// </summary>
-        /// <param name="startTime">开始时间（UTC）</param>
-        /// <param name="endTime">结束时间（UTC）</param>
-        /// <param name="method">HTTP 方法过滤</param>
-        /// <param name="path">路径过滤（模糊匹配）</param>
-        /// <param name="statusCode">精确状态码</param>
-        /// <param name="minStatusCode">最小状态码</param>
-        /// <param name="maxStatusCode">最大状态码</param>
-        /// <param name="userId">用户ID</param>
-        /// <param name="clientIp">客户端IP</param>
-        /// <param name="onlyErrors">只显示错误请求（状态码>=400）</param>
-        /// <param name="slowRequestThresholdMs">慢请求阈值（毫秒）</param>
-        /// <param name="page">页码</param>
-        /// <param name="pageSize">每页数量</param>
+        /// <param name="startTime">Start time (UTC)</param>
+        /// <param name="endTime">End time (UTC)</param>
+        /// <param name="method">HTTP method filter</param>
+        /// <param name="path">Path filter (fuzzy match)</param>
+        /// <param name="statusCode">Exact status code</param>
+        /// <param name="minStatusCode">Minimum status code</param>
+        /// <param name="maxStatusCode">Maximum status code</param>
+        /// <param name="userId">User ID</param>
+        /// <param name="clientIp">Client IP</param>
+        /// <param name="onlyErrors">Show only error requests (status code >= 400)</param>
+        /// <param name="slowRequestThresholdMs">Slow request threshold (milliseconds)</param>
+        /// <param name="page">Page number</param>
+        /// <param name="pageSize">Page size</param>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetList(
@@ -104,10 +104,10 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取请求统计信息
+        /// Get request statistics
         /// </summary>
-        /// <param name="startTime">开始时间（UTC），默认过去24小时</param>
-        /// <param name="endTime">结束时间（UTC），默认当前时间</param>
+        /// <param name="startTime">Start time (UTC), default past 24 hours</param>
+        /// <param name="endTime">End time (UTC), default current time</param>
         [HttpGet("statistics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetStatistics(
@@ -128,9 +128,9 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 清理过期日志
+        /// Clean up expired logs
         /// </summary>
-        /// <param name="retentionDays">保留天数（默认30天）</param>
+        /// <param name="retentionDays">Retention days (default 30 days)</param>
         [HttpDelete("cleanup")]
         [Authorize(Roles = "super_admin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -172,12 +172,12 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取错误请求摘要
+        /// Get error request summary
         /// </summary>
-        /// <param name="startTime">开始时间</param>
-        /// <param name="endTime">结束时间</param>
-        /// <param name="page">页码</param>
-        /// <param name="pageSize">每页数量</param>
+        /// <param name="startTime">Start time</param>
+        /// <param name="endTime">End time</param>
+        /// <param name="page">Page number</param>
+        /// <param name="pageSize">Page size</param>
         [HttpGet("errors")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetErrors(
@@ -216,13 +216,13 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取慢请求列表
+        /// Get slow request list
         /// </summary>
-        /// <param name="startTime">开始时间</param>
-        /// <param name="endTime">结束时间</param>
-        /// <param name="thresholdMs">响应时间阈值（毫秒），默认1000ms</param>
-        /// <param name="page">页码</param>
-        /// <param name="pageSize">每页数量</param>
+        /// <param name="startTime">Start time</param>
+        /// <param name="endTime">End time</param>
+        /// <param name="thresholdMs">Response time threshold (milliseconds), default 1000ms</param>
+        /// <param name="page">Page number</param>
+        /// <param name="pageSize">Page size</param>
         [HttpGet("slow")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSlowRequests(

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration;
 
 /// <summary>
-/// 告警管理控制器
+/// Alert Management Controller
 /// </summary>
 [ApiVersion("1.0")]
 [ApiController]
@@ -31,10 +31,10 @@ public class AlertController : ControllerBase
         _auditLogHelper = auditLogHelper;
     }
 
-    #region 告警规则管理
+    #region Alert Rule Management
 
     /// <summary>
-    /// 获取所有告警规则
+    /// Get all alert rules
     /// </summary>
     [HttpGet("rules")]
     public async Task<ActionResult<IEnumerable<AlertRuleDto>>> GetAllRules()
@@ -44,7 +44,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 获取已启用的告警规则
+    /// Get enabled alert rules
     /// </summary>
     [HttpGet("rules/enabled")]
     public async Task<ActionResult<IEnumerable<AlertRuleDto>>> GetEnabledRules()
@@ -54,7 +54,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 获取指定告警规则
+    /// Get specific alert rule
     /// </summary>
     [HttpGet("rules/{id:long}")]
     public async Task<ActionResult<AlertRuleDto>> GetRule(long id)
@@ -62,13 +62,13 @@ public class AlertController : ControllerBase
         var rule = await _alertService.GetRuleByIdAsync(id);
         if (rule == null)
         {
-            return NotFound(new { message = "告警规则不存在" });
+            return NotFound(new { message = "Alert rule not found" });
         }
         return Ok(rule);
     }
 
     /// <summary>
-    /// 创建告警规则
+    /// Create alert rule
     /// </summary>
     [HttpPost("rules")]
     public async Task<ActionResult<AlertRuleDto>> CreateRule(
@@ -87,7 +87,7 @@ public class AlertController : ControllerBase
             "CreateAlertRule",
             "AlertRule",
             null,
-            $"创建告警规则: {rule.Name}",
+            $"Created alert rule: {rule.Name}",
             null,
             request
         );
@@ -96,7 +96,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 更新告警规则
+    /// Update alert rule
     /// </summary>
     [HttpPut("rules/{id:long}")]
     public async Task<ActionResult<AlertRuleDto>> UpdateRule(
@@ -112,7 +112,7 @@ public class AlertController : ControllerBase
         var rule = await _alertService.UpdateRuleAsync(id, request);
         if (rule == null)
         {
-            return NotFound(new { message = "告警规则不存在" });
+            return NotFound(new { message = "Alert rule not found" });
         }
 
         _logger.LogInformation("Updated alert rule: {RuleName}", rule.Name);
@@ -121,7 +121,7 @@ public class AlertController : ControllerBase
             "UpdateAlertRule",
             "AlertRule",
             null,
-            $"更新告警规则: {rule.Name}",
+            $"Updated alert rule: {rule.Name}",
             null,
             request
         );
@@ -130,7 +130,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 删除告警规则
+    /// Delete alert rule
     /// </summary>
     [HttpDelete("rules/{id:long}")]
     public async Task<IActionResult> DeleteRule(long id)
@@ -138,7 +138,7 @@ public class AlertController : ControllerBase
         var success = await _alertService.DeleteRuleAsync(id);
         if (!success)
         {
-            return NotFound(new { message = "告警规则不存在" });
+            return NotFound(new { message = "Alert rule not found" });
         }
 
         _logger.LogInformation("Deleted alert rule: {Id}", id);
@@ -147,14 +147,14 @@ public class AlertController : ControllerBase
             "DeleteAlertRule",
             "AlertRule",
             null,
-            $"删除告警规则 ID: {id}"
+            $"Deleted alert rule ID: {id}"
         );
 
         return NoContent();
     }
 
     /// <summary>
-    /// 启用/禁用告警规则
+    /// Enable/disable alert rule
     /// </summary>
     [HttpPatch("rules/{id:long}/enabled")]
     public async Task<IActionResult> SetRuleEnabled(
@@ -165,7 +165,7 @@ public class AlertController : ControllerBase
         var success = await _alertService.SetRuleEnabledAsync(id, request.IsEnabled);
         if (!success)
         {
-            return NotFound(new { message = "告警规则不存在" });
+            return NotFound(new { message = "Alert rule not found" });
         }
 
         _logger.LogInformation("Set alert rule {Id} enabled: {IsEnabled}", id, request.IsEnabled);
@@ -174,18 +174,18 @@ public class AlertController : ControllerBase
             request.IsEnabled ? "EnableAlertRule" : "DisableAlertRule",
             "AlertRule",
             null,
-            $"{(request.IsEnabled ? "启用" : "禁用")}告警规则 ID: {id}"
+            $"{(request.IsEnabled ? "Enabled" : "Disabled")} alert rule ID: {id}"
         );
 
-        return Ok(new { message = request.IsEnabled ? "规则已启用" : "规则已禁用" });
+        return Ok(new { message = request.IsEnabled ? "Rule enabled" : "Rule disabled" });
     }
 
     #endregion
 
-    #region 告警历史管理
+    #region Alert History Management
 
     /// <summary>
-    /// 查询告警历史 (分页)
+    /// Query alert history (paged)
     /// </summary>
     [HttpGet("history")]
     public async Task<ActionResult> GetAlertHistory([FromQuery] AlertHistoryQueryParams queryParams)
@@ -205,7 +205,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 获取指定告警历史
+    /// Get specific alert history
     /// </summary>
     [HttpGet("history/{id:long}")]
     public async Task<ActionResult<AlertHistoryDto>> GetAlertHistoryById(long id)
@@ -213,13 +213,13 @@ public class AlertController : ControllerBase
         var history = await _alertService.GetAlertHistoryByIdAsync(id);
         if (history == null)
         {
-            return NotFound(new { message = "告警记录不存在" });
+            return NotFound(new { message = "Alert record not found" });
         }
         return Ok(history);
     }
 
     /// <summary>
-    /// 获取未解决的告警
+    /// Get unresolved alerts
     /// </summary>
     [HttpGet("unresolved")]
     public async Task<ActionResult<IEnumerable<AlertHistoryDto>>> GetUnresolvedAlerts()
@@ -229,7 +229,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 更新告警状态 (确认/解决)
+    /// Update alert status (acknowledge/resolve)
     /// </summary>
     [HttpPatch("history/{id:long}/status")]
     public async Task<IActionResult> UpdateAlertStatus(
@@ -237,7 +237,7 @@ public class AlertController : ControllerBase
         [FromBody] UpdateAlertStatusRequest request
     )
     {
-        // 自动填充操作人
+        // Auto-fill operator
         if (string.IsNullOrEmpty(request.ResolvedBy))
         {
             request.ResolvedBy = User.Identity?.Name ?? "system";
@@ -246,7 +246,7 @@ public class AlertController : ControllerBase
         var success = await _alertService.UpdateAlertStatusAsync(id, request);
         if (!success)
         {
-            return NotFound(new { message = "告警记录不存在" });
+            return NotFound(new { message = "Alert record not found" });
         }
 
         _logger.LogInformation(
@@ -255,11 +255,11 @@ public class AlertController : ControllerBase
             request.Status,
             request.ResolvedBy
         );
-        return Ok(new { message = "状态更新成功" });
+        return Ok(new { message = "Status updated successfully" });
     }
 
     /// <summary>
-    /// 批量确认告警
+    /// Batch acknowledge alerts
     /// </summary>
     [HttpPost("history/acknowledge")]
     public async Task<IActionResult> AcknowledgeAlerts([FromBody] BatchAlertActionRequest request)
@@ -280,7 +280,7 @@ public class AlertController : ControllerBase
         return Ok(
             new
             {
-                message = $"成功确认 {successCount}/{request.Ids.Count} 条告警",
+                message = $"Successfully acknowledged {successCount}/{request.Ids.Count} alerts",
                 successCount,
                 totalCount = request.Ids.Count,
             }
@@ -288,7 +288,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 批量解决告警
+    /// Batch resolve alerts
     /// </summary>
     [HttpPost("history/resolve")]
     public async Task<IActionResult> ResolveAlerts([FromBody] BatchAlertActionRequest request)
@@ -309,7 +309,7 @@ public class AlertController : ControllerBase
         return Ok(
             new
             {
-                message = $"成功解决 {successCount}/{request.Ids.Count} 条告警",
+                message = $"Successfully resolved {successCount}/{request.Ids.Count} alerts",
                 successCount,
                 totalCount = request.Ids.Count,
             }
@@ -318,10 +318,10 @@ public class AlertController : ControllerBase
 
     #endregion
 
-    #region 告警检查与统计
+    #region Alert Check and Statistics
 
     /// <summary>
-    /// 手动触发告警检查
+    /// Manually trigger alert check
     /// </summary>
     [HttpPost("check")]
     public async Task<ActionResult<AlertCheckResult>> TriggerAlertCheck()
@@ -332,7 +332,7 @@ public class AlertController : ControllerBase
     }
 
     /// <summary>
-    /// 获取告警统计
+    /// Get alert statistics
     /// </summary>
     [HttpGet("statistics")]
     public async Task<ActionResult<AlertStatisticsDto>> GetStatistics()
@@ -345,7 +345,7 @@ public class AlertController : ControllerBase
 }
 
 /// <summary>
-/// 设置规则启用状态请求
+/// Set rule enabled status request
 /// </summary>
 public class SetRuleEnabledRequest
 {
@@ -353,7 +353,7 @@ public class SetRuleEnabledRequest
 }
 
 /// <summary>
-/// 批量告警操作请求
+/// Batch alert action request
 /// </summary>
 public class BatchAlertActionRequest
 {

@@ -4,20 +4,20 @@ using Microsoft.AspNetCore.Builder;
 namespace Dawning.Core.Extensions;
 
 /// <summary>
-/// 中间件扩展方法
+/// Middleware extension methods
 /// </summary>
 public static class MiddlewareExtensions
 {
     /// <summary>
-    /// 使用全局异常处理中间件
-    /// 应该在中间件管道的最外层使用
+    /// Use global exception handling middleware
+    /// Should be used at the outermost layer of the middleware pipeline
     /// </summary>
     /// <example>
     /// <code>
     /// var app = builder.Build();
-    /// app.UseDawningExceptionHandling(); // 放在最前面
+    /// app.UseDawningExceptionHandling(); // Place at the beginning
     /// app.UseRouting();
-    /// // ... 其他中间件
+    /// // ... other middleware
     /// </code>
     /// </example>
     public static IApplicationBuilder UseDawningExceptionHandling(this IApplicationBuilder app)

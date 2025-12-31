@@ -4,21 +4,21 @@ using Microsoft.AspNetCore.Authorization;
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// 权限授权配置
+    /// Permission authorization configuration
     /// </summary>
     public static class PermissionAuthorizationConfig
     {
         /// <summary>
-        /// 添加权限授权配置
+        /// Add permission authorization configuration
         /// </summary>
         public static IServiceCollection AddPermissionAuthorization(
             this IServiceCollection services
         )
         {
-            // 注册自定义策略提供器
+            // Register custom policy provider
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
-            // 注册权限验证处理器
+            // Register permission validation handler
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
             return services;

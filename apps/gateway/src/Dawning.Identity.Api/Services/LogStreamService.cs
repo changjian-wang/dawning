@@ -4,89 +4,89 @@ using Microsoft.AspNetCore.SignalR;
 namespace Dawning.Identity.Api.Services
 {
     /// <summary>
-    /// 日志流服务 - 用于实时推送日志到订阅的客户端
+    /// Log stream service - for real-time log push to subscribed clients
     /// </summary>
     public interface ILogStreamService
     {
         /// <summary>
-        /// 推送日志条目到订阅的客户端
+        /// Push log entry to subscribed clients
         /// </summary>
         Task PushLogAsync(LogEntry entry);
 
         /// <summary>
-        /// 推送批量日志条目
+        /// Push batch log entries
         /// </summary>
         Task PushLogsAsync(IEnumerable<LogEntry> entries);
     }
 
     /// <summary>
-    /// 日志条目
+    /// Log entry
     /// </summary>
     public class LogEntry
     {
         /// <summary>
-        /// 日志ID
+        /// Log ID
         /// </summary>
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 日志级别 (Information, Warning, Error, Debug)
+        /// Log level (Information, Warning, Error, Debug)
         /// </summary>
         public string Level { get; set; } = "Information";
 
         /// <summary>
-        /// 日志消息
+        /// Log message
         /// </summary>
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// 异常信息（如果有）
+        /// Exception information (if any)
         /// </summary>
         public string? Exception { get; set; }
 
         /// <summary>
-        /// 日志来源/类别
+        /// Log source/category
         /// </summary>
         public string? Category { get; set; }
 
         /// <summary>
-        /// 请求路径（如果有）
+        /// Request path (if any)
         /// </summary>
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 用户ID（如果有）
+        /// User ID (if any)
         /// </summary>
         public string? UserId { get; set; }
 
         /// <summary>
-        /// 用户名（如果有）
+        /// Username (if any)
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP address
         /// </summary>
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 请求ID
+        /// Request ID
         /// </summary>
         public string? RequestId { get; set; }
 
         /// <summary>
-        /// 额外属性
+        /// Extra properties
         /// </summary>
         public Dictionary<string, object>? Properties { get; set; }
     }
 
     /// <summary>
-    /// 日志流服务实现
+    /// Log stream service implementation
     /// </summary>
     public class LogStreamService : ILogStreamService
     {
@@ -123,7 +123,7 @@ namespace Dawning.Identity.Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "推送日志条目失败: {Message}", entry.Message);
+                _logger.LogError(ex, "Failed to push log entry: {Message}", entry.Message);
             }
         }
 
@@ -137,7 +137,7 @@ namespace Dawning.Identity.Api.Services
         }
 
         /// <summary>
-        /// 获取日志级别对应的频道名
+        /// Get channel name corresponding to log level
         /// </summary>
         private static string? GetLevelChannel(string level)
         {

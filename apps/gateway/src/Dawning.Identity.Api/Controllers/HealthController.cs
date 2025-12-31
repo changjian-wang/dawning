@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Controllers
 {
     /// <summary>
-    /// 健康检查控制器
-    /// 提供系统健康状态和监控指标
+    /// Health check controller
+    /// Provides system health status and monitoring metrics
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 基本健康检查
+        /// Basic health check
         /// </summary>
         [HttpGet]
         public IActionResult Get()
@@ -44,7 +44,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 详细健康检查（包括数据库连接）
+        /// Detailed health check (including database connection)
         /// </summary>
         [HttpGet("detailed")]
         public async Task<IActionResult> GetDetailed()
@@ -89,14 +89,14 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 就绪检查（用于Kubernetes readiness probe）
+        /// Readiness check (for Kubernetes readiness probe)
         /// </summary>
         [HttpGet("ready")]
         public async Task<IActionResult> Ready()
         {
             try
             {
-                // 检查数据库连接
+                // Check database connection
                 var dbCheck = await CheckDatabaseHealth();
                 if (dbCheck.status != "Healthy")
                 {

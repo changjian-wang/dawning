@@ -5,16 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dawning.Messaging;
 
 /// <summary>
-/// 消息服务扩展方法
+/// Messaging service extension methods
 /// </summary>
 public static class MessagingServiceCollectionExtensions
 {
     /// <summary>
-    /// 添加 Dawning 消息服务
+    /// Adds Dawning messaging services
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     public static IServiceCollection AddDawningMessaging(
         this IServiceCollection services,
         Action<MessagingOptions>? configure = null
@@ -50,11 +50,11 @@ public static class MessagingServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加 RabbitMQ 消息服务
+    /// Adds RabbitMQ messaging services
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     public static IServiceCollection AddDawningRabbitMQ(
         this IServiceCollection services,
         Action<RabbitMQOptions>? configure = null
@@ -68,12 +68,12 @@ public static class MessagingServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加 Azure Service Bus 消息服务
+    /// Adds Azure Service Bus messaging services
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="connectionString">连接字符串</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="connectionString">Connection string</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     public static IServiceCollection AddDawningServiceBus(
         this IServiceCollection services,
         string connectionString,

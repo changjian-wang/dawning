@@ -5,93 +5,93 @@ using Microsoft.AspNetCore.Http;
 namespace Dawning.Identity;
 
 /// <summary>
-/// 当前用户接口 - 方便在服务层获取当前登录用户信息
+/// Current user interface - convenient for getting current logged-in user information in the service layer
 /// </summary>
 public interface ICurrentUser
 {
     /// <summary>
-    /// 是否已认证
+    /// Whether the user is authenticated
     /// </summary>
     bool IsAuthenticated { get; }
 
     /// <summary>
-    /// 用户ID
+    /// User ID
     /// </summary>
     string? UserId { get; }
 
     /// <summary>
-    /// 用户ID (Guid)
+    /// User ID (Guid)
     /// </summary>
     Guid? UserIdAsGuid { get; }
 
     /// <summary>
-    /// 用户名
+    /// Username
     /// </summary>
     string? UserName { get; }
 
     /// <summary>
-    /// 邮箱
+    /// Email
     /// </summary>
     string? Email { get; }
 
     /// <summary>
-    /// 所有角色
+    /// All roles
     /// </summary>
     IEnumerable<string> Roles { get; }
 
     /// <summary>
-    /// 所有权限
+    /// All permissions
     /// </summary>
     IEnumerable<string> Permissions { get; }
 
     /// <summary>
-    /// 租户ID
+    /// Tenant ID
     /// </summary>
     string? TenantId { get; }
 
     /// <summary>
-    /// 租户ID (Guid)
+    /// Tenant ID (Guid)
     /// </summary>
     Guid? TenantIdAsGuid { get; }
 
     /// <summary>
-    /// 租户编码
+    /// Tenant code
     /// </summary>
     string? TenantCode { get; }
 
     /// <summary>
-    /// 是否为宿主管理员
+    /// Whether the user is a host administrator
     /// </summary>
     bool IsHost { get; }
 
     /// <summary>
-    /// 是否为超级管理员
+    /// Whether the user is a super administrator
     /// </summary>
     bool IsSuperAdmin { get; }
 
     /// <summary>
-    /// 是否为管理员
+    /// Whether the user is an administrator
     /// </summary>
     bool IsAdmin { get; }
 
     /// <summary>
-    /// 检查是否有指定角色
+    /// Checks if the user has the specified role
     /// </summary>
     bool HasRole(string role);
 
     /// <summary>
-    /// 检查是否有指定权限
+    /// Checks if the user has the specified permission
     /// </summary>
     bool HasPermission(string permission);
 
     /// <summary>
-    /// 获取原始 ClaimsPrincipal
+    /// Gets the original ClaimsPrincipal
     /// </summary>
     ClaimsPrincipal? Principal { get; }
 }
 
 /// <summary>
-/// 当前用户实现
+/// Current user implementation
 /// </summary>
 public class CurrentUser : ICurrentUser
 {

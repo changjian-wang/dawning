@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Caching;
 
 /// <summary>
-/// 内存缓存服务实现
+/// Memory cache service implementation
 /// </summary>
 public class MemoryCacheService : ICacheService
 {
@@ -15,7 +15,7 @@ public class MemoryCacheService : ICacheService
     private readonly ConcurrentDictionary<string, byte> _keys = new();
 
     /// <summary>
-    /// 初始化内存缓存服务
+    /// Initialize memory cache service
     /// </summary>
     public MemoryCacheService(IMemoryCache cache, IOptions<CacheOptions> options)
     {

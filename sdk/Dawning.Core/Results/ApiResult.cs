@@ -3,60 +3,60 @@ using System.Text.Json.Serialization;
 namespace Dawning.Core.Results;
 
 /// <summary>
-/// 统一 API 响应结果
+/// Unified API response result
 /// </summary>
-/// <typeparam name="T">数据类型</typeparam>
+/// <typeparam name="T">Data type</typeparam>
 public class ApiResult<T>
 {
     /// <summary>
-    /// 是否成功
+    /// Whether the operation succeeded
     /// </summary>
     [JsonPropertyName("success")]
     public bool Success { get; set; }
 
     /// <summary>
-    /// 状态码
+    /// Status code
     /// </summary>
     [JsonPropertyName("code")]
     public string Code { get; set; } = "OK";
 
     /// <summary>
-    /// 消息
+    /// Message
     /// </summary>
     [JsonPropertyName("message")]
     public string? Message { get; set; }
 
     /// <summary>
-    /// 数据
+    /// Data payload
     /// </summary>
     [JsonPropertyName("data")]
     public T? Data { get; set; }
 
     /// <summary>
-    /// 时间戳
+    /// Timestamp
     /// </summary>
     [JsonPropertyName("timestamp")]
     public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
     /// <summary>
-    /// 请求追踪ID
+    /// Request trace ID
     /// </summary>
     [JsonPropertyName("traceId")]
     public string? TraceId { get; set; }
 }
 
 /// <summary>
-/// 统一 API 响应结果 (无数据)
+/// Unified API response result (without data)
 /// </summary>
 public class ApiResult : ApiResult<object> { }
 
 /// <summary>
-/// API 结果工厂
+/// API result factory
 /// </summary>
 public static class ApiResults
 {
     /// <summary>
-    /// 成功响应
+    /// Success response
     /// </summary>
     public static ApiResult<T> Ok<T>(T data, string? message = null)
     {
@@ -70,7 +70,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 成功响应 (无数据)
+    /// Success response (without data)
     /// </summary>
     public static ApiResult Ok(string? message = null)
     {
@@ -83,7 +83,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 创建成功
+    /// Created successfully
     /// </summary>
     public static ApiResult<T> Created<T>(T data, string? message = null)
     {
@@ -97,7 +97,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 失败响应
+    /// Failure response
     /// </summary>
     public static ApiResult<T> Fail<T>(string code, string message, T? data = default)
     {
@@ -111,7 +111,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 失败响应 (无数据)
+    /// Failure response (without data)
     /// </summary>
     public static ApiResult Fail(string code, string message)
     {
@@ -124,7 +124,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 资源未找到
+    /// Resource not found
     /// </summary>
     public static ApiResult NotFound(string message = "Resource not found")
     {
@@ -132,7 +132,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 验证失败
+    /// Validation failed
     /// </summary>
     public static ApiResult ValidationError(
         IDictionary<string, string[]>? errors = null,
@@ -149,7 +149,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 未授权
+    /// Unauthorized access
     /// </summary>
     public static ApiResult Unauthorized(string message = "Unauthorized")
     {
@@ -157,7 +157,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 禁止访问
+    /// Access forbidden
     /// </summary>
     public static ApiResult Forbidden(string message = "Access forbidden")
     {
@@ -165,7 +165,7 @@ public static class ApiResults
     }
 
     /// <summary>
-    /// 服务器错误
+    /// Internal server error
     /// </summary>
     public static ApiResult Error(string message = "Internal server error", string? traceId = null)
     {

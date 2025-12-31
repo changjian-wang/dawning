@@ -8,7 +8,7 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===== 配置 Serilog =====
+// ===== Configure Serilog =====
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
@@ -18,7 +18,7 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// ===== 数据库连接 =====
+// ===== Database Connection =====
 var connectionString = builder.Configuration.GetConnectionString("MySQL");
 if (!string.IsNullOrWhiteSpace(connectionString))
 {
@@ -26,7 +26,7 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     Log.Information("Database connection configured");
 }
 
-// ===== 注册应用服务 (依赖注入) =====
+// ===== Register Application Services (Dependency Injection) =====
 builder.Services.AddApplicationServices();
 
 // ===== YARP =====
@@ -34,20 +34,20 @@ var useDatabase = builder.Configuration.GetValue<bool>("Gateway:UseDatabase");
 
 if (useDatabase)
 {
-    // 从数据库加载配置
+    // Load configuration from database
     builder.Services.AddReverseProxy().LoadFromDatabase();
     Log.Information("YARP configured to load routes from database");
 }
 else
 {
-    // 从配置文件加载（静态配置，作为后备）
+    // Load from configuration file (static configuration, as fallback)
     builder
         .Services.AddReverseProxy()
         .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
     Log.Information("YARP configured to load routes from appsettings.json");
 }
 
-// ===== 认证 =====
+// ===== Authentication =====
 builder
     .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -64,7 +64,7 @@ builder
         };
     });
 
-// ===== 授权 =====
+// ===== Authorization =====
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("authenticated", policy => policy.RequireAuthenticatedUser());
@@ -72,10 +72,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("admin", policy => policy.RequireRole("admin"));
 });
 
-// ===== 限流策略 =====
+// ===== Rate Limiting Policies =====
 builder.Services.AddRateLimiter(options =>
 {
-    // 固定窗口限流：每分钟 100 个请求
+    // Fixed window rate limiting: 100 requests per minute
     options.AddFixedWindowLimiter(
         "fixed-window",
         config =>
@@ -91,7 +91,7 @@ builder.Services.AddRateLimiter(options =>
         }
     );
 
-    // 滑动窗口限流：每分钟 100 个请求，分 6 段
+    // Sliding window rate limiting: 100 requests per minute, divided into 6 segments
     options.AddSlidingWindowLimiter(
         "sliding-window",
         config =>
@@ -108,7 +108,7 @@ builder.Services.AddRateLimiter(options =>
         }
     );
 
-    // 令牌桶限流：持续补充令牌
+    // Token bucket rate limiting: continuous token replenishment
     options.AddTokenBucketLimiter(
         "token-bucket",
         config =>
@@ -125,7 +125,7 @@ builder.Services.AddRateLimiter(options =>
         }
     );
 
-    // 并发限流：最多 50 个并发请求
+    // Concurrency rate limiting: max 50 concurrent requests
     options.AddConcurrencyLimiter(
         "concurrency",
         config =>
@@ -140,7 +140,7 @@ builder.Services.AddRateLimiter(options =>
         }
     );
 
-    // 限流响应
+    // Rate limit response
     options.OnRejected = async (context, cancellationToken) =>
     {
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
@@ -171,7 +171,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "DawningGateway_";
 });
 
-// ===== 健康检查 =====
+// ===== Health Checks =====
 builder
     .Services.AddHealthChecks()
     .AddUrlGroup(
@@ -182,13 +182,13 @@ builder
 
 var app = builder.Build();
 
-// ===== 初始化数据库配置 =====
+// ===== Initialize Database Configuration =====
 if (useDatabase)
 {
     await app.InitializeDatabaseProxyConfigAsync();
 }
 
-// ===== 开发环境 =====
+// ===== Development Environment =====
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

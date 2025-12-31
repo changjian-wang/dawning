@@ -6,8 +6,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Infra.Messaging;
 
 /// <summary>
-/// 基于 MediatR 的领域事件分发器
-/// 用于进程内发布领域事件
+/// MediatR-based domain event dispatcher
+/// Used for in-process domain event publishing
 /// </summary>
 public class MediatRDomainEventDispatcher : IDomainEventDispatcher
 {
@@ -24,7 +24,7 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
     }
 
     /// <summary>
-    /// 发布单个领域事件
+    /// Publish a single domain event
     /// </summary>
     public async Task DispatchAsync(
         IDomainEvent domainEvent,
@@ -59,7 +59,7 @@ public class MediatRDomainEventDispatcher : IDomainEventDispatcher
     }
 
     /// <summary>
-    /// 发布多个领域事件（按顺序）
+    /// Publish multiple domain events (in sequence)
     /// </summary>
     public async Task DispatchAsync(
         IEnumerable<IDomainEvent> domainEvents,

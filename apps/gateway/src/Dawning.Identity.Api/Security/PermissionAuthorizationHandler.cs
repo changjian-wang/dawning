@@ -6,7 +6,7 @@ using OpenIddict.Abstractions;
 namespace Dawning.Identity.Api.Security
 {
     /// <summary>
-    /// 权限验证处理器，负责验证用户是否拥有指定权限
+    /// Permission authorization handler, responsible for verifying if user has specified permissions
     /// </summary>
     public class PermissionAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
     {
@@ -27,7 +27,7 @@ namespace Dawning.Identity.Api.Security
             PermissionRequirement requirement
         )
         {
-            // 获取用户ID
+            // Get user ID
             var userIdClaim =
                 context.User.FindFirst(ClaimTypes.NameIdentifier) ?? context.User.FindFirst("sub");
 
@@ -37,8 +37,8 @@ namespace Dawning.Identity.Api.Security
                 return;
             }
 
-            // 检查是否是超级管理员（超级管理员拥有所有权限）
-            // 注意：OpenIddict 使用 "role" claim type，需要直接检查 claims
+            // Check if super admin (super admin has all permissions)
+            // Note: OpenIddict uses "role" claim type, need to check claims directly
             var roles = context
                 .User.Claims.Where(c =>
                     c.Type == OpenIddictConstants.Claims.Role
@@ -65,7 +65,7 @@ namespace Dawning.Identity.Api.Security
                 string.Join(", ", roles)
             );
 
-            // 使用 scope 获取仓储服务
+            // Use scope to get repository services
             using var scope = _serviceProvider.CreateScope();
             var userRoleRepository =
                 scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
@@ -74,7 +74,7 @@ namespace Dawning.Identity.Api.Security
 
             try
             {
-                // Step 1: 获取用户的所有角色
+                // Step 1: Get all roles of the user
                 var userRoles = await userRoleRepository.GetUserRolesAsync(userId);
                 if (!userRoles.Any())
                 {
@@ -86,7 +86,7 @@ namespace Dawning.Identity.Api.Security
                     return;
                 }
 
-                // Step 2: 检查用户的任意角色是否拥有该权限
+                // Step 2: Check if any of the user's roles have this permission
                 foreach (var role in userRoles)
                 {
                     var hasPermission = await rolePermissionRepository.HasPermissionAsync(

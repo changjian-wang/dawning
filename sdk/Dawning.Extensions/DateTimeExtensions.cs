@@ -1,23 +1,23 @@
 namespace Dawning.Extensions;
 
 /// <summary>
-/// 日期时间扩展方法
+/// DateTime extension methods
 /// </summary>
 public static class DateTimeExtensions
 {
     /// <summary>
-    /// 获取当天的开始时间 (00:00:00)
+    /// Get the start of day (00:00:00)
     /// </summary>
     public static DateTime StartOfDay(this DateTime dateTime) => dateTime.Date;
 
     /// <summary>
-    /// 获取当天的结束时间 (23:59:59.999)
+    /// Get the end of day (23:59:59.999)
     /// </summary>
     public static DateTime EndOfDay(this DateTime dateTime) =>
         dateTime.Date.AddDays(1).AddMilliseconds(-1);
 
     /// <summary>
-    /// 获取本周的第一天（周一）
+    /// Get the first day of the week (Monday)
     /// </summary>
     public static DateTime StartOfWeek(
         this DateTime dateTime,
@@ -29,7 +29,7 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
-    /// 获取本周的最后一天
+    /// Get the last day of the week
     /// </summary>
     public static DateTime EndOfWeek(
         this DateTime dateTime,
@@ -37,48 +37,48 @@ public static class DateTimeExtensions
     ) => dateTime.StartOfWeek(startOfWeek).AddDays(6).EndOfDay();
 
     /// <summary>
-    /// 获取本月的第一天
+    /// Get the first day of the month
     /// </summary>
     public static DateTime StartOfMonth(this DateTime dateTime) =>
         new DateTime(dateTime.Year, dateTime.Month, 1, 0, 0, 0, dateTime.Kind);
 
     /// <summary>
-    /// 获取本月的最后一天
+    /// Get the last day of the month
     /// </summary>
     public static DateTime EndOfMonth(this DateTime dateTime) =>
         dateTime.StartOfMonth().AddMonths(1).AddMilliseconds(-1);
 
     /// <summary>
-    /// 获取本年的第一天
+    /// Get the first day of the year
     /// </summary>
     public static DateTime StartOfYear(this DateTime dateTime) =>
         new DateTime(dateTime.Year, 1, 1, 0, 0, 0, dateTime.Kind);
 
     /// <summary>
-    /// 获取本年的最后一天
+    /// Get the last day of the year
     /// </summary>
     public static DateTime EndOfYear(this DateTime dateTime) =>
         new DateTime(dateTime.Year, 12, 31, 23, 59, 59, 999, dateTime.Kind);
 
     /// <summary>
-    /// 判断是否是周末
+    /// Check if the date is a weekend
     /// </summary>
     public static bool IsWeekend(this DateTime dateTime) =>
         dateTime.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
 
     /// <summary>
-    /// 判断是否是工作日
+    /// Check if the date is a weekday
     /// </summary>
     public static bool IsWeekday(this DateTime dateTime) => !dateTime.IsWeekend();
 
     /// <summary>
-    /// 获取两个日期之间的天数
+    /// Get the number of days between two dates
     /// </summary>
     public static int DaysBetween(this DateTime startDate, DateTime endDate) =>
         (int)(endDate.Date - startDate.Date).TotalDays;
 
     /// <summary>
-    /// 计算年龄
+    /// Calculate age
     /// </summary>
     public static int CalculateAge(this DateTime birthDate, DateTime? referenceDate = null)
     {
@@ -92,31 +92,31 @@ public static class DateTimeExtensions
     }
 
     /// <summary>
-    /// 转换为 Unix 时间戳（秒）
+    /// Convert to Unix timestamp (seconds)
     /// </summary>
     public static long ToUnixTimeSeconds(this DateTime dateTime) =>
         new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeSeconds();
 
     /// <summary>
-    /// 转换为 Unix 时间戳（毫秒）
+    /// Convert to Unix timestamp (milliseconds)
     /// </summary>
     public static long ToUnixTimeMilliseconds(this DateTime dateTime) =>
         new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
 
     /// <summary>
-    /// 从 Unix 时间戳（秒）创建 DateTime
+    /// Create DateTime from Unix timestamp (seconds)
     /// </summary>
     public static DateTime FromUnixTimeSeconds(this long timestamp) =>
         DateTimeOffset.FromUnixTimeSeconds(timestamp).LocalDateTime;
 
     /// <summary>
-    /// 从 Unix 时间戳（毫秒）创建 DateTime
+    /// Create DateTime from Unix timestamp (milliseconds)
     /// </summary>
     public static DateTime FromUnixTimeMilliseconds(this long timestamp) =>
         DateTimeOffset.FromUnixTimeMilliseconds(timestamp).LocalDateTime;
 
     /// <summary>
-    /// 获取相对时间描述（如"3分钟前"）
+    /// Get relative time description (e.g., "3 minutes ago")
     /// </summary>
     public static string ToRelativeTime(this DateTime dateTime)
     {
@@ -124,40 +124,40 @@ public static class DateTimeExtensions
         var span = now - dateTime;
 
         if (span.TotalSeconds < 60)
-            return "刚刚";
+            return "just now";
         if (span.TotalMinutes < 60)
-            return $"{(int)span.TotalMinutes}分钟前";
+            return $"{(int)span.TotalMinutes} minutes ago";
         if (span.TotalHours < 24)
-            return $"{(int)span.TotalHours}小时前";
+            return $"{(int)span.TotalHours} hours ago";
         if (span.TotalDays < 7)
-            return $"{(int)span.TotalDays}天前";
+            return $"{(int)span.TotalDays} days ago";
         if (span.TotalDays < 30)
-            return $"{(int)(span.TotalDays / 7)}周前";
+            return $"{(int)(span.TotalDays / 7)} weeks ago";
         if (span.TotalDays < 365)
-            return $"{(int)(span.TotalDays / 30)}个月前";
+            return $"{(int)(span.TotalDays / 30)} months ago";
 
-        return $"{(int)(span.TotalDays / 365)}年前";
+        return $"{(int)(span.TotalDays / 365)} years ago";
     }
 
     /// <summary>
-    /// 格式化为标准日期字符串 (yyyy-MM-dd)
+    /// Format as standard date string (yyyy-MM-dd)
     /// </summary>
     public static string ToDateString(this DateTime dateTime) => dateTime.ToString("yyyy-MM-dd");
 
     /// <summary>
-    /// 格式化为标准日期时间字符串 (yyyy-MM-dd HH:mm:ss)
+    /// Format as standard datetime string (yyyy-MM-dd HH:mm:ss)
     /// </summary>
     public static string ToDateTimeString(this DateTime dateTime) =>
         dateTime.ToString("yyyy-MM-dd HH:mm:ss");
 
     /// <summary>
-    /// 格式化为 ISO 8601 格式
+    /// Format as ISO 8601 format
     /// </summary>
     public static string ToIso8601(this DateTime dateTime) =>
         dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
 
     /// <summary>
-    /// 设置时间部分
+    /// Set time portion
     /// </summary>
     public static DateTime SetTime(
         this DateTime dateTime,
@@ -178,7 +178,7 @@ public static class DateTimeExtensions
         );
 
     /// <summary>
-    /// 添加工作日
+    /// Add business days
     /// </summary>
     public static DateTime AddWorkdays(this DateTime dateTime, int days)
     {

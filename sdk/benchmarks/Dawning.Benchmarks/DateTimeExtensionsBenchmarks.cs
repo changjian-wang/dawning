@@ -5,7 +5,7 @@ using Dawning.Extensions;
 namespace Dawning.Benchmarks;
 
 /// <summary>
-/// 日期时间扩展方法基准测试
+/// DateTime extension methods benchmarks
 /// </summary>
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

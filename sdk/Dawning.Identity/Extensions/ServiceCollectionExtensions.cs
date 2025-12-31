@@ -9,16 +9,16 @@ using Microsoft.IdentityModel.Tokens;
 namespace Dawning.Identity.Extensions;
 
 /// <summary>
-/// 服务注册扩展方法
+/// Service registration extension methods
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// 添加 Dawning 统一认证
+    /// Adds Dawning unified authentication
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configuration">配置</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="configuration">Configuration</param>
+    /// <returns>Service collection</returns>
     /// <example>
     /// <code>
     /// // appsettings.json:
@@ -45,11 +45,11 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加 Dawning 统一认证 (使用配置委托)
+    /// Adds Dawning unified authentication (with configuration delegate)
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     /// <example>
     /// <code>
     /// builder.Services.AddDawningAuthentication(options =>
@@ -72,26 +72,26 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加 Dawning 统一认证 (使用选项对象)
+    /// Adds Dawning unified authentication (with options object)
     /// </summary>
     private static IServiceCollection AddDawningAuthentication(
         this IServiceCollection services,
         DawningAuthOptions options
     )
     {
-        // 验证必填配置
+        // Validate required configuration
         if (string.IsNullOrWhiteSpace(options.Authority))
             throw new ArgumentException("DawningAuth:Authority is required");
         if (string.IsNullOrWhiteSpace(options.Issuer))
             throw new ArgumentException("DawningAuth:Issuer is required");
 
-        // 清除默认的 Claim 类型映射 (避免 sub -> nameidentifier 等转换)
+        // Clear default claim type mappings (avoid sub -> nameidentifier conversions)
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-        // 注册配置选项
+        // Register configuration options
         services.AddSingleton(options);
 
-        // 配置认证
+        // Configure authentication
         services
             .AddAuthentication(authOptions =>
             {
@@ -105,32 +105,32 @@ public static class ServiceCollectionExtensions
 
                 jwtOptions.TokenValidationParameters = new TokenValidationParameters
                 {
-                    // 签发者验证
+                    // Issuer validation
                     ValidateIssuer = true,
                     ValidIssuer = options.Issuer,
 
-                    // 受众验证 (可选)
+                    // Audience validation (optional)
                     ValidateAudience = !string.IsNullOrWhiteSpace(options.Audience),
                     ValidAudience = options.Audience,
 
-                    // 过期验证
+                    // Expiration validation
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(options.ClockSkewMinutes),
 
-                    // 签名验证 (从 Authority 自动获取公钥)
+                    // Signature validation (automatically gets public key from Authority)
                     ValidateIssuerSigningKey = true,
 
-                    // 保持原始 Claim 名称
+                    // Keep original claim names
                     NameClaimType = "name",
                     RoleClaimType = "role",
                 };
 
-                // 事件处理
+                // Event handling
                 jwtOptions.Events = new JwtBearerEvents
                 {
                     OnAuthenticationFailed = context =>
                     {
-                        // 记录认证失败原因
+                        // Log authentication failure reason
                         var logger = context
                             .HttpContext.RequestServices.GetService<Microsoft.Extensions.Logging.ILoggerFactory>()
                             ?.CreateLogger("DawningAuthentication");
@@ -145,18 +145,18 @@ public static class ServiceCollectionExtensions
                     },
                     OnTokenValidated = context =>
                     {
-                        // Token 验证成功后的处理 (可扩展)
+                        // Processing after token validation success (extensible)
                         return Task.CompletedTask;
                     },
                     OnChallenge = context =>
                     {
-                        // 自定义 401 响应 (可选)
+                        // Custom 401 response (optional)
                         return Task.CompletedTask;
                     },
                 };
             });
 
-        // 注册当前用户服务
+        // Register current user service
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
 
@@ -164,16 +164,16 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加 Dawning 授权策略
+    /// Adds Dawning authorization policies
     /// </summary>
     public static IServiceCollection AddDawningAuthorization(this IServiceCollection services)
     {
         services.AddAuthorization(options =>
         {
-            // 基础策略
+            // Basic policy
             options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
 
-            // 角色策略
+            // Role policies
             options.AddPolicy(
                 "SuperAdmin",
                 policy => policy.RequireRole(Constants.DawningRoles.SuperAdmin)

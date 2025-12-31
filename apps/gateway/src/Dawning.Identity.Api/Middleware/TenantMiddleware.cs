@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Middleware
 {
     /// <summary>
-    /// 租户解析中间件
-    /// 从请求中识别租户并设置到租户上下文
+    /// Tenant resolution middleware
+    /// Identifies tenant from request and sets tenant context
     /// </summary>
     public class TenantMiddleware
     {
@@ -18,17 +18,17 @@ namespace Dawning.Identity.Api.Middleware
         private readonly ILogger<TenantMiddleware> _logger;
 
         /// <summary>
-        /// 租户标识的请求头名称
+        /// Request header name for tenant ID
         /// </summary>
         public const string TenantHeader = "X-Tenant-Id";
 
         /// <summary>
-        /// 租户代码的请求头名称
+        /// Request header name for tenant code
         /// </summary>
         public const string TenantCodeHeader = "X-Tenant-Code";
 
         /// <summary>
-        /// JWT 中的租户声明类型
+        /// Tenant claim type in JWT
         /// </summary>
         public const string TenantClaimType = "tenant_id";
 
@@ -46,41 +46,41 @@ namespace Dawning.Identity.Api.Middleware
         {
             try
             {
-                // 解析租户信息
+                // Resolve tenant information
                 var (tenantId, tenantName, isHost) = await ResolveTenantAsync(
                     context,
                     tenantService
                 );
 
-                // 设置租户上下文
+                // Set tenant context
                 tenantContext.SetTenant(tenantId, tenantName, isHost);
 
                 if (tenantId.HasValue)
                 {
-                    _logger.LogDebug("请求租户: {TenantId} ({TenantName})", tenantId, tenantName);
+                    _logger.LogDebug("Request tenant: {TenantId} ({TenantName})", tenantId, tenantName);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "解析租户失败");
+                _logger.LogWarning(ex, "Failed to resolve tenant");
             }
 
             await _next(context);
         }
 
         /// <summary>
-        /// 解析租户信息
-        /// 优先级: JWT声明 > 请求头 > 子域名
+        /// Resolve tenant information
+        /// Priority: JWT claim > Request header > Subdomain
         /// </summary>
         private async Task<(Guid? TenantId, string? TenantName, bool IsHost)> ResolveTenantAsync(
             HttpContext context,
             ITenantService tenantService
         )
         {
-            // 1. 从 JWT Token 中获取租户ID
+            // 1. Get tenant ID from JWT Token
             if (context.User.Identity?.IsAuthenticated == true)
             {
-                // 检查是否是主机用户（超级管理员）
+                // Check if user is host user (super admin)
                 var isHost = context.User.IsInRole("super_admin");
 
                 var tenantClaim = context.User.FindFirst(TenantClaimType);
@@ -93,7 +93,7 @@ namespace Dawning.Identity.Api.Middleware
                     }
                 }
 
-                // 超级管理员可以通过请求头切换租户
+                // Super admin can switch tenant via request header
                 if (isHost)
                 {
                     var switchTenant = await ResolveTenantFromHeaderAsync(context, tenantService);
@@ -101,19 +101,19 @@ namespace Dawning.Identity.Api.Middleware
                     {
                         return (switchTenant.TenantId, switchTenant.TenantName, true);
                     }
-                    // 超级管理员没有指定租户时，设置为主机模式（可以访问所有数据）
+                    // When super admin doesn't specify tenant, set to host mode (can access all data)
                     return (null, null, true);
                 }
             }
 
-            // 2. 从请求头获取租户
+            // 2. Get tenant from request header
             var headerTenant = await ResolveTenantFromHeaderAsync(context, tenantService);
             if (headerTenant.TenantId.HasValue)
             {
                 return headerTenant;
             }
 
-            // 3. 从子域名获取租户
+            // 3. Get tenant from subdomain
             var host = context.Request.Host.Host;
             var tenant2 = await tenantService.ResolveTenantAsync(null, host);
             if (tenant2 != null)
@@ -121,7 +121,7 @@ namespace Dawning.Identity.Api.Middleware
                 return (tenant2.Id, tenant2.Name, false);
             }
 
-            // 没有解析到租户
+            // No tenant resolved
             return (null, null, false);
         }
 
@@ -131,7 +131,7 @@ namespace Dawning.Identity.Api.Middleware
             bool IsHost
         )> ResolveTenantFromHeaderAsync(HttpContext context, ITenantService tenantService)
         {
-            // 尝试从请求头获取租户ID
+            // Try to get tenant ID from request header
             if (context.Request.Headers.TryGetValue(TenantHeader, out var tenantIdHeader))
             {
                 if (Guid.TryParse(tenantIdHeader.ToString(), out var headerTenantId))
@@ -144,7 +144,7 @@ namespace Dawning.Identity.Api.Middleware
                 }
             }
 
-            // 尝试从请求头获取租户代码
+            // Try to get tenant code from request header
             if (context.Request.Headers.TryGetValue(TenantCodeHeader, out var tenantCodeHeader))
             {
                 var tenantCode = tenantCodeHeader.ToString();
@@ -158,7 +158,7 @@ namespace Dawning.Identity.Api.Middleware
                 }
             }
 
-            // 尝试从查询参数获取
+            // Try to get from query parameter
             if (context.Request.Query.TryGetValue("tenant", out var tenantQuery))
             {
                 var tenantCode = tenantQuery.ToString();
@@ -177,7 +177,7 @@ namespace Dawning.Identity.Api.Middleware
     }
 
     /// <summary>
-    /// 租户中间件扩展方法
+    /// Tenant middleware extension methods
     /// </summary>
     public static class TenantMiddlewareExtensions
     {

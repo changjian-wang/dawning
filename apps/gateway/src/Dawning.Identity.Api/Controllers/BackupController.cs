@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers
 {
     /// <summary>
-    /// 数据库备份管理控制器
+    /// Database backup management controller
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
@@ -24,10 +24,10 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 创建数据库备份
+        /// Create database backup
         /// </summary>
-        /// <param name="options">备份选项</param>
-        /// <returns>备份结果</returns>
+        /// <param name="options">Backup options</param>
+        /// <returns>Backup result</returns>
         [HttpPost]
         public async Task<ActionResult<BackupResult>> CreateBackup(
             [FromBody] BackupOptions? options = null
@@ -46,10 +46,10 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取备份历史列表
+        /// Get backup history list
         /// </summary>
-        /// <param name="count">返回数量（默认20）</param>
-        /// <returns>备份记录列表</returns>
+        /// <param name="count">Return count (default 20)</param>
+        /// <returns>Backup record list</returns>
         [HttpGet("history")]
         public async Task<ActionResult> GetBackupHistory([FromQuery] int count = 20)
         {
@@ -58,10 +58,10 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 删除指定备份
+        /// Delete specified backup
         /// </summary>
-        /// <param name="id">备份ID</param>
-        /// <returns>是否成功</returns>
+        /// <param name="id">Backup ID</param>
+        /// <returns>Whether successful</returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBackup(Guid id)
         {
@@ -69,23 +69,23 @@ namespace Dawning.Identity.Api.Controllers
 
             if (!success)
             {
-                return NotFound(new { message = "备份不存在" });
+                return NotFound(new { message = "Backup does not exist" });
             }
 
-            return Ok(new { message = "备份已删除" });
+            return Ok(new { message = "Backup deleted" });
         }
 
         /// <summary>
-        /// 清理过期备份
+        /// Cleanup expired backups
         /// </summary>
-        /// <param name="retentionDays">保留天数（默认30）</param>
-        /// <returns>清理结果</returns>
+        /// <param name="retentionDays">Retention days (default 30)</param>
+        /// <returns>Cleanup result</returns>
         [HttpPost("cleanup")]
         public async Task<ActionResult> CleanupOldBackups([FromQuery] int retentionDays = 30)
         {
             if (retentionDays < 1)
             {
-                return BadRequest(new { message = "保留天数必须大于0" });
+                return BadRequest(new { message = "Retention days must be greater than 0" });
             }
 
             var count = await _backupService.CleanupOldBackupsAsync(retentionDays);
@@ -93,7 +93,7 @@ namespace Dawning.Identity.Api.Controllers
             return Ok(
                 new
                 {
-                    message = $"已清理 {count} 个过期备份",
+                    message = $"Cleaned up {count} expired backups",
                     deletedCount = count,
                     retentionDays = retentionDays,
                 }

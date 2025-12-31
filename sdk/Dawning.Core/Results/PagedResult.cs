@@ -3,49 +3,49 @@ using System.Text.Json.Serialization;
 namespace Dawning.Core.Results;
 
 /// <summary>
-/// 分页结果
+/// Paged result
 /// </summary>
-/// <typeparam name="T">数据类型</typeparam>
+/// <typeparam name="T">Data type</typeparam>
 public class PagedResult<T>
 {
     /// <summary>
-    /// 数据列表
+    /// Data list
     /// </summary>
     [JsonPropertyName("items")]
     public IReadOnlyList<T> Items { get; set; } = Array.Empty<T>();
 
     /// <summary>
-    /// 总记录数
+    /// Total record count
     /// </summary>
     [JsonPropertyName("totalCount")]
     public int TotalCount { get; set; }
 
     /// <summary>
-    /// 当前页码 (从1开始)
+    /// Current page index (starting from 1)
     /// </summary>
     [JsonPropertyName("pageIndex")]
     public int PageIndex { get; set; } = 1;
 
     /// <summary>
-    /// 每页大小
+    /// Page size
     /// </summary>
     [JsonPropertyName("pageSize")]
     public int PageSize { get; set; } = 10;
 
     /// <summary>
-    /// 总页数
+    /// Total pages count
     /// </summary>
     [JsonPropertyName("totalPages")]
     public int TotalPages => PageSize > 0 ? (int)Math.Ceiling(TotalCount / (double)PageSize) : 0;
 
     /// <summary>
-    /// 是否有上一页
+    /// Has previous page
     /// </summary>
     [JsonPropertyName("hasPreviousPage")]
     public bool HasPreviousPage => PageIndex > 1;
 
     /// <summary>
-    /// 是否有下一页
+    /// Has next page
     /// </summary>
     [JsonPropertyName("hasNextPage")]
     public bool HasNextPage => PageIndex < TotalPages;
@@ -61,7 +61,7 @@ public class PagedResult<T>
     }
 
     /// <summary>
-    /// 创建空的分页结果
+    /// Create an empty paged result
     /// </summary>
     public static PagedResult<T> Empty(int pageIndex = 1, int pageSize = 10)
     {
@@ -69,7 +69,7 @@ public class PagedResult<T>
     }
 
     /// <summary>
-    /// 从列表创建分页结果 (内存分页)
+    /// Create paged result from list (in-memory paging)
     /// </summary>
     public static PagedResult<T> FromList(IEnumerable<T> source, int pageIndex, int pageSize)
     {
@@ -79,7 +79,7 @@ public class PagedResult<T>
     }
 
     /// <summary>
-    /// 映射到另一个类型
+    /// Map to another type
     /// </summary>
     public PagedResult<TDestination> Map<TDestination>(Func<T, TDestination> mapper)
     {
@@ -94,7 +94,7 @@ public class PagedResult<T>
 }
 
 /// <summary>
-/// 分页请求参数
+/// Paged request parameters
 /// </summary>
 public class PagedRequest
 {
@@ -102,7 +102,7 @@ public class PagedRequest
     private int _pageSize = 10;
 
     /// <summary>
-    /// 页码 (从1开始, 最小为1)
+    /// Page index (starting from 1, minimum is 1)
     /// </summary>
     [JsonPropertyName("pageIndex")]
     public int PageIndex
@@ -112,7 +112,7 @@ public class PagedRequest
     }
 
     /// <summary>
-    /// 每页大小 (1-100)
+    /// Page size (1-100)
     /// </summary>
     [JsonPropertyName("pageSize")]
     public int PageSize
@@ -122,31 +122,31 @@ public class PagedRequest
     }
 
     /// <summary>
-    /// 排序字段
+    /// Sort field
     /// </summary>
     [JsonPropertyName("sortField")]
     public string? SortField { get; set; }
 
     /// <summary>
-    /// 是否降序
+    /// Sort in descending order
     /// </summary>
     [JsonPropertyName("sortDescending")]
     public bool SortDescending { get; set; }
 
     /// <summary>
-    /// 搜索关键字
+    /// Search keyword
     /// </summary>
     [JsonPropertyName("keyword")]
     public string? Keyword { get; set; }
 
     /// <summary>
-    /// 计算跳过的记录数
+    /// Number of records to skip
     /// </summary>
     [JsonIgnore]
     public int Skip => (PageIndex - 1) * PageSize;
 
     /// <summary>
-    /// 获取记录数 (等于 PageSize)
+    /// Number of records to take (equals PageSize)
     /// </summary>
     [JsonIgnore]
     public int Take => PageSize;

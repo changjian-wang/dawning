@@ -4,15 +4,15 @@ using Microsoft.AspNetCore.SignalR;
 namespace Dawning.Identity.Api.Hubs
 {
     /// <summary>
-    /// 实时通知 Hub
-    /// 提供实时推送告警、系统消息、用户状态更新等功能
+    /// Real-time notification Hub
+    /// Provides real-time push alerts, system messages, user status updates, etc.
     /// </summary>
     [Authorize]
     public class NotificationHub : Hub
     {
         private readonly ILogger<NotificationHub> _logger;
 
-        // 支持的日志频道（需要管理员权限）
+        // Supported log channels (requires admin permission)
         private static readonly string[] LogChannels =
         [
             "logs_all",
@@ -21,7 +21,7 @@ namespace Dawning.Identity.Api.Hubs
             "logs_info",
         ];
 
-        // 支持的通知频道
+        // Supported notification channels
         private static readonly string[] NotificationChannels =
         [
             "alerts",
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Api.Hubs
         }
 
         /// <summary>
-        /// 客户端连接时调用
+        /// Called when client connects
         /// </summary>
         public override async Task OnConnectedAsync()
         {
@@ -45,10 +45,10 @@ namespace Dawning.Identity.Api.Hubs
 
             if (!string.IsNullOrEmpty(userId))
             {
-                // 将用户加入其个人组
+                // Add user to their personal group
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
 
-                // 根据角色加入对应组
+                // Add to corresponding groups based on roles
                 var roles = Context.User?.FindAll("role")?.Select(c => c.Value) ?? [];
                 foreach (var role in roles)
                 {
@@ -56,7 +56,7 @@ namespace Dawning.Identity.Api.Hubs
                 }
 
                 _logger.LogInformation(
-                    "用户 {Username} (ID: {UserId}) 已连接，ConnectionId: {ConnectionId}",
+                    "User {Username} (ID: {UserId}) connected, ConnectionId: {ConnectionId}",
                     username,
                     userId,
                     Context.ConnectionId
@@ -67,7 +67,7 @@ namespace Dawning.Identity.Api.Hubs
         }
 
         /// <summary>
-        /// 客户端断开连接时调用
+        /// Called when client disconnects
         /// </summary>
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
@@ -78,7 +78,7 @@ namespace Dawning.Identity.Api.Hubs
             {
                 _logger.LogWarning(
                     exception,
-                    "用户 {Username} 连接异常断开，ConnectionId: {ConnectionId}",
+                    "User {Username} connection disconnected abnormally, ConnectionId: {ConnectionId}",
                     username,
                     Context.ConnectionId
                 );
@@ -86,7 +86,7 @@ namespace Dawning.Identity.Api.Hubs
             else
             {
                 _logger.LogInformation(
-                    "用户 {Username} 已断开连接，ConnectionId: {ConnectionId}",
+                    "User {Username} disconnected, ConnectionId: {ConnectionId}",
                     username,
                     Context.ConnectionId
                 );
@@ -96,46 +96,46 @@ namespace Dawning.Identity.Api.Hubs
         }
 
         /// <summary>
-        /// 订阅特定频道
+        /// Subscribe to a specific channel
         /// </summary>
-        /// <param name="channel">频道名称 (如: alerts, system, monitoring, logs_all, logs_error)</param>
+        /// <param name="channel">Channel name (e.g.: alerts, system, monitoring, logs_all, logs_error)</param>
         public async Task Subscribe(string channel)
         {
             if (string.IsNullOrWhiteSpace(channel))
             {
-                throw new HubException("频道名称不能为空");
+                throw new HubException("Channel name cannot be empty");
             }
 
             var channelLower = channel.ToLower();
 
-            // 检查日志频道权限
+            // Check log channel permissions
             if (LogChannels.Contains(channelLower))
             {
                 if (!IsAdmin())
                 {
-                    throw new HubException("只有管理员才能订阅日志频道");
+                    throw new HubException("Only administrators can subscribe to log channels");
                 }
             }
             else if (!NotificationChannels.Contains(channelLower))
             {
-                throw new HubException($"无效的频道名称: {channel}");
+                throw new HubException($"Invalid channel name: {channel}");
             }
 
             await Groups.AddToGroupAsync(Context.ConnectionId, $"channel_{channelLower}");
             _logger.LogDebug(
-                "用户 {Username} 订阅了频道 {Channel}",
+                "User {Username} subscribed to channel {Channel}",
                 Context.User?.Identity?.Name,
                 channel
             );
 
-            // 通知客户端订阅成功
+            // Notify client subscription successful
             await Clients.Caller.SendAsync("Subscribed", channelLower);
         }
 
         /// <summary>
-        /// 取消订阅频道
+        /// Unsubscribe from channel
         /// </summary>
-        /// <param name="channel">频道名称</param>
+        /// <param name="channel">Channel name</param>
         public async Task Unsubscribe(string channel)
         {
             if (!string.IsNullOrWhiteSpace(channel))
@@ -143,48 +143,48 @@ namespace Dawning.Identity.Api.Hubs
                 var channelLower = channel.ToLower();
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"channel_{channelLower}");
                 _logger.LogDebug(
-                    "用户 {Username} 取消订阅了频道 {Channel}",
+                    "User {Username} unsubscribed from channel {Channel}",
                     Context.User?.Identity?.Name,
                     channel
                 );
 
-                // 通知客户端取消订阅成功
+                // Notify client unsubscription successful
                 await Clients.Caller.SendAsync("Unsubscribed", channelLower);
             }
         }
 
         /// <summary>
-        /// 确认收到通知
+        /// Acknowledge notification receipt
         /// </summary>
-        /// <param name="notificationId">通知ID</param>
+        /// <param name="notificationId">Notification ID</param>
         public async Task AcknowledgeNotification(string notificationId)
         {
             var userId = Context.User?.FindFirst("sub")?.Value;
             _logger.LogInformation(
-                "用户 {UserId} 确认收到通知 {NotificationId}",
+                "User {UserId} acknowledged notification {NotificationId}",
                 userId,
                 notificationId
             );
 
-            // 可以在这里记录确认状态到数据库
+            // Can record acknowledgment status to database here
             await Clients.Caller.SendAsync("NotificationAcknowledged", notificationId);
         }
 
         /// <summary>
-        /// 获取当前连接的订阅状态
+        /// Get current connection subscription status
         /// </summary>
         public async Task GetSubscriptions()
         {
-            // 这个方法让客户端可以查询当前连接订阅了哪些频道
-            // 服务端暂时无法直接获取，客户端需自己维护状态
+            // This method lets clients query which channels the current connection is subscribed to
+            // Server cannot directly get this information, client needs to maintain state
             await Clients.Caller.SendAsync(
                 "SubscriptionStatus",
-                new { ConnectionId = Context.ConnectionId, Message = "请在客户端维护订阅状态" }
+                new { ConnectionId = Context.ConnectionId, Message = "Please maintain subscription status on client side" }
             );
         }
 
         /// <summary>
-        /// 检查当前用户是否是管理员
+        /// Check if current user is an administrator
         /// </summary>
         private bool IsAdmin()
         {

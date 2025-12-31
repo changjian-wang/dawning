@@ -1,27 +1,27 @@
 namespace Dawning.Caching;
 
 /// <summary>
-/// 缓存服务接口
+/// Cache service interface
 /// </summary>
 public interface ICacheService
 {
     /// <summary>
-    /// 获取缓存值
+    /// Get cached value
     /// </summary>
-    /// <typeparam name="T">值类型</typeparam>
-    /// <param name="key">缓存键</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>缓存值，不存在则返回 default</returns>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="key">Cache key</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Cached value, returns default if not found</returns>
     Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 设置缓存值
+    /// Set cached value
     /// </summary>
-    /// <typeparam name="T">值类型</typeparam>
-    /// <param name="key">缓存键</param>
-    /// <param name="value">缓存值</param>
-    /// <param name="expiration">过期时间</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="key">Cache key</param>
+    /// <param name="value">Cache value</param>
+    /// <param name="expiration">Expiration time</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     Task SetAsync<T>(
         string key,
         T value,
@@ -30,14 +30,14 @@ public interface ICacheService
     );
 
     /// <summary>
-    /// 获取或设置缓存值
+    /// Get or set cached value
     /// </summary>
-    /// <typeparam name="T">值类型</typeparam>
-    /// <param name="key">缓存键</param>
-    /// <param name="factory">值工厂方法</param>
-    /// <param name="expiration">过期时间</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>缓存值</returns>
+    /// <typeparam name="T">Value type</typeparam>
+    /// <param name="key">Cache key</param>
+    /// <param name="factory">Value factory method</param>
+    /// <param name="expiration">Expiration time</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Cached value</returns>
     Task<T?> GetOrSetAsync<T>(
         string key,
         Func<Task<T>> factory,
@@ -46,33 +46,33 @@ public interface ICacheService
     );
 
     /// <summary>
-    /// 移除缓存
+    /// Remove cache
     /// </summary>
-    /// <param name="key">缓存键</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="key">Cache key</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     Task RemoveAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 按模式移除缓存
+    /// Remove cache by pattern
     /// </summary>
-    /// <param name="pattern">键模式（支持通配符 *）</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="pattern">Key pattern (supports wildcard *)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     Task RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 检查缓存是否存在
+    /// Check if cache exists
     /// </summary>
-    /// <param name="key">缓存键</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>是否存在</returns>
+    /// <param name="key">Cache key</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Whether exists</returns>
     Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 刷新缓存过期时间
+    /// Refresh cache expiration time
     /// </summary>
-    /// <param name="key">缓存键</param>
-    /// <param name="expiration">新的过期时间</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <param name="key">Cache key</param>
+    /// <param name="expiration">New expiration time</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     Task RefreshAsync(
         string key,
         TimeSpan expiration,

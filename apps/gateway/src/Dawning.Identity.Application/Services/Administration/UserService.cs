@@ -21,7 +21,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Administration
 {
     /// <summary>
-    /// 用户应用服务实现
+    /// User Application Service Implementation
     /// </summary>
     public class UserService : IUserService
     {
@@ -50,7 +50,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 根据ID获取用户
+        /// Get user by ID
         /// </summary>
         public async Task<UserDto?> GetByIdAsync(Guid id)
         {
@@ -59,7 +59,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 根据用户名获取用户
+        /// Get user by username
         /// </summary>
         public async Task<UserDto?> GetByUsernameAsync(string username)
         {
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取分页用户列表
+        /// Get paged user list
         /// </summary>
         public async Task<PagedData<UserDto>> GetPagedListAsync(
             UserModel model,
@@ -88,7 +88,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取用户列表（Cursor 分页）
+        /// Get user list (Cursor pagination)
         /// </summary>
         public async Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(
             UserModel model,
@@ -112,17 +112,17 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 创建用户
+        /// Create user
         /// </summary>
         public async Task<UserDto> CreateAsync(CreateUserDto dto, Guid? operatorId = null)
         {
-            // 验证用户名是否已存在
+            // Validate if username already exists
             if (await _userRepository.UsernameExistsAsync(dto.Username))
             {
                 throw new InvalidOperationException($"Username '{dto.Username}' already exists.");
             }
 
-            // 验证邮箱是否已存在
+            // Validate if email already exists
             if (
                 !string.IsNullOrWhiteSpace(dto.Email)
                 && await _userRepository.EmailExistsAsync(dto.Email)
@@ -131,7 +131,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"Email '{dto.Email}' already exists.");
             }
 
-            // 验证密码复杂度（优先使用密码策略服务）
+            // Validate password complexity (prefer password policy service)
             await ValidatePasswordAsync(dto.Password);
 
             // 创建用户实体
@@ -154,7 +154,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
             await _userRepository.InsertAsync(user);
 
-            // 发布用户创建集成事件
+            // Publish user creation integration event
             try
             {
                 await _integrationEventBus.PublishAsync(
@@ -190,7 +190,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 更新用户
+        /// Update user
         /// </summary>
         public async Task<UserDto> UpdateAsync(UpdateUserDto dto, Guid? operatorId = null)
         {
@@ -200,7 +200,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"User with ID '{dto.Id}' not found.");
             }
 
-            // 验证邮箱是否已存在（排除当前用户）
+            // Validate if email already exists (exclude current user)
             if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != user.Email)
             {
                 if (await _userRepository.EmailExistsAsync(dto.Email, user.Id))
@@ -209,7 +209,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 }
             }
 
-            // 更新字段
+            // Update fields
             if (dto.Email != null)
                 user.Email = dto.Email;
             if (dto.PhoneNumber != null)
@@ -234,7 +234,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 删除用户
+        /// Delete user
         /// </summary>
         public async Task<bool> DeleteAsync(Guid id, Guid? operatorId = null)
         {
@@ -244,7 +244,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"User with ID '{id}' not found.");
             }
 
-            // 保护系统用户，禁止删除
+            // Protect system user, prevent deletion
             if (user.IsSystem)
             {
                 throw new InvalidOperationException("System user cannot be deleted.");
@@ -253,7 +253,7 @@ namespace Dawning.Identity.Application.Services.Administration
             user.UpdatedBy = operatorId;
             var result = await _userRepository.DeleteAsync(user);
 
-            // 发布用户删除集成事件
+            // Publish user deletion integration event
             if (result)
             {
                 try

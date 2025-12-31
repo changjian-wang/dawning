@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 namespace Dawning.Identity.Application.Services
 {
     /// <summary>
-    /// 当前用户服务实现
-    /// 从 HttpContext 获取当前登录用户信息
+    /// Current user service implementation
+    /// Gets current logged-in user information from HttpContext
     /// </summary>
     public class CurrentUserService : ICurrentUserService
     {
@@ -23,7 +23,7 @@ namespace Dawning.Identity.Application.Services
         private ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
 
         /// <summary>
-        /// 获取当前用户ID
+        /// Get current user ID
         /// </summary>
         public Guid? UserId
         {
@@ -32,7 +32,7 @@ namespace Dawning.Identity.Application.Services
                 if (User == null || !User.Identity?.IsAuthenticated == true)
                     return null;
 
-                // 尝试从多个声明类型获取用户ID
+                // Try to get user ID from multiple claim types
                 var userIdClaim =
                     User.FindFirst(ClaimTypes.NameIdentifier)
                     ?? User.FindFirst("sub")
@@ -48,7 +48,7 @@ namespace Dawning.Identity.Application.Services
         }
 
         /// <summary>
-        /// 获取当前用户名
+        /// Get current username
         /// </summary>
         public string? Username
         {
@@ -65,12 +65,12 @@ namespace Dawning.Identity.Application.Services
         }
 
         /// <summary>
-        /// 是否已认证
+        /// Whether authenticated
         /// </summary>
         public bool IsAuthenticated => User?.Identity?.IsAuthenticated ?? false;
 
         /// <summary>
-        /// 获取用户角色列表
+        /// Get user role list
         /// </summary>
         public IEnumerable<string> Roles
         {
@@ -87,7 +87,7 @@ namespace Dawning.Identity.Application.Services
         }
 
         /// <summary>
-        /// 检查用户是否拥有指定角色
+        /// Check if user has specified role
         /// </summary>
         public bool IsInRole(string role)
         {

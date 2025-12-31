@@ -8,7 +8,7 @@ using RabbitMQ.Client.Events;
 namespace Dawning.Messaging.RabbitMQ;
 
 /// <summary>
-/// RabbitMQ 消息订阅者
+/// RabbitMQ message subscriber
 /// </summary>
 public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
 {
@@ -25,7 +25,7 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
     };
 
     /// <summary>
-    /// 初始化 RabbitMQ 订阅者
+    /// Initializes the RabbitMQ subscriber
     /// </summary>
     public RabbitMQSubscriber(
         IOptions<MessagingOptions> options,
@@ -172,7 +172,7 @@ public class RabbitMQSubscriber : IMessageSubscriber, IAsyncDisposable
     }
 
     /// <summary>
-    /// 释放资源
+    /// Releases resources
     /// </summary>
     public async ValueTask DisposeAsync()
     {

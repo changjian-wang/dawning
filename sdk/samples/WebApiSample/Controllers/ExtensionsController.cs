@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApiSample.Controllers;
 
 /// <summary>
-/// 扩展方法演示控制器
+/// Extensions demo controller
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class ExtensionsController : ControllerBase
 {
     /// <summary>
-    /// 字符串扩展演示
+    /// String extensions demo
     /// </summary>
     [HttpGet("string")]
     public ActionResult<ApiResult<object>> StringExtensions([FromQuery] string input = "HelloWorld")
@@ -33,7 +33,7 @@ public class ExtensionsController : ControllerBase
     }
 
     /// <summary>
-    /// 日期时间扩展演示
+    /// DateTime extensions demo
     /// </summary>
     [HttpGet("datetime")]
     public ActionResult<ApiResult<object>> DateTimeExtensions()
@@ -61,7 +61,7 @@ public class ExtensionsController : ControllerBase
     }
 
     /// <summary>
-    /// JSON 扩展演示
+    /// JSON extensions demo
     /// </summary>
     [HttpPost("json")]
     public ActionResult<ApiResult<object>> JsonExtensions([FromBody] object input)
@@ -82,7 +82,7 @@ public class ExtensionsController : ControllerBase
     }
 
     /// <summary>
-    /// 集合扩展演示
+    /// Collection extensions demo
     /// </summary>
     [HttpGet("collection")]
     public ActionResult<ApiResult<object>> CollectionExtensions()
@@ -107,7 +107,7 @@ public class ExtensionsController : ControllerBase
     }
 
     /// <summary>
-    /// 对象扩展演示
+    /// Object extensions demo
     /// </summary>
     [HttpGet("object")]
     public ActionResult<ApiResult<object>> ObjectExtensions()
@@ -121,7 +121,7 @@ public class ExtensionsController : ControllerBase
             Clamped = value.Clamp(0, 30),
             IsBetween = value.IsBetween(40, 60),
             IsIn = value.IsIn(10, 20, 50, 100),
-            IfNullOrWhiteSpace = nullString.IfNullOrWhiteSpace("默认值"),
+            IfNullOrWhiteSpace = nullString.IfNullOrWhiteSpace("Default value"),
             ToDictionary = testObj.ToDictionary(),
             PropertyValue = testObj.GetPropertyValue("Name"),
         };
@@ -130,7 +130,7 @@ public class ExtensionsController : ControllerBase
     }
 
     /// <summary>
-    /// 手机号掩码演示
+    /// Phone number mask demo
     /// </summary>
     [HttpGet("mask")]
     public ActionResult<ApiResult<object>> MaskDemo([FromQuery] string phone = "13812345678")
@@ -146,7 +146,7 @@ public class ExtensionsController : ControllerBase
     }
 
     /// <summary>
-    /// 时间戳工具演示
+    /// Timestamp utility demo
     /// </summary>
     [HttpGet("timestamp")]
     public ActionResult<ApiResult<object>> TimestampDemo()

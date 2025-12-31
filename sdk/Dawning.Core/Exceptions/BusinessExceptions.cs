@@ -3,22 +3,22 @@ using System.Net;
 namespace Dawning.Core.Exceptions;
 
 /// <summary>
-/// 业务异常基类 - 用于可预期的业务错误
+/// Business exception base class - for expected business errors
 /// </summary>
 public class BusinessException : Exception
 {
     /// <summary>
-    /// 错误码
+    /// Error code
     /// </summary>
     public string ErrorCode { get; }
 
     /// <summary>
-    /// HTTP 状态码
+    /// HTTP status code
     /// </summary>
     public HttpStatusCode StatusCode { get; }
 
     /// <summary>
-    /// 额外数据
+    /// Additional data
     /// </summary>
     public new object? Data { get; }
 
@@ -37,7 +37,7 @@ public class BusinessException : Exception
 }
 
 /// <summary>
-/// 资源未找到异常
+/// Resource not found exception
 /// </summary>
 public class NotFoundException : BusinessException
 {
@@ -53,7 +53,7 @@ public class NotFoundException : BusinessException
 }
 
 /// <summary>
-/// 未授权异常
+/// Unauthorized access exception
 /// </summary>
 public class UnauthorizedException : BusinessException
 {
@@ -62,7 +62,7 @@ public class UnauthorizedException : BusinessException
 }
 
 /// <summary>
-/// 禁止访问异常
+/// Access forbidden exception
 /// </summary>
 public class ForbiddenException : BusinessException
 {
@@ -78,12 +78,12 @@ public class ForbiddenException : BusinessException
 }
 
 /// <summary>
-/// 验证异常
+/// Validation exception
 /// </summary>
 public class ValidationException : BusinessException
 {
     /// <summary>
-    /// 验证错误详情
+    /// Validation error details
     /// </summary>
     public IDictionary<string, string[]> Errors { get; }
 
@@ -105,7 +105,7 @@ public class ValidationException : BusinessException
 }
 
 /// <summary>
-/// 冲突异常 (如重复数据)
+/// Conflict exception (e.g., duplicate data)
 /// </summary>
 public class ConflictException : BusinessException
 {
@@ -121,12 +121,12 @@ public class ConflictException : BusinessException
 }
 
 /// <summary>
-/// 请求过多异常 (限流)
+/// Too many requests exception (rate limiting)
 /// </summary>
 public class TooManyRequestsException : BusinessException
 {
     /// <summary>
-    /// 重试等待时间 (秒)
+    /// Retry wait time in seconds
     /// </summary>
     public int? RetryAfterSeconds { get; }
 
@@ -141,7 +141,7 @@ public class TooManyRequestsException : BusinessException
 }
 
 /// <summary>
-/// 服务不可用异常
+/// Service unavailable exception
 /// </summary>
 public class ServiceUnavailableException : BusinessException
 {

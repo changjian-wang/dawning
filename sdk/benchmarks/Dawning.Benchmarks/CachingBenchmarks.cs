@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Benchmarks;
 
 /// <summary>
-/// 内存缓存服务基准测试
+/// Memory cache service benchmarks
 /// </summary>
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

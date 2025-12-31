@@ -6,41 +6,41 @@ using Dawning.Identity.Application.Interfaces.Notification;
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// SignalR 实时通信配置
+    /// SignalR real-time communication configuration
     /// </summary>
     public static class SignalRConfiguration
     {
         /// <summary>
-        /// 添加 SignalR 服务
+        /// Add SignalR services
         /// </summary>
         public static IServiceCollection AddSignalRConfiguration(
             this IServiceCollection services,
             IConfiguration configuration
         )
         {
-            // 添加 SignalR 服务
+            // Add SignalR services
             var signalRBuilder = services.AddSignalR(options =>
             {
-                // 启用详细错误信息（仅开发环境）
+                // Enable detailed error messages (development only)
                 options.EnableDetailedErrors = true;
 
-                // 客户端超时时间（默认30秒）
+                // Client timeout (default 30 seconds)
                 options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
 
-                // 保持连接间隔（默认15秒）
+                // Keep alive interval (default 15 seconds)
                 options.KeepAliveInterval = TimeSpan.FromSeconds(15);
 
-                // 握手超时时间
+                // Handshake timeout
                 options.HandshakeTimeout = TimeSpan.FromSeconds(15);
 
-                // 最大接收消息大小（1MB）
+                // Maximum receive message size (1MB)
                 options.MaximumReceiveMessageSize = 1024 * 1024;
 
-                // 流缓冲区大小
+                // Stream buffer capacity
                 options.StreamBufferCapacity = 10;
             });
 
-            // 如果配置了 Redis，使用 Redis 作为背板
+            // If Redis is configured, use Redis as backplane
             var redisConnection = configuration.GetConnectionString("Redis");
             if (!string.IsNullOrEmpty(redisConnection))
             {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Api.Configurations
                 );
             }
 
-            // 添加消息包序列化选项
+            // Add message packet serialization options
             signalRBuilder.AddJsonProtocol(options =>
             {
                 options.PayloadSerializerOptions.PropertyNamingPolicy = System
@@ -65,20 +65,20 @@ namespace Dawning.Identity.Api.Configurations
                 options.PayloadSerializerOptions.WriteIndented = false;
             });
 
-            // 注册通知服务
+            // Register notification service
             services.AddScoped<INotificationService, NotificationService>();
 
-            // 注册实时通知适配器（供 Application 层使用）
+            // Register real-time notification adapter (for Application layer use)
             services.AddScoped<IRealTimeNotificationService, SignalRNotificationAdapter>();
 
-            // 注册日志流服务（实时日志推送）
+            // Register log stream service (real-time log push)
             services.AddSingleton<ILogStreamService, LogStreamService>();
 
             return services;
         }
 
         /// <summary>
-        /// 配置 SignalR 端点
+        /// Configure SignalR endpoints
         /// </summary>
         public static IApplicationBuilder UseSignalRConfiguration(this IApplicationBuilder app)
         {
@@ -86,28 +86,28 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 映射 SignalR Hub 端点
+        /// Map SignalR Hub endpoints
         /// </summary>
         public static IEndpointRouteBuilder MapSignalRHubs(this IEndpointRouteBuilder endpoints)
         {
-            // 主通知 Hub
+            // Main notification Hub
             endpoints.MapHub<NotificationHub>(
                 "/hubs/notification",
                 options =>
                 {
-                    // 传输方式配置
+                    // Transport configuration
                     options.Transports =
                         Microsoft.AspNetCore.Http.Connections.HttpTransportType.WebSockets
                         | Microsoft.AspNetCore.Http.Connections.HttpTransportType.ServerSentEvents
                         | Microsoft.AspNetCore.Http.Connections.HttpTransportType.LongPolling;
 
-                    // WebSocket 配置
+                    // WebSocket configuration
                     options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(5);
 
-                    // 长轮询配置
+                    // Long polling configuration
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(90);
 
-                    // 授权要求
+                    // Authorization requirement
                     options.AllowStatefulReconnects = true;
                 }
             );

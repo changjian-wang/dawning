@@ -7,7 +7,7 @@ using Dawning.Identity.Domain.Core.Security;
 namespace Dawning.Identity.Application.Services.Authentication
 {
     /// <summary>
-    /// 用户认证服务实现 - 集成UserService进行数据库验证
+    /// User authentication service implementation - integrates UserService for database validation
     /// </summary>
     public class UserAuthenticationService : IUserAuthenticationService
     {
@@ -24,7 +24,7 @@ namespace Dawning.Identity.Application.Services.Authentication
         }
 
         /// <summary>
-        /// 验证用户凭据
+        /// Validate user credentials
         /// </summary>
         public async Task<UserAuthenticationDto?> ValidateCredentialsAsync(
             string username,
@@ -36,19 +36,19 @@ namespace Dawning.Identity.Application.Services.Authentication
                 return null;
             }
 
-            // 检查账户是否被锁定
+            // Check if account is locked
             if (_lockoutService != null)
             {
                 var lockoutEnd = await _lockoutService.IsLockedOutAsync(username);
                 if (lockoutEnd.HasValue)
                 {
-                    // 返回特殊的锁定状态
+                    // Return special lockout status
                     return new UserAuthenticationDto
                     {
                         IsLockedOut = true,
                         LockoutEnd = lockoutEnd.Value,
                         LockoutMessage =
-                            $"账户已被锁定，请在 {lockoutEnd.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss} 后重试",
+                            $"Account is locked, please try again after {lockoutEnd.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss}",
                     };
                 }
             }
@@ -61,7 +61,7 @@ namespace Dawning.Identity.Application.Services.Authentication
 
             if (user == null)
             {
-                // 记录登录失败
+                // Record failed login
                 if (_lockoutService != null)
                 {
                     var (failedCount, isLockedOut, lockoutEndTime) =
@@ -74,24 +74,24 @@ namespace Dawning.Identity.Application.Services.Authentication
                             IsLockedOut = true,
                             LockoutEnd = lockoutEndTime.Value,
                             LockoutMessage =
-                                $"登录失败次数过多，账户已被锁定至 {lockoutEndTime.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss}",
+                                $"Too many failed login attempts, account locked until {lockoutEndTime.Value.ToLocalTime():yyyy-MM-dd HH:mm:ss}",
                         };
                     }
                 }
                 return null;
             }
 
-            // 登录成功，重置失败计数
+            // Login successful, reset failed count
             if (_lockoutService != null)
             {
                 await _lockoutService.ResetFailedCountAsync(username);
             }
 
-            // 加载用户角色
+            // Load user roles
             var userRoles = await _userService.GetUserRolesAsync(user.Id);
             var roleNames = userRoles.Select(r => r.Name).ToList();
 
-            // 返回认证DTO
+            // Return authentication DTO
             return new UserAuthenticationDto
             {
                 Id = user.Id.ToString(),
@@ -103,7 +103,7 @@ namespace Dawning.Identity.Application.Services.Authentication
         }
 
         /// <summary>
-        /// 根据用户ID获取用户信息
+        /// Get user information by user ID
         /// </summary>
         public async Task<UserAuthenticationDto?> GetUserByIdAsync(string userId)
         {
@@ -118,7 +118,7 @@ namespace Dawning.Identity.Application.Services.Authentication
                 return null;
             }
 
-            // 加载用户角色
+            // Load user roles
             var userRoles = await _userService.GetUserRolesAsync(id);
             var roleNames = userRoles.Select(r => r.Name).ToList();
 
@@ -133,7 +133,7 @@ namespace Dawning.Identity.Application.Services.Authentication
         }
 
         /// <summary>
-        /// 根据用户名获取用户信息
+        /// Get user information by username
         /// </summary>
         public async Task<UserAuthenticationDto?> GetByUsernameAsync(string username)
         {
@@ -155,7 +155,7 @@ namespace Dawning.Identity.Application.Services.Authentication
                 return null;
             }
 
-            // 加载用户角色
+            // Load user roles
             var userRoles = await _userService.GetUserRolesAsync(user.Id);
             var roleNames = userRoles.Select(r => r.Name).ToList();
 

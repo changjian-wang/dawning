@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Identity.Api.Security
 {
     /// <summary>
-    /// 动态权限策略提供器，根据策略名称动态创建权限需求
+    /// Dynamic permission policy provider, creates permission requirements dynamically based on policy name
     /// </summary>
     public class PermissionPolicyProvider : IAuthorizationPolicyProvider
     {
@@ -17,7 +17,7 @@ namespace Dawning.Identity.Api.Security
 
         public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
-            // 检查是否是权限策略
+            // Check if this is a permission policy
             if (policyName.StartsWith(RequirePermissionAttribute.PolicyPrefix))
             {
                 var permission = policyName[RequirePermissionAttribute.PolicyPrefix.Length..];
@@ -30,7 +30,7 @@ namespace Dawning.Identity.Api.Security
                 return Task.FromResult<AuthorizationPolicy?>(policy);
             }
 
-            // 使用默认策略提供器
+            // Use default policy provider
             return _fallbackPolicyProvider.GetPolicyAsync(policyName);
         }
 

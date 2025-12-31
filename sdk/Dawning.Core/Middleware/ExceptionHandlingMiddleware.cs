@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Core.Middleware;
 
 /// <summary>
-/// 全局异常处理中间件
-/// 自动将 BusinessException 转换为标准 API 响应
+/// Global exception handling middleware
+/// Automatically converts BusinessException to standard API responses
 /// </summary>
 public class ExceptionHandlingMiddleware
 {
@@ -88,16 +88,16 @@ public class ExceptionHandlingMiddleware
 
             OperationCanceledException => (
                 499, // Client Closed Request
-                ApiResults.Fail("REQUEST_CANCELLED", "请求已取消")
+                ApiResults.Fail("REQUEST_CANCELLED", "Request cancelled")
             ),
 
             _ => HandleUnexpectedException(exception),
         };
 
-        // 记录日志
+        // Log the exception
         LogException(exception, statusCode, context);
 
-        // 返回响应
+        // Return response
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json; charset=utf-8";
 
@@ -107,16 +107,16 @@ public class ExceptionHandlingMiddleware
     private static ApiResult CreateRateLimitResult(TooManyRequestsException ex)
     {
         var result = ApiResults.Fail(ex.ErrorCode, ex.Message);
-        // 可以在这里添加额外的限流信息到 Data
+        // Additional rate limit info can be added to Data here
         return result;
     }
 
     private (int statusCode, ApiResult result) HandleUnexpectedException(Exception exception)
     {
-        // 未预期的异常，返回 500
+        // Unexpected exception, return 500
         return (
             StatusCodes.Status500InternalServerError,
-            ApiResults.Error("服务器内部错误，请稍后重试")
+            ApiResults.Error("Internal server error, please try again later")
         );
     }
 
@@ -128,10 +128,10 @@ public class ExceptionHandlingMiddleware
 
         if (exception is BusinessException businessEx)
         {
-            // 业务异常使用 Warning 级别
+            // Business exceptions use Warning level
             _logger.LogWarning(
                 exception,
-                "[{TraceId}] 业务异常 - {Method} {Path} - Code: {ErrorCode}, Message: {Message}",
+                "[{TraceId}] Business exception - {Method} {Path} - Code: {ErrorCode}, Message: {Message}",
                 traceId,
                 method,
                 requestPath,
@@ -141,9 +141,9 @@ public class ExceptionHandlingMiddleware
         }
         else if (exception is OperationCanceledException)
         {
-            // 请求取消使用 Information 级别
+            // Request cancellation uses Information level
             _logger.LogInformation(
-                "[{TraceId}] 请求取消 - {Method} {Path}",
+                "[{TraceId}] Request cancelled - {Method} {Path}",
                 traceId,
                 method,
                 requestPath
@@ -151,10 +151,10 @@ public class ExceptionHandlingMiddleware
         }
         else
         {
-            // 未预期异常使用 Error 级别
+            // Unexpected exceptions use Error level
             _logger.LogError(
                 exception,
-                "[{TraceId}] 未处理异常 - {Method} {Path}",
+                "[{TraceId}] Unhandled exception - {Method} {Path}",
                 traceId,
                 method,
                 requestPath
@@ -164,12 +164,12 @@ public class ExceptionHandlingMiddleware
 }
 
 /// <summary>
-/// 扩展 HTTP 状态码 (非标准)
+/// Extended HTTP status codes (non-standard)
 /// </summary>
 public static class StatusCodesExtensions
 {
     /// <summary>
-    /// 499 Client Closed Request (Nginx 扩展)
+    /// 499 Client Closed Request (Nginx extension)
     /// </summary>
     public const int Status499ClientClosedRequest = 499;
 }

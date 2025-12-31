@@ -5,16 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Dawning.Caching;
 
 /// <summary>
-/// 缓存服务扩展方法
+/// Cache service extension methods
 /// </summary>
 public static class CachingServiceCollectionExtensions
 {
     /// <summary>
-    /// 添加 Dawning 缓存服务
+    /// Add Dawning caching service
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     public static IServiceCollection AddDawningCaching(
         this IServiceCollection services,
         Action<CacheOptions>? configure = null
@@ -53,11 +53,11 @@ public static class CachingServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加内存缓存服务
+    /// Add memory cache service
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     public static IServiceCollection AddDawningMemoryCache(
         this IServiceCollection services,
         Action<CacheOptions>? configure = null
@@ -71,12 +71,12 @@ public static class CachingServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加 Redis 缓存服务
+    /// Add Redis cache service
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="connectionString">Redis 连接字符串</param>
-    /// <param name="configure">配置委托</param>
-    /// <returns>服务集合</returns>
+    /// <param name="services">Service collection</param>
+    /// <param name="connectionString">Redis connection string</param>
+    /// <param name="configure">Configuration delegate</param>
+    /// <returns>Service collection</returns>
     public static IServiceCollection AddDawningRedisCache(
         this IServiceCollection services,
         string connectionString,

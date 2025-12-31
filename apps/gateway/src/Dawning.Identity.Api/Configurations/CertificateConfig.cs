@@ -3,79 +3,79 @@ using System.Security.Cryptography.X509Certificates;
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// 证书配置
+    /// Certificate configuration
     /// </summary>
     public class CertificateConfig
     {
         /// <summary>
-        /// 签名证书
+        /// Signing certificate
         /// </summary>
         public CertificateSource? Signing { get; set; }
 
         /// <summary>
-        /// 加密证书
+        /// Encryption certificate
         /// </summary>
         public CertificateSource? Encryption { get; set; }
     }
 
     /// <summary>
-    /// 证书来源配置
+    /// Certificate source configuration
     /// </summary>
     public class CertificateSource
     {
         /// <summary>
-        /// 证书来源类型 (File, Store, AzureKeyVault)
+        /// Certificate source type (File, Store, AzureKeyVault)
         /// </summary>
         public string Type { get; set; } = "File";
 
         /// <summary>
-        /// 文件路径（Type=File 时使用）
+        /// File path (used when Type=File)
         /// </summary>
         public string? Path { get; set; }
 
         /// <summary>
-        /// 文件密码（Type=File 时使用）
+        /// File password (used when Type=File)
         /// </summary>
         public string? Password { get; set; }
 
         /// <summary>
-        /// 存储位置（Type=Store 时使用）
+        /// Store location (used when Type=Store)
         /// </summary>
         public string? StoreLocation { get; set; } = "CurrentUser";
 
         /// <summary>
-        /// 存储名称（Type=Store 时使用）
+        /// Store name (used when Type=Store)
         /// </summary>
         public string? StoreName { get; set; } = "My";
 
         /// <summary>
-        /// 证书主题名称（Type=Store 时使用）
+        /// Certificate subject name (used when Type=Store)
         /// </summary>
         public string? SubjectName { get; set; }
 
         /// <summary>
-        /// 证书指纹（Type=Store 时使用）
+        /// Certificate thumbprint (used when Type=Store)
         /// </summary>
         public string? Thumbprint { get; set; }
 
         /// <summary>
-        /// Azure Key Vault URL（Type=AzureKeyVault 时使用）
+        /// Azure Key Vault URL (used when Type=AzureKeyVault)
         /// </summary>
         public string? KeyVaultUrl { get; set; }
 
         /// <summary>
-        /// 证书名称（Type=AzureKeyVault 时使用）
+        /// Certificate name (used when Type=AzureKeyVault)
         /// </summary>
         public string? CertificateName { get; set; }
     }
 
     /// <summary>
-    /// 证书加载器
+    /// Certificate loader
     /// </summary>
     public static class CertificateLoader
     {
         /// <summary>
-        /// 加载证书
+        /// Load certificate
         /// </summary>
         public static X509Certificate2? LoadCertificate(CertificateSource? config)
         {
@@ -98,7 +98,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 从文件加载证书
+        /// Load certificate from file
         /// </summary>
         private static X509Certificate2? LoadFromFile(CertificateSource config)
         {
@@ -118,7 +118,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 从证书存储加载证书
+        /// Load certificate from certificate store
         /// </summary>
         private static X509Certificate2? LoadFromStore(CertificateSource config)
         {

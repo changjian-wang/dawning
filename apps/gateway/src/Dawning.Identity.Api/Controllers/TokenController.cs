@@ -10,7 +10,7 @@ using OpenIddict.Validation.AspNetCore;
 namespace Dawning.Identity.Api.Controllers
 {
     /// <summary>
-    /// Token 管理控制器 - 处理令牌撤销和会话管理
+    /// Token management controller - handles token revocation and session management
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
@@ -32,9 +32,9 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取当前用户的活跃会话列表
+        /// Get active session list for current user
         /// </summary>
-        /// <returns>会话列表</returns>
+        /// <returns>Session list</returns>
         [HttpGet("sessions")]
         [ProducesResponseType(typeof(IEnumerable<UserSessionDto>), 200)]
         public async Task<IActionResult> GetSessions()
@@ -45,7 +45,7 @@ namespace Dawning.Identity.Api.Controllers
 
             var sessions = await _tokenService.GetUserSessionsAsync(userId.Value);
 
-            // 标记当前会话
+            // Mark current session
             var currentTokenId = GetCurrentTokenId();
             foreach (var session in sessions)
             {
@@ -56,9 +56,9 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 撤销指定会话/设备
+        /// Revoke specified session/device
         /// </summary>
-        /// <param name="deviceId">设备ID</param>
+        /// <param name="deviceId">Device ID</param>
         [HttpDelete("sessions/{deviceId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -72,13 +72,13 @@ namespace Dawning.Identity.Api.Controllers
             var count = await _tokenService.RevokeDeviceTokensAsync(userId.Value, deviceId);
 
             if (count == 0)
-                return NotFound(new { message = "会话不存在或已失效" });
+                return NotFound(new { message = "Session does not exist or has expired" });
 
-            return Ok(new { message = "会话已撤销", revokedCount = count });
+            return Ok(new { message = "Session revoked", revokedCount = count });
         }
 
         /// <summary>
-        /// 撤销当前用户的所有其他会话（仅保留当前会话）
+        /// Revoke all other sessions for current user (keep only current session)
         /// </summary>
         [HttpPost("sessions/revoke-others")]
         [ProducesResponseType(200)]
@@ -88,10 +88,10 @@ namespace Dawning.Identity.Api.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            // 获取当前设备ID
+            // Get current device ID
             var currentDeviceId = GetCurrentDeviceId();
 
-            // 获取所有会话
+            // Get all sessions
             var sessions = await _tokenService.GetUserSessionsAsync(userId.Value);
             var revokedCount = 0;
 

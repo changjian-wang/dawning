@@ -12,7 +12,7 @@ public class CurrentUserTests
     [Fact]
     public void CurrentUser_WithValidClaims_ShouldExtractUserInfo()
     {
-        // Arrange - 使用 DawningClaimTypes 定义的 claim type
+        // Arrange - Use claim types defined in DawningClaimTypes
         var claims = new List<Claim>
         {
             new Claim(DawningClaimTypes.UserId, "123"),

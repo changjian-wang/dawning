@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// 系统日志管理控制器
+    /// System log management controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -31,18 +31,18 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 分页获取系统日志列表
+        /// Get paginated system log list
         /// </summary>
-        /// <param name="level">日志级别（Information/Warning/Error）</param>
-        /// <param name="keyword">关键字搜索（Message/Exception）</param>
-        /// <param name="userId">用户ID</param>
-        /// <param name="username">用户名</param>
-        /// <param name="ipAddress">IP地址</param>
-        /// <param name="requestPath">请求路径</param>
-        /// <param name="startDate">开始日期</param>
-        /// <param name="endDate">结束日期</param>
-        /// <param name="page">页码（默认1）</param>
-        /// <param name="pageSize">每页条数（默认20）</param>
+        /// <param name="level">Log level (Information/Warning/Error)</param>
+        /// <param name="keyword">Keyword search (Message/Exception)</param>
+        /// <param name="userId">User ID</param>
+        /// <param name="username">Username</param>
+        /// <param name="ipAddress">IP address</param>
+        /// <param name="requestPath">Request path</param>
+        /// <param name="startDate">Start date</param>
+        /// <param name="endDate">End date</param>
+        /// <param name="page">Page number (default 1)</param>
+        /// <param name="pageSize">Page size (default 20)</param>
         [HttpGet("paged")]
         public async Task<IActionResult> GetPagedList(
             [FromQuery] string? level = null,

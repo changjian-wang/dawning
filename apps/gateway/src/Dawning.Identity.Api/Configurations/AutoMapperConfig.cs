@@ -3,7 +3,7 @@
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// AutoMapper 配置
+    /// AutoMapper configuration
     /// </summary>
     public static class AutoMapperConfig
     {

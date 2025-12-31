@@ -4,30 +4,30 @@ using System.Reflection;
 namespace Dawning.Extensions;
 
 /// <summary>
-/// 对象扩展方法
+/// Object extension methods
 /// </summary>
 public static class ObjectExtensions
 {
     /// <summary>
-    /// 判断对象是否为 null
+    /// Checks if the object is null
     /// </summary>
     public static bool IsNull<T>(this T? obj)
         where T : class => obj == null;
 
     /// <summary>
-    /// 判断对象是否不为 null
+    /// Checks if the object is not null
     /// </summary>
     public static bool IsNotNull<T>(this T? obj)
         where T : class => obj != null;
 
     /// <summary>
-    /// 如果对象为 null，返回默认值
+    /// Returns the default value if the object is null
     /// </summary>
     public static T IfNull<T>(this T? obj, T defaultValue)
         where T : class => obj ?? defaultValue;
 
     /// <summary>
-    /// 如果对象为 null，执行工厂方法获取默认值
+    /// Executes a factory method to get the default value if the object is null
     /// </summary>
     public static T IfNull<T>(this T? obj, Func<T> defaultFactory)
         where T : class
@@ -37,7 +37,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 如果条件为真，执行操作并返回对象
+    /// Executes an action and returns the object if the condition is true
     /// </summary>
     public static T When<T>(this T obj, bool condition, Action<T> action)
     {
@@ -48,7 +48,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 如果条件为真，执行转换并返回结果
+    /// Executes a transformation and returns the result if the condition is true
     /// </summary>
     public static T When<T>(this T obj, bool condition, Func<T, T> transform)
     {
@@ -57,7 +57,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 将对象转换为字典
+    /// Converts the object to a dictionary
     /// </summary>
     public static Dictionary<string, object?> ToDictionary(this object? obj)
     {
@@ -71,17 +71,17 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 检查对象是否在指定的值列表中
+    /// Checks if the object is in the specified list of values
     /// </summary>
     public static bool IsIn<T>(this T obj, params T[] values) => values.Contains(obj);
 
     /// <summary>
-    /// 检查对象是否不在指定的值列表中
+    /// Checks if the object is not in the specified list of values
     /// </summary>
     public static bool IsNotIn<T>(this T obj, params T[] values) => !values.Contains(obj);
 
     /// <summary>
-    /// 执行操作并返回对象（链式调用）
+    /// Executes an action and returns the object (for chaining)
     /// </summary>
     public static T Tap<T>(this T obj, Action<T> action)
     {
@@ -91,7 +91,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 转换对象
+    /// Transforms the object
     /// </summary>
     public static TResult Pipe<T, TResult>(this T obj, Func<T, TResult> transform)
     {
@@ -100,13 +100,13 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 尝试将对象转换为指定类型
+    /// Attempts to cast the object to the specified type
     /// </summary>
     public static T? As<T>(this object? obj)
         where T : class => obj as T;
 
     /// <summary>
-    /// 获取枚举的 Description 特性值
+    /// Gets the Description attribute value of an enum
     /// </summary>
     public static string GetDescription(this Enum value)
     {
@@ -116,7 +116,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 安全地获取属性值
+    /// Safely gets a property value
     /// </summary>
     public static object? GetPropertyValue(this object obj, string propertyName)
     {
@@ -130,7 +130,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 安全地设置属性值
+    /// Safely sets a property value
     /// </summary>
     public static bool SetPropertyValue(this object obj, string propertyName, object? value)
     {
@@ -148,7 +148,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 将值限制在指定范围内
+    /// Clamps the value within the specified range
     /// </summary>
     public static T Clamp<T>(this T value, T min, T max)
         where T : IComparable<T>
@@ -161,7 +161,7 @@ public static class ObjectExtensions
     }
 
     /// <summary>
-    /// 检查值是否在指定范围内
+    /// Checks if the value is within the specified range
     /// </summary>
     public static bool IsBetween<T>(this T value, T min, T max, bool inclusive = true)
         where T : IComparable<T>

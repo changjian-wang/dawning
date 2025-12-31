@@ -1,100 +1,100 @@
 namespace Dawning.Resilience.Options;
 
 /// <summary>
-/// 弹性策略配置选项
+/// Resilience policy configuration options
 /// </summary>
 public class ResilienceOptions
 {
     /// <summary>
-    /// 重试配置
+    /// Retry configuration
     /// </summary>
     public RetryOptions Retry { get; set; } = new();
 
     /// <summary>
-    /// 熔断器配置
+    /// Circuit breaker configuration
     /// </summary>
     public CircuitBreakerOptions CircuitBreaker { get; set; } = new();
 
     /// <summary>
-    /// 超时配置
+    /// Timeout configuration
     /// </summary>
     public TimeoutOptions Timeout { get; set; } = new();
 }
 
 /// <summary>
-/// 重试策略配置
+/// Retry policy configuration
 /// </summary>
 public class RetryOptions
 {
     /// <summary>
-    /// 是否启用重试
+    /// Whether to enable retry
     /// </summary>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// 最大重试次数
+    /// Maximum retry attempts
     /// </summary>
     public int MaxRetryAttempts { get; set; } = 3;
 
     /// <summary>
-    /// 基础延迟时间（毫秒）
+    /// Base delay time (milliseconds)
     /// </summary>
     public int BaseDelayMs { get; set; } = 200;
 
     /// <summary>
-    /// 是否使用指数退避
+    /// Whether to use exponential backoff
     /// </summary>
     public bool UseExponentialBackoff { get; set; } = true;
 
     /// <summary>
-    /// 最大延迟时间（毫秒）
+    /// Maximum delay time (milliseconds)
     /// </summary>
     public int MaxDelayMs { get; set; } = 30000;
 }
 
 /// <summary>
-/// 熔断器策略配置
+/// Circuit breaker policy configuration
 /// </summary>
 public class CircuitBreakerOptions
 {
     /// <summary>
-    /// 是否启用熔断器
+    /// Whether to enable circuit breaker
     /// </summary>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// 采样时长（秒）
+    /// Sampling duration (seconds)
     /// </summary>
     public int SamplingDurationSeconds { get; set; } = 30;
 
     /// <summary>
-    /// 触发熔断的失败率阈值 (0.0 - 1.0)
+    /// Failure rate threshold to trigger circuit breaker (0.0 - 1.0)
     /// </summary>
     public double FailureRatioThreshold { get; set; } = 0.5;
 
     /// <summary>
-    /// 采样期间最小吞吐量
+    /// Minimum throughput during sampling period
     /// </summary>
     public int MinimumThroughput { get; set; } = 10;
 
     /// <summary>
-    /// 熔断持续时间（秒）
+    /// Circuit breaker duration (seconds)
     /// </summary>
     public int BreakDurationSeconds { get; set; } = 30;
 }
 
 /// <summary>
-/// 超时策略配置
+/// Timeout policy configuration
 /// </summary>
 public class TimeoutOptions
 {
     /// <summary>
-    /// 是否启用超时
+    /// Whether to enable timeout
     /// </summary>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// 超时时间（秒）
+    /// Timeout duration (seconds)
     /// </summary>
     public int TimeoutSeconds { get; set; } = 30;
 }

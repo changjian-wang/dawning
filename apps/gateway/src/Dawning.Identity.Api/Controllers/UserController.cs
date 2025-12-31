@@ -15,7 +15,7 @@ using MySql.Data.MySqlClient;
 namespace Dawning.Identity.Api.Controllers
 {
     /// <summary>
-    /// 用户管理控制器
+    /// User management controller
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
@@ -52,9 +52,9 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取当前登录用户信息
+        /// Get current logged-in user information
         /// </summary>
-        /// <returns>用户信息</returns>
+        /// <returns>User information</returns>
         [HttpGet("info")]
         [ProducesResponseType(typeof(UserInfoDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -62,7 +62,7 @@ namespace Dawning.Identity.Api.Controllers
         {
             try
             {
-                // 从 JWT Claims 中获取用户 ID
+                // Get user ID from JWT Claims
                 var userId =
                     User.FindFirst(ClaimTypes.NameIdentifier)?.Value
                     ?? User.FindFirst("sub")?.Value;
@@ -75,7 +75,7 @@ namespace Dawning.Identity.Api.Controllers
                     );
                 }
 
-                // 获取用户信息
+                // Get user information
                 var user = await _userAuthenticationService.GetUserByIdAsync(userId);
                 if (user == null)
                 {
@@ -83,16 +83,16 @@ namespace Dawning.Identity.Api.Controllers
                     return NotFound(ApiResponse.Error(40400, "User not found"));
                 }
 
-                // 转换为响应 DTO
+                // Convert to response DTO
                 var userInfo = new UserInfoDto
                 {
                     Id = user.Id,
                     Username = user.Username!,
                     Email = user.Email!,
                     Roles = user.Roles,
-                    Name = user.Username!, // 暂时使用 username 作为显示名称
-                    Avatar = null, // 暂无头像功能
-                    CreatedAt = DateTime.UtcNow, // 暂时返回当前时间
+                    Name = user.Username!, // Temporarily use username as display name
+                    Avatar = null, // Avatar feature not available yet
+                    CreatedAt = DateTime.UtcNow, // Temporarily return current time
                     IsActive = user.IsActive,
                 };
 

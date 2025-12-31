@@ -7,19 +7,19 @@ using ApplicationEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Applicat
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// OpenIddict 配置
+    /// OpenIddict configuration
     /// </summary>
     public static class OpenIddictConfig
     {
         /// <summary>
-        /// 添加 OpenIddict 配置
+        /// Add OpenIddict configuration
         /// </summary>
         public static IServiceCollection AddOpenIddictConfiguration(
             this IServiceCollection services,
             IConfiguration configuration
         )
         {
-            // 添加默认 Authentication Scheme
+            // Add default Authentication Scheme
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme =
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Api.Configurations
                     OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
             });
 
-            // 注册自定义 Stores（基于 Dapper Repository）
+            // Register custom Stores (based on Dapper Repository)
             services.AddScoped<
                 IOpenIddictApplicationStore<ApplicationEntity>,
                 OpenIddictApplicationStore
@@ -42,30 +42,30 @@ namespace Dawning.Identity.Api.Configurations
 
             services
                 .AddOpenIddict()
-                // 注册 OpenIddict Core 组件
+                // Register OpenIddict Core components
                 .AddCore(options =>
                 {
-                    // 使用自定义 Stores（基于 Dapper + MySQL）
+                    // Use custom Stores (based on Dapper + MySQL)
                     options
                         .SetDefaultApplicationEntity<ApplicationEntity>()
                         .SetDefaultScopeEntity<Scope>()
                         .SetDefaultAuthorizationEntity<Authorization>()
                         .SetDefaultTokenEntity<Token>();
 
-                    // 注册 Quartz 集成（用于令牌清理等后台任务）
+                    // Register Quartz integration (for background tasks such as token cleanup)
                     options.UseQuartz();
                 })
-                // 注册 OpenIddict Server 组件
+                // Register OpenIddict Server components
                 .AddServer(options =>
                 {
-                    // 启用各种 OAuth 2.0 / OpenID Connect 流程
+                    // Enable various OAuth 2.0 / OpenID Connect flows
                     options
-                        .AllowPasswordFlow() // 密码授权流程
-                        .AllowClientCredentialsFlow() // 客户端凭证流程
-                        .AllowAuthorizationCodeFlow() // 授权码流程
-                        .AllowRefreshTokenFlow(); // 刷新令牌流程
+                        .AllowPasswordFlow() // Password grant flow
+                        .AllowClientCredentialsFlow() // Client credentials flow
+                        .AllowAuthorizationCodeFlow() // Authorization code flow
+                        .AllowRefreshTokenFlow(); // Refresh token flow
 
-                    // 配置端点
+                    // Configure endpoints
                     options
                         .SetTokenEndpointUris("/connect/token")
                         .SetAuthorizationEndpointUris("/connect/authorize")
@@ -74,17 +74,17 @@ namespace Dawning.Identity.Api.Configurations
                         .SetIntrospectionEndpointUris("/connect/introspect")
                         .SetRevocationEndpointUris("/connect/revoke");
 
-                    // 注册签名和加密凭据
+                    // Register signing and encryption credentials
                     if (configuration.GetValue<bool>("OpenIddict:UseDevelopmentCertificate"))
                     {
-                        // 开发环境使用临时证书
+                        // Use temporary certificates in development environment
                         options
                             .AddDevelopmentEncryptionCertificate()
                             .AddDevelopmentSigningCertificate();
                     }
                     else
                     {
-                        // 生产环境使用真实证书
+                        // Use real certificates in production environment
                         var certConfig = configuration
                             .GetSection("OpenIddict:Certificates")
                             .Get<CertificateConfig>();
@@ -114,12 +114,12 @@ namespace Dawning.Identity.Api.Configurations
                         }
                         else
                         {
-                            // 如果没有配置加密证书，使用签名证书
+                            // If no encryption certificate is configured, use signing certificate
                             options.AddEncryptionCertificate(signingCert);
                         }
                     }
 
-                    // 注册作用域
+                    // Register scopes
                     options.RegisterScopes(
                         OpenIddictConstants.Scopes.OpenId,
                         OpenIddictConstants.Scopes.Email,
@@ -128,7 +128,7 @@ namespace Dawning.Identity.Api.Configurations
                         "api"
                     );
 
-                    // 配置令牌生命周期（从配置文件读取，可通过数据库覆盖）
+                    // Configure token lifetime (read from configuration, can be overridden via database)
                     var accessTokenLifetimeMinutes = configuration.GetValue<int>(
                         "OpenIddict:AccessTokenLifetimeMinutes",
                         60
@@ -150,22 +150,22 @@ namespace Dawning.Identity.Api.Configurations
                         TimeSpan.FromMinutes(identityTokenLifetimeMinutes)
                     );
 
-                    // 配置 ASP.NET Core 集成
+                    // Configure ASP.NET Core integration
                     options
                         .UseAspNetCore()
                         .EnableTokenEndpointPassthrough()
                         .EnableAuthorizationEndpointPassthrough()
                         .EnableUserinfoEndpointPassthrough()
                         .EnableLogoutEndpointPassthrough()
-                        .DisableTransportSecurityRequirement(); // 仅在开发环境禁用，生产环境应该启用 HTTPS
+                        .DisableTransportSecurityRequirement(); // Only disabled in development, HTTPS should be enabled in production
                 })
-                // 注册 OpenIddict Validation 组件
+                // Register OpenIddict Validation components
                 .AddValidation(options =>
                 {
-                    // 导入服务器配置
+                    // Import server configuration
                     options.UseLocalServer();
 
-                    // 注册 ASP.NET Core 集成
+                    // Register ASP.NET Core integration
                     options.UseAspNetCore();
                 });
 

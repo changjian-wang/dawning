@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// Swagger 配置
+    /// Swagger configuration
     /// </summary>
     public static class SwaggerConfig
     {
@@ -20,7 +20,7 @@ namespace Dawning.Identity.Api.Configurations
 
             services.AddSwaggerGen(options =>
             {
-                // 中文文档
+                // Chinese documentation
                 options.SwaggerDoc(
                     VersionZh,
                     new OpenApiInfo
@@ -42,7 +42,7 @@ namespace Dawning.Identity.Api.Configurations
                     }
                 );
 
-                // 英文文档
+                // English documentation
                 options.SwaggerDoc(
                     VersionEn,
                     new OpenApiInfo
@@ -64,10 +64,10 @@ namespace Dawning.Identity.Api.Configurations
                     }
                 );
 
-                // 让所有 API 同时显示在两个文档中
+                // Display all APIs in both documents
                 options.DocInclusionPredicate((docName, api) => true);
 
-                // 添加 XML 注释
+                // Add XML comments
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
@@ -76,7 +76,7 @@ namespace Dawning.Identity.Api.Configurations
                     options.IncludeXmlComments(xmlPath);
                 }
 
-                // 添加 Application 层的 XML 注释
+                // Add Application layer XML comments
                 var applicationXmlFile = "Dawning.Identity.Application.xml";
                 var applicationXmlPath = Path.Combine(AppContext.BaseDirectory, applicationXmlFile);
                 if (File.Exists(applicationXmlPath))
@@ -84,7 +84,7 @@ namespace Dawning.Identity.Api.Configurations
                     options.IncludeXmlComments(applicationXmlPath);
                 }
 
-                // API 分组标签描述
+                // API group tag description
                 options.TagActionsBy(api =>
                 {
                     if (api.GroupName != null)
@@ -96,20 +96,20 @@ namespace Dawning.Identity.Api.Configurations
                     return new[] { controllerName ?? "Other" };
                 });
 
-                // 添加 JWT Bearer 认证
+                // Add JWT Bearer authentication
                 options.AddSecurityDefinition(
                     "Bearer",
                     new OpenApiSecurityScheme
                     {
                         Description =
                             @"
-JWT 授权头使用 Bearer 方案。
+JWT Authorization header using the Bearer scheme.
 
-在下面输入框中输入 **Bearer {你的token}**
+Enter **Bearer {your_token}** in the input box below
 
-示例: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+Example: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
 
-获取 Token 请使用 `/api/auth/connect/token` 接口",
+To obtain a Token, use the `/api/auth/connect/token` endpoint",
                         Name = "Authorization",
                         In = ParameterLocation.Header,
                         Type = SecuritySchemeType.Http,
@@ -135,7 +135,7 @@ JWT 授权头使用 Bearer 方案。
                     }
                 );
 
-                // 启用注解支持
+                // Enable annotation support
                 options.EnableAnnotations();
             });
         }
@@ -157,7 +157,7 @@ JWT 授权头使用 Bearer 方案。
                 options.SwaggerEndpoint($"/swagger/{VersionZh}/swagger.json", TitleZh);
                 options.DocumentTitle = "Dawning Identity API";
 
-                // UI 增强配置
+                // UI enhancement configuration
                 options.DefaultModelsExpandDepth(2);
                 options.DefaultModelExpandDepth(2);
                 options.DisplayRequestDuration();

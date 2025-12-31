@@ -24,7 +24,7 @@ public class ApiResultTests
     public void Ok_WithMessage_ShouldReturnCustomMessage()
     {
         // Arrange
-        var message = "操作成功";
+        var message = "Operation successful";
 
         // Act
         var result = ApiResults.Ok("data", message);
@@ -38,7 +38,7 @@ public class ApiResultTests
     {
         // Arrange
         var code = "ERROR";
-        var errorMessage = "操作失败";
+        var errorMessage = "Operation failed";
 
         // Act
         var result = ApiResults.Fail(code, errorMessage);
@@ -53,7 +53,7 @@ public class ApiResultTests
     {
         // Arrange
         var code = "VALIDATION_ERROR";
-        var message = "参数错误";
+        var message = "Parameter error";
 
         // Act
         var result = ApiResults.Fail(code, message);

@@ -3,28 +3,28 @@ using System.Text.RegularExpressions;
 namespace Dawning.Extensions;
 
 /// <summary>
-/// 字符串扩展方法
+/// String extension methods
 /// </summary>
 public static class StringExtensions
 {
     /// <summary>
-    /// 检查字符串是否为 null 或空白
+    /// Checks if the string is null or whitespace
     /// </summary>
     public static bool IsNullOrWhiteSpace(this string? value) => string.IsNullOrWhiteSpace(value);
 
     /// <summary>
-    /// 检查字符串是否为 null 或空
+    /// Checks if the string is null or empty
     /// </summary>
     public static bool IsNullOrEmpty(this string? value) => string.IsNullOrEmpty(value);
 
     /// <summary>
-    /// 如果字符串为 null 或空白，返回默认值
+    /// Returns the default value if the string is null or whitespace
     /// </summary>
     public static string IfNullOrWhiteSpace(this string? value, string defaultValue) =>
         string.IsNullOrWhiteSpace(value) ? defaultValue : value;
 
     /// <summary>
-    /// 截断字符串到指定长度，超出部分用省略号代替
+    /// Truncates the string to the specified length, replacing excess with ellipsis
     /// </summary>
     public static string Truncate(this string? value, int maxLength, string suffix = "...")
     {
@@ -35,7 +35,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 将字符串转换为 PascalCase
+    /// Converts the string to PascalCase
     /// </summary>
     public static string ToPascalCase(this string? value)
     {
@@ -49,14 +49,14 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 将字符串转换为 camelCase
+    /// Converts the string to camelCase
     /// </summary>
     public static string ToCamelCase(this string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return string.Empty;
 
-        // 如果已经是 PascalCase（首字母大写），直接处理
+        // If already PascalCase (starts with uppercase), handle directly
         if (
             char.IsUpper(value[0])
             && !value.Contains('_')
@@ -75,7 +75,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 将字符串转换为 snake_case
+    /// Converts the string to snake_case
     /// </summary>
     public static string ToSnakeCase(this string? value)
     {
@@ -90,7 +90,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 将字符串转换为 kebab-case
+    /// Converts the string to kebab-case
     /// </summary>
     public static string ToKebabCase(this string? value)
     {
@@ -105,7 +105,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 移除字符串中的所有空白字符
+    /// Removes all whitespace characters from the string
     /// </summary>
     public static string RemoveWhitespace(this string? value)
     {
@@ -116,7 +116,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 安全地获取子字符串，不会抛出异常
+    /// Safely gets a substring without throwing exceptions
     /// </summary>
     public static string SafeSubstring(this string? value, int startIndex, int? length = null)
     {
@@ -133,7 +133,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 检查字符串是否为有效的邮箱格式
+    /// Checks if the string is a valid email format
     /// </summary>
     public static bool IsValidEmail(this string? value)
     {
@@ -144,7 +144,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 检查字符串是否为有效的手机号格式（中国大陆）
+    /// Checks if the string is a valid phone number format (China mainland)
     /// </summary>
     public static bool IsValidPhoneNumber(this string? value)
     {
@@ -155,7 +155,7 @@ public static class StringExtensions
     }
 
     /// <summary>
-    /// 对字符串进行掩码处理（用于隐私保护）
+    /// Masks the string (for privacy protection)
     /// </summary>
     public static string Mask(
         this string? value,

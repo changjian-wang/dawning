@@ -3,70 +3,70 @@ using Serilog;
 namespace Dawning.Logging;
 
 /// <summary>
-/// 日志配置选项
+/// Logging configuration options
 /// </summary>
 public class DawningLogOptions
 {
     /// <summary>
-    /// 应用程序名称 (用于日志标识)
+    /// Application name (for log identification)
     /// </summary>
     public string ApplicationName { get; set; } = "DawningApp";
 
     /// <summary>
-    /// 日志文件路径模板
-    /// 默认: logs/{ApplicationName}-.log
+    /// Log file path template
+    /// Default: logs/{ApplicationName}-.log
     /// </summary>
     public string? LogFilePath { get; set; }
 
     /// <summary>
-    /// 是否启用控制台日志
+    /// Whether to enable console logging
     /// </summary>
     public bool EnableConsole { get; set; } = true;
 
     /// <summary>
-    /// 是否启用文件日志
+    /// Whether to enable file logging
     /// </summary>
     public bool EnableFile { get; set; } = true;
 
     /// <summary>
-    /// 最小日志级别
+    /// Minimum log level
     /// </summary>
     public LogLevel MinimumLevel { get; set; } = LogLevel.Information;
 
     /// <summary>
-    /// 日志文件保留天数
+    /// Log file retention days
     /// </summary>
     public int RetainedFileCountLimit { get; set; } = 31;
 
     /// <summary>
-    /// 单个日志文件最大大小 (MB)
+    /// Maximum single log file size (MB)
     /// </summary>
     public int FileSizeLimitMb { get; set; } = 50;
 
     /// <summary>
-    /// 是否滚动日志文件
+    /// Whether to roll log files
     /// </summary>
     public bool RollOnFileSizeLimit { get; set; } = true;
 
     /// <summary>
-    /// 是否使用 JSON 格式
+    /// Whether to use JSON format
     /// </summary>
     public bool UseJsonFormat { get; set; } = false;
 
     /// <summary>
-    /// 控制台日志模板
+    /// Console log template
     /// </summary>
     public string ConsoleOutputTemplate { get; set; } =
         "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext}{NewLine}      {Message:lj}{NewLine}{Exception}";
 
     /// <summary>
-    /// 文件日志模板
+    /// File log template
     /// </summary>
     public string FileOutputTemplate { get; set; } =
         "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext}] [{TraceId}] {Message:lj}{NewLine}{Exception}";
 
     /// <summary>
-    /// 覆盖特定命名空间的日志级别
+    /// Override log level for specific namespaces
     /// </summary>
     public Dictionary<string, LogLevel> OverrideMinimumLevels { get; set; } =
         new()
@@ -78,7 +78,7 @@ public class DawningLogOptions
         };
 
     /// <summary>
-    /// 获取完整的日志文件路径
+    /// Gets the complete log file path
     /// </summary>
     internal string GetLogFilePath()
     {
@@ -86,7 +86,7 @@ public class DawningLogOptions
     }
 
     /// <summary>
-    /// 转换为 Serilog LogEventLevel
+    /// Converts to Serilog LogEventLevel
     /// </summary>
     internal Serilog.Events.LogEventLevel ToSerilogLevel(LogLevel level)
     {
@@ -104,7 +104,7 @@ public class DawningLogOptions
 }
 
 /// <summary>
-/// 日志级别 (与 Microsoft.Extensions.Logging 兼容)
+/// Log level (compatible with Microsoft.Extensions.Logging)
 /// </summary>
 public enum LogLevel
 {

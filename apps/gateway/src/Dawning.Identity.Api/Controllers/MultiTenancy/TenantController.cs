@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.MultiTenancy
 {
     /// <summary>
-    /// 租户管理控制器
-    /// 仅限超级管理员访问
+    /// Tenant Management Controller
+    /// Accessible only by super administrators
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         }
 
         /// <summary>
-        /// 获取当前租户信息
+        /// Get current tenant information
         /// </summary>
         [HttpGet("current")]
         [AllowAnonymous]
@@ -57,7 +57,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         }
 
         /// <summary>
-        /// 分页获取租户列表
+        /// Get paged tenant list
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetPaged(
@@ -82,13 +82,13 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取租户列表失败");
-                return StatusCode(500, ApiResponse.Error(50000, "获取租户列表失败"));
+                _logger.LogError(ex, "Failed to get tenant list");
+                return StatusCode(500, ApiResponse.Error(50000, "Failed to get tenant list"));
             }
         }
 
         /// <summary>
-        /// 获取所有租户
+        /// Get all tenants
         /// </summary>
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
@@ -100,13 +100,13 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取所有租户失败");
-                return StatusCode(500, new { code = 50000, message = "获取所有租户失败" });
+                _logger.LogError(ex, "Failed to get all tenants");
+                return StatusCode(500, new { code = 50000, message = "Failed to get all tenants" });
             }
         }
 
         /// <summary>
-        /// 获取所有启用的租户
+        /// Get all active tenants
         /// </summary>
         [HttpGet("active")]
         [AllowAnonymous]
@@ -119,13 +119,13 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取启用租户失败");
-                return StatusCode(500, new { code = 50000, message = "获取启用租户失败" });
+                _logger.LogError(ex, "Failed to get active tenants");
+                return StatusCode(500, new { code = 50000, message = "Failed to get active tenants" });
             }
         }
 
         /// <summary>
-        /// 根据ID获取租户
+        /// Get tenant by ID
         /// </summary>
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> Get(Guid id)
@@ -135,19 +135,19 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                 var tenant = await _tenantService.GetAsync(id);
                 if (tenant == null)
                 {
-                    return NotFound(new { code = 40400, message = "租户不存在" });
+                    return NotFound(new { code = 40400, message = "Tenant not found" });
                 }
                 return Ok(new { code = 20000, data = tenant });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取租户失败: {TenantId}", id);
-                return StatusCode(500, new { code = 50000, message = "获取租户失败" });
+                _logger.LogError(ex, "Failed to get tenant: {TenantId}", id);
+                return StatusCode(500, new { code = 50000, message = "Failed to get tenant" });
             }
         }
 
         /// <summary>
-        /// 创建租户
+        /// Create tenant
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTenantRequest request)
@@ -172,7 +172,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
 
                 var created = await _tenantService.CreateAsync(tenant);
                 _logger.LogInformation(
-                    "创建租户: {TenantCode} ({TenantId})",
+                    "Tenant created: {TenantCode} ({TenantId})",
                     created.Code,
                     created.Id
                 );
@@ -182,7 +182,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                     {
                         code = 20000,
                         data = created,
-                        message = "租户创建成功",
+                        message = "Tenant created successfully",
                     }
                 );
             }
@@ -192,13 +192,13 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "创建租户失败");
-                return StatusCode(500, new { code = 50000, message = "创建租户失败" });
+                _logger.LogError(ex, "Failed to create tenant");
+                return StatusCode(500, new { code = 50000, message = "Failed to create tenant" });
             }
         }
 
         /// <summary>
-        /// 更新租户
+        /// Update tenant
         /// </summary>
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTenantRequest request)
@@ -208,7 +208,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                 var existing = await _tenantService.GetAsync(id);
                 if (existing == null)
                 {
-                    return NotFound(new { code = 40400, message = "租户不存在" });
+                    return NotFound(new { code = 40400, message = "Tenant not found" });
                 }
 
                 existing.Code = request.Code ?? existing.Code;
@@ -231,7 +231,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
 
                 var updated = await _tenantService.UpdateAsync(existing);
                 _logger.LogInformation(
-                    "更新租户: {TenantCode} ({TenantId})",
+                    "Tenant updated: {TenantCode} ({TenantId})",
                     updated.Code,
                     updated.Id
                 );
@@ -241,7 +241,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                     {
                         code = 20000,
                         data = updated,
-                        message = "租户更新成功",
+                        message = "Tenant updated successfully",
                     }
                 );
             }
@@ -251,13 +251,13 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "更新租户失败: {TenantId}", id);
-                return StatusCode(500, new { code = 50000, message = "更新租户失败" });
+                _logger.LogError(ex, "Failed to update tenant: {TenantId}", id);
+                return StatusCode(500, new { code = 50000, message = "Failed to update tenant" });
             }
         }
 
         /// <summary>
-        /// 删除租户
+        /// Delete tenant
         /// </summary>
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
@@ -267,21 +267,21 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                 var result = await _tenantService.DeleteAsync(id);
                 if (!result)
                 {
-                    return NotFound(new { code = 40400, message = "租户不存在" });
+                    return NotFound(new { code = 40400, message = "Tenant not found" });
                 }
 
-                _logger.LogInformation("删除租户: {TenantId}", id);
-                return Ok(new { code = 20000, message = "租户删除成功" });
+                _logger.LogInformation("Tenant deleted: {TenantId}", id);
+                return Ok(new { code = 20000, message = "Tenant deleted successfully" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "删除租户失败: {TenantId}", id);
-                return StatusCode(500, new { code = 50000, message = "删除租户失败" });
+                _logger.LogError(ex, "Failed to delete tenant: {TenantId}", id);
+                return StatusCode(500, new { code = 50000, message = "Failed to delete tenant" });
             }
         }
 
         /// <summary>
-        /// 设置租户启用状态
+        /// Set tenant active status
         /// </summary>
         [HttpPut("{id:guid}/active")]
         public async Task<IActionResult> SetActive(Guid id, [FromBody] SetActiveRequest request)
@@ -291,22 +291,22 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
                 var result = await _tenantService.SetActiveAsync(id, request.IsActive);
                 if (!result)
                 {
-                    return NotFound(new { code = 40400, message = "租户不存在" });
+                    return NotFound(new { code = 40400, message = "Tenant not found" });
                 }
 
-                var status = request.IsActive ? "启用" : "禁用";
-                _logger.LogInformation("设置租户状态: {TenantId} -> {Status}", id, status);
-                return Ok(new { code = 20000, message = $"租户已{status}" });
+                var status = request.IsActive ? "enabled" : "disabled";
+                _logger.LogInformation("Tenant status changed: {TenantId} -> {Status}", id, status);
+                return Ok(new { code = 20000, message = $"Tenant has been {status}" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "设置租户状态失败: {TenantId}", id);
-                return StatusCode(500, new { code = 50000, message = "设置租户状态失败" });
+                _logger.LogError(ex, "Failed to set tenant status: {TenantId}", id);
+                return StatusCode(500, new { code = 50000, message = "Failed to set tenant status" });
             }
         }
 
         /// <summary>
-        /// 检查租户代码是否可用
+        /// Check if tenant code is available
         /// </summary>
         [HttpGet("check-code")]
         public async Task<IActionResult> CheckCode(
@@ -319,7 +319,7 @@ namespace Dawning.Identity.Api.Controllers.MultiTenancy
         }
 
         /// <summary>
-        /// 检查域名是否可用
+        /// Check if domain is available
         /// </summary>
         [HttpGet("check-domain")]
         public async Task<IActionResult> CheckDomain(

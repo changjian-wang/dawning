@@ -5,7 +5,7 @@ using Dawning.Extensions;
 namespace Dawning.Benchmarks;
 
 /// <summary>
-/// 字符串扩展方法基准测试
+/// String extension methods benchmarks
 /// </summary>
 [MemoryDiagnoser]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]

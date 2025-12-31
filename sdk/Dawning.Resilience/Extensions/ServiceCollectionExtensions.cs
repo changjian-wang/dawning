@@ -7,15 +7,15 @@ using Polly;
 namespace Dawning.Resilience.Extensions;
 
 /// <summary>
-/// 服务集合扩展方法
+/// Service collection extension methods
 /// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// 添加弹性策略服务
+    /// Adds resilience policy services
     /// </summary>
-    /// <param name="services">服务集合</param>
-    /// <param name="configure">配置委托</param>
+    /// <param name="services">Service collection</param>
+    /// <param name="configure">Configuration delegate</param>
     /// <returns></returns>
     public static IServiceCollection AddDawningResilience(
         this IServiceCollection services,
@@ -36,12 +36,12 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加具有弹性策略的 HttpClient
+    /// Adds an HttpClient with resilience policies
     /// </summary>
-    /// <typeparam name="TClient">HttpClient 类型</typeparam>
-    /// <param name="services">服务集合</param>
-    /// <param name="configureClient">配置 HttpClient</param>
-    /// <param name="configureResilience">配置弹性选项</param>
+    /// <typeparam name="TClient">HttpClient type</typeparam>
+    /// <param name="services">Service collection</param>
+    /// <param name="configureClient">Configure HttpClient</param>
+    /// <param name="configureResilience">Configure resilience options</param>
     /// <returns></returns>
     public static IHttpClientBuilder AddResilientHttpClient<TClient>(
         this IServiceCollection services,
@@ -91,10 +91,10 @@ public static class ServiceCollectionExtensions
                             OnRetry = args =>
                             {
                                 logger?.LogWarning(
-                                    "HTTP 请求重试第 {AttemptNumber} 次，状态码: {StatusCode}，异常: {Exception}",
+                                    "HTTP request retry attempt {AttemptNumber}, status code: {StatusCode}, exception: {Exception}",
                                     args.AttemptNumber,
                                     args.Outcome.Result?.StatusCode,
-                                    args.Outcome.Exception?.Message ?? "无"
+                                    args.Outcome.Exception?.Message ?? "None"
                                 );
                                 return default;
                             },
@@ -122,14 +122,14 @@ public static class ServiceCollectionExtensions
                             OnOpened = args =>
                             {
                                 logger?.LogError(
-                                    "HTTP 客户端熔断器已打开，持续 {BreakDuration} 秒",
+                                    "HTTP client circuit breaker opened for {BreakDuration} seconds",
                                     options.CircuitBreaker.BreakDurationSeconds
                                 );
                                 return default;
                             },
                             OnClosed = _ =>
                             {
-                                logger?.LogInformation("HTTP 客户端熔断器已关闭");
+                                logger?.LogInformation("HTTP client circuit breaker closed");
                                 return default;
                             },
                         }
@@ -142,7 +142,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// 添加具有弹性策略的命名 HttpClient
+    /// Adds a named HttpClient with resilience policies
     /// </summary>
     public static IHttpClientBuilder AddResilientHttpClient(
         this IServiceCollection services,

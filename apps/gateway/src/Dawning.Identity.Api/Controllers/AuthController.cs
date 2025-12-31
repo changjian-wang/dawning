@@ -13,7 +13,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace Dawning.Identity.Api.Controllers
 {
     /// <summary>
-    /// 认证控制器 - 处理 OAuth 2.0 / OpenID Connect 认证流程
+    /// Authentication controller - handles OAuth 2.0 / OpenID Connect authentication flow
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
@@ -27,8 +27,8 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// Token 端点 - 处理各种 OAuth 2.0 授权类型
-        /// 支持：password、client_credentials、authorization_code、refresh_token
+        /// Token endpoint - handles various OAuth 2.0 grant types
+        /// Supports: password, client_credentials, authorization_code, refresh_token
         /// </summary>
         [HttpPost("~/connect/token")]
         [Produces("application/json")]
@@ -40,25 +40,25 @@ namespace Dawning.Identity.Api.Controllers
                     "The OpenID Connect request cannot be retrieved."
                 );
 
-            // 处理密码授权流程 (Resource Owner Password Credentials)
+            // Handle password grant flow (Resource Owner Password Credentials)
             if (request.IsPasswordGrantType())
             {
                 return await HandlePasswordGrantAsync(request);
             }
 
-            // 处理客户端凭证流程 (Client Credentials)
+            // Handle client credentials grant flow (Client Credentials)
             if (request.IsClientCredentialsGrantType())
             {
                 return await HandleClientCredentialsGrantAsync(request);
             }
 
-            // 处理授权码流程 (Authorization Code)
+            // Handle authorization code grant flow (Authorization Code)
             if (request.IsAuthorizationCodeGrantType())
             {
                 return await HandleAuthorizationCodeGrantAsync();
             }
 
-            // 处理刷新令牌流程 (Refresh Token)
+            // Handle refresh token grant flow (Refresh Token)
             if (request.IsRefreshTokenGrantType())
             {
                 return await HandleRefreshTokenGrantAsync();
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 授权端点 - 用于授权码流程
+        /// Authorization endpoint - for authorization code flow
         /// </summary>
         [HttpGet("~/connect/authorize")]
         [HttpPost("~/connect/authorize")]
@@ -81,11 +81,11 @@ namespace Dawning.Identity.Api.Controllers
                     "The OpenID Connect request cannot be retrieved."
                 );
 
-            // 检查用户是否已认证
+            // Check if user is authenticated
             var result = await HttpContext.AuthenticateAsync();
             if (!result.Succeeded || request.HasPrompt(Prompts.Login))
             {
-                // 如果用户未认证，返回挑战响应
+                // If user is not authenticated, return challenge response
                 return Challenge(
                     authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
                     properties: new AuthenticationProperties
@@ -102,14 +102,14 @@ namespace Dawning.Identity.Api.Controllers
                 );
             }
 
-            // 创建用户身份声明
+            // Create user identity claims
             var identity = new ClaimsIdentity(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
                 roleType: Claims.Role
             );
 
-            // 从认证结果中获取用户信息
+            // Get user info from authentication result
             identity
                 .SetClaim(
                     Claims.Subject,
@@ -126,7 +126,7 @@ namespace Dawning.Identity.Api.Controllers
 
             identity.SetDestinations(GetDestinations);
 
-            // 返回授权响应
+            // Return authorization response
             return SignIn(
                 new ClaimsPrincipal(identity),
                 OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
@@ -134,7 +134,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 用户信息端点 - 返回当前用户的信息
+        /// UserInfo endpoint - returns current user information
         /// </summary>
         [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
         [HttpGet("~/connect/userinfo")]
@@ -166,11 +166,11 @@ namespace Dawning.Identity.Api.Controllers
 
             var claims = new Dictionary<string, object>(StringComparer.Ordinal)
             {
-                // 必需声明
+                // Required claims
                 [Claims.Subject] = claimsPrincipal.GetClaim(Claims.Subject) ?? string.Empty,
             };
 
-            // 可选声明
+            // Optional claims
             if (claimsPrincipal.HasScope(Scopes.Profile))
             {
                 claims[Claims.Name] = claimsPrincipal.GetClaim(Claims.Name) ?? string.Empty;
@@ -186,34 +186,34 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 登出端点
-        /// 对于纯 API OAuth 2.0 服务器（无服务端 session），登出只需要客户端清除本地 token
-        /// 如果需要服务端撤销 token，应使用 /connect/revoke 端点
+        /// Logout endpoint
+        /// For pure API OAuth 2.0 server (no server-side session), logout only requires client to clear local token
+        /// If server-side token revocation is needed, use the /connect/revoke endpoint
         /// </summary>
         [HttpGet("~/connect/logout")]
         [HttpPost("~/connect/logout")]
         public IActionResult Logout()
         {
-            // OAuth 2.0 API 服务器是无状态的，没有服务端 session 需要清除
-            // 客户端登出只需清除本地存储的 access_token、refresh_token 等
-            // 如果需要撤销 token 使其立即失效，应调用 /connect/revoke 端点
+            // OAuth 2.0 API server is stateless, no server-side session needs to be cleared
+            // Client logout only needs to clear locally stored access_token, refresh_token, etc.
+            // If token revocation is needed to invalidate immediately, call the /connect/revoke endpoint
             return Ok(ApiResponse.Success("Logged out successfully"));
         }
 
-        #region 私有辅助方法
+        #region Private helper methods
 
         /// <summary>
-        /// 处理密码授权流程
+        /// Handle password grant flow
         /// </summary>
         private async Task<IActionResult> HandlePasswordGrantAsync(OpenIddictRequest request)
         {
-            // 验证用户凭据
+            // Validate user credentials
             var user = await _userAuthenticationService.ValidateCredentialsAsync(
                 request.Username ?? string.Empty,
                 request.Password ?? string.Empty
             );
 
-            // 检查是否账户被锁定
+            // Check if account is locked out
             if (user != null && user.IsLockedOut)
             {
                 var lockoutProperties = new AuthenticationProperties(
@@ -248,7 +248,7 @@ namespace Dawning.Identity.Api.Controllers
                 return Forbid(properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
 
-            // 创建用户身份
+            // Create user identity
             var identity = new ClaimsIdentity(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
@@ -260,13 +260,13 @@ namespace Dawning.Identity.Api.Controllers
                 .SetClaim(Claims.Name, user.Username)
                 .SetClaim(Claims.Email, user.Email ?? string.Empty);
 
-            // 添加所有用户角色作为 role claims
+            // Add all user roles as role claims
             foreach (var role in user.Roles)
             {
                 identity.AddClaim(new Claim(Claims.Role, role));
             }
 
-            // 设置作用域
+            // Set scopes
             identity.SetScopes(request.GetScopes());
             identity.SetDestinations(GetDestinations);
 
@@ -277,11 +277,11 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 处理客户端凭证流程
+        /// Handle client credentials grant flow
         /// </summary>
         private Task<IActionResult> HandleClientCredentialsGrantAsync(OpenIddictRequest request)
         {
-            // 创建客户端身份
+            // Create client identity
             var identity = new ClaimsIdentity(
                 authenticationType: TokenValidationParameters.DefaultAuthenticationType,
                 nameType: Claims.Name,
@@ -292,7 +292,7 @@ namespace Dawning.Identity.Api.Controllers
                 .SetClaim(Claims.Subject, request.ClientId ?? string.Empty)
                 .SetClaim(Claims.Name, request.ClientId ?? string.Empty);
 
-            // 设置作用域
+            // Set scopes
             identity.SetScopes(request.GetScopes());
             identity.SetDestinations(GetDestinations);
 
@@ -305,7 +305,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 处理授权码流程
+        /// Handle authorization code grant flow
         /// </summary>
         private async Task<IActionResult> HandleAuthorizationCodeGrantAsync()
         {
@@ -335,7 +335,7 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 处理刷新令牌流程
+        /// Handle refresh token grant flow
         /// </summary>
         private async Task<IActionResult> HandleRefreshTokenGrantAsync()
         {
@@ -361,7 +361,7 @@ namespace Dawning.Identity.Api.Controllers
                 );
             }
 
-            // 验证用户是否仍然存在
+            // Verify user still exists
             var userId = claimsPrincipal.GetClaim(Claims.Subject);
             if (string.IsNullOrEmpty(userId))
             {
@@ -395,34 +395,34 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 确定声明的目标（access_token 和/或 id_token）
+        /// Determine claim destinations (access_token and/or id_token)
         /// </summary>
         private static IEnumerable<string> GetDestinations(Claim claim)
         {
-            // 注意: 默认情况下，声明不会自动包含在访问令牌和身份令牌中
-            // 必须显式指定声明的目标
+            // Note: By default, claims are not automatically included in access tokens and identity tokens
+            // Must explicitly specify claim destinations
 
             switch (claim.Type)
             {
-                // 这些声明应该包含在访问令牌和身份令牌中
+                // These claims should be included in both access token and identity token
                 case Claims.Name:
                 case Claims.Subject:
                     yield return Destinations.AccessToken;
                     yield return Destinations.IdentityToken;
                     yield break;
 
-                // 这些声明只应包含在身份令牌中
+                // These claims should only be included in identity token
                 case Claims.Email:
                 case Claims.EmailVerified:
                     yield return Destinations.IdentityToken;
                     yield break;
 
-                // 角色声明只应包含在访问令牌中
+                // Role claims should only be included in access token
                 case Claims.Role:
                     yield return Destinations.AccessToken;
                     yield break;
 
-                // 其他声明默认不包含
+                // Other claims are not included by default
                 default:
                     yield break;
             }

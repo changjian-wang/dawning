@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Gateway
 {
     /// <summary>
-    /// 网关路由管理控制器
+    /// Gateway Route Management Controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -31,7 +31,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
         }
 
         /// <summary>
-        /// 分页获取路由列表
+        /// Get paged route list
         /// </summary>
         [HttpGet("paged")]
         public async Task<IActionResult> GetPagedList(
@@ -70,16 +70,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取路由列表失败");
+                _logger.LogError(ex, "Failed to get route list");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取路由列表失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get route list: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 获取所有启用的路由（用于YARP配置）
+        /// Get all enabled routes (for YARP configuration)
         /// </summary>
         [HttpGet("enabled")]
         [AllowAnonymous]
@@ -99,16 +99,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取启用的路由失败");
+                _logger.LogError(ex, "Failed to get enabled routes");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取启用的路由失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get enabled routes: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 根据ID获取路由
+        /// Get route by ID
         /// </summary>
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> Get(Guid id)
@@ -118,7 +118,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
                 var route = await _routeService.GetAsync(id);
                 if (route == null)
                 {
-                    return NotFound(new { code = 40400, message = "路由不存在" });
+                    return NotFound(new { code = 40400, message = "Route not found" });
                 }
 
                 return Ok(
@@ -132,16 +132,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "获取路由详情失败");
+                _logger.LogError(ex, "Failed to get route details");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "获取路由详情失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to get route details: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 创建路由
+        /// Create route
         /// </summary>
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateGatewayRouteDto dto)
@@ -155,7 +155,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
                     new
                     {
                         code = 20000,
-                        message = "创建成功",
+                        message = "Created successfully",
                         data = route,
                     }
                 );
@@ -166,16 +166,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "创建路由失败");
+                _logger.LogError(ex, "Failed to create route");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "创建路由失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to create route: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 更新路由
+        /// Update route
         /// </summary>
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateGatewayRouteDto dto)
@@ -184,7 +184,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             {
                 if (id != dto.Id)
                 {
-                    return BadRequest(new { code = 40000, message = "ID不匹配" });
+                    return BadRequest(new { code = 40000, message = "ID mismatch" });
                 }
 
                 var username = User.Identity?.Name;
@@ -192,14 +192,14 @@ namespace Dawning.Identity.Api.Controllers.Gateway
 
                 if (route == null)
                 {
-                    return NotFound(new { code = 40400, message = "路由不存在" });
+                    return NotFound(new { code = 40400, message = "Route not found" });
                 }
 
                 return Ok(
                     new
                     {
                         code = 20000,
-                        message = "更新成功",
+                        message = "Updated successfully",
                         data = route,
                     }
                 );
@@ -210,16 +210,16 @@ namespace Dawning.Identity.Api.Controllers.Gateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "更新路由失败");
+                _logger.LogError(ex, "Failed to update route");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "更新路由失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to update route: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 删除路由
+        /// Delete route
         /// </summary>
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
@@ -229,23 +229,23 @@ namespace Dawning.Identity.Api.Controllers.Gateway
                 var result = await _routeService.DeleteAsync(id);
                 if (!result)
                 {
-                    return NotFound(new { code = 40400, message = "路由不存在" });
+                    return NotFound(new { code = 40400, message = "Route not found" });
                 }
 
-                return Ok(new { code = 20000, message = "删除成功" });
+                return Ok(new { code = 20000, message = "Deleted successfully" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "删除路由失败");
+                _logger.LogError(ex, "Failed to delete route");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "删除路由失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to delete route: " + ex.Message }
                 );
             }
         }
 
         /// <summary>
-        /// 切换路由启用状态
+        /// Toggle route enabled status
         /// </summary>
         [HttpPatch("{id:guid}/toggle")]
         public async Task<IActionResult> ToggleEnabled(Guid id, [FromBody] ToggleEnabledDto dto)
@@ -257,24 +257,24 @@ namespace Dawning.Identity.Api.Controllers.Gateway
 
                 if (!result)
                 {
-                    return NotFound(new { code = 40400, message = "路由不存在" });
+                    return NotFound(new { code = 40400, message = "Route not found" });
                 }
 
-                return Ok(new { code = 20000, message = dto.IsEnabled ? "已启用" : "已禁用" });
+                return Ok(new { code = 20000, message = dto.IsEnabled ? "Enabled" : "Disabled" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "切换路由状态失败");
+                _logger.LogError(ex, "Failed to toggle route status");
                 return StatusCode(
                     500,
-                    new { code = 50000, message = "切换路由状态失败: " + ex.Message }
+                    new { code = 50000, message = "Failed to toggle route status: " + ex.Message }
                 );
             }
         }
     }
 
     /// <summary>
-    /// 切换启用状态 DTO
+    /// Toggle enabled status DTO
     /// </summary>
     public class ToggleEnabledDto
     {

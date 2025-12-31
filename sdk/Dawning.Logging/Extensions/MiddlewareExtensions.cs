@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Builder;
 namespace Dawning.Logging.Extensions;
 
 /// <summary>
-/// 中间件扩展
+/// Middleware extensions
 /// </summary>
 public static class MiddlewareExtensions
 {
     /// <summary>
-    /// 使用日志上下文富化中间件
-    /// 自动将请求信息添加到日志上下文中
+    /// Uses the log context enrichment middleware
+    /// Automatically adds request information to the log context
     /// </summary>
     /// <example>
     /// <code>

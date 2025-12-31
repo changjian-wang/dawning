@@ -3,7 +3,7 @@
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// 数据库配置
+    /// Database configuration
     /// </summary>
     public static class DatabaseConfig
     {
@@ -24,7 +24,7 @@ namespace Dawning.Identity.Api.Configurations
                 );
             }
 
-            // 注册 DbContext（Scoped 生命周期）
+            // Register DbContext (Scoped lifetime)
             services.AddScoped(provider => new DbContext(connectionString));
         }
     }

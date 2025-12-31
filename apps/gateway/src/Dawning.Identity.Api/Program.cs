@@ -15,7 +15,7 @@ namespace Dawning.Identity.Api
             builder.WebHost.ConfigureKestrel(options =>
             {
                 options.AddServerHeader = false;
-                // 禁用响应体长度验证，避免 OpenIddict Content-Length mismatch 错误
+                // Disable response body length validation to avoid OpenIddict Content-Length mismatch errors
                 options.AllowSynchronousIO = true;
             });
 
@@ -40,7 +40,7 @@ namespace Dawning.Identity.Api
             builder.Services.AddDependencyInjectionConfiguration();
 
             // ===== OpenIddict Configuration =====
-            // 使用基于 Dapper + MySQL 的自定义 Stores
+            // Uses custom Stores based on Dapper + MySQL
             builder.Services.AddOpenIddictConfiguration(builder.Configuration);
 
             // ===== Security Services =====
@@ -58,7 +58,7 @@ namespace Dawning.Identity.Api
             >();
 
             // ===== Token Management Services =====
-            // 配置 Redis 分布式缓存（如果配置了连接字符串）
+            // Configure Redis distributed cache (if connection string is configured)
             var redisConnection = builder.Configuration.GetConnectionString("Redis");
             if (!string.IsNullOrEmpty(redisConnection))
             {
@@ -74,7 +74,7 @@ namespace Dawning.Identity.Api
             }
             else
             {
-                // 使用内存分布式缓存作为回退
+                // Use in-memory distributed cache as fallback
                 builder.Services.AddDistributedMemoryCache();
                 builder.Services.AddScoped<
                     Application.Interfaces.Token.ITokenBlacklistService,
@@ -82,13 +82,13 @@ namespace Dawning.Identity.Api
                 >();
             }
 
-            // ===== Cache Service (统一缓存服务) =====
+            // ===== Cache Service (Unified Cache Service) =====
             builder.Services.AddScoped<
                 Application.Interfaces.Caching.ICacheService,
                 Application.Services.Caching.DistributedCacheService
             >();
 
-            // ===== Cache Warmup Service (缓存预热) =====
+            // ===== Cache Warmup Service (Cache Preloading) =====
             builder.Services.AddHostedService<Application.Services.Caching.CacheWarmupService>();
 
             builder.Services.AddScoped<
@@ -164,7 +164,7 @@ namespace Dawning.Identity.Api
                 options.LowercaseQueryStrings = false; // Query strings not lowercase
             });
 
-            // CORS (支持 SignalR)
+            // CORS (with SignalR support)
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(
@@ -172,10 +172,10 @@ namespace Dawning.Identity.Api
                     policy =>
                     {
                         policy
-                            .SetIsOriginAllowed(_ => true) // 允许任何源（生产环境应限制）
+                            .SetIsOriginAllowed(_ => true) // Allow any origin (should be restricted in production)
                             .AllowAnyMethod()
                             .AllowAnyHeader()
-                            .AllowCredentials(); // SignalR 需要凭据支持
+                            .AllowCredentials(); // SignalR requires credentials support
                     }
                 );
             });
@@ -192,7 +192,7 @@ namespace Dawning.Identity.Api
             // ===== Health Checks =====
             builder.Services.AddHealthChecks();
 
-            // ===== SignalR (实时通信) =====
+            // ===== SignalR (Real-time Communication) =====
             builder.Services.AddSignalRConfiguration(builder.Configuration);
 
             // ===== OpenTelemetry =====

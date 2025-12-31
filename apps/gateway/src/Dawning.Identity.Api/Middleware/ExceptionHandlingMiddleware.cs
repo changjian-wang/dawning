@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Api.Middleware
 {
     /// <summary>
-    /// 全局异常处理中间件
-    /// 捕获并记录所有未处理的异常
+    /// Global Exception Handling Middleware
+    /// Captures and logs all unhandled exceptions
     /// </summary>
     public class ExceptionHandlingMiddleware
     {
@@ -43,7 +43,7 @@ namespace Dawning.Identity.Api.Middleware
                     context.User?.Identity?.Name ?? "Anonymous"
                 );
 
-                // 记录异常到数据库
+                // Log exception to database
                 await LogExceptionToDatabaseAsync(context, ex);
 
                 await HandleExceptionAsync(context, ex);
@@ -51,7 +51,7 @@ namespace Dawning.Identity.Api.Middleware
         }
 
         /// <summary>
-        /// 记录异常到数据库
+        /// Log exception to database
         /// </summary>
         private async Task LogExceptionToDatabaseAsync(HttpContext context, Exception exception)
         {
@@ -61,7 +61,7 @@ namespace Dawning.Identity.Api.Middleware
                 var systemLogService = context.RequestServices.GetService<ISystemLogService>();
                 if (systemLogService != null)
                 {
-                    // 确定状态码
+                // Determine status code
                     int statusCode = exception switch
                     {
                         ArgumentNullException => (int)HttpStatusCode.BadRequest,
@@ -76,17 +76,17 @@ namespace Dawning.Identity.Api.Middleware
             }
             catch (Exception logEx)
             {
-                // 记录日志失败不应影响异常处理流程
+                // Logging failure should not affect the exception handling flow
                 _logger.LogError(logEx, "Failed to log exception to database");
             }
         }
 
         private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            // 检查响应是否已经开始
+            // Check if response has already started
             if (context.Response.HasStarted)
             {
-                // 响应已经开始，无法修改状态码和headers，直接返回
+                // Response has already started, cannot modify status code and headers, return directly
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace Dawning.Identity.Api.Middleware
                 Timestamp = DateTime.UtcNow,
             };
 
-            // 根据异常类型设置不同的状态码
+            // Set different status codes based on exception type
             switch (exception)
             {
                 case ArgumentNullException:

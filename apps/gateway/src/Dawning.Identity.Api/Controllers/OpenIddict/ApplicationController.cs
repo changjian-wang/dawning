@@ -32,7 +32,7 @@ namespace Dawning.Identity.Api.Controllers.OpenIddict
         }
 
         /// <summary>
-        /// 从JWT Claims中获取操作员ID
+        /// Get operator ID from JWT Claims
         /// </summary>
         private Guid GetOperatorId()
         {

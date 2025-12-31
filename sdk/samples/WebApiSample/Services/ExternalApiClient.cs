@@ -4,7 +4,7 @@ using WebApiSample.Controllers;
 namespace WebApiSample.Services;
 
 /// <summary>
-/// 外部 API 客户端接口
+/// External API client interface
 /// </summary>
 public interface IExternalApiClient
 {
@@ -13,8 +13,8 @@ public interface IExternalApiClient
 }
 
 /// <summary>
-/// 外部 API 客户端实现
-/// 使用弹性 HttpClient（自动重试、熔断）
+/// External API client implementation
+/// Uses resilient HttpClient (automatic retry, circuit breaker)
 /// </summary>
 public class ExternalApiClient : IExternalApiClient
 {
@@ -29,7 +29,7 @@ public class ExternalApiClient : IExternalApiClient
 
     public async Task<IEnumerable<PostDto>> GetPostsAsync()
     {
-        _logger.LogInformation("正在获取帖子列表");
+        _logger.LogInformation("Getting posts list");
 
         var response = await _httpClient.GetStringAsync("/posts");
         var posts = response.FromJson<List<PostDto>>();
@@ -39,7 +39,7 @@ public class ExternalApiClient : IExternalApiClient
 
     public async Task<PostDto?> GetPostAsync(int id)
     {
-        _logger.LogInformation("正在获取帖子 {PostId}", id);
+        _logger.LogInformation("Getting post {PostId}", id);
 
         try
         {
@@ -48,7 +48,7 @@ public class ExternalApiClient : IExternalApiClient
         }
         catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            _logger.LogWarning("帖子 {PostId} 不存在", id);
+            _logger.LogWarning("Post {PostId} not found", id);
             return null;
         }
     }

@@ -1,69 +1,69 @@
 namespace Dawning.Caching;
 
 /// <summary>
-/// 缓存配置选项
+/// Cache configuration options
 /// </summary>
 public class CacheOptions
 {
     /// <summary>
-    /// 配置节名称
+    /// Configuration section name
     /// </summary>
     public const string SectionName = "Caching";
 
     /// <summary>
-    /// 缓存提供程序类型
+    /// Cache provider type
     /// </summary>
     public CacheProvider Provider { get; set; } = CacheProvider.Memory;
 
     /// <summary>
-    /// 默认过期时间（分钟）
+    /// Default expiration time in minutes
     /// </summary>
     public int DefaultExpirationMinutes { get; set; } = 30;
 
     /// <summary>
-    /// 键前缀
+    /// Key prefix
     /// </summary>
     public string KeyPrefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// Redis 配置
+    /// Redis configuration
     /// </summary>
     public RedisOptions Redis { get; set; } = new();
 }
 
 /// <summary>
-/// Redis 配置选项
+/// Redis configuration options
 /// </summary>
 public class RedisOptions
 {
     /// <summary>
-    /// 连接字符串
+    /// Connection string
     /// </summary>
     public string ConnectionString { get; set; } = "localhost:6379";
 
     /// <summary>
-    /// 实例名称
+    /// Instance name
     /// </summary>
     public string InstanceName { get; set; } = "Dawning:";
 
     /// <summary>
-    /// 数据库索引
+    /// Database index
     /// </summary>
     public int Database { get; set; } = 0;
 }
 
 /// <summary>
-/// 缓存提供程序类型
+/// Cache provider type
 /// </summary>
 public enum CacheProvider
 {
     /// <summary>
-    /// 内存缓存
+    /// In-memory cache
     /// </summary>
     Memory,
 
     /// <summary>
-    /// Redis 分布式缓存
+    /// Redis distributed cache
     /// </summary>
     Redis,
 }

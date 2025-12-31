@@ -7,7 +7,7 @@ using RabbitMQ.Client;
 namespace Dawning.Messaging.RabbitMQ;
 
 /// <summary>
-/// RabbitMQ 消息发布者
+/// RabbitMQ message publisher
 /// </summary>
 public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
 {
@@ -24,7 +24,7 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
     };
 
     /// <summary>
-    /// 初始化 RabbitMQ 发布者
+    /// Initializes the RabbitMQ publisher
     /// </summary>
     public RabbitMQPublisher(IOptions<MessagingOptions> options, ILogger<RabbitMQPublisher> logger)
     {
@@ -122,7 +122,7 @@ public class RabbitMQPublisher : IMessagePublisher, IAsyncDisposable
     }
 
     /// <summary>
-    /// 释放资源
+    /// Releases resources
     /// </summary>
     public async ValueTask DisposeAsync()
     {

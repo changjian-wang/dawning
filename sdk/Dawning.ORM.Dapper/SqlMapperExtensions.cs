@@ -323,13 +323,13 @@ namespace Dawning.ORM.Dapper
                     var name =
                         property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
 
-                    // ✅ 使用 TryGetValue
+                    // ✅ Use TryGetValue
                     if (!res.TryGetValue(name, out var val))
                     {
                         continue;
                     }
 
-                    // ✅ 处理 DBNull 和 null
+                    // ✅ Handle DBNull and null
                     if (val == null || val is DBNull)
                     {
                         if (
@@ -345,7 +345,7 @@ namespace Dawning.ORM.Dapper
 
                     try
                     {
-                        // ✅ 安全的类型转换
+                        // ✅ Safe type conversion
                         if (
                             property.PropertyType.IsGenericType
                             && property.PropertyType.GetGenericTypeDefinition()
@@ -368,7 +368,7 @@ namespace Dawning.ORM.Dapper
                             || property.PropertyType == typeof(DateTime?)
                         )
                         {
-                            // 直接设置DateTime，避免Convert.ChangeType的类型转换问题
+                            // Set DateTime directly to avoid Convert.ChangeType type conversion issues
                             property.SetValue(
                                 obj,
                                 val is DateTime dt ? dt : DateTime.Parse(val.ToString()!),
@@ -983,7 +983,7 @@ namespace Dawning.ORM.Dapper
         #region Build Conditions
 
         /// <summary>
-        /// 创建查询构建器
+        /// Create query builder
         /// </summary>
         public static QueryBuilder<TEntity> Builder<TEntity>(
             this IDbConnection connection,
@@ -1032,7 +1032,7 @@ namespace Dawning.ORM.Dapper
             /// </summary>
             public QueryBuilder<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
             {
-                // 如果已有条件，添加 AND 连接符
+                // If conditions exist, add AND connector
                 if (_conditions.Count > 0)
                 {
                     _conditions.Add("AND");
@@ -1051,7 +1051,7 @@ namespace Dawning.ORM.Dapper
             {
                 if (exists)
                 {
-                    // 如果已有条件，添加 AND 连接符
+                    // If conditions exist, add AND connector
                     if (_conditions.Count > 0)
                     {
                         _conditions.Add("AND");
@@ -1178,13 +1178,13 @@ namespace Dawning.ORM.Dapper
                 var type = typeof(TEntity);
                 var name = GetTableName(type);
 
-                // 构建 WHERE 子句（使用空格连接，保持 AND/OR/括号）
+                // Build WHERE clause (join with spaces, keeping AND/OR/parentheses)
                 string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
 
-                // 转换参数
+                // Convert parameters
                 var parameters = ConvertToDynamicParameters();
 
-                // 确保有排序列
+                // Ensure a sort column is specified
                 if (string.IsNullOrEmpty(_orderBy))
                 {
                     throw new InvalidOperationException(
@@ -1193,7 +1193,7 @@ namespace Dawning.ORM.Dapper
                     );
                 }
 
-                // 获取分页数据
+                // Get paginated data
                 var list = sqlAdapter.RetrieveCurrentPaginatedData(
                     _connection,
                     _transaction,
@@ -1206,7 +1206,7 @@ namespace Dawning.ORM.Dapper
                     parameters
                 );
 
-                // 获取总数
+                // Get total count
                 var countSql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
                 var count = _connection.ExecuteScalar(
                     countSql,
@@ -1230,23 +1230,23 @@ namespace Dawning.ORM.Dapper
                 var type = typeof(TEntity);
                 var name = GetTableName(type);
 
-                // 构建 WHERE 子句
+                // Build WHERE clause
                 string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
 
-                // 转换参数
+                // Convert parameters
                 var parameters = ConvertToDynamicParameters();
 
-                // 构建 SELECT 子句
+                // Build SELECT clause
                 var selectClause = BuildSelectClause();
 
-                // 构建 SQL
+                // Build SQL
                 var distinctKeyword = _distinct ? "DISTINCT " : "";
                 var sql = $"SELECT {distinctKeyword}{selectClause} FROM {name} WHERE {whereClause}";
 
-                // 添加排序（支持多列）
+                // Add sorting (supports multiple columns)
                 sql += BuildOrderByClause();
 
-                // 添加 SKIP/TAKE
+                // Add SKIP/TAKE
                 sql = ApplySkipTake(sql);
 
                 var list = _connection.Query(
@@ -1271,11 +1271,11 @@ namespace Dawning.ORM.Dapper
                 string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
                 var parameters = ConvertToDynamicParameters();
 
-                // 构建 SELECT 子句
+                // Build SELECT clause
                 var selectClause = BuildSelectClause();
                 var distinctKeyword = _distinct ? "DISTINCT " : "";
 
-                // 使用数据库特定的 LIMIT 语法
+                // Use database-specific LIMIT syntax
                 var sql = $"SELECT {distinctKeyword}{selectClause} FROM {name} WHERE {whereClause}";
                 sql += BuildOrderByClause();
 
@@ -1481,7 +1481,7 @@ namespace Dawning.ORM.Dapper
                         memberName = GetMemberName(binaryEqual.Left);
                         value = GetValueFromExpression(binaryEqual.Right);
 
-                        // ✅ 处理 null 比较
+                        // ✅ Handle null comparison
                         if (value == null)
                         {
                             conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} IS NULL");
@@ -1498,7 +1498,7 @@ namespace Dawning.ORM.Dapper
                         memberName = GetMemberName(binaryNotEqual.Left);
                         value = GetValueFromExpression(binaryNotEqual.Right);
 
-                        // ✅ 处理 null 比较
+                        // ✅ Handle null comparison
                         if (value == null)
                         {
                             conditions.Add(
@@ -1599,7 +1599,7 @@ namespace Dawning.ORM.Dapper
                             memberName = GetMemberName(methodCall.Object);
                             value = GetValueFromExpression(methodCall.Arguments[0]);
 
-                            // ✅ 处理 null 值
+                            // ✅ Handle null value
                             if (value == null)
                             {
                                 conditions.Add(
@@ -1618,7 +1618,7 @@ namespace Dawning.ORM.Dapper
                         {
                             if (methodCall.Method.DeclaringType == typeof(string))
                             {
-                                // ✅ 字符串的 Contains: x.Name.Contains("test")
+                                // ✅ String Contains: x.Name.Contains("test")
                                 memberName = GetMemberName(methodCall.Object);
                                 value = GetValueFromExpression(methodCall.Arguments[0]);
 
@@ -1638,7 +1638,7 @@ namespace Dawning.ORM.Dapper
                             }
                             else
                             {
-                                // ✅ 集合的 Contains: list.Contains(x.Name)
+                                // ✅ Collection Contains: list.Contains(x.Name)
                                 memberName = GetMemberName(methodCall.Arguments[0]);
                                 value = GetValueFromExpression(methodCall.Object);
 
@@ -1648,7 +1648,7 @@ namespace Dawning.ORM.Dapper
                                     break;
                                 }
 
-                                // ✅ 检查集合是否为空
+                                // ✅ Check if collection is empty
                                 if (value is System.Collections.IEnumerable enumerable)
                                 {
                                     var enumerator = enumerable.GetEnumerator();
@@ -1717,18 +1717,18 @@ namespace Dawning.ORM.Dapper
                     || adapter is SQLiteAdapter
                 )
                 {
-                    // MySQL, PostgreSQL, SQLite 使用反斜杠转义
+                    // MySQL, PostgreSQL, SQLite use backslash escape
                     return value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
                 }
                 else
                 {
-                    // SQL Server 使用方括号转义
+                    // SQL Server uses bracket escape
                     return value.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]");
                 }
             }
 
             /// <summary>
-            /// 构建 LIKE 条件（某些数据库需要 ESCAPE 子句）
+            /// Build LIKE condition (some databases require ESCAPE clause)
             /// </summary>
             private static string BuildLikeCondition(
                 string memberName,
@@ -1738,19 +1738,19 @@ namespace Dawning.ORM.Dapper
             {
                 var columnName = adapter.ConvertColumnName(memberName);
 
-                // SQLite 和 Firebird 需要显式指定 ESCAPE 子句
+                // SQLite and Firebird require explicit ESCAPE clause
                 if (adapter is SQLiteAdapter || adapter is FbAdapter)
                 {
                     return $"{columnName} LIKE {paramName} ESCAPE '\\'";
                 }
 
-                // PostgreSQL 在某些情况下也需要 ESCAPE
+                // PostgreSQL may also need ESCAPE in some cases
                 if (adapter is PostgresAdapter)
                 {
                     return $"{columnName} LIKE {paramName} ESCAPE '\\'";
                 }
 
-                // SQL Server, MySQL 默认支持转义
+                // SQL Server, MySQL support escape by default
                 return $"{columnName} LIKE {paramName}";
             }
 
@@ -1807,7 +1807,7 @@ namespace Dawning.ORM.Dapper
             }
 
             /// <summary>
-            /// 从表达式中获取实际值（用于参数化查询）
+            /// Get actual value from expression (used for parameterized queries)
             /// </summary>
             private static object? GetValueFromExpression(Expression expression)
             {

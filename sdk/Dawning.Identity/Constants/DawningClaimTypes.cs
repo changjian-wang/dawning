@@ -1,63 +1,63 @@
 namespace Dawning.Identity.Constants;
 
 /// <summary>
-/// Dawning 认证相关常量
+/// Dawning authentication related constants
 /// </summary>
 public static class DawningClaimTypes
 {
     /// <summary>
-    /// 用户ID
+    /// User ID
     /// </summary>
     public const string UserId = "sub";
 
     /// <summary>
-    /// 用户名
+    /// Username
     /// </summary>
     public const string UserName = "name";
 
     /// <summary>
-    /// 邮箱
+    /// Email
     /// </summary>
     public const string Email = "email";
 
     /// <summary>
-    /// 角色
+    /// Role
     /// </summary>
     public const string Role = "role";
 
     /// <summary>
-    /// 权限
+    /// Permission
     /// </summary>
     public const string Permission = "permission";
 
     /// <summary>
-    /// 租户ID
+    /// Tenant ID
     /// </summary>
     public const string TenantId = "tenant_id";
 
     /// <summary>
-    /// 租户编码
+    /// Tenant code
     /// </summary>
     public const string TenantCode = "tenant_code";
 
     /// <summary>
-    /// 是否为宿主管理员
+    /// Whether the user is a host administrator
     /// </summary>
     public const string IsHost = "is_host";
 
     /// <summary>
-    /// 客户端ID
+    /// Client ID
     /// </summary>
     public const string ClientId = "client_id";
 
     /// <summary>
-    /// 作用域
+    /// Scope
     /// </summary>
     public const string Scope = "scope";
 }
 
 /// <summary>
-/// 预定义的角色
+/// Predefined roles
 /// </summary>
 public static class DawningRoles
 {
@@ -69,31 +69,31 @@ public static class DawningRoles
 }
 
 /// <summary>
-/// 预定义的权限
+/// Predefined permissions
 /// </summary>
 public static class DawningPermissions
 {
-    // 用户管理
+    // User management
     public const string UserRead = "user.read";
     public const string UserCreate = "user.create";
     public const string UserUpdate = "user.update";
     public const string UserDelete = "user.delete";
 
-    // 角色管理
+    // Role management
     public const string RoleRead = "role.read";
     public const string RoleCreate = "role.create";
     public const string RoleUpdate = "role.update";
     public const string RoleDelete = "role.delete";
 
-    // 权限管理
+    // Permission management
     public const string PermissionRead = "permission.read";
     public const string PermissionManage = "permission.manage";
 
-    // 系统配置
+    // System configuration
     public const string ConfigRead = "config.read";
     public const string ConfigWrite = "config.write";
 
-    // 审计日志
+    // Audit logs
     public const string AuditLogRead = "audit.read";
     public const string AuditLogExport = "audit.export";
 }

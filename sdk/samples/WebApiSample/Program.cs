@@ -7,7 +7,7 @@ using WebApiSample.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // ========================================
-// 1. 配置 Dawning 日志 (Serilog)
+// 1. Configure Dawning Logging (Serilog)
 // ========================================
 builder.Host.UseDawningLogging(options =>
 {
@@ -18,44 +18,44 @@ builder.Host.UseDawningLogging(options =>
 });
 
 // ========================================
-// 2. 配置 Dawning 认证 (JWT)
+// 2. Configure Dawning Authentication (JWT)
 // ========================================
 builder.Services.AddDawningAuthentication(options =>
 {
     options.Authority = builder.Configuration["Auth:Authority"] ?? "https://localhost:5001";
     options.Audience = builder.Configuration["Auth:Audience"] ?? "api";
-    options.RequireHttpsMetadata = false; // 开发环境
+    options.RequireHttpsMetadata = false; // Development environment
 });
 
 // ========================================
-// 3. 配置 Dawning 弹性策略 (Polly)
+// 3. Configure Dawning Resilience (Polly)
 // ========================================
 builder.Services.AddDawningResilience(options =>
 {
-    // 重试配置
+    // Retry configuration
     options.Retry.MaxRetryAttempts = 3;
     options.Retry.BaseDelayMs = 200;
     options.Retry.UseExponentialBackoff = true;
 
-    // 熔断器配置
+    // Circuit breaker configuration
     options.CircuitBreaker.Enabled = true;
     options.CircuitBreaker.FailureRatioThreshold = 0.5;
     options.CircuitBreaker.SamplingDurationSeconds = 30;
     options.CircuitBreaker.BreakDurationSeconds = 30;
 
-    // 超时配置
+    // Timeout configuration
     options.Timeout.TimeoutSeconds = 30;
 });
 
 // ========================================
-// 4. 添加弹性 HttpClient
+// 4. Add Resilient HttpClient
 // ========================================
 builder.Services.AddHttpClient<IExternalApiClient, ExternalApiClient>(client =>
 {
     client.BaseAddress = new Uri("https://jsonplaceholder.typicode.com");
 });
 
-// 添加服务
+// Add services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -63,12 +63,12 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // ========================================
-// 5. 使用 Dawning 异常处理中间件
+// 5. Use Dawning Exception Handling Middleware
 // ========================================
 app.UseDawningExceptionHandling();
 
 // ========================================
-// 6. 使用 Dawning 日志富化中间件
+// 6. Use Dawning Logging Enrichment Middleware
 // ========================================
 app.UseDawningLoggingEnrichment();
 

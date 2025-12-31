@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// 角色管理控制器
+    /// Role management controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 根据ID获取角色
+        /// Get role by ID
         /// </summary>
         [HttpGet("{id:guid}")]
         [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
@@ -63,7 +63,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 根据名称获取角色
+        /// Get role by name
         /// </summary>
         [HttpGet("by-name/{name}")]
         [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
@@ -88,7 +88,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取角色列表（分页）
+        /// Get role list (paginated)
         /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -130,7 +130,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取所有角色
+        /// Get all roles
         /// </summary>
         [HttpGet("all")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -149,7 +149,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 创建角色
+        /// Create role
         /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(RoleDto), StatusCodes.Status201Created)]
@@ -163,7 +163,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
 
                 _logger.LogInformation("Role created: {RoleName}", role.Name);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "Create",
                     entityType: "Role",
@@ -197,7 +197,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 更新角色
+        /// Update role
         /// </summary>
         [HttpPut("{id:guid}")]
         [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
@@ -209,14 +209,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
                 dto.Id = id;
                 var operatorId = GetCurrentUserId();
 
-                // 获取更新前的角色信息
+                // Get role info before update
                 var oldRole = await _roleService.GetAsync(id);
 
                 var role = await _roleService.UpdateAsync(dto, operatorId);
 
                 _logger.LogInformation("Role updated: {RoleId}", id);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "Update",
                     entityType: "Role",
@@ -253,7 +253,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除角色
+        /// Delete role
         /// </summary>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -264,14 +264,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
             {
                 var operatorId = GetCurrentUserId();
 
-                // 获取删除前的角色信息
+                // Get role info before delete
                 var role = await _roleService.GetAsync(id);
 
                 await _roleService.DeleteAsync(id, operatorId);
 
                 _logger.LogInformation("Role deleted: {RoleId}", id);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "Delete",
                     entityType: "Role",
@@ -302,7 +302,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 检查角色名称是否存在
+        /// Check if role name exists
         /// </summary>
         [HttpGet("check-name")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -324,7 +324,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取当前登录用户ID
+        /// Get current logged-in user ID
         /// </summary>
         private Guid? GetCurrentUserId()
         {

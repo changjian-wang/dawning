@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers.Administration
 {
     /// <summary>
-    /// 权限管理控制器
+    /// Permission management controller
     /// </summary>
     [ApiVersion("1.0")]
     [ApiController]
@@ -35,7 +35,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 获取单个权限
+        /// Get single permission
         /// </summary>
         [HttpGet("{id:guid}")]
         [RequirePermission("permission.read")]
@@ -44,14 +44,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
             var permission = await _permissionService.GetAsync(id);
             if (permission == null)
             {
-                return NotFound(ApiResponse.Error(40400, $"权限 ID '{id}' 不存在"));
+                return NotFound(ApiResponse.Error(40400, $"Permission ID '{id}' does not exist"));
             }
 
             return Ok(ApiResponse<object>.Success(permission));
         }
 
         /// <summary>
-        /// 根据代码获取权限
+        /// Get permission by code
         /// </summary>
         [HttpGet("code/{code}")]
         public async Task<IActionResult> GetByCodeAsync(string code)
@@ -59,14 +59,14 @@ namespace Dawning.Identity.Api.Controllers.Administration
             var permission = await _permissionService.GetByCodeAsync(code);
             if (permission == null)
             {
-                return NotFound(ApiResponse.Error(40400, $"权限代码 '{code}' 不存在"));
+                return NotFound(ApiResponse.Error(40400, $"Permission code '{code}' does not exist"));
             }
 
             return Ok(ApiResponse<object>.Success(permission));
         }
 
         /// <summary>
-        /// 获取权限分页列表
+        /// Get permission paginated list
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetPagedListAsync(

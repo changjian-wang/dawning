@@ -7,33 +7,33 @@ using OpenTelemetry.Trace;
 namespace Dawning.Identity.Api.Configurations
 {
     /// <summary>
-    /// OpenTelemetry 配置扩展
-    /// 提供分布式追踪和指标收集功能
+    /// OpenTelemetry configuration extension
+    /// Provides distributed tracing and metrics collection functionality
     /// </summary>
     public static class OpenTelemetryConfiguration
     {
         /// <summary>
-        /// 服务名称
+        /// Service name
         /// </summary>
         public const string ServiceName = "Dawning.Identity.Api";
 
         /// <summary>
-        /// 服务版本
+        /// Service version
         /// </summary>
         public static readonly string ServiceVersion =
             typeof(OpenTelemetryConfiguration).Assembly.GetName().Version?.ToString() ?? "1.0.0";
 
         /// <summary>
-        /// ActivitySource 用于创建追踪 Span
+        /// ActivitySource for creating trace Spans
         /// </summary>
         public static readonly ActivitySource ActivitySource = new(ServiceName, ServiceVersion);
 
         /// <summary>
-        /// Meter 用于创建自定义指标
+        /// Meter for creating custom metrics
         /// </summary>
         public static readonly Meter Meter = new(ServiceName, ServiceVersion);
 
-        // 自定义指标
+        // Custom metrics
         private static readonly Counter<long> _requestCounter = Meter.CreateCounter<long>(
             "dawning_http_requests_total",
             description: "Total number of HTTP requests"
@@ -61,7 +61,7 @@ namespace Dawning.Identity.Api.Configurations
         );
 
         /// <summary>
-        /// 添加 OpenTelemetry 服务配置
+        /// Add OpenTelemetry service configuration
         /// </summary>
         public static IServiceCollection AddOpenTelemetryConfiguration(
             this IServiceCollection services,
@@ -74,7 +74,7 @@ namespace Dawning.Identity.Api.Configurations
 
             var otelBuilder = services.AddOpenTelemetry();
 
-            // 配置资源信息
+            // Configure resource information
             otelBuilder.ConfigureResource(resource =>
                 resource
                     .AddService(
@@ -93,7 +93,7 @@ namespace Dawning.Identity.Api.Configurations
                     )
             );
 
-            // 配置追踪
+            // Configure tracing
             if (enableTracing)
             {
                 otelBuilder.WithTracing(tracing =>
@@ -102,7 +102,7 @@ namespace Dawning.Identity.Api.Configurations
                         .AddSource(ServiceName)
                         .AddAspNetCoreInstrumentation(options =>
                         {
-                            // 过滤健康检查等噪音请求
+                            // Filter noisy requests like health checks
                             options.Filter = httpContext =>
                             {
                                 var path = httpContext.Request.Path.Value ?? "";
@@ -117,7 +117,7 @@ namespace Dawning.Identity.Api.Configurations
                                     );
                             };
 
-                            // 丰富 Span 信息
+                            // Enrich Span information
                             options.EnrichWithHttpRequest = (activity, request) =>
                             {
                                 activity.SetTag(
@@ -145,17 +145,17 @@ namespace Dawning.Identity.Api.Configurations
                             options.RecordException = true;
                         });
 
-                    // 如果配置了 OTLP 导出端点，添加 OTLP 导出器
+                    // If OTLP export endpoint is configured, add OTLP exporter
                     var otlpEndpoint = configuration["OpenTelemetry:OtlpEndpoint"];
                     if (!string.IsNullOrEmpty(otlpEndpoint))
                     {
-                        // 需要额外安装 OpenTelemetry.Exporter.OpenTelemetryProtocol 包
+                        // Requires additional installation of OpenTelemetry.Exporter.OpenTelemetryProtocol package
                         // tracing.AddOtlpExporter(options => options.Endpoint = new Uri(otlpEndpoint));
                     }
                 });
             }
 
-            // 配置指标
+            // Configure metrics
             if (enableMetrics)
             {
                 otelBuilder.WithMetrics(metrics =>
@@ -166,7 +166,7 @@ namespace Dawning.Identity.Api.Configurations
                         .AddHttpClientInstrumentation()
                         .AddRuntimeInstrumentation()
                         .AddProcessInstrumentation()
-                        // Prometheus 导出
+                        // Prometheus export
                         .AddPrometheusExporter();
                 });
             }
@@ -175,22 +175,22 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 配置 OpenTelemetry 中间件
+        /// Configure OpenTelemetry middleware
         /// </summary>
         public static IApplicationBuilder UseOpenTelemetryConfiguration(
             this IApplicationBuilder app
         )
         {
-            // Prometheus 指标端点
+            // Prometheus metrics endpoint
             app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
             return app;
         }
 
-        #region 自定义指标记录方法
+        #region Custom metrics recording methods
 
         /// <summary>
-        /// 记录 HTTP 请求
+        /// Record HTTP request
         /// </summary>
         public static void RecordRequest(string method, string path, int statusCode)
         {
@@ -203,7 +203,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 记录请求耗时
+        /// Record request duration
         /// </summary>
         public static void RecordRequestDuration(
             string method,
@@ -221,7 +221,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 记录认证成功
+        /// Record authentication success
         /// </summary>
         public static void RecordAuthSuccess(string authType = "password")
         {
@@ -229,7 +229,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 记录认证失败
+        /// Record authentication failure
         /// </summary>
         public static void RecordAuthFailure(
             string authType = "password",
@@ -244,7 +244,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 记录数据库查询
+        /// Record database query
         /// </summary>
         public static void RecordDbQuery(string operation, string table)
         {
@@ -256,7 +256,7 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 创建追踪 Span
+        /// Create trace Span
         /// </summary>
         public static Activity? StartActivity(
             string name,
@@ -267,21 +267,21 @@ namespace Dawning.Identity.Api.Configurations
         }
 
         /// <summary>
-        /// 规范化路径（移除动态参数）
+        /// Normalize path (remove dynamic parameters)
         /// </summary>
         private static string NormalizePath(string path)
         {
             if (string.IsNullOrEmpty(path))
                 return "/";
 
-            // 移除 GUID 参数
+            // Remove GUID parameters
             var normalized = System.Text.RegularExpressions.Regex.Replace(
                 path,
                 @"/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
                 "/{id}"
             );
 
-            // 移除数字 ID 参数
+            // Remove numeric ID parameters
             normalized = System.Text.RegularExpressions.Regex.Replace(
                 normalized,
                 @"/\d+(?=/|$)",

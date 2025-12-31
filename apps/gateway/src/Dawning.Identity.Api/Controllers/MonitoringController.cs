@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dawning.Identity.Api.Controllers
 {
     /// <summary>
-    /// 监控和日志API控制器
+    /// Monitoring and Logging API Controller
     /// </summary>
     [ApiController]
     [ApiVersion("1.0")]
@@ -33,22 +33,22 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取请求日志列表
+        /// Get request log list
         /// </summary>
-        /// <param name="startTime">起始时间</param>
-        /// <param name="endTime">结束时间</param>
-        /// <param name="method">HTTP方法</param>
-        /// <param name="path">路径过滤</param>
-        /// <param name="statusCode">状态码</param>
-        /// <param name="minStatusCode">最小状态码</param>
-        /// <param name="maxStatusCode">最大状态码</param>
-        /// <param name="userId">用户ID</param>
-        /// <param name="clientIp">客户端IP</param>
-        /// <param name="onlyErrors">只显示错误</param>
-        /// <param name="slowRequestThresholdMs">慢请求阈值</param>
-        /// <param name="page">页码</param>
-        /// <param name="pageSize">每页数量</param>
-        /// <returns>分页请求日志</returns>
+        /// <param name="startTime">Start time</param>
+        /// <param name="endTime">End time</param>
+        /// <param name="method">HTTP method</param>
+        /// <param name="path">Path filter</param>
+        /// <param name="statusCode">Status code</param>
+        /// <param name="minStatusCode">Minimum status code</param>
+        /// <param name="maxStatusCode">Maximum status code</param>
+        /// <param name="userId">User ID</param>
+        /// <param name="clientIp">Client IP</param>
+        /// <param name="onlyErrors">Show only errors</param>
+        /// <param name="slowRequestThresholdMs">Slow request threshold</param>
+        /// <param name="page">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <returns>Paged request logs</returns>
         [HttpGet("logs")]
         public async Task<ActionResult<PagedRequestLogs>> GetLogs(
             [FromQuery] DateTime? startTime = null,
@@ -88,13 +88,13 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取请求统计信息
+        /// Get request statistics
         /// </summary>
-        /// <param name="startTime">起始时间（默认24小时前）</param>
-        /// <param name="endTime">结束时间（默认现在）</param>
-        /// <returns>请求统计信息</returns>
+        /// <param name="startTime">Start time (default 24 hours ago)</param>
+        /// <param name="endTime">End time (default now)</param>
+        /// <returns>Request statistics</returns>
         [HttpGet("statistics")]
-        [CacheResponse(60, VaryByQueryKeys = "startTime,endTime")] // 缓存1分钟
+        [CacheResponse(60, VaryByQueryKeys = "startTime,endTime")] // Cache for 1 minute
         public async Task<ActionResult<RequestStatistics>> GetStatistics(
             [FromQuery] DateTime? startTime = null,
             [FromQuery] DateTime? endTime = null
@@ -105,44 +105,44 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取系统性能指标
+        /// Get system performance metrics
         /// </summary>
-        /// <returns>系统性能指标</returns>
+        /// <returns>System performance metrics</returns>
         [HttpGet("performance")]
-        [CacheResponse(30)] // 缓存30秒
+        [CacheResponse(30)] // Cache for 30 seconds
         public ActionResult<SystemPerformanceMetrics> GetPerformanceMetrics()
         {
             var process = Process.GetCurrentProcess();
             var metrics = new SystemPerformanceMetrics
             {
-                // 进程信息
+                // Process information
                 ProcessId = process.Id,
                 ProcessName = process.ProcessName,
                 StartTime = process.StartTime,
                 Uptime = DateTime.Now - process.StartTime,
 
-                // 内存信息
+                // Memory information
                 WorkingSetMemoryMb = process.WorkingSet64 / (1024.0 * 1024.0),
                 PrivateMemoryMb = process.PrivateMemorySize64 / (1024.0 * 1024.0),
                 VirtualMemoryMb = process.VirtualMemorySize64 / (1024.0 * 1024.0),
                 ManagedMemoryMb = GC.GetTotalMemory(false) / (1024.0 * 1024.0),
 
-                // GC 信息
+                // GC information
                 Gen0Collections = GC.CollectionCount(0),
                 Gen1Collections = GC.CollectionCount(1),
                 Gen2Collections = GC.CollectionCount(2),
                 TotalAllocatedMb = GC.GetTotalAllocatedBytes(false) / (1024.0 * 1024.0),
 
-                // 线程信息
+                // Thread information
                 ThreadCount = process.Threads.Count,
                 HandleCount = process.HandleCount,
 
-                // CPU 信息
+                // CPU information
                 TotalProcessorTime = process.TotalProcessorTime,
                 UserProcessorTime = process.UserProcessorTime,
                 PrivilegedProcessorTime = process.PrivilegedProcessorTime,
 
-                // 时间戳
+                // Timestamp
                 Timestamp = DateTime.UtcNow,
             };
 
@@ -150,11 +150,11 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取实时监控数据（用于仪表盘轮询）
+        /// Get real-time monitoring data (for dashboard polling)
         /// </summary>
-        /// <returns>实时监控数据</returns>
+        /// <returns>Real-time monitoring data</returns>
         [HttpGet("realtime")]
-        [CacheResponse(15)] // 缓存15秒
+        [CacheResponse(15)] // Cache for 15 seconds
         public async Task<ActionResult<RealtimeMonitoringData>> GetRealtimeData()
         {
             var now = DateTime.UtcNow;
@@ -192,10 +192,10 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 清理过期日志
+        /// Clean up expired logs
         /// </summary>
-        /// <param name="retentionDays">保留天数</param>
-        /// <returns>删除的日志数量</returns>
+        /// <param name="retentionDays">Retention days</param>
+        /// <returns>Number of deleted logs</returns>
         [HttpPost("logs/cleanup")]
         public async Task<ActionResult<LogCleanupResult>> CleanupLogs(
             [FromQuery] int retentionDays = 30
@@ -219,11 +219,11 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取用户统计信息
+        /// Get user statistics
         /// </summary>
-        /// <returns>用户统计数据</returns>
+        /// <returns>User statistics data</returns>
         [HttpGet("user-statistics")]
-        [CacheResponse(120)] // 缓存2分钟
+        [CacheResponse(120)] // Cache for 2 minutes
         public async Task<ActionResult<UserStatisticsDto>> GetUserStatistics()
         {
             var stats = await _userService.GetUserStatisticsAsync();
@@ -231,12 +231,12 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 获取最近活跃用户
+        /// Get recently active users
         /// </summary>
-        /// <param name="count">返回数量（默认10）</param>
-        /// <returns>最近活跃用户列表</returns>
+        /// <param name="count">Return count (default 10)</param>
+        /// <returns>Recently active user list</returns>
         [HttpGet("recent-active-users")]
-        [CacheResponse(60, VaryByQueryKeys = "count")] // 缓存1分钟
+        [CacheResponse(60, VaryByQueryKeys = "count")] // Cache for 1 minute
         public async Task<ActionResult<IEnumerable<RecentActiveUserDto>>> GetRecentActiveUsers(
             [FromQuery] int count = 10
         )
@@ -251,9 +251,9 @@ namespace Dawning.Identity.Api.Controllers
         }
 
         /// <summary>
-        /// 触发垃圾回收（仅用于调试）
+        /// Trigger garbage collection (for debugging only)
         /// </summary>
-        /// <returns>GC结果</returns>
+        /// <returns>GC result</returns>
         [HttpPost("gc")]
         public ActionResult<GcResult> TriggerGarbageCollection()
         {
@@ -278,7 +278,7 @@ namespace Dawning.Identity.Api.Controllers
     }
 
     /// <summary>
-    /// 系统性能指标
+    /// System Performance Metrics
     /// </summary>
     public class SystemPerformanceMetrics
     {
@@ -308,7 +308,7 @@ namespace Dawning.Identity.Api.Controllers
     }
 
     /// <summary>
-    /// 实时监控数据
+    /// Real-time Monitoring Data
     /// </summary>
     public class RealtimeMonitoringData
     {
@@ -327,7 +327,7 @@ namespace Dawning.Identity.Api.Controllers
     }
 
     /// <summary>
-    /// 日志清理结果
+    /// Log Cleanup Result
     /// </summary>
     public class LogCleanupResult
     {
@@ -337,7 +337,7 @@ namespace Dawning.Identity.Api.Controllers
     }
 
     /// <summary>
-    /// GC结果
+    /// GC Result
     /// </summary>
     public class GcResult
     {
