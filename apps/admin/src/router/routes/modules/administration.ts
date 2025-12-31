@@ -239,15 +239,17 @@ export const TENANT: AppRouteRecordRaw = {
   path: '/tenant',
   name: 'Tenant',
   component: DEFAULT_LAYOUT,
+  redirect: '/tenant/index',
   meta: {
     locale: 'menu.administration.tenant',
     requiresAuth: true,
     icon: 'icon-apps',
     order: 5,
+    hideChildrenInMenu: true,
   },
   children: [
     {
-      path: '',
+      path: 'index',
       name: 'TenantManagement',
       component: () => import('@/views/administration/tenant/index.vue'),
       meta: {
@@ -255,7 +257,7 @@ export const TENANT: AppRouteRecordRaw = {
         requiresAuth: true,
         icon: 'icon-apps',
         roles: ['super_admin'],
-        hideInMenu: true,
+        activeMenu: 'Tenant',
       },
     },
   ],

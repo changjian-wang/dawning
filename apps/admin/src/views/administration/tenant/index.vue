@@ -301,7 +301,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, computed, onMounted } from 'vue';
+  import { ref, reactive, computed, onMounted, onActivated } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Message, Modal } from '@arco-design/web-vue';
   import dayjs from 'dayjs';
@@ -604,6 +604,11 @@
   };
 
   onMounted(() => {
+    fetchData();
+  });
+
+  // 处理从缓存激活时重新加载数据
+  onActivated(() => {
     fetchData();
   });
 </script>
