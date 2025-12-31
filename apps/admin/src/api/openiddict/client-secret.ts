@@ -6,10 +6,10 @@ export interface IClientSecret extends Secret {
 }
 
 /**
- * 优化点：
- * 1. 使用构造函数支持 Partial<IClientSecret> 初始化，减少冗余和硬编码。
- * 2. 默认值通过参数解构设置，初始化更灵活。
- * 3. 类型声明更清晰，方便扩展和维护。
+ * Optimizations:
+ * 1. Use constructor supporting Partial<IClientSecret> initialization to reduce redundancy and hard-coding.
+ * 2. Default values are set via parameter destructuring for more flexible initialization.
+ * 3. Type declarations are clearer, easier to extend and maintain.
  */
 export class ClientSecret implements IClientSecret {
   clientId: string;

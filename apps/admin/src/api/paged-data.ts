@@ -1,13 +1,13 @@
 export interface IPagedData<T> {
-  // 当前页码
+  // Current page number
   pageIndex: number;
 
-  // 每页数量
+  // Items per page
   pageSize: number;
 
-  // 总记录数
+  // Total record count
   totalCount: number;
 
-  // 数据列表
+  // Data list
   items: T[];
 }

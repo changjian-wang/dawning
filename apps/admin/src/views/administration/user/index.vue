@@ -94,7 +94,7 @@
         </a-form>
       </a-card>
       <a-card class="general-card table-card">
-        <!-- 批量操作栏 -->
+        <!-- Batch operations bar -->
         <div v-if="selectedRowKeys.length > 0" class="batch-action-bar">
           <a-space>
             <span class="selected-count">
@@ -216,7 +216,7 @@
       </a-card>
     </div>
 
-    <!-- 新增/编辑用户弹窗 -->
+    <!-- Add/Edit user modal -->
     <a-modal
       v-model:visible="modalVisible"
       :title="modalTitle"
@@ -299,7 +299,7 @@
       </a-form>
     </a-modal>
 
-    <!-- 查看用户详情弹窗 -->
+    <!-- View user details modal -->
     <a-modal
       v-model:visible="viewModalVisible"
       :title="$t('user.modal.detail.title')"
@@ -398,7 +398,7 @@
       </div>
     </a-modal>
 
-    <!-- 重置密码弹窗 -->
+    <!-- Reset password modal -->
     <a-modal
       v-model:visible="resetPasswordVisible"
       :title="$t('user.resetPassword.title')"
@@ -415,7 +415,7 @@
       </a-form>
     </a-modal>
 
-    <!-- 角色分配模态框 -->
+    <!-- Role assignment modal -->
     <a-modal
       v-model:visible="roleModalVisible"
       :title="$t('user.role.assignTitle', { username: currentUser?.username })"

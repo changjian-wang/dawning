@@ -11,7 +11,7 @@ const isLogin = () => {
     return false;
   }
 
-  // 检查 token 是否过期
+  // Check if token is expired
   const now = Date.now();
   return now < parseInt(expiresAt, 10);
 };

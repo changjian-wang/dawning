@@ -5,7 +5,7 @@
     />
 
     <a-card class="general-card" :title="$t('auditLog.list.title')">
-      <!-- 搜索表单 -->
+      <!-- Search form -->
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -188,7 +188,7 @@
         </a-col>
       </a-row>
 
-      <!-- 数据表格 -->
+      <!-- Data table -->
       <a-table
         row-key="id"
         :loading="loading"
@@ -239,7 +239,7 @@
       </a-table>
     </a-card>
 
-    <!-- 详情对话框 -->
+    <!-- Detail dialog -->
     <a-modal
       v-model:visible="detailVisible"
       :title="$t('auditLog.detail.title')"
@@ -321,7 +321,7 @@
           <span class="value">{{ formatDateTime(currentLog.createdAt) }}</span>
         </div>
 
-        <!-- 变更内容 -->
+        <!-- Changes content -->
         <div
           v-if="currentLog.oldValues || currentLog.newValues"
           style="

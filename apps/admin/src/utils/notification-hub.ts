@@ -1,7 +1,7 @@
 import * as signalR from '@microsoft/signalr';
 import { getToken } from '@/utils/auth';
 
-// 通知类型
+// Notification type
 export interface Notification {
   id: string;
   type: string;
@@ -11,7 +11,7 @@ export interface Notification {
   data?: Record<string, unknown>;
 }
 
-// 告警通知
+// Alert notification
 export interface AlertNotification extends Notification {
   severity: 'info' | 'warning' | 'error' | 'critical';
   ruleId?: string;
@@ -21,14 +21,14 @@ export interface AlertNotification extends Notification {
   threshold?: number;
 }
 
-// 系统消息
+// System message
 export interface SystemMessage extends Notification {
   requireAcknowledge: boolean;
   priority: 'low' | 'normal' | 'high' | 'urgent';
   expiresAt?: string;
 }
 
-// 日志条目
+// Log entry
 export interface LogEntry {
   id: string;
   timestamp: string;
@@ -43,16 +43,16 @@ export interface LogEntry {
   ipAddress?: string;
 }
 
-// 连接状态
+// Connection state
 export type ConnectionState = 'connecting' | 'connected' | 'disconnected' | 'reconnecting';
 
-// 日志频道类型
+// Log channel type
 export type LogChannel = 'logs_all' | 'logs_error' | 'logs_warning' | 'logs_info';
 
-// 通知频道类型
+// Notification channel type
 export type NotificationChannel = 'alerts' | 'system' | 'monitoring' | 'audit';
 
-// 事件回调类型
+// Event callback types
 type NotificationCallback = (notification: Notification) => void;
 type AlertCallback = (alert: AlertNotification) => void;
 type SystemMessageCallback = (message: SystemMessage) => void;
@@ -65,7 +65,7 @@ class NotificationHubService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 10;
 
-  // 事件监听器
+  // Event listeners
   private notificationListeners: Set<NotificationCallback> = new Set();
   private alertListeners: Set<AlertCallback> = new Set();
   private systemMessageListeners: Set<SystemMessageCallback> = new Set();
@@ -73,7 +73,7 @@ class NotificationHubService {
   private connectionStateListeners: Set<ConnectionStateCallback> = new Set();
 
   /**
-   * 初始化并连接到 SignalR Hub
+   * Initialize and connect to SignalR Hub
    */
   async connect(): Promise<void> {
     if (this.connection?.state === signalR.HubConnectionState.Connected) {
@@ -99,19 +99,19 @@ class NotificationHubService {
         nextRetryDelayInMilliseconds: (retryContext) => {
           this.reconnectAttempts = retryContext.previousRetryCount;
           if (retryContext.previousRetryCount < this.maxReconnectAttempts) {
-            // 指数退避：1s, 2s, 4s, 8s, 16s, 最大 30s
+            // Exponential backoff: 1s, 2s, 4s, 8s, 16s, max 30s
             return Math.min(1000 * Math.pow(2, retryContext.previousRetryCount), 30000);
           }
-          return null; // 停止重连
+          return null; // Stop reconnecting
         },
       })
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    // 注册事件处理器
+    // Register event handlers
     this.registerEventHandlers();
 
-    // 连接状态监听
+    // Connection state listening
     this.connection.onreconnecting(() => {
       this.setConnectionState('reconnecting');
     });
@@ -138,7 +138,7 @@ class NotificationHubService {
   }
 
   /**
-   * 断开连接
+   * Disconnect
    */
   async disconnect(): Promise<void> {
     if (this.connection) {
@@ -150,7 +150,7 @@ class NotificationHubService {
   }
 
   /**
-   * 订阅频道
+   * Subscribe to channel
    */
   async subscribe(channel: NotificationChannel | LogChannel): Promise<void> {
     if (this.connection?.state === signalR.HubConnectionState.Connected) {
@@ -160,7 +160,7 @@ class NotificationHubService {
   }
 
   /**
-   * 订阅日志频道 (仅管理员)
+   * Subscribe to log channel (admin only)
    */
   async subscribeToLogs(level: 'all' | 'error' | 'warning' | 'info' = 'all'): Promise<void> {
     const channel = `logs_${level}` as LogChannel;
@@ -168,7 +168,7 @@ class NotificationHubService {
   }
 
   /**
-   * 取消订阅频道
+   * Unsubscribe from channel
    */
   async unsubscribe(channel: string): Promise<void> {
     if (this.connection?.state === signalR.HubConnectionState.Connected) {
@@ -178,7 +178,7 @@ class NotificationHubService {
   }
 
   /**
-   * 取消订阅日志频道
+   * Unsubscribe from log channel
    */
   async unsubscribeFromLogs(level: 'all' | 'error' | 'warning' | 'info' = 'all'): Promise<void> {
     const channel = `logs_${level}`;
@@ -186,7 +186,7 @@ class NotificationHubService {
   }
 
   /**
-   * 确认通知
+   * Acknowledge notification
    */
   async acknowledgeNotification(notificationId: string): Promise<void> {
     if (this.connection?.state === signalR.HubConnectionState.Connected) {
@@ -195,53 +195,53 @@ class NotificationHubService {
   }
 
   /**
-   * 注册事件处理器
+   * Register event handlers
    */
   private registerEventHandlers(): void {
     if (!this.connection) return;
 
-    // 接收普通通知
+    // Receive regular notifications
     this.connection.on('NotificationReceived', (notification: Notification) => {
       this.notificationListeners.forEach((callback) => callback(notification));
     });
 
-    // 接收告警
+    // Receive alert
     this.connection.on('AlertReceived', (alert: AlertNotification) => {
       this.alertListeners.forEach((callback) => callback(alert));
-      // 同时触发普通通知
+      // Also trigger regular notification
       this.notificationListeners.forEach((callback) => callback(alert));
     });
 
-    // 接收系统消息
+    // Receive system message
     this.connection.on('SystemMessage', (message: SystemMessage) => {
       this.systemMessageListeners.forEach((callback) => callback(message));
-      // 同时触发普通通知
+      // Also trigger regular notification
       this.notificationListeners.forEach((callback) => callback(message));
     });
 
-    // 接收日志条目
+    // Receive log entry
     this.connection.on('LogEntry', (log: LogEntry) => {
       this.logEntryListeners.forEach((callback) => callback(log));
     });
 
-    // 订阅成功回调
+    // Subscription success callback
     this.connection.on('Subscribed', (channel: string) => {
       console.log(`[SignalR] Successfully subscribed to: ${channel}`);
     });
 
-    // 取消订阅回调
+    // Unsubscription callback
     this.connection.on('Unsubscribed', (channel: string) => {
       console.log(`[SignalR] Successfully unsubscribed from: ${channel}`);
     });
 
-    // 通知确认回调
+    // Notification acknowledgment callback
     this.connection.on('NotificationAcknowledged', (notificationId: string) => {
       console.log(`[SignalR] Notification acknowledged: ${notificationId}`);
     });
   }
 
   /**
-   * 设置连接状态
+   * Set connection state
    */
   private setConnectionState(state: ConnectionState): void {
     this.connectionState = state;
@@ -249,14 +249,14 @@ class NotificationHubService {
   }
 
   /**
-   * 获取当前连接状态
+   * Get current connection state
    */
   getConnectionState(): ConnectionState {
     return this.connectionState;
   }
 
   /**
-   * 添加通知监听器
+   * Add notification listener
    */
   onNotification(callback: NotificationCallback): () => void {
     this.notificationListeners.add(callback);
@@ -264,7 +264,7 @@ class NotificationHubService {
   }
 
   /**
-   * 添加告警监听器
+   * Add alert listener
    */
   onAlert(callback: AlertCallback): () => void {
     this.alertListeners.add(callback);
@@ -272,7 +272,7 @@ class NotificationHubService {
   }
 
   /**
-   * 添加系统消息监听器
+   * Add system message listener
    */
   onSystemMessage(callback: SystemMessageCallback): () => void {
     this.systemMessageListeners.add(callback);
@@ -280,7 +280,7 @@ class NotificationHubService {
   }
 
   /**
-   * 添加日志条目监听器
+   * Add log entry listener
    */
   onLogEntry(callback: LogEntryCallback): () => void {
     this.logEntryListeners.add(callback);
@@ -288,7 +288,7 @@ class NotificationHubService {
   }
 
   /**
-   * 添加连接状态监听器
+   * Add connection state listener
    */
   onConnectionStateChange(callback: ConnectionStateCallback): () => void {
     this.connectionStateListeners.add(callback);
@@ -296,6 +296,6 @@ class NotificationHubService {
   }
 }
 
-// 单例导出
+// Singleton export
 export const notificationHub = new NotificationHubService();
 export default notificationHub;

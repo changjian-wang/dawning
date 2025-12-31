@@ -3,7 +3,7 @@
     <Breadcrumb :items="['menu.administration', 'menu.administration.tenant']" />
 
     <a-card class="general-card" :title="$t('tenant.list.title')">
-      <!-- 搜索和筛选 -->
+      <!-- Search and filter -->
       <a-row :gutter="16" style="margin-bottom: 16px">
         <a-col :span="8">
           <a-input-search
@@ -34,7 +34,7 @@
         </a-col>
       </a-row>
 
-      <!-- 数据表格 -->
+      <!-- Data table -->
       <a-table
         row-key="id"
         :columns="columns"
@@ -119,7 +119,7 @@
       </a-table>
     </a-card>
 
-    <!-- 新建/编辑弹窗 -->
+    <!-- Create/Edit modal -->
     <a-modal
       v-model:visible="modalVisible"
       :title="isEdit ? $t('tenant.modal.edit') : $t('tenant.modal.create')"
@@ -224,7 +224,7 @@
       </a-form>
     </a-modal>
 
-    <!-- 查看详情弹窗 -->
+    <!-- View details modal -->
     <a-modal
       v-model:visible="viewModalVisible"
       :title="$t('tenant.modal.view')"

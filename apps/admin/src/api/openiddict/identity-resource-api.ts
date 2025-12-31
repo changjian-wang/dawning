@@ -23,7 +23,7 @@ export interface IIdentityResourceModel {
 }
 
 export const identityResourceApi = {
-  // 获取分页列表
+  // Get paged list
   async getPagedList(
     model: IIdentityResourceModel,
     page: number,
@@ -40,13 +40,13 @@ export const identityResourceApi = {
     return { items, totalCount, pageIndex, pageSize: size };
   },
 
-  // 获取详情
+  // Get details
   async get(id: string): Promise<IIdentityResource> {
     const response = await axios.get(`/api/openiddict/identity-resource/${id}`);
     return response.data;
   },
 
-  // 创建
+  // Create
   async create(model: Partial<IIdentityResource>): Promise<number> {
     const response = await axios.post(
       '/api/openiddict/identity-resource',
@@ -55,7 +55,7 @@ export const identityResourceApi = {
     return response.data;
   },
 
-  // 更新
+  // Update
   async update(
     id: string,
     model: Partial<IIdentityResource>
@@ -67,7 +67,7 @@ export const identityResourceApi = {
     return response.data;
   },
 
-  // 删除
+  // Delete
   async remove(id: string): Promise<boolean> {
     const response = await axios.delete(
       `/api/openiddict/identity-resource/${id}`

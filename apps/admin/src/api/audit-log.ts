@@ -1,7 +1,7 @@
 import axios from '@/api/interceptor';
 import type { IPagedData } from './paged-data';
 
-// 审计日志接口定义
+// Audit log interface definition
 export interface AuditLog {
   id: string;
   userId?: string;
@@ -20,7 +20,7 @@ export interface AuditLog {
   createdAt: string;
 }
 
-// 审计日志查询参数
+// Audit log query parameters
 export interface AuditLogQueryParams {
   page?: number;
   pageSize?: number;
@@ -34,7 +34,7 @@ export interface AuditLogQueryParams {
   endDate?: string;
 }
 
-// 获取审计日志分页列表
+// Get audit logs paginated list
 export async function getAuditLogs(
   params: AuditLogQueryParams
 ): Promise<IPagedData<AuditLog>> {
@@ -42,7 +42,7 @@ export async function getAuditLogs(
     '/api/audit-log',
     { params }
   );
-  // 拦截器返回 { code, message, data }，response.data 包含 { list, pagination }
+  // Interceptor returns { code, message, data }, response.data contains { list, pagination }
   const { list, pagination } = response.data;
   return {
     items: list,
@@ -52,12 +52,12 @@ export async function getAuditLogs(
   };
 }
 
-// 根据ID获取审计日志详情
+// Get audit log details by ID
 export function getAuditLogById(id: string) {
   return axios.get<AuditLog>(`/api/audit-log/${id}`);
 }
 
-// 清理指定天数之前的审计日志（仅super_admin）
+// Clean up audit logs older than specified days (super_admin only)
 export function cleanupOldAuditLogs(daysToKeep: number) {
   return axios.delete<void>(`/api/audit-log/cleanup?daysToKeep=${daysToKeep}`);
 }

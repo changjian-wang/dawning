@@ -1,7 +1,7 @@
 import axios from '@/api/interceptor';
 import type { IPagedData } from '../paged-data';
 
-// 角色模型
+// Role model
 export interface RoleModel {
   id?: string;
   name: string;
@@ -14,7 +14,7 @@ export interface RoleModel {
   updatedAt?: string;
 }
 
-// 创建角色DTO
+// Create role DTO
 export interface CreateRoleDto {
   name: string;
   displayName: string;
@@ -23,7 +23,7 @@ export interface CreateRoleDto {
   permissions: string[];
 }
 
-// 更新角色DTO
+// Update role DTO
 export interface UpdateRoleDto {
   displayName?: string;
   description?: string;
@@ -31,7 +31,7 @@ export interface UpdateRoleDto {
   permissions?: string[];
 }
 
-// 角色查询参数
+// Role query parameters
 export interface RoleQueryParams {
   name?: string;
   displayName?: string;
@@ -42,7 +42,7 @@ export interface RoleQueryParams {
 }
 
 /**
- * 获取角色列表（分页）
+ * Get role list (paginated)
  */
 export async function getRoleList(
   params: RoleQueryParams
@@ -51,7 +51,7 @@ export async function getRoleList(
     '/api/role',
     { params }
   );
-  // 响应拦截器返回 {code, message, data: {list, pagination}}
+  // Response interceptor returns {code, message, data: {list, pagination}}
   const { list, pagination } = response.data;
   return {
     items: list,
@@ -62,7 +62,7 @@ export async function getRoleList(
 }
 
 /**
- * 获取所有活动角色
+ * Get all active roles
  */
 export async function getAllActiveRoles(): Promise<RoleModel[]> {
   const response = await axios.get<RoleModel[]>('/api/role/all');
@@ -70,7 +70,7 @@ export async function getAllActiveRoles(): Promise<RoleModel[]> {
 }
 
 /**
- * 根据ID获取角色
+ * Get role by ID
  */
 export async function getRoleById(id: string): Promise<RoleModel> {
   const response = await axios.get<RoleModel>(`/api/role/${id}`);
@@ -78,7 +78,7 @@ export async function getRoleById(id: string): Promise<RoleModel> {
 }
 
 /**
- * 根据名称获取角色
+ * Get role by name
  */
 export async function getRoleByName(name: string): Promise<RoleModel> {
   const response = await axios.get<RoleModel>(`/api/role/by-name/${name}`);
@@ -86,7 +86,7 @@ export async function getRoleByName(name: string): Promise<RoleModel> {
 }
 
 /**
- * 检查角色名称是否存在
+ * Check if role name exists
  */
 export async function checkRoleName(
   name: string,
@@ -99,7 +99,7 @@ export async function checkRoleName(
 }
 
 /**
- * 创建角色
+ * Create role
  */
 export async function createRole(data: CreateRoleDto): Promise<RoleModel> {
   const response = await axios.post<RoleModel>('/api/role', data);
@@ -107,7 +107,7 @@ export async function createRole(data: CreateRoleDto): Promise<RoleModel> {
 }
 
 /**
- * 更新角色
+ * Update role
  */
 export async function updateRole(
   id: string,
@@ -118,7 +118,7 @@ export async function updateRole(
 }
 
 /**
- * 删除角色
+ * Delete role
  */
 export async function deleteRole(id: string): Promise<void> {
   await axios.delete<void>(`/api/role/${id}`);

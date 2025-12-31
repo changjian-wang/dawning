@@ -11,7 +11,7 @@ export interface HttpResponse<T = unknown> {
   data: T;
 }
 
-// 错误码常量
+// Error code constants
 const ERROR_CODES = {
   SUCCESS: 20000,
   ILLEGAL_TOKEN: 50008,
@@ -19,127 +19,127 @@ const ERROR_CODES = {
   TOKEN_EXPIRED: 50014,
 } as const;
 
-// HTTP 状态码错误消息映射
+// HTTP status code error message mapping
 const HTTP_ERROR_MESSAGES: Record<number, string> = {
-  400: '请求参数错误',
-  401: '未授权，请重新登录',
-  403: '拒绝访问，权限不足',
-  404: '请求的资源不存在',
-  405: '请求方法不允许',
-  408: '请求超时',
-  409: '资源冲突',
-  410: '资源已被删除',
-  422: '请求数据验证失败',
-  429: '请求过于频繁，请稍后再试',
-  500: '服务器内部错误',
-  501: '服务未实现',
-  502: '网关错误',
-  503: '服务不可用',
-  504: '网关超时',
+  400: 'Invalid request parameters',
+  401: 'Unauthorized, please login again',
+  403: 'Access denied, insufficient permissions',
+  404: 'The requested resource does not exist',
+  405: 'Request method not allowed',
+  408: 'Request timeout',
+  409: 'Resource conflict',
+  410: 'Resource has been deleted',
+  422: 'Request data validation failed',
+  429: 'Too many requests, please try again later',
+  500: 'Internal server error',
+  501: 'Service not implemented',
+  502: 'Gateway error',
+  503: 'Service unavailable',
+  504: 'Gateway timeout',
 };
 
-// 网络错误消息
+// Network error messages
 const NETWORK_ERROR_MESSAGES: Record<string, string> = {
-  ECONNABORTED: '请求超时，请检查网络连接',
-  ENOTFOUND: '无法连接到服务器',
-  ECONNREFUSED: '服务器拒绝连接',
-  ECONNRESET: '连接被重置',
-  ERR_NETWORK: '网络连接失败，请检查网络',
-  ERR_CANCELED: '请求已取消',
+  ECONNABORTED: 'Request timeout, please check your network connection',
+  ENOTFOUND: 'Cannot connect to server',
+  ECONNREFUSED: 'Server refused connection',
+  ECONNRESET: 'Connection reset',
+  ERR_NETWORK: 'Network connection failed, please check your network',
+  ERR_CANCELED: 'Request cancelled',
 };
 
-// 需要自动登出的错误码
+// Error codes that require auto logout
 const LOGOUT_ERROR_CODES: number[] = [
   ERROR_CODES.ILLEGAL_TOKEN,
   ERROR_CODES.OTHER_CLIENT_LOGIN,
   ERROR_CODES.TOKEN_EXPIRED,
 ];
 
-// 重试配置
+// Retry configuration
 const RETRY_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000,
   retryStatusCodes: [408, 429, 500, 502, 503, 504],
 };
 
-// 获取友好的错误消息
+// Get user-friendly error message
 function getErrorMessage(error: AxiosError<HttpResponse>): string {
-  // 1. 检查是否有后端返回的业务错误消息
+  // 1. Check if there is a business error message from backend
   if (error.response?.data) {
     const { message, msg } = error.response.data;
     if (message && message !== 'Error') return message;
     if (msg && msg !== 'Error') return msg;
   }
 
-  // 2. 检查 HTTP 状态码
+  // 2. Check HTTP status code
   if (error.response?.status) {
     const httpMessage = HTTP_ERROR_MESSAGES[error.response.status];
     if (httpMessage) return httpMessage;
   }
 
-  // 3. 检查网络错误
+  // 3. Check network error
   if (error.code) {
     const networkMessage = NETWORK_ERROR_MESSAGES[error.code];
     if (networkMessage) return networkMessage;
   }
 
-  // 4. 检查是否是超时
+  // 4. Check if it is a timeout
   if (error.message?.includes('timeout')) {
-    return '请求超时，请稍后重试';
+    return 'Request timeout, please try again later';
   }
 
-  // 5. 检查是否是网络错误
+  // 5. Check if it is a network error
   if (error.message?.includes('Network Error')) {
-    return '网络连接失败，请检查网络';
+    return 'Network connection failed, please check your network';
   }
 
-  // 6. 默认错误消息
-  return error.message || '请求失败，请稍后重试';
+  // 6. Default error message
+  return error.message || 'Request failed, please try again later';
 }
 
-// 延迟函数
+// Delay function
 const delay = (ms: number) =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
 
-// 判断是否应该重试
+// Determine if request should be retried
 function shouldRetry(error: AxiosError, retryCount: number): boolean {
-  // 超过最大重试次数
+  // Exceeded max retry count
   if (retryCount >= RETRY_CONFIG.maxRetries) return false;
 
-  // 请求被取消不重试
+  // Do not retry cancelled requests
   if (axios.isCancel(error)) return false;
 
-  // 网络错误可以重试
+  // Network errors can be retried
   if (!error.response) return true;
 
-  // 特定状态码可以重试
+  // Specific status codes can be retried
   return RETRY_CONFIG.retryStatusCodes.includes(error.response.status);
 }
 
-// 设置基础URL（空字符串表示使用相对路径）
+// Set base URL (empty string means using relative path)
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 if (apiBaseUrl && apiBaseUrl.trim() !== '') {
   axios.defaults.baseURL = apiBaseUrl;
 }
 
-// Token 刷新相关
+// Token refresh related
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-// 添加订阅者等待 token 刷新
+// Add subscriber waiting for token refresh
 function subscribeTokenRefresh(callback: (token: string) => void) {
   refreshSubscribers.push(callback);
 }
 
-// 通知所有订阅者 token 已刷新
+// Notify all subscribers that token has been refreshed
 function onTokenRefreshed(token: string) {
   refreshSubscribers.forEach((callback) => callback(token));
   refreshSubscribers = [];
 }
 
-// 请求拦截器
+// Request interceptor
 axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     const token = getToken();
@@ -156,13 +156,13 @@ axios.interceptors.request.use(
   }
 );
 
-// 处理自动登出 - 直接清除 token 并刷新页面，避免循环依赖
+// Handle auto logout - clear token and refresh page to avoid circular dependency
 const handleAutoLogout = () => {
   clearToken();
   window.location.href = '/login';
 };
 
-// 显示登出确认弹窗
+// Show logout confirmation modal
 const showLogoutModal = () => {
   Modal.error({
     title: 'Confirm logout',
@@ -173,30 +173,30 @@ const showLogoutModal = () => {
   });
 };
 
-// 响应拦截器
+// Response interceptor
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const { data } = response;
 
-    // OAuth 端点直接返回原始响应
+    // OAuth endpoint returns raw response directly
     if (response.config.url?.includes('/connect/token')) {
       return response;
     }
 
-    // 如果响应数据不符合标准格式（没有 code 字段），直接返回原始响应
+    // If response data does not conform to standard format (no code field), return raw response
     if (!data || typeof data !== 'object' || !('code' in data)) {
       return response;
     }
 
-    // 检查业务状态码
+    // Check business status code
     if (data.code !== ERROR_CODES.SUCCESS) {
-      // 显示错误消息
+      // Show error message
       Message.error({
         content: data.message || data.msg || 'Error',
         duration: 5000,
       });
 
-      // 处理需要登出的错误码
+      // Handle error codes that require logout
       const shouldLogout =
         LOGOUT_ERROR_CODES.includes(data.code) &&
         response.config?.url !== '/api/user/info';
@@ -208,12 +208,12 @@ axios.interceptors.response.use(
       return Promise.reject(new Error(data.message || data.msg || 'Error'));
     }
 
-    // 返回业务数据 - 后端返回 { code: 0, message: "Success", data: {...} }
-    // 我们直接返回 data 字段的内容
+    // Return business data - backend returns { code: 0, message: "Success", data: {...} }
+    // We directly return the content of the data field
     return { ...response, data: data.data !== undefined ? data.data : data };
   },
   async (error: AxiosError<HttpResponse>) => {
-    // 处理 401 未授权错误 - 尝试刷新 token
+    // Handle 401 unauthorized error - try to refresh token
     if (
       error.response?.status === 401 &&
       error.config?.url !== '/connect/token'
@@ -221,7 +221,7 @@ axios.interceptors.response.use(
       const originalRequest = error.config;
       const refreshToken = getRefreshToken();
 
-      // 如果有 refresh token 且不在刷新过程中，尝试刷新
+      // If there is a refresh token and not in refresh process, try to refresh
       if (refreshToken && !isRefreshing) {
         isRefreshing = true;
 
@@ -230,7 +230,7 @@ axios.interceptors.response.use(
           const { access_token, refresh_token, id_token, expires_in } =
             response.data;
 
-          // 更新 tokens
+          // Update tokens
           const { setToken, setRefreshToken, setIdToken, setTokenExpiresAt } =
             await import('@/utils/auth');
           setToken(access_token);
@@ -242,11 +242,11 @@ axios.interceptors.response.use(
           }
           setTokenExpiresAt(expires_in);
 
-          // 通知所有等待的请求
+          // Notify all waiting requests
           onTokenRefreshed(access_token);
           isRefreshing = false;
 
-          // 重试原始请求
+          // Retry original request
           if (originalRequest?.headers) {
             originalRequest.headers.Authorization = `Bearer ${access_token}`;
           }
@@ -255,7 +255,7 @@ axios.interceptors.response.use(
           }
           return Promise.reject(new Error('No original request'));
         } catch (refreshError) {
-          // 刷新失败，跳转登录
+          // Refresh failed, redirect to login
           isRefreshing = false;
           refreshSubscribers = [];
           showLogoutModal();
@@ -263,7 +263,7 @@ axios.interceptors.response.use(
         }
       }
 
-      // 如果正在刷新,将请求加入队列
+      // If refreshing, add request to queue
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           subscribeTokenRefresh((token: string) => {
@@ -279,25 +279,25 @@ axios.interceptors.response.use(
         });
       }
 
-      // 没有 refresh token，直接登出
+      // No refresh token, logout directly
       showLogoutModal();
       return Promise.reject(error);
     }
 
-    // 获取当前重试次数
+    // Get current retry count
     const config = error.config as AxiosRequestConfig & { retryCount?: number };
     const retryCount = config?.retryCount || 0;
 
-    // 判断是否应该自动重试
+    // Determine if should auto retry
     if (shouldRetry(error, retryCount)) {
       config.retryCount = retryCount + 1;
 
-      // 计算延迟时间（指数退避）
+      // Calculate delay time (exponential backoff)
       const delayMs = RETRY_CONFIG.retryDelay * 2 ** retryCount;
 
       // eslint-disable-next-line no-console
       console.log(
-        `[HTTP] 请求失败，${delayMs}ms 后进行第 ${config.retryCount} 次重试...`,
+        `[HTTP] Request failed, retrying attempt ${config.retryCount} after ${delayMs}ms...`,
         error.config?.url
       );
 
@@ -305,10 +305,10 @@ axios.interceptors.response.use(
       return axios(config);
     }
 
-    // 获取友好的错误消息
+    // Get user-friendly error message
     const message = getErrorMessage(error);
 
-    // 显示错误消息
+    // Show error message
     Message.error({
       content: message,
       duration: 5000,
@@ -318,5 +318,5 @@ axios.interceptors.response.use(
   }
 );
 
-// 导出配置好的 axios 实例
+// Export configured axios instance
 export default axios;

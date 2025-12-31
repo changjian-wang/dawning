@@ -1,7 +1,7 @@
 import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
-// 用户DTO（匹配后端UserDto）
+// User DTO (matches backend UserDto)
 export interface IUser {
   id: string;
   username: string;
@@ -21,7 +21,7 @@ export interface IUser {
   timestamp: number;
 }
 
-// 查询模型
+// Query model
 export interface IUserModel {
   username?: string;
   email?: string;
@@ -30,7 +30,7 @@ export interface IUserModel {
   isActive?: boolean;
 }
 
-// 创建用户请求
+// Create user request
 export interface ICreateUserModel {
   username: string;
   password: string;
@@ -43,10 +43,10 @@ export interface ICreateUserModel {
   remark?: string;
 }
 
-// 更新用户请求
+// Update user request
 export interface IUpdateUserModel {
   id: string;
-  username?: string; // 用于显示，不可修改
+  username?: string; // For display, not editable
   email?: string;
   phoneNumber?: string;
   displayName?: string;
@@ -56,14 +56,14 @@ export interface IUpdateUserModel {
   remark?: string;
 }
 
-// 重置密码请求
+// Reset password request
 export interface IResetPasswordModel {
   newPassword: string;
 }
 
-// 统一的 user 对象
+// Unified user object
 export const user = {
-  // 表单工厂
+  // Form factory
   form: {
     create: (): ICreateUserModel => ({
       username: '',
@@ -83,7 +83,7 @@ export const user = {
 
     clone: (source: IUser): IUpdateUserModel => ({
       id: source.id,
-      username: source.username, // 用于显示，不会发送到服务器
+      username: source.username, // For display, not sent to server
       email: source.email,
       phoneNumber: source.phoneNumber,
       displayName: source.displayName,
@@ -95,22 +95,22 @@ export const user = {
 
     isValid: (form: ICreateUserModel | IUpdateUserModel): boolean => {
       if ('password' in form) {
-        // 创建用户时需要验证用户名和密码
+        // When creating user, validate username and password
         return !!(form.username?.trim() && form.password?.trim());
       }
-      // 更新用户时不需要验证
+      // No validation needed when updating user
       return true;
     },
   },
 
   api: {
-    // 获取用户详情
+    // Get user details
     async get(id: string): Promise<IUser> {
       const response = await axios.get<IUser>(`/api/user/${id}`);
       return response.data;
     },
 
-    // 获取用户列表（分页）
+    // Get user list (paginated)
     async getPagedList(
       model: IUserModel,
       page: number,
@@ -127,7 +127,7 @@ export const user = {
         },
       });
 
-      // response.data 现在直接是业务数据 {list, pagination}
+      // response.data is now the business data directly {list, pagination}
       const { list, pagination } = response.data;
 
       return {
@@ -138,25 +138,25 @@ export const user = {
       };
     },
 
-    // 创建用户
+    // Create user
     async create(model: ICreateUserModel): Promise<IUser> {
       const response = await axios.post<IUser>('/api/user', model);
       return response.data;
     },
 
-    // 更新用户
+    // Update user
     async update(model: IUpdateUserModel): Promise<IUser> {
       const response = await axios.put<IUser>(`/api/user/${model.id}`, model);
       return response.data;
     },
 
-    // 删除用户
+    // Delete user
     async delete(id: string): Promise<boolean> {
       await axios.delete(`/api/user/${id}`);
       return true;
     },
 
-    // 重置密码
+    // Reset password
     async resetPassword(id: string, newPassword: string): Promise<boolean> {
       await axios.post(`/api/user/${id}/reset-password`, {
         newPassword,
@@ -164,7 +164,7 @@ export const user = {
       return true;
     },
 
-    // 修改密码
+    // Change password
     async changePassword(
       userId: string,
       oldPassword: string,
@@ -178,19 +178,19 @@ export const user = {
       return true;
     },
 
-    // 获取用户的角色列表
+    // Get user roles list
     async getUserRoles(userId: string): Promise<any[]> {
       const response = await axios.get(`/api/user/${userId}/roles`);
       return response.data;
     },
 
-    // 为用户分配角色
+    // Assign roles to user
     async assignRoles(userId: string, roleIds: string[]): Promise<boolean> {
       await axios.post(`/api/user/${userId}/roles`, { roleIds });
       return true;
     },
 
-    // 批量删除用户
+    // Batch delete users
     async batchDelete(ids: string[]): Promise<{
       successCount: number;
       failedCount: number;
@@ -200,7 +200,7 @@ export const user = {
       return response.data;
     },
 
-    // 批量更新用户状态
+    // Batch update user status
     async batchUpdateStatus(
       ids: string[],
       isActive: boolean

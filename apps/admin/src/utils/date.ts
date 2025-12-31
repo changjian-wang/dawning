@@ -4,7 +4,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 /**
- * 格式化日期时间
+ * Format date and time
  */
 export function formatDateTime(date: string | Date | undefined): string {
   if (!date) return '-';
@@ -12,7 +12,7 @@ export function formatDateTime(date: string | Date | undefined): string {
 }
 
 /**
- * 格式化日期
+ * Format date
  */
 export function formatDate(date: string | Date | undefined): string {
   if (!date) return '-';
@@ -20,7 +20,7 @@ export function formatDate(date: string | Date | undefined): string {
 }
 
 /**
- * 格式化时间
+ * Format time
  */
 export function formatTime(date: string | Date | undefined): string {
   if (!date) return '-';
@@ -28,7 +28,7 @@ export function formatTime(date: string | Date | undefined): string {
 }
 
 /**
- * 相对时间
+ * Relative time
  */
 export function formatRelativeTime(date: string | Date | undefined): string {
   if (!date) return '-';

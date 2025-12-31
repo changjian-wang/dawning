@@ -1,13 +1,13 @@
 import axios from '@/api/interceptor';
 
-// 基本健康状态
+// Basic health status
 export interface HealthStatus {
   status: string;
   timestamp: string;
   uptime: string;
 }
 
-// 详细健康检查结果
+// Detailed health check result
 export interface DetailedHealthStatus extends HealthStatus {
   checks: {
     api: {
@@ -29,7 +29,7 @@ export interface DetailedHealthStatus extends HealthStatus {
   };
 }
 
-// 性能指标
+// Performance metrics
 export interface Metrics {
   timestamp: string;
   uptime: string;
@@ -53,7 +53,7 @@ export interface Metrics {
   };
 }
 
-// 服务状态
+// Service status
 export interface ServiceStatus {
   name: string;
   url: string;
@@ -64,37 +64,37 @@ export interface ServiceStatus {
 }
 
 export const healthApi = {
-  // 获取基本健康状态
+  // Get basic health status
   async getHealth(): Promise<HealthStatus> {
     const response = await axios.get('/api/health');
     return response.data;
   },
 
-  // 获取详细健康状态
+  // Get detailed health status
   async getDetailedHealth(): Promise<DetailedHealthStatus> {
     const response = await axios.get('/api/health/detailed');
     return response.data;
   },
 
-  // 获取就绪状态
+  // Get ready status
   async getReady(): Promise<{ status: string; reason?: string }> {
     const response = await axios.get('/api/health/ready');
     return response.data;
   },
 
-  // 获取存活状态
+  // Get liveness status
   async getLive(): Promise<{ status: string }> {
     const response = await axios.get('/api/health/live');
     return response.data;
   },
 
-  // 获取性能指标
+  // Get performance metrics
   async getMetrics(): Promise<Metrics> {
     const response = await axios.get('/api/health/metrics');
     return response.data;
   },
 
-  // 检查指定 URL 的健康状态
+  // Check health status of specified URL
   async checkService(name: string, url: string): Promise<ServiceStatus> {
     const startTime = Date.now();
     try {

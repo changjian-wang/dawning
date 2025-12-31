@@ -1,70 +1,70 @@
 /**
- * 数据导出工具
- * 支持导出为 CSV 和 Excel (xlsx) 格式
+ * Data Export Utility
+ * Supports exporting to CSV and Excel (xlsx) formats
  */
 
 /**
- * 列定义
+ * Column definition
  */
 export interface ExportColumn {
-  /** 数据字段名 */
+  /** Data field name */
   field: string;
-  /** 列标题 */
+  /** Column title */
   title: string;
-  /** 格式化函数 */
+  /** Formatter function */
   formatter?: (value: any, record: any) => string;
 }
 
 /**
- * 导出配置
+ * Export configuration
  */
 export interface ExportOptions {
-  /** 文件名（不含扩展名） */
+  /** Filename (without extension) */
   filename: string;
-  /** 列定义 */
+  /** Column definitions */
   columns: ExportColumn[];
-  /** 数据 */
+  /** Data */
   data: any[];
-  /** 导出格式 */
+  /** Export format */
   format?: 'csv' | 'xlsx';
-  /** CSV 分隔符 */
+  /** CSV separator */
   separator?: string;
 }
 
 /**
- * 将数据转换为 CSV 字符串
+ * Convert data to CSV string
  */
 function convertToCSV(
   data: any[],
   columns: ExportColumn[],
   separator = ','
 ): string {
-  // 添加 BOM 以支持中文
+  // Add BOM to support Chinese characters
   const BOM = '\uFEFF';
 
-  // 表头
+  // Headers
   const headers = columns.map((col) => `"${col.title}"`).join(separator);
 
-  // 数据行
+  // Data rows
   const rows = data.map((record) => {
     return columns
       .map((col) => {
         let value = record[col.field];
 
-        // 使用格式化函数
+        // Use formatter function
         if (col.formatter) {
           value = col.formatter(value, record);
         }
 
-        // 处理 null/undefined
+        // Handle null/undefined
         if (value === null || value === undefined) {
           value = '';
         }
 
-        // 转换为字符串
+        // Convert to string
         value = String(value);
 
-        // 转义双引号，并用双引号包裹
+        // Escape double quotes and wrap with double quotes
         value = value.replace(/"/g, '""');
         return `"${value}"`;
       })
@@ -75,7 +75,7 @@ function convertToCSV(
 }
 
 /**
- * 下载文件
+ * Download file
  */
 function downloadFile(content: string, filename: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });
@@ -87,13 +87,13 @@ function downloadFile(content: string, filename: string, mimeType: string) {
   document.body.appendChild(link);
   link.click();
 
-  // 清理
+  // Cleanup
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
 
 /**
- * 导出为 CSV 文件
+ * Export to CSV file
  */
 export function exportToCSV(options: ExportOptions): void {
   const { filename, columns, data, separator = ',' } = options;
@@ -103,7 +103,7 @@ export function exportToCSV(options: ExportOptions): void {
 }
 
 /**
- * HTML 转义
+ * HTML escape
  */
 function escapeHtml(str: string): string {
   const htmlEntities: Record<string, string> = {
@@ -117,13 +117,13 @@ function escapeHtml(str: string): string {
 }
 
 /**
- * 导出为 Excel 文件（简单 HTML 表格格式，Excel 可直接打开）
- * 注意：这是一个简易实现，如需更复杂的 Excel 功能请使用 xlsx 库
+ * Export to Excel file (simple HTML table format, Excel can open directly)
+ * Note: This is a simple implementation, use xlsx library for more complex Excel features
  */
 export function exportToExcel(options: ExportOptions): void {
   const { filename, columns, data } = options;
 
-  // 使用 HTML 表格格式，Excel 可以直接打开
+  // Use HTML table format, Excel can open directly
   let html = `
     <html xmlns:o="urn:schemas-microsoft-com:office:office" 
           xmlns:x="urn:schemas-microsoft-com:office:excel" 
@@ -202,7 +202,7 @@ export function exportToExcel(options: ExportOptions): void {
 }
 
 /**
- * 通用导出函数
+ * General export function
  */
 export function exportData(options: ExportOptions): void {
   const format = options.format || 'csv';
@@ -217,8 +217,8 @@ export function exportData(options: ExportOptions): void {
 }
 
 /**
- * 格式化日期时间
- * 返回格式: YYYY-MM-DD HH:mm:ss
+ * Format date time
+ * Returns format: YYYY-MM-DD HH:mm:ss
  */
 export function formatDateTime(
   value: string | Date | null | undefined
@@ -238,9 +238,9 @@ export function formatDateTime(
 }
 
 /**
- * 格式化布尔值
+ * Format boolean value
  */
 export function formatBoolean(value: boolean | null | undefined): string {
   if (value === null || value === undefined) return '';
-  return value ? '是' : '否';
+  return value ? 'Yes' : 'No';
 }

@@ -1,7 +1,7 @@
 import axios from '@/api/interceptor';
 import type { HttpResponse } from './interceptor';
 
-// 租户类型定义
+// Tenant type definitions
 export interface Tenant {
   id: string;
   code: string;
@@ -70,13 +70,13 @@ export interface CurrentTenant {
   isHost: boolean;
 }
 
-// 获取当前租户信息
+// Get current tenant information
 export function getCurrentTenant() {
   return axios.get<HttpResponse<CurrentTenant>>('/api/tenant/current');
 }
 
-// 分页获取租户列表
-// 注意：拦截器会解包响应，实际返回的是 TenantListResponse
+// Get tenant list (paginated)
+// Note: Interceptor will unwrap the response, actual return is TenantListResponse
 export function getTenantList(params: {
   keyword?: string;
   isActive?: boolean;
@@ -86,49 +86,49 @@ export function getTenantList(params: {
   return axios.get<TenantListResponse>('/api/tenant', { params });
 }
 
-// 获取所有租户
+// Get all tenants
 export function getAllTenants() {
   return axios.get<HttpResponse<Tenant[]>>('/api/tenant/all');
 }
 
-// 获取所有启用的租户
+// Get all active tenants
 export function getActiveTenants() {
   return axios.get<HttpResponse<Tenant[]>>('/api/tenant/active');
 }
 
-// 根据ID获取租户
+// Get tenant by ID
 export function getTenantById(id: string) {
   return axios.get<HttpResponse<Tenant>>(`/api/tenant/${id}`);
 }
 
-// 创建租户
+// Create tenant
 export function createTenant(data: CreateTenantRequest) {
   return axios.post<HttpResponse<Tenant>>('/api/tenant', data);
 }
 
-// 更新租户
+// Update tenant
 export function updateTenant(id: string, data: UpdateTenantRequest) {
   return axios.put<HttpResponse<Tenant>>(`/api/tenant/${id}`, data);
 }
 
-// 删除租户
+// Delete tenant
 export function deleteTenant(id: string) {
   return axios.delete<HttpResponse<void>>(`/api/tenant/${id}`);
 }
 
-// 设置租户启用状态
+// Set tenant active status
 export function setTenantActive(id: string, isActive: boolean) {
   return axios.put<HttpResponse<void>>(`/api/tenant/${id}/active`, { isActive });
 }
 
-// 检查租户代码是否可用
+// Check if tenant code is available
 export function checkTenantCode(code: string, excludeId?: string) {
   return axios.get<HttpResponse<{ available: boolean }>>('/api/tenant/check-code', {
     params: { code, excludeId },
   });
 }
 
-// 检查域名是否可用
+// Check if domain is available
 export function checkTenantDomain(domain: string, excludeId?: string) {
   return axios.get<HttpResponse<{ available: boolean }>>('/api/tenant/check-domain', {
     params: { domain, excludeId },

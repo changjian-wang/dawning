@@ -5,10 +5,10 @@ import setupMock, {
 
 setupMock({
   setup() {
-    // 注意：/api/user/info, /api/user/login, /api/user/logout 使用真实后端 API
-    // 只 mock /api/user/menu 接口，因为后端没有实现这个接口
+    // Note: /api/user/info, /api/user/login, /api/user/logout use real backend API
+    // Only mock /api/user/menu endpoint because backend has not implemented it
 
-    // 用户的服务端菜单
+    // User's server-side menu
     Mock.mock(new RegExp('/api/user/menu'), () => {
       const menuList = [
         {

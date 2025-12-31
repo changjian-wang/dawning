@@ -13,15 +13,15 @@ export interface KeyboardShortcut {
 }
 
 /**
- * 键盘快捷键组合式函数
- * 提供全局和局部快捷键支持
+ * Keyboard shortcuts composable
+ * Provides global and local shortcut support
  */
 export function useKeyboard(shortcuts: KeyboardShortcut[] = []) {
   const activeShortcuts = ref<KeyboardShortcut[]>([]);
   const showHelpModal = ref(false);
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    // 忽略输入框中的快捷键（除了 Escape）
+    // Ignore shortcuts in input elements (except Escape)
     const target = event.target as HTMLElement;
     const isInputElement =
       target.tagName === 'INPUT' ||
@@ -32,7 +32,7 @@ export function useKeyboard(shortcuts: KeyboardShortcut[] = []) {
       return;
     }
 
-    // 查找匹配的快捷键
+    // Find matching shortcut
     const matchedShortcut = activeShortcuts.value.find((shortcut) => {
       const keyMatch = shortcut.key.toLowerCase() === event.key.toLowerCase();
       const ctrlMatch = !!shortcut.ctrl === (event.ctrlKey || event.metaKey);
@@ -95,8 +95,8 @@ export function useKeyboard(shortcuts: KeyboardShortcut[] = []) {
 }
 
 /**
- * 全局快捷键组合式函数
- * 提供应用级别的快捷键
+ * Global keyboard shortcuts composable
+ * Provides application-level shortcuts
  */
 export function useGlobalKeyboard() {
   const router = useRouter();
@@ -105,15 +105,15 @@ export function useGlobalKeyboard() {
     {
       key: '?',
       shift: true,
-      description: '显示快捷键帮助',
+      description: 'Show keyboard shortcuts help',
       action: () => {
-        Message.info('按 Shift + ? 查看快捷键帮助');
+        Message.info('Press Shift + ? to view keyboard shortcuts help');
       },
     },
     {
       key: 'h',
       alt: true,
-      description: '返回首页',
+      description: 'Go to Home',
       action: () => {
         router.push('/dashboard/workplace');
       },
@@ -121,7 +121,7 @@ export function useGlobalKeyboard() {
     {
       key: 'u',
       alt: true,
-      description: '用户管理',
+      description: 'User Management',
       action: () => {
         router.push('/administration/user');
       },
@@ -129,7 +129,7 @@ export function useGlobalKeyboard() {
     {
       key: 'r',
       alt: true,
-      description: '角色管理',
+      description: 'Role Management',
       action: () => {
         router.push('/administration/role');
       },
@@ -137,7 +137,7 @@ export function useGlobalKeyboard() {
     {
       key: 'p',
       alt: true,
-      description: '权限管理',
+      description: 'Permission Management',
       action: () => {
         router.push('/administration/permission');
       },
@@ -145,7 +145,7 @@ export function useGlobalKeyboard() {
     {
       key: 'l',
       alt: true,
-      description: '审计日志',
+      description: 'Audit Log',
       action: () => {
         router.push('/administration/audit-log');
       },
@@ -153,16 +153,16 @@ export function useGlobalKeyboard() {
     {
       key: 's',
       alt: true,
-      description: '系统配置',
+      description: 'System Configuration',
       action: () => {
         router.push('/administration/system-config');
       },
     },
     {
       key: 'Escape',
-      description: '关闭弹窗/取消操作',
+      description: 'Close modal/Cancel operation',
       action: () => {
-        // 由各组件自行处理
+        // Handled by individual components
       },
     },
   ];
@@ -171,8 +171,8 @@ export function useGlobalKeyboard() {
 }
 
 /**
- * 表格页面快捷键组合式函数
- * 提供 CRUD 操作的快捷键
+ * Table page keyboard shortcuts composable
+ * Provides shortcuts for CRUD operations
  */
 export function useTableKeyboard(handlers: {
   onAdd?: () => void;
@@ -188,7 +188,7 @@ export function useTableKeyboard(handlers: {
     tableShortcuts.push({
       key: 'n',
       ctrl: true,
-      description: '新增记录',
+      description: 'Add new record',
       action: handlers.onAdd,
     });
   }
@@ -197,7 +197,7 @@ export function useTableKeyboard(handlers: {
     tableShortcuts.push({
       key: 'e',
       ctrl: true,
-      description: '编辑选中记录',
+      description: 'Edit selected record',
       action: handlers.onEdit,
     });
   }
@@ -205,7 +205,7 @@ export function useTableKeyboard(handlers: {
   if (handlers.onDelete) {
     tableShortcuts.push({
       key: 'Delete',
-      description: '删除选中记录',
+      description: 'Delete selected record',
       action: handlers.onDelete,
     });
   }
@@ -214,7 +214,7 @@ export function useTableKeyboard(handlers: {
     tableShortcuts.push({
       key: 'f',
       ctrl: true,
-      description: '搜索/筛选',
+      description: 'Search/Filter',
       action: handlers.onSearch,
     });
   }
@@ -223,7 +223,7 @@ export function useTableKeyboard(handlers: {
     tableShortcuts.push({
       key: 'r',
       ctrl: true,
-      description: '刷新数据',
+      description: 'Refresh data',
       action: handlers.onRefresh,
     });
   }
@@ -233,7 +233,7 @@ export function useTableKeyboard(handlers: {
       key: 'e',
       ctrl: true,
       shift: true,
-      description: '导出数据',
+      description: 'Export data',
       action: handlers.onExport,
     });
   }

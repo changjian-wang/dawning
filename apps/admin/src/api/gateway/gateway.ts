@@ -1,7 +1,7 @@
 import axios from '@/api/interceptor';
 import type { IPagedData } from '../paged-data';
 
-// ==================== 路由相关接口 ====================
+// ==================== Route Related Interfaces ====================
 
 export interface GatewayRoute {
   id: string;
@@ -69,7 +69,7 @@ export interface GatewayRouteQueryParams {
   pageSize?: number;
 }
 
-// ==================== 集群相关接口 ====================
+// ==================== Cluster Related Interfaces ====================
 
 export interface GatewayCluster {
   id: string;
@@ -147,10 +147,10 @@ export interface ClusterOption {
   isEnabled: boolean;
 }
 
-// ==================== 路由 API ====================
+// ==================== Route API ====================
 
 /**
- * 分页获取路由列表
+ * Get route list (paginated)
  */
 export async function getRoutePagedList(
   params: GatewayRouteQueryParams
@@ -160,7 +160,7 @@ export async function getRoutePagedList(
 }
 
 /**
- * 获取所有启用的路由
+ * Get all enabled routes
  */
 export async function getEnabledRoutes(): Promise<GatewayRoute[]> {
   const response = await axios.get('/api/gateway/route/enabled');
@@ -168,7 +168,7 @@ export async function getEnabledRoutes(): Promise<GatewayRoute[]> {
 }
 
 /**
- * 根据ID获取路由
+ * Get route by ID
  */
 export async function getRoute(id: string): Promise<GatewayRoute> {
   const response = await axios.get(`/api/gateway/route/${id}`);
@@ -176,7 +176,7 @@ export async function getRoute(id: string): Promise<GatewayRoute> {
 }
 
 /**
- * 创建路由
+ * Create route
  */
 export async function createRoute(
   data: CreateGatewayRouteDto
@@ -186,7 +186,7 @@ export async function createRoute(
 }
 
 /**
- * 更新路由
+ * Update route
  */
 export async function updateRoute(
   id: string,
@@ -197,14 +197,14 @@ export async function updateRoute(
 }
 
 /**
- * 删除路由
+ * Delete route
  */
 export async function deleteRoute(id: string): Promise<void> {
   await axios.delete(`/api/gateway/route/${id}`);
 }
 
 /**
- * 切换路由启用状态
+ * Toggle route enabled status
  */
 export async function toggleRouteEnabled(
   id: string,
@@ -213,10 +213,10 @@ export async function toggleRouteEnabled(
   await axios.patch(`/api/gateway/route/${id}/toggle`, { isEnabled });
 }
 
-// ==================== 集群 API ====================
+// ==================== Cluster API ====================
 
 /**
- * 分页获取集群列表
+ * Get cluster list (paginated)
  */
 export async function getClusterPagedList(
   params: GatewayClusterQueryParams
@@ -226,7 +226,7 @@ export async function getClusterPagedList(
 }
 
 /**
- * 获取所有启用的集群
+ * Get all enabled clusters
  */
 export async function getEnabledClusters(): Promise<GatewayCluster[]> {
   const response = await axios.get('/api/gateway/cluster/enabled');
@@ -234,7 +234,7 @@ export async function getEnabledClusters(): Promise<GatewayCluster[]> {
 }
 
 /**
- * 获取集群选项（用于下拉选择）
+ * Get cluster options (for dropdown selection)
  */
 export async function getClusterOptions(): Promise<ClusterOption[]> {
   const response = await axios.get('/api/gateway/cluster/options');
@@ -242,7 +242,7 @@ export async function getClusterOptions(): Promise<ClusterOption[]> {
 }
 
 /**
- * 根据ID获取集群
+ * Get cluster by ID
  */
 export async function getCluster(id: string): Promise<GatewayCluster> {
   const response = await axios.get(`/api/gateway/cluster/${id}`);
@@ -250,7 +250,7 @@ export async function getCluster(id: string): Promise<GatewayCluster> {
 }
 
 /**
- * 创建集群
+ * Create cluster
  */
 export async function createCluster(
   data: CreateGatewayClusterDto
@@ -260,7 +260,7 @@ export async function createCluster(
 }
 
 /**
- * 更新集群
+ * Update cluster
  */
 export async function updateCluster(
   id: string,
@@ -271,14 +271,14 @@ export async function updateCluster(
 }
 
 /**
- * 删除集群
+ * Delete cluster
  */
 export async function deleteCluster(id: string): Promise<void> {
   await axios.delete(`/api/gateway/cluster/${id}`);
 }
 
 /**
- * 切换集群启用状态
+ * Toggle cluster enabled status
  */
 export async function toggleClusterEnabled(
   id: string,
@@ -287,25 +287,25 @@ export async function toggleClusterEnabled(
   await axios.patch(`/api/gateway/cluster/${id}/toggle`, { isEnabled });
 }
 
-// 负载均衡策略选项
+// Load balancing policy options
 export const loadBalancingPolicies = [
-  { value: 'RoundRobin', label: '轮询 (Round Robin)' },
-  { value: 'Random', label: '随机 (Random)' },
-  { value: 'LeastRequests', label: '最少请求 (Least Requests)' },
-  { value: 'PowerOfTwoChoices', label: '二选一 (Power of Two Choices)' },
-  { value: 'First', label: '第一个 (First)' },
+  { value: 'RoundRobin', label: 'Round Robin' },
+  { value: 'Random', label: 'Random' },
+  { value: 'LeastRequests', label: 'Least Requests' },
+  { value: 'PowerOfTwoChoices', label: 'Power of Two Choices' },
+  { value: 'First', label: 'First' },
 ];
 
-// 授权策略选项
+// Authorization policy options
 export const authorizationPolicies = [
-  { value: '', label: '无' },
-  { value: 'RequireAuthenticatedUser', label: '需要认证用户' },
-  { value: 'RequireAdmin', label: '需要管理员' },
+  { value: '', label: 'None' },
+  { value: 'RequireAuthenticatedUser', label: 'Require Authenticated User' },
+  { value: 'RequireAdmin', label: 'Require Admin' },
 ];
 
-// 限流策略选项
+// Rate limiter policy options
 export const rateLimiterPolicies = [
-  { value: '', label: '无' },
-  { value: 'FixedWindowPolicy', label: '固定窗口' },
-  { value: 'SlidingWindowPolicy', label: '滑动窗口' },
+  { value: '', label: 'None' },
+  { value: 'FixedWindowPolicy', label: 'Fixed Window' },
+  { value: 'SlidingWindowPolicy', label: 'Sliding Window' },
 ];

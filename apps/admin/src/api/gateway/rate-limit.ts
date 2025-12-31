@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// ==================== 限流策略 ====================
+// ==================== Rate Limit Policy ====================
 
 export interface RateLimitPolicy {
   id: string;
@@ -37,21 +37,21 @@ export interface UpdateRateLimitPolicy extends CreateRateLimitPolicy {
   id: string;
 }
 
-// 获取所有限流策略
+// Get all rate limit policies
 export function getAllPolicies() {
   return axios.get<{ success: boolean; data: RateLimitPolicy[] }>(
     '/api/rate-limit/policies'
   );
 }
 
-// 获取限流策略详情
+// Get rate limit policy details
 export function getPolicy(id: string) {
   return axios.get<{ success: boolean; data: RateLimitPolicy }>(
     `/api/rate-limit/policies/${id}`
   );
 }
 
-// 创建限流策略
+// Create rate limit policy
 export function createPolicy(data: CreateRateLimitPolicy) {
   return axios.post<{ success: boolean; data: { id: string } }>(
     '/api/rate-limit/policies',
@@ -59,7 +59,7 @@ export function createPolicy(data: CreateRateLimitPolicy) {
   );
 }
 
-// 更新限流策略
+// Update rate limit policy
 export function updatePolicy(id: string, data: UpdateRateLimitPolicy) {
   return axios.put<{ success: boolean }>(
     `/api/rate-limit/policies/${id}`,
@@ -67,12 +67,12 @@ export function updatePolicy(id: string, data: UpdateRateLimitPolicy) {
   );
 }
 
-// 删除限流策略
+// Delete rate limit policy
 export function deletePolicy(id: string) {
   return axios.delete<{ success: boolean }>(`/api/rate-limit/policies/${id}`);
 }
 
-// ==================== IP 访问规则 ====================
+// ==================== IP Access Rules ====================
 
 export interface IpAccessRule {
   id: string;
@@ -105,7 +105,7 @@ export interface IpRulesResponse {
   pageSize: number;
 }
 
-// 获取 IP 规则列表
+// Get IP rules list
 export function getIpRules(params: {
   ruleType?: string;
   isEnabled?: boolean;
@@ -118,28 +118,28 @@ export function getIpRules(params: {
   );
 }
 
-// 获取 IP 规则详情
+// Get IP rule details
 export function getIpRule(id: string) {
   return axios.get<{ success: boolean; data: IpAccessRule }>(
     `/api/rate-limit/ip-rules/${id}`
   );
 }
 
-// 获取黑名单
+// Get blacklist
 export function getBlacklist() {
   return axios.get<{ success: boolean; data: IpAccessRule[] }>(
     '/api/rate-limit/ip-rules/blacklist'
   );
 }
 
-// 获取白名单
+// Get whitelist
 export function getWhitelist() {
   return axios.get<{ success: boolean; data: IpAccessRule[] }>(
     '/api/rate-limit/ip-rules/whitelist'
   );
 }
 
-// 创建 IP 规则
+// Create IP rule
 export function createIpRule(data: CreateIpAccessRule) {
   return axios.post<{ success: boolean; data: { id: string } }>(
     '/api/rate-limit/ip-rules',
@@ -147,7 +147,7 @@ export function createIpRule(data: CreateIpAccessRule) {
   );
 }
 
-// 更新 IP 规则
+// Update IP rule
 export function updateIpRule(id: string, data: UpdateIpAccessRule) {
   return axios.put<{ success: boolean }>(
     `/api/rate-limit/ip-rules/${id}`,
@@ -155,12 +155,12 @@ export function updateIpRule(id: string, data: UpdateIpAccessRule) {
   );
 }
 
-// 删除 IP 规则
+// Delete IP rule
 export function deleteIpRule(id: string) {
   return axios.delete<{ success: boolean }>(`/api/rate-limit/ip-rules/${id}`);
 }
 
-// 检查 IP 是否在黑名单中
+// Check if IP is in blacklist
 export function checkBlacklist(ip: string) {
   return axios.get<{
     success: boolean;
@@ -168,7 +168,7 @@ export function checkBlacklist(ip: string) {
   }>('/api/rate-limit/check-blacklist', { params: { ip } });
 }
 
-// 检查 IP 是否在白名单中
+// Check if IP is in whitelist
 export function checkWhitelist(ip: string) {
   return axios.get<{
     success: boolean;
@@ -176,16 +176,16 @@ export function checkWhitelist(ip: string) {
   }>('/api/rate-limit/check-whitelist', { params: { ip } });
 }
 
-// ==================== 常量 ====================
+// ==================== Constants ====================
 
 export const policyTypes = [
-  { value: 'fixed-window', label: '固定窗口' },
-  { value: 'sliding-window', label: '滑动窗口' },
-  { value: 'token-bucket', label: '令牌桶' },
-  { value: 'concurrency', label: '并发限制' },
+  { value: 'fixed-window', label: 'Fixed Window' },
+  { value: 'sliding-window', label: 'Sliding Window' },
+  { value: 'token-bucket', label: 'Token Bucket' },
+  { value: 'concurrency', label: 'Concurrency Limit' },
 ];
 
 export const ruleTypes = [
-  { value: 'blacklist', label: '黑名单' },
-  { value: 'whitelist', label: '白名单' },
+  { value: 'blacklist', label: 'Blacklist' },
+  { value: 'whitelist', label: 'Whitelist' },
 ];

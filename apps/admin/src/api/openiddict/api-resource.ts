@@ -20,7 +20,7 @@ export interface IApiResource {
   nonEditable: boolean;
 }
 
-// 查询模型
+// Query model
 export interface IApiResourceModel {
   name?: string;
   displayName?: string;
@@ -28,11 +28,11 @@ export interface IApiResourceModel {
 }
 
 /**
- * 优化说明:
- * 1. 提供构造函数，支持初始化对象属性。
- * 2. 支持传入部分属性，避免手动赋值全部属性。
- * 3. 默认值通过参数解构设置，更灵活。
- * 4. 增加类型安全，方便后续拓展和维护。
+ * Optimization notes:
+ * 1. Provides constructor to support initializing object properties.
+ * 2. Supports passing partial properties, avoiding manual assignment of all properties.
+ * 3. Default values are set via parameter destructuring for more flexibility.
+ * 4. Enhanced type safety for easier future extension and maintenance.
  */
 export class ApiResource implements IApiResource {
   id: string;
@@ -79,7 +79,7 @@ export class ApiResource implements IApiResource {
 }
 
 export const apiResourceApi = {
-  // 获取分页列表
+  // Get paged list
   async getPagedList(
     model: IApiResourceModel,
     page: number,
@@ -96,19 +96,19 @@ export const apiResourceApi = {
     return { items, totalCount, pageIndex, pageSize: size };
   },
 
-  // 获取详情
+  // Get details
   async get(id: string): Promise<IApiResource> {
     const response = await axios.get(`/api/openiddict/api-resource/${id}`);
     return response.data;
   },
 
-  // 创建
+  // Create
   async create(model: Partial<IApiResource>): Promise<number> {
     const response = await axios.post('/api/openiddict/api-resource', model);
     return response.data;
   },
 
-  // 更新
+  // Update
   async update(id: string, model: Partial<IApiResource>): Promise<boolean> {
     const response = await axios.put(
       `/api/openiddict/api-resource/${id}`,
@@ -117,7 +117,7 @@ export const apiResourceApi = {
     return response.data;
   },
 
-  // 删除
+  // Delete
   async remove(id: string): Promise<boolean> {
     const response = await axios.delete(`/api/openiddict/api-resource/${id}`);
     return response.data;

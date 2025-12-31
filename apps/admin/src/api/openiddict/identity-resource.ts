@@ -16,9 +16,9 @@ export interface IIdentityResourceClaimModel {
   identityResourceId: string;
 }
 
-// 统一的 identityResourceClaim 对象
+// Unified identityResourceClaim object
 export const identityResourceClaim = {
-  // 表单工厂
+  // Form factory
   form: {
     create: (identityResourceId?: string): IIdentityResourceClaim => ({
       id: null,
@@ -43,7 +43,7 @@ export const identityResourceClaim = {
     },
   },
 
-  // API 方法
+  // API methods
   async get(id: string): Promise<IIdentityResourceClaim> {
     const response = await axios.get<IIdentityResourceClaim>(
       `/api/identity-resource-claim/get/${id}`

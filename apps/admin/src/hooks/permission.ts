@@ -6,16 +6,16 @@ export default function usePermission() {
 
   return {
     /**
-     * 检查是否可以访问路由
-     * 支持 roles 和 permissions 两种验证方式
+     * Check if route can be accessed
+     * Supports both roles and permissions validation methods
      */
     accessRouter(route: RouteLocationNormalized | RouteRecordRaw) {
-      // 不需要认证的路由直接放行
+      // Routes that don't require auth are allowed directly
       if (!route.meta?.requiresAuth) {
         return true;
       }
 
-      // 超级管理员拥有所有权限
+      // Super admin has all permissions
       if (
         userStore.role === 'super_admin' ||
         userStore.roles.includes('super_admin')
@@ -23,13 +23,13 @@ export default function usePermission() {
         return true;
       }
 
-      // 检查角色权限
+      // Check role permissions
       const hasRoleAccess =
         !route.meta?.roles ||
         route.meta?.roles?.includes('*') ||
         route.meta?.roles?.includes(userStore.role);
 
-      // 检查权限码（如果路由定义了 permissions）
+      // Check permission code (if route defines permissions)
       const requiredPermissions = route.meta?.permissions as
         | string[]
         | undefined;
@@ -44,7 +44,7 @@ export default function usePermission() {
     },
 
     /**
-     * 查找第一个有权限访问的路由
+     * Find first route with permission to access
      */
     findFirstPermissionRoute(_routers: any, role = 'admin') {
       const cloneRouters = [..._routers];
@@ -64,21 +64,21 @@ export default function usePermission() {
     },
 
     /**
-     * 检查是否拥有指定权限
+     * Check if has specified permission
      */
     hasPermission(permission: string): boolean {
       return userStore.hasPermission(permission);
     },
 
     /**
-     * 检查是否拥有任意一个权限
+     * Check if has any of the specified permissions
      */
     hasAnyPermission(permissions: string[]): boolean {
       return userStore.hasAnyPermission(permissions);
     },
 
     /**
-     * 检查是否拥有所有权限
+     * Check if has all specified permissions
      */
     hasAllPermissions(permissions: string[]): boolean {
       return userStore.hasAllPermissions(permissions);

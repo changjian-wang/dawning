@@ -217,7 +217,7 @@
   const { isFullscreen, toggle: toggleFullScreen } = useFullscreen();
   const locales = [...LOCALE_OPTIONS];
   const avatar = computed(() => {
-    // 确保只有有效的 URL 才返回
+    // Ensure only valid URLs are returned
     const avatarUrl = userStore.avatar;
     return avatarUrl && avatarUrl.trim() !== '' ? avatarUrl : undefined;
   });
@@ -273,11 +273,11 @@
   });
   const switchRoles = async () => {
     if (!canSwitchRoles.value) {
-      Message.info('当前用户只有一个角色，无法切换');
+      Message.info('Current user has only one role, cannot switch');
       return;
     }
     const res = await userStore.switchRoles();
-    Message.success(`已切换到角色: ${res}`);
+    Message.success(`Switched to role: ${res}`);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
 </script>

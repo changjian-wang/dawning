@@ -2,7 +2,7 @@
   <div class="container">
     <a-card class="general-card" :title="$t('userCenter.title')">
       <div class="user-info-wrapper">
-        <!-- 头像区域 -->
+        <!-- Avatar section -->
         <div class="avatar-section">
           <a-avatar :size="100" :style="{ backgroundColor: '#165dff' }">
             <template v-if="!userStore.avatar">
@@ -18,7 +18,7 @@
           </a-tag>
         </div>
 
-        <!-- 信息区域（卡片分组式） -->
+        <!-- Info section (card group style) -->
         <div class="info-section">
           <div class="info-group">
             <div class="info-item">
@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <!-- 操作按钮 -->
+      <!-- Action buttons -->
       <div class="action-section">
         <a-space>
           <a-button type="primary" @click="goToSettings">
@@ -87,7 +87,7 @@
   const userStore = useUserStore();
   const router = useRouter();
 
-  // 页面加载时从后端获取最新用户信息
+  // Fetch latest user info from backend when page loads
   onMounted(async () => {
     if (userStore.accountId) {
       try {
@@ -116,11 +116,11 @@
   });
 
   const roleLabels: Record<string, string> = {
-    super_admin: '超级管理员',
-    admin: '系统管理员',
-    user_manager: '用户管理员',
-    auditor: '审计员',
-    user: '普通用户',
+    super_admin: 'Super Admin',
+    admin: 'System Admin',
+    user_manager: 'User Manager',
+    auditor: 'Auditor',
+    user: 'User',
   };
 
   const roleColors: Record<string, string> = {

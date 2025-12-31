@@ -22,9 +22,9 @@ export interface IClaimTypeModel {
   description: string;
 }
 
-// 统一的 claimType 对象
+// Unified claimType object
 export const claimType = {
-  // 表单工厂
+  // Form factory
   form: {
     create: (): IClaimType => ({
       id: null,
@@ -56,7 +56,7 @@ export const claimType = {
     },
   },
   api: {
-    // API 方法
+    // API methods
     async get(id: string): Promise<IClaimType> {
       const response = await axios.get<IClaimType>(`/api/claim-type/get/${id}`);
       return response.data;
@@ -71,7 +71,7 @@ export const claimType = {
         `/api/claim-type/get-paged-list?page=${page}&size=${size}`,
         model
       );
-      // ApiResponse 包装的数据，拦截器解包后直接是 IPagedData 格式
+      // ApiResponse wrapped data, interceptor unwraps to IPagedData format directly
       return response.data;
     },
 

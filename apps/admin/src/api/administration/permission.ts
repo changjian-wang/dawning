@@ -2,7 +2,7 @@ import axios from '@/api/interceptor';
 import type { IPagedData } from '../paged-data';
 
 /**
- * 权限模型
+ * Permission model
  */
 export interface PermissionModel {
   id: string;
@@ -20,7 +20,7 @@ export interface PermissionModel {
 }
 
 /**
- * 创建权限DTO
+ * Create permission DTO
  */
 export interface CreatePermissionDto {
   code: string;
@@ -34,7 +34,7 @@ export interface CreatePermissionDto {
 }
 
 /**
- * 更新权限DTO
+ * Update permission DTO
  */
 export interface UpdatePermissionDto {
   name?: string;
@@ -44,7 +44,7 @@ export interface UpdatePermissionDto {
 }
 
 /**
- * 权限查询参数
+ * Permission query parameters
  */
 export interface PermissionQueryParams {
   code?: string;
@@ -59,7 +59,7 @@ export interface PermissionQueryParams {
 }
 
 /**
- * 角色权限关联
+ * Role permission association
  */
 export interface RolePermissionDto {
   roleId: string;
@@ -67,7 +67,7 @@ export interface RolePermissionDto {
 }
 
 /**
- * 权限分组（按资源）
+ * Permission group (by resource)
  */
 export interface PermissionGroup {
   resource: string;
@@ -75,7 +75,7 @@ export interface PermissionGroup {
 }
 
 /**
- * 获取权限列表（分页）
+ * Get permission list (paginated)
  */
 export async function getPermissionList(
   params: PermissionQueryParams
@@ -84,12 +84,12 @@ export async function getPermissionList(
     '/api/permission',
     { params }
   );
-  // ApiResponse 包装的数据，拦截器解包后直接是 IPagedData 格式
+  // Data wrapped by ApiResponse, interceptor unwraps it to IPagedData format
   return response.data;
 }
 
 /**
- * 获取所有启用的权限
+ * Get all active permissions
  */
 export async function getAllActivePermissions(): Promise<PermissionModel[]> {
   const response = await axios.get<PermissionModel[]>('/api/permission/all');
@@ -97,7 +97,7 @@ export async function getAllActivePermissions(): Promise<PermissionModel[]> {
 }
 
 /**
- * 获取分组的权限（按资源分组）
+ * Get grouped permissions (grouped by resource)
  */
 export async function getGroupedPermissions(): Promise<PermissionGroup[]> {
   const response = await axios.get<PermissionGroup[]>(
@@ -107,7 +107,7 @@ export async function getGroupedPermissions(): Promise<PermissionGroup[]> {
 }
 
 /**
- * 获取所有资源类型
+ * Get all resource types
  */
 export async function getResourceTypes(): Promise<string[]> {
   const response = await axios.get<string[]>('/api/permission/resources');
@@ -115,7 +115,7 @@ export async function getResourceTypes(): Promise<string[]> {
 }
 
 /**
- * 获取所有分类
+ * Get all categories
  */
 export async function getCategories(): Promise<string[]> {
   const response = await axios.get<string[]>('/api/permission/categories');
@@ -123,7 +123,7 @@ export async function getCategories(): Promise<string[]> {
 }
 
 /**
- * 根据ID获取权限
+ * Get permission by ID
  */
 export async function getPermissionById(id: string): Promise<PermissionModel> {
   const response = await axios.get<PermissionModel>(`/api/permission/${id}`);
@@ -131,7 +131,7 @@ export async function getPermissionById(id: string): Promise<PermissionModel> {
 }
 
 /**
- * 根据代码获取权限
+ * Get permission by code
  */
 export async function getPermissionByCode(
   code: string
@@ -143,7 +143,7 @@ export async function getPermissionByCode(
 }
 
 /**
- * 获取角色的权限列表
+ * Get role permissions list
  */
 export async function getRolePermissions(
   roleId: string
@@ -155,7 +155,7 @@ export async function getRolePermissions(
 }
 
 /**
- * 获取用户的所有权限代码（聚合所有角色的权限）
+ * Get user's all permission codes (aggregated from all roles)
  */
 export async function getUserPermissions(userId: string): Promise<string[]> {
   const response = await axios.get<string[]>(
@@ -165,7 +165,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
 }
 
 /**
- * 检查角色是否拥有指定权限
+ * Check if role has specified permission
  */
 export async function checkRolePermission(
   roleId: string,
@@ -178,7 +178,7 @@ export async function checkRolePermission(
 }
 
 /**
- * 创建权限
+ * Create permission
  */
 export async function createPermission(
   data: CreatePermissionDto
@@ -188,7 +188,7 @@ export async function createPermission(
 }
 
 /**
- * 更新权限
+ * Update permission
  */
 export async function updatePermission(
   id: string,
@@ -199,7 +199,7 @@ export async function updatePermission(
 }
 
 /**
- * 删除权限
+ * Delete permission
  */
 export async function deletePermission(id: string): Promise<boolean> {
   const response = await axios.delete<boolean>(`/api/permission/${id}`);
@@ -207,7 +207,7 @@ export async function deletePermission(id: string): Promise<boolean> {
 }
 
 /**
- * 为角色分配权限
+ * Assign permissions to role
  */
 export async function assignPermissionsToRole(
   roleId: string,
@@ -221,7 +221,7 @@ export async function assignPermissionsToRole(
 }
 
 /**
- * 移除角色的权限
+ * Remove permissions from role
  */
 export async function removePermissionsFromRole(
   roleId: string,

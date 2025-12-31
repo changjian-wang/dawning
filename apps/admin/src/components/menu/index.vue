@@ -183,7 +183,7 @@
       }
     }
 
-    // 确保所有层级的菜单项都显示图标
+    // Ensure all menu item levels display icons
     .arco-menu-item,
     .arco-menu-inline-header {
       .arco-menu-icon {
@@ -199,7 +199,7 @@
       }
     }
 
-    // 子菜单项的图标样式
+    // Submenu item icon styles
     .arco-menu-inline-content {
       .arco-menu-item {
         .arco-menu-icon {
@@ -212,7 +212,7 @@
       }
     }
 
-    // 选中状态的图标颜色
+    // Selected state icon color
     .arco-menu-item.arco-menu-selected,
     .arco-menu-inline-header.arco-menu-selected {
       .arco-menu-icon {
@@ -221,11 +221,11 @@
     }
   }
 
-  // 菜单收起时的样式优化
+  // Collapsed menu style optimization
   .arco-menu-collapsed {
     width: 48px;
 
-    // 收起时的一级菜单项（包含子菜单的）
+    // First level menu items (with submenu) when collapsed
     .arco-menu-pop {
       display: flex;
       align-items: center;
@@ -244,7 +244,7 @@
         }
       }
 
-      // 隐藏文字和箭头
+      // Hide text and arrow
       .arco-menu-title,
       .arco-menu-icon-suffix {
         display: none !important;
@@ -259,7 +259,7 @@
       }
     }
 
-    // 收起时的单独菜单项（无子菜单）
+    // Single menu items (without submenu) when collapsed
     .arco-menu-item {
       display: flex;
       align-items: center;
@@ -278,9 +278,9 @@
   }
 </style>
 
-<!-- 弹出菜单样式（需要全局样式，挂载在 body 上） -->
+<!-- Popup menu styles (global styles needed, mounted on body) -->
 <style lang="less">
-  // 收起时弹出的子菜单样式
+  // Popup submenu styles when collapsed
   .arco-trigger-popup {
     .arco-menu {
       min-width: 180px;

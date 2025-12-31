@@ -10,7 +10,7 @@ export interface IAuthorization {
   scopes: string[];
   properties: Record<string, string>;
   createdAt?: string;
-  // 展示用，可从关联查询获取
+  // For display, can be obtained from join query
   applicationName?: string;
   userName?: string;
 }
@@ -23,7 +23,7 @@ export interface IAuthorizationModel {
 }
 
 export const authorizationApi = {
-  // 获取分页列表
+  // Get paged list
   async getPagedList(
     model: IAuthorizationModel,
     page: number,
@@ -40,13 +40,13 @@ export const authorizationApi = {
     return { items, totalCount, pageIndex, pageSize: size };
   },
 
-  // 获取详情
+  // Get details
   async get(id: string): Promise<IAuthorization> {
     const response = await axios.get(`/api/openiddict/authorization/get/${id}`);
     return response.data;
   },
 
-  // 按用户获取
+  // Get by user
   async getBySubject(subject: string): Promise<IAuthorization[]> {
     const response = await axios.get(
       `/api/openiddict/authorization/get-by-subject/${subject}`
@@ -54,7 +54,7 @@ export const authorizationApi = {
     return response.data;
   },
 
-  // 按应用获取
+  // Get by application
   async getByApplicationId(applicationId: string): Promise<IAuthorization[]> {
     const response = await axios.get(
       `/api/openiddict/authorization/get-by-application/${applicationId}`
@@ -62,7 +62,7 @@ export const authorizationApi = {
     return response.data;
   },
 
-  // 撤销授权（删除）
+  // Revoke authorization (delete)
   async revoke(id: string): Promise<boolean> {
     const response = await axios.delete(
       `/api/openiddict/authorization/delete/${id}`

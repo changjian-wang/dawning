@@ -2,17 +2,17 @@ import UserClaim from './user-claim';
 
 export interface IIdentityResourceClaim {
   /**
-   * 主键ID
+   * Primary key ID
    */
   id: string;
 
   /**
-   * 声明类型
+   * Claim type
    */
   type: string;
 
   /**
-   * 身份资源ID
+   * Identity resource ID
    */
   identityResourceId: string;
 }

@@ -11,28 +11,28 @@ export interface SystemConfigItem {
   updatedAt?: string;
 }
 
-// 获取所有配置分组
+// Get all configuration groups
 export function getConfigGroups() {
   return axios.get<{ success: boolean; data: string[] }>(
     '/api/system-config/groups'
   );
 }
 
-// 获取分组下的配置
+// Get configurations by group
 export function getConfigsByGroup(group: string) {
   return axios.get<{ success: boolean; data: SystemConfigItem[] }>(
     `/api/system-config/group/${encodeURIComponent(group)}`
   );
 }
 
-// 获取单个配置值
+// Get single configuration value
 export function getConfigValue(group: string, key: string) {
   return axios.get<{ success: boolean; data: string }>(
     `/api/system-config/${encodeURIComponent(group)}/${encodeURIComponent(key)}`
   );
 }
 
-// 设置配置值
+// Set configuration value
 export function setConfigValue(
   group: string,
   key: string,
@@ -47,28 +47,28 @@ export function setConfigValue(
   );
 }
 
-// 批量更新配置
+// Batch update configurations
 export function batchUpdateConfigs(configs: SystemConfigItem[]) {
   return axios.post<{ success: boolean }>('/api/system-config/batch', {
     configs,
   });
 }
 
-// 删除配置
+// Delete configuration
 export function deleteConfig(group: string, key: string) {
   return axios.delete<{ success: boolean }>(
     `/api/system-config/${encodeURIComponent(group)}/${encodeURIComponent(key)}`
   );
 }
 
-// 获取配置更新时间戳
+// Get configuration update timestamp
 export function getConfigTimestamp() {
   return axios.get<{ success: boolean; data: number }>(
     '/api/system-config/timestamp'
   );
 }
 
-// 初始化默认配置
+// Initialize default configurations
 export function initDefaultConfigs() {
   return axios.post<{ success: boolean; message: string }>(
     '/api/system-config/init-defaults'

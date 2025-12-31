@@ -41,7 +41,7 @@
         </a-layout>
       </a-layout>
     </a-layout>
-    <!-- 快捷键帮助弹窗 -->
+    <!-- Keyboard shortcuts help modal -->
     <KeyboardShortcutsHelp v-model="showKeyboardHelp" />
   </a-layout>
 </template>
@@ -72,12 +72,12 @@
   const hideMenu = computed(() => appStore.hideMenu);
   const footer = computed(() => appStore.footer);
   
-  // 快捷键帮助弹窗
+  // Keyboard shortcuts help modal
   const showKeyboardHelp = ref(false);
 
-  // 全局快捷键处理
+  // Global keyboard shortcuts handler
   const handleGlobalKeydown = (event: KeyboardEvent) => {
-    // 忽略输入框中的快捷键（除了 Escape）
+    // Ignore keyboard shortcuts in input elements (except Escape)
     const target = event.target as HTMLElement;
     const isInputElement =
       target.tagName === 'INPUT' ||

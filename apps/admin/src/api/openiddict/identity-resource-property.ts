@@ -2,17 +2,17 @@ import { IProperty } from './property';
 
 export interface IIdentityResourceProperty extends IProperty {
   /**
-   * 主键ID
+   * Primary key ID
    */
   id: string;
 
   /**
-   * 声明类型
+   * Claim type
    */
   type: string;
 
   /**
-   * 身份资源ID
+   * Identity resource ID
    */
   identityResourceId: string;
 }

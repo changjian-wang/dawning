@@ -2,17 +2,17 @@ import { DirectiveBinding } from 'vue';
 import { useUserStore } from '@/store';
 
 /**
- * v-has-permission 指令
- * 用法：
- *   v-has-permission="'permission.code'" - 检查单个权限
- *   v-has-permission="['permission.code1', 'permission.code2']" - 检查任意一个权限
- *   v-has-permission:all="['permission.code1', 'permission.code2']" - 检查所有权限
+ * v-has-permission directive
+ * Usage:
+ *   v-has-permission="'permission.code'" - Check single permission
+ *   v-has-permission="['permission.code1', 'permission.code2']" - Check any one permission
+ *   v-has-permission:all="['permission.code1', 'permission.code2']" - Check all permissions
  */
 function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
   const { value, arg } = binding;
   const userStore = useUserStore();
 
-  // 超级管理员拥有所有权限
+  // Super admin has all permissions
   if (
     userStore.role === 'super_admin' ||
     userStore.roles.includes('super_admin')
@@ -23,16 +23,16 @@ function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
   let hasPermission = false;
 
   if (typeof value === 'string') {
-    // 单个权限检查
+    // Single permission check
     hasPermission = userStore.permissions.includes(value);
   } else if (Array.isArray(value)) {
     if (arg === 'all') {
-      // 检查所有权限
+      // Check all permissions
       hasPermission = value.every((p: string) =>
         userStore.permissions.includes(p)
       );
     } else {
-      // 检查任意一个权限
+      // Check any one permission
       hasPermission = value.some((p: string) =>
         userStore.permissions.includes(p)
       );

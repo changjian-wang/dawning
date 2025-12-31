@@ -47,25 +47,25 @@ export interface CreateSystemLogDto {
 }
 
 /**
- * 分页获取系统日志列表
+ * Get system log list (paginated)
  */
 export async function getSystemLogList(
   params: SystemLogQueryParams
 ): Promise<IPagedData<SystemLog>> {
   const response = await axios.get('/api/systemlog/paged', { params });
-  // response.data 就是拦截器处理后的数据，格式是 IPagedData
+  // response.data is the data processed by interceptor, in IPagedData format
   return response.data as IPagedData<SystemLog>;
 }
 
 /**
- * 根据ID获取系统日志详情
+ * Get system log details by ID
  */
 export function getSystemLog(id: string) {
   return axios.get<SystemLog>(`/api/systemlog/${id}`);
 }
 
 /**
- * 删除指定日期之前的日志
+ * Delete logs before specified date
  */
 export function cleanupSystemLogs(beforeDate: string) {
   return axios.delete('/api/systemlog/cleanup', {
@@ -74,7 +74,7 @@ export function cleanupSystemLogs(beforeDate: string) {
 }
 
 /**
- * 创建测试日志
+ * Create test log
  */
 export function createTestLog(data: CreateSystemLogDto) {
   return axios.post('/api/systemlog/test', data);

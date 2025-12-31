@@ -2,7 +2,7 @@ import axios from '@/api/interceptor';
 import { IPagedData } from '../paged-data';
 
 /**
- * OpenIddict 应用程序（客户端）
+ * OpenIddict Application (Client)
  */
 export interface IApplication {
   id?: string;
@@ -22,7 +22,7 @@ export interface IApplication {
 }
 
 /**
- * 应用程序查询模型
+ * Application query model
  */
 export interface IApplicationQuery {
   clientId?: string;
@@ -31,11 +31,11 @@ export interface IApplicationQuery {
 }
 
 /**
- * 创建应用程序DTO
+ * Create application DTO
  */
 export interface ICreateApplicationDto {
   clientId: string;
-  clientSecret?: string; // Public客户端不需要
+  clientSecret?: string; // Not required for Public clients
   displayName: string;
   type: 'confidential' | 'public';
   consentType: 'explicit' | 'implicit' | 'systematic';
@@ -45,18 +45,18 @@ export interface ICreateApplicationDto {
 }
 
 /**
- * 更新应用程序DTO
+ * Update application DTO
  */
 export interface IUpdateApplicationDto extends ICreateApplicationDto {
   id: string;
 }
 
 /**
- * 客户端类型预设
+ * Client type presets
  */
 export const ClientTypePresets = {
   /**
-   * SPA应用 (React, Vue, Angular)
+   * SPA Application (React, Vue, Angular)
    */
   spa: (): Partial<ICreateApplicationDto> => ({
     type: 'public',
@@ -77,7 +77,7 @@ export const ClientTypePresets = {
   }),
 
   /**
-   * 移动应用 (iOS, Android)
+   * Mobile Application (iOS, Android)
    */
   mobile: (): Partial<ICreateApplicationDto> => ({
     type: 'public',
@@ -98,7 +98,7 @@ export const ClientTypePresets = {
   }),
 
   /**
-   * Web应用 (传统服务器端渲染)
+   * Web Application (Traditional server-side rendering)
    */
   web: (): Partial<ICreateApplicationDto> => ({
     type: 'confidential',
@@ -119,7 +119,7 @@ export const ClientTypePresets = {
   }),
 
   /**
-   * API客户端 (机器对机器)
+   * API Client (Machine-to-machine)
    */
   api: (): Partial<ICreateApplicationDto> => ({
     type: 'confidential',
@@ -136,10 +136,10 @@ export const ClientTypePresets = {
 };
 
 /**
- * OpenIddict权限类型
+ * OpenIddict Permission Types
  */
 export const PermissionTypes = {
-  // 端点权限
+  // Endpoint permissions
   Endpoints: {
     authorization: 'ept:authorization',
     token: 'ept:token',
@@ -147,7 +147,7 @@ export const PermissionTypes = {
     introspection: 'ept:introspection',
     revocation: 'ept:revocation',
   },
-  // 授权类型
+  // Grant types
   GrantTypes: {
     authorizationCode: 'gt:authorization_code',
     clientCredentials: 'gt:client_credentials',
@@ -155,13 +155,13 @@ export const PermissionTypes = {
     implicit: 'gt:implicit',
     password: 'gt:password',
   },
-  // 响应类型
+  // Response types
   ResponseTypes: {
     code: 'rst:code',
     token: 'rst:token',
     idToken: 'rst:id_token',
   },
-  // 作用域
+  // Scopes
   Scopes: {
     openid: 'scp:openid',
     profile: 'scp:profile',
@@ -173,7 +173,7 @@ export const PermissionTypes = {
 
 export const application = {
   /**
-   * 获取应用程序详情
+   * Get application details
    */
   async get(id: string): Promise<IApplication> {
     const response = await axios.get<IApplication>(
@@ -183,7 +183,7 @@ export const application = {
   },
 
   /**
-   * 根据ClientId获取应用程序
+   * Get application by ClientId
    */
   async getByClientId(clientId: string): Promise<IApplication> {
     const response = await axios.get<IApplication>(
@@ -193,7 +193,7 @@ export const application = {
   },
 
   /**
-   * 获取分页列表
+   * Get paged list
    */
   async getPagedList(
     query: IApplicationQuery,
@@ -208,7 +208,7 @@ export const application = {
   },
 
   /**
-   * 获取所有应用程序
+   * Get all applications
    */
   async getAll(): Promise<IApplication[]> {
     const response = await axios.get<IApplication[]>(
@@ -218,7 +218,7 @@ export const application = {
   },
 
   /**
-   * 创建应用程序
+   * Create application
    */
   async create(dto: ICreateApplicationDto): Promise<string> {
     const response = await axios.post<string>('/api/openiddict/application', {
@@ -237,7 +237,7 @@ export const application = {
   },
 
   /**
-   * 更新应用程序
+   * Update application
    */
   async update(dto: IUpdateApplicationDto): Promise<boolean> {
     const response = await axios.put<boolean>(
@@ -248,7 +248,7 @@ export const application = {
   },
 
   /**
-   * 删除应用程序
+   * Delete application
    */
   async delete(id: string): Promise<boolean> {
     const response = await axios.delete<boolean>(
@@ -258,10 +258,10 @@ export const application = {
   },
 
   /**
-   * 更新客户端密钥（重新生成哈希）
+   * Update client secret (regenerate hash)
    */
   async updateSecret(id: string, newSecret: string): Promise<boolean> {
-    // 通过update接口更新密钥
+    // Update secret through update interface
     const app = await this.get(id);
     return this.update({
       ...app,

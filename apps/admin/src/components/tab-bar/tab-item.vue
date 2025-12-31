@@ -116,7 +116,7 @@
   const tagClose = (tag: TagProps, idx: number) => {
     tabBarStore.deleteTag(idx, tag);
     if (props.itemData.fullPath === route.fullPath) {
-      const latest = tagList.value[idx - 1]; // 获取队列的前一个tab
+      const latest = tagList.value[idx - 1]; // Get the previous tab in the queue
       router.push({ name: latest.name });
     }
   };

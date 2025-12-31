@@ -1,11 +1,11 @@
 export interface IUserClaim {
   /**
-   * 主键ID
+   * Primary key ID
    */
   id: string;
 
   /**
-   * 声明类型
+   * Claim type
    */
   type: string;
 }

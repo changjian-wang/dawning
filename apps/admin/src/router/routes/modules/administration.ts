@@ -1,7 +1,7 @@
 import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-// ========== 用户权限管理 ==========
+// ========== User Permission Management ==========
 export const USER_PERMISSION: AppRouteRecordRaw = {
   path: '/user-permission',
   name: 'UserPermission',
@@ -49,7 +49,7 @@ export const USER_PERMISSION: AppRouteRecordRaw = {
   ],
 };
 
-// ========== OpenIddict 认证授权 ==========
+// ========== OpenIddict Authentication ==========
 export const OPENIDDICT: AppRouteRecordRaw = {
   path: '/openiddict',
   name: 'OpenIddict',
@@ -124,7 +124,7 @@ export const OPENIDDICT: AppRouteRecordRaw = {
   ],
 };
 
-// ========== 网关管理 ==========
+// ========== Gateway Management ==========
 export const GATEWAY: AppRouteRecordRaw = {
   path: '/gateway',
   name: 'Gateway',
@@ -174,7 +174,7 @@ export const GATEWAY: AppRouteRecordRaw = {
   ],
 };
 
-// ========== 监控告警 ==========
+// ========== Monitoring and Alerting ==========
 export const MONITORING: AppRouteRecordRaw = {
   path: '/monitoring',
   name: 'Monitoring',
@@ -234,7 +234,7 @@ export const MONITORING: AppRouteRecordRaw = {
   ],
 };
 
-// ========== 多租户管理 ==========
+// ========== Multi-tenant Management ==========
 export const TENANT: AppRouteRecordRaw = {
   path: '/tenant',
   name: 'Tenant',
@@ -263,7 +263,7 @@ export const TENANT: AppRouteRecordRaw = {
   ],
 };
 
-// ========== 系统设置 ==========
+// ========== System Settings ==========
 export const SETTINGS: AppRouteRecordRaw = {
   path: '/settings',
   name: 'Settings',
@@ -311,7 +311,7 @@ export const SETTINGS: AppRouteRecordRaw = {
   ],
 };
 
-// 导出所有路由
+// Export all routes
 export default [
   USER_PERMISSION,
   OPENIDDICT,

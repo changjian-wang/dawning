@@ -5,7 +5,7 @@
         :items="['menu.administration', 'menu.administration.systemMonitor']"
       />
 
-      <!-- 系统状态概览 -->
+      <!-- System status overview -->
       <a-row :gutter="16" class="stat-cards">
         <a-col :xs="24" :sm="12" :md="6">
           <a-card class="stat-card">
@@ -45,7 +45,7 @@
         </a-col>
       </a-row>
 
-      <!-- 健康检查详情 -->
+      <!-- Health check details -->
       <a-card class="general-card" :title="$t('systemMonitor.healthCheck')">
         <template #extra>
           <a-button type="text" :loading="loading" @click="refreshAll">
@@ -79,7 +79,7 @@
         </a-table>
       </a-card>
 
-      <!-- 性能指标 -->
+      <!-- Performance metrics -->
       <a-row :gutter="16" style="margin-top: 16px">
         <a-col :xs="24" :md="12">
           <a-card class="general-card" :title="$t('systemMonitor.memoryDetails')">
@@ -176,7 +176,7 @@
         </a-col>
       </a-row>
 
-      <!-- 服务端点检查 -->
+      <!-- Service endpoints check -->
       <a-card class="general-card" :title="$t('systemMonitor.serviceEndpoints')" style="margin-top: 16px">
         <a-table :columns="serviceColumns" :data="services" :pagination="false">
           <template #status="{ record }">

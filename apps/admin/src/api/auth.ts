@@ -20,7 +20,7 @@ export interface OAuthTokenResponse {
 }
 
 /**
- * OAuth 2.0 Password Grant 登录
+ * OAuth 2.0 Password Grant login
  */
 export function loginWithPassword(username: string, password: string) {
   const params = new URLSearchParams();
@@ -38,7 +38,7 @@ export function loginWithPassword(username: string, password: string) {
 }
 
 /**
- * OAuth 2.0 Refresh Token Grant 刷新令牌
+ * OAuth 2.0 Refresh Token Grant - Refresh token
  */
 export function refreshAccessToken(refreshToken: string) {
   const params = new URLSearchParams();
@@ -54,7 +54,7 @@ export function refreshAccessToken(refreshToken: string) {
 }
 
 /**
- * 解析 JWT Token 获取用户信息
+ * Parse JWT Token to get user information
  */
 export function parseJwtToken(token: string): any {
   try {

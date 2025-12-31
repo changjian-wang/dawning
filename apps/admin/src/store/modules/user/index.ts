@@ -43,22 +43,22 @@ const useUserStore = defineStore('user', {
     userInfo(state: UserState): UserState {
       return { ...state };
     },
-    // 检查是否拥有指定权限
+    // Check if user has specified permission
     hasPermission: (state) => (permission: string) => {
-      // 超级管理员拥有所有权限
+      // Super admin has all permissions
       if (state.role === 'super_admin' || state.roles.includes('super_admin')) {
         return true;
       }
       return state.permissions.includes(permission);
     },
-    // 检查是否拥有任意一个权限
+    // Check if user has any of the specified permissions
     hasAnyPermission: (state) => (permissions: string[]) => {
       if (state.role === 'super_admin' || state.roles.includes('super_admin')) {
         return true;
       }
       return permissions.some((p) => state.permissions.includes(p));
     },
-    // 检查是否拥有所有权限
+    // Check if user has all specified permissions
     hasAllPermissions: (state) => (permissions: string[]) => {
       if (state.role === 'super_admin' || state.roles.includes('super_admin')) {
         return true;
@@ -68,19 +68,19 @@ const useUserStore = defineStore('user', {
   },
 
   actions: {
-    // 在用户拥有的多个角色之间切换
+    // Switch between user's multiple roles
     switchRoles() {
       return new Promise((resolve) => {
         if (this.roles.length <= 1) {
-          // 只有一个角色，无法切换
+          // Only one role, cannot switch
           resolve(this.role);
           return;
         }
-        // 找到当前角色在数组中的索引，切换到下一个
+        // Find current role index and switch to next
         const currentIndex = this.roles.indexOf(this.role);
         const nextIndex = (currentIndex + 1) % this.roles.length;
         this.role = this.roles[nextIndex] as RoleType;
-        // 切换角色后重新获取权限
+        // Refresh permissions after switching roles
         this.fetchPermissions();
         resolve(this.role);
       });
@@ -100,7 +100,7 @@ const useUserStore = defineStore('user', {
       const res = await getUserInfo();
       const userData = res.data as any;
       
-      // 处理角色（可能是单个字符串或数组）
+      // Handle roles (may be a single string or array)
       let roles: string[] = [];
       if (Array.isArray(userData.roles)) {
         roles = userData.roles;
@@ -118,7 +118,7 @@ const useUserStore = defineStore('user', {
         accountId: userData.id,
       });
       
-      // 获取用户权限
+      // Get user permissions
       await this.fetchPermissions();
     },
 
@@ -146,7 +146,7 @@ const useUserStore = defineStore('user', {
         );
         const { access_token, refresh_token, id_token, expires_in } = res.data;
 
-        // 存储 tokens
+        // Store tokens
         setToken(access_token);
         if (refresh_token) {
           setRefreshToken(refresh_token);
@@ -156,14 +156,14 @@ const useUserStore = defineStore('user', {
         }
         setTokenExpiresAt(expires_in);
 
-        // 注意：角色信息只存在于 access_token 中，id_token 不包含角色
-        // 从 access_token 获取角色信息
+        // Note: Role info only exists in access_token, id_token does not contain roles
+        // Get role info from access_token
         const accessTokenInfo = parseJwtToken(access_token);
-        // 从 id_token 获取用户基本信息（如果有的话）
+        // Get user basic info from id_token (if available)
         const idTokenInfo = id_token ? parseJwtToken(id_token) : null;
 
         if (accessTokenInfo) {
-          // 处理角色（可能是单个字符串或数组）- 从 access_token 获取
+          // Handle roles (may be a single string or array) - get from access_token
           let roles: string[] = [];
           if (Array.isArray(accessTokenInfo.role)) {
             roles = accessTokenInfo.role;
@@ -172,7 +172,7 @@ const useUserStore = defineStore('user', {
           }
           const primaryRole = (roles[0] || 'user') as RoleType;
 
-          // 优先使用 id_token 中的用户信息，角色信息从 access_token 获取
+          // Prefer user info from id_token, get role info from access_token
           const userInfo = idTokenInfo || accessTokenInfo;
 
           this.setInfo({
@@ -183,7 +183,7 @@ const useUserStore = defineStore('user', {
             accountId: userInfo.sub,
           });
 
-          // 登录后获取用户权限
+          // Get user permissions after login
           await this.fetchPermissions();
         }
       } catch (err) {

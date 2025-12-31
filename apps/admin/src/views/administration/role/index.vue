@@ -75,7 +75,7 @@
         </a-form>
       </a-card>
       <a-card class="general-card table-card">
-        <!-- 表格 -->
+        <!-- Table -->
         <a-table
           row-key="id"
           :loading="loading"
@@ -205,7 +205,7 @@
         </a-table>
       </a-card>
 
-      <!-- 权限分配对话框 -->
+      <!-- Permission assignment dialog -->
       <a-modal
         v-model:visible="permissionModalVisible"
         :title="$t('role.permission.assignTitle', { roleName: currentRole?.displayName })"
@@ -283,7 +283,7 @@
         </a-spin>
       </a-modal>
 
-      <!-- 创建/编辑对话框 -->
+      <!-- Create/Edit dialog -->
       <a-modal
         v-model:visible="modalVisible"
         :title="isEdit ? $t('role.button.edit') : $t('role.button.create')"

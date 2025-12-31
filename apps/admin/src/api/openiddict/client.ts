@@ -86,11 +86,11 @@ export interface IClientModel {
   enabled: boolean;
 }
 
-// 统一的 client 对象
+// Unified client object
 export const client = {
-  // 表单工厂
+  // Form factory
   form: {
-    // 基础客户端
+    // Base client
     create: (): IClient => ({
       id: '',
       enabled: false,
@@ -142,13 +142,13 @@ export const client = {
       nonEditable: false,
     }),
 
-    // 带登录URI的客户端
+    // Client with login URI
     createWithLoginURI: (): IClientWithLoginURI => ({
       ...client.form.create(),
       loginUri: '',
     }),
 
-    // SPA客户端预设
+    // SPA client preset
     createSpa: (
       overrides: Partial<IClientWithLoginURI> = {}
     ): IClientWithLoginURI => ({
@@ -163,7 +163,7 @@ export const client = {
       ...overrides,
     }),
 
-    // Web应用客户端预设
+    // Web application client preset
     createWebApp: (
       overrides: Partial<IClientWithLoginURI> = {}
     ): IClientWithLoginURI => ({
@@ -178,7 +178,7 @@ export const client = {
       ...overrides,
     }),
 
-    // API客户端预设
+    // API client preset
     createApi: (
       overrides: Partial<IClientWithLoginURI> = {}
     ): IClientWithLoginURI => ({
@@ -193,7 +193,7 @@ export const client = {
       ...overrides,
     }),
 
-    // 移动应用客户端预设
+    // Mobile application client preset
     createMobile: (
       overrides: Partial<IClientWithLoginURI> = {}
     ): IClientWithLoginURI => ({
@@ -208,7 +208,7 @@ export const client = {
       ...overrides,
     }),
 
-    // 重置方法
+    // Reset methods
     reset: (target: IClient) => {
       Object.assign(target, client.form.create());
     },
@@ -217,7 +217,7 @@ export const client = {
       Object.assign(target, client.form.createWithLoginURI());
     },
 
-    // 克隆方法
+    // Clone methods
     clone: (source: IClient): IClient => ({
       ...source,
       id: '',
@@ -233,7 +233,7 @@ export const client = {
       loginUri: '',
     }),
 
-    // 验证方法
+    // Validation methods
     isValid: (form: IClient): boolean => {
       return !!(form.clientName?.trim() && form.clientId?.trim());
     },
@@ -243,7 +243,7 @@ export const client = {
     },
   },
 
-  // 重定向URI工厂
+  // Redirect URI factory
   redirectUri: {
     create: (): IRedirectUri => ({
       uri: '',
@@ -260,7 +260,7 @@ export const client = {
     },
   },
 
-  // 验证工具
+  // Validation utilities
   validate: {
     grantType: (grantType: string): grantType is GrantType => {
       return Object.values(GrantTypes).includes(grantType as GrantType);
@@ -273,7 +273,7 @@ export const client = {
     },
   },
 
-  // API 方法
+  // API methods
   async get(id: string): Promise<IClient> {
     const response = await axios.get<IClient>(`/api/client/get/${id}`);
     return response.data;

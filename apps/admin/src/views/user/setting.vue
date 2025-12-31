@@ -2,7 +2,7 @@
   <div class="container">
     <a-card class="general-card" :title="$t('userSettings.title')">
       <a-tabs default-active-key="password">
-        <!-- 修改密码 -->
+        <!-- Change password -->
         <a-tab-pane key="password" :title="$t('userSettings.changePassword')">
           <div class="form-wrapper">
             <a-form
@@ -61,7 +61,7 @@
           </div>
         </a-tab-pane>
 
-        <!-- 个人信息 -->
+        <!-- Profile -->
         <a-tab-pane key="profile" :title="$t('userSettings.profile')">
           <div class="form-wrapper">
             <a-form
@@ -124,7 +124,7 @@
   const router = useRouter();
   const userStore = useUserStore();
 
-  // 密码表单
+  // Password form
   const passwordFormRef = ref();
   const passwordLoading = ref(false);
   const passwordForm = reactive({
@@ -188,7 +188,7 @@
     }
   };
 
-  // 个人信息表单
+  // Profile form
   const profileFormRef = ref();
   const profileLoading = ref(false);
   const profileForm = reactive({
@@ -228,7 +228,7 @@
     router.push({ name: 'Info' });
   };
 
-  // 页面加载时从后端获取最新用户信息
+  // Fetch latest user info from backend when page loads
   onMounted(async () => {
     if (userStore.accountId) {
       try {
