@@ -108,10 +108,10 @@ dawning/
 cd deploy/docker
 
 # Start infrastructure
-docker-compose up -d mysql redis zookeeper kafka
+docker compose up -d mysql redis zookeeper kafka
 
 # Start all services
-docker-compose --profile all up -d --build
+docker compose --profile all up -d --build
 ```
 
 This will start: MySQL, Redis, Zookeeper, Kafka, Kafka UI, and backend services.
@@ -162,16 +162,16 @@ pnpm dev
 cd deploy/docker
 
 # Start infrastructure
-docker-compose up -d mysql redis zookeeper kafka
+docker compose up -d mysql redis zookeeper kafka
 
 # Start all services
-docker-compose --profile all up -d --build
+docker compose --profile all up -d --build
 
 # Stop services
-docker-compose down
+docker compose down
 
 # Clean up data
-docker-compose down -v
+docker compose down -v
 ```
 
 ## 🔗 Business System Integration

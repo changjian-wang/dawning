@@ -115,10 +115,10 @@ dawning/
 cd deploy/docker
 
 # 启动基础设施
-docker-compose up -d mysql redis zookeeper kafka
+docker compose up -d mysql redis zookeeper kafka
 
 # 启动所有服务
-docker-compose --profile all up -d --build
+docker compose --profile all up -d --build
 ```
 
 这将启动：MySQL、Redis、Zookeeper、Kafka、Kafka UI 和后端服务。
@@ -169,16 +169,16 @@ pnpm dev
 cd deploy/docker
 
 # 启动基础设施
-docker-compose up -d mysql redis zookeeper kafka
+docker compose up -d mysql redis zookeeper kafka
 
 # 启动所有服务
-docker-compose --profile all up -d --build
+docker compose --profile all up -d --build
 
 # 停止服务
-docker-compose down
+docker compose down
 
 # 清理数据
-docker-compose down -v
+docker compose down -v
 ```
 
 ## ☸️ Kubernetes 部署
