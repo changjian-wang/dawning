@@ -98,7 +98,28 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const res = await getUserInfo();
-      this.setInfo(res.data);
+      const userData = res.data as any;
+      
+      // 处理角色（可能是单个字符串或数组）
+      let roles: string[] = [];
+      if (Array.isArray(userData.roles)) {
+        roles = userData.roles;
+      } else if (userData.roles) {
+        roles = [userData.roles];
+      }
+      const primaryRole = (roles[0] || 'user') as RoleType;
+      
+      this.setInfo({
+        name: userData.name || userData.username,
+        email: userData.email,
+        avatar: userData.avatar,
+        role: primaryRole,
+        roles,
+        accountId: userData.id,
+      });
+      
+      // 获取用户权限
+      await this.fetchPermissions();
     },
 
     // Fetch user permissions

@@ -264,7 +264,7 @@ source apps/gateway/docs/sql/seed/001_init_admin.sql
 
 After initialization:
 - **Username**: `admin`
-- **Password**: `Admin@123456`
+- **Password**: `Admin@123`
 
 ⚠️ **Change the default password immediately after first login!**
 

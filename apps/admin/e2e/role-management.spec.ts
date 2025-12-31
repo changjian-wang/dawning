@@ -7,7 +7,7 @@ const ROLE_PATH = '/administration/user-permission/role';
 test.describe('角色管理 E2E 测试', () => {
   test.beforeEach(async ({ page }) => {
     // 登录为管理员
-    const loginSuccess = await login(page, 'admin', 'Admin@123456');
+    const loginSuccess = await login(page, 'admin', 'Admin@123');
     if (!loginSuccess) {
       test.skip(true, '后端服务未运行或登录失败，跳过测试');
     }

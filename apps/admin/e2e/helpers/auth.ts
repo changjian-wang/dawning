@@ -9,7 +9,7 @@ import { Page } from '@playwright/test';
 export async function login(
   page: Page,
   username: string = 'admin',
-  password: string = 'Admin@123456'
+  password: string = 'Admin@123'
 ): Promise<boolean> {
   try {
     // 导航到登录页面

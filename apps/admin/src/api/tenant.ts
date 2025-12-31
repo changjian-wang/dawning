@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/api/interceptor';
 import type { HttpResponse } from './interceptor';
 
 // 租户类型定义
