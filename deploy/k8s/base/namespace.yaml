@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dawning
+  labels:
+    app.kubernetes.io/name: dawning
+    app.kubernetes.io/part-of: dawning-gateway

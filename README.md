@@ -107,6 +107,9 @@ dawning/
 ```bash
 cd deploy/docker
 
+# Copy environment configuration
+cp .env.example .env
+
 # Start infrastructure
 docker compose up -d mysql redis zookeeper kafka
 
@@ -161,6 +164,9 @@ pnpm dev
 ```bash
 cd deploy/docker
 
+# Copy environment configuration
+cp .env.example .env
+
 # Start infrastructure
 docker compose up -d mysql redis zookeeper kafka
 
@@ -173,6 +179,93 @@ docker compose down
 # Clean up data
 docker compose down -v
 ```
+
+## ☸️ Kubernetes Deployment (Multi-Node)
+
+Deploy to a local multi-node Kubernetes cluster using Kind and Kustomize.
+
+### Prerequisites
+
+- Docker Desktop or Colima
+- Kind (`brew install kind`)
+- kubectl (`brew install kubectl`)
+
+### 1. Create Multi-Node Cluster
+
+```bash
+# Using setup script
+chmod +x deploy/k8s/setup-cluster.sh
+./deploy/k8s/setup-cluster.sh
+
+# Or manually
+kind create cluster --name dawning --config deploy/k8s/kind-config.yaml
+```
+
+This creates a cluster with 1 control-plane + 3 worker nodes:
+- Worker 1: Infrastructure (MySQL, Redis)
+- Worker 2: Messaging (Zookeeper, Kafka)
+- Worker 3: Application (Gateway, Identity API, Frontend)
+
+### 2. Build and Load Images
+
+```bash
+# Build images
+cd apps/gateway
+docker build -t dawning-identity-api:latest -f src/Dawning.Identity.Api/Dockerfile ../..
+docker build -t dawning-gateway-api:latest -f src/Dawning.Gateway.Api/Dockerfile ../..
+cd ../admin
+docker build -t dawning-admin-frontend:latest .
+
+# Load to Kind cluster
+kind load docker-image dawning-identity-api:latest --name dawning
+kind load docker-image dawning-gateway-api:latest --name dawning
+kind load docker-image dawning-admin-frontend:latest --name dawning
+```
+
+### 3. Deploy
+
+```bash
+# Deploy dev environment (1 replica, low resources)
+kubectl apply -k deploy/k8s/overlays/dev
+
+# Or staging (2 replicas)
+kubectl apply -k deploy/k8s/overlays/staging
+
+# Or prod simulation (3 replicas, high resources)
+kubectl apply -k deploy/k8s/overlays/prod
+
+# Watch pods coming up
+kubectl get pods -n dawning -w
+```
+
+### 4. Access Services
+
+Add to `/etc/hosts`:
+```
+127.0.0.1 dawning.local api.dawning.local auth.dawning.local
+```
+
+- Frontend: http://dawning.local
+- API Gateway: http://api.dawning.local
+- Identity API: http://auth.dawning.local
+
+### Useful Commands
+
+```bash
+# Check pod distribution across nodes
+kubectl get pods -n dawning -o wide
+
+# View logs
+kubectl logs -n dawning -l app=identity-api -f
+
+# Scale deployment
+kubectl scale deployment -n dawning gateway-api --replicas=5
+
+# Delete cluster
+kind delete cluster --name dawning
+```
+
+See [K8s Deployment Guide](deploy/k8s/README.md) for details.
 
 ## 🔗 Business System Integration
 

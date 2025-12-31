@@ -114,6 +114,9 @@ dawning/
 ```bash
 cd deploy/docker
 
+# 复制环境配置
+cp .env.example .env
+
 # 启动基础设施
 docker compose up -d mysql redis zookeeper kafka
 
@@ -168,6 +171,9 @@ pnpm dev
 ```bash
 cd deploy/docker
 
+# 复制环境配置
+cp .env.example .env
+
 # 启动基础设施
 docker compose up -d mysql redis zookeeper kafka
 
@@ -181,99 +187,92 @@ docker compose down
 docker compose down -v
 ```
 
-## ☸️ Kubernetes 部署
+## ☸️ Kubernetes 部署 (多节点)
+
+使用 Kind 和 Kustomize 部署到本地多节点 Kubernetes 集群。
 
 ### 前置条件
 
-- Kubernetes 1.25+ 集群 (Docker Desktop / Kind / Minikube)
-- Helm 3.10+
-- kubectl 已配置
+- Docker Desktop 或 Colima
+- Kind (`brew install kind`)
+- kubectl (`brew install kubectl`)
 
-### 1. 安装 Helm
-
-**Windows：**
-```powershell
-winget install Helm.Helm
-```
-
-**macOS：**
-```bash
-brew install helm
-```
-
-**Linux：**
-```bash
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-```
-
-### 2. 安装 Ingress Controller
+### 1. 创建多节点集群
 
 ```bash
-# Docker Desktop / Kind
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+# 使用安装脚本
+chmod +x deploy/k8s/setup-cluster.sh
+./deploy/k8s/setup-cluster.sh
 
-# 等待就绪
-kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
+# 或手动创建
+kind create cluster --name dawning --config deploy/k8s/kind-config.yaml
 ```
 
-### 3. 同步数据库 Schema
+这将创建 1 个控制平面 + 3 个工作节点的集群：
+- Worker 1: 基础设施 (MySQL, Redis)
+- Worker 2: 消息队列 (Zookeeper, Kafka)
+- Worker 3: 应用服务 (Gateway, Identity API, Frontend)
 
-```powershell
-cd deploy/scripts
-.\sync-schema.ps1
-```
-
-### 4. 部署
+### 2. 构建并加载镜像
 
 ```bash
-# 创建命名空间
-kubectl create namespace dawning-dev
+# 构建镜像
+cd apps/gateway
+docker build -t dawning-identity-api:latest -f src/Dawning.Identity.Api/Dockerfile ../..
+docker build -t dawning-gateway-api:latest -f src/Dawning.Gateway.Api/Dockerfile ../..
+cd ../admin
+docker build -t dawning-admin-frontend:latest .
 
-# 安装（本地开发）- 从项目根目录运行
-helm install dawning deploy/helm/dawning --namespace dawning-dev --set "ingress.hosts[0].host=localhost" --set "ingress.hosts[0].paths[0].path=/" --set "ingress.hosts[0].paths[0].pathType=Prefix" --set "ingress.hosts[0].paths[0].service=admin-frontend" --set identityApi.replicaCount=1
-
-# 等待就绪
-kubectl wait --for=condition=ready pod --all -n dawning-dev --timeout=180s
+# 加载到 Kind 集群
+kind load docker-image dawning-identity-api:latest --name dawning
+kind load docker-image dawning-gateway-api:latest --name dawning
+kind load docker-image dawning-admin-frontend:latest --name dawning
 ```
 
-### 5. 访问
+### 3. 部署
 
-部署完成后访问：**http://localhost**
+```bash
+# 部署开发环境 (1 副本, 低资源)
+kubectl apply -k deploy/k8s/overlays/dev
+
+# 或测试环境 (2 副本)
+kubectl apply -k deploy/k8s/overlays/staging
+
+# 或生产模拟 (3 副本, 高资源)
+kubectl apply -k deploy/k8s/overlays/prod
+
+# 监控 Pod 启动
+kubectl get pods -n dawning -w
+```
+
+### 4. 访问服务
+
+添加到 `/etc/hosts`:
+```
+127.0.0.1 dawning.local api.dawning.local auth.dawning.local
+```
+
+- 前端: http://dawning.local
+- API 网关: http://api.dawning.local
+- 认证 API: http://auth.dawning.local
 
 ### 常用命令
 
 ```bash
-# 查看 Pod 状态
-kubectl get pods -n dawning-dev
+# 查看 Pod 在各节点的分布
+kubectl get pods -n dawning -o wide
 
 # 查看日志
-kubectl logs -f deployment/dawning-identity-api -n dawning-dev
+kubectl logs -n dawning -l app=identity-api -f
 
-# 升级
-helm upgrade dawning deploy/helm/dawning -n dawning-dev --reuse-values
+# 扩缩容
+kubectl scale deployment -n dawning gateway-api --replicas=5
 
-# 卸载
-helm uninstall dawning -n dawning-dev
-kubectl delete namespace dawning-dev
+# 删除集群
+kind delete cluster --name dawning
 ```
 
-### 生产环境部署
-
-使用自定义域名部署生产环境：
-
-```bash
-# 1. 编辑 values-prod.yaml - 更新域名和数据库配置
-#    - ingress.hosts[0].host: admin.yourdomain.com
-#    - database.external.host: your-db-host.com
-
-# 2. 使用生产配置部署
-helm install dawning deploy/helm/dawning -n dawning-prod --create-namespace -f deploy/helm/dawning/values-prod.yaml --set database.external.password=YOUR_DB_PASSWORD
-
-# 3. 配置 DNS
-#    在 DNS 服务商添加 A 记录指向 K8s Ingress Controller 外部 IP
-```
-
-完整生产配置参见 [values-prod.yaml](deploy/helm/dawning/values-prod.yaml)。
+详见 [K8s 部署指南](deploy/k8s/README.zh-CN.md)。
 
 ## 🔗 业务系统接入
 

@@ -1,0 +1,67 @@
+# =============================================
+# Kind Multi-Node Cluster Configuration
+# =============================================
+# 使用方法:
+#   创建集群: kind create cluster --name dawning --config kind-config.yaml
+#   删除集群: kind delete cluster --name dawning
+#   查看节点: kubectl get nodes
+# =============================================
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: dawning
+
+nodes:
+  # Control Plane (Master)
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      # HTTP
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP
+      # HTTPS
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+      # NodePort range for services
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+      - containerPort: 30001
+        hostPort: 30001
+        protocol: TCP
+      - containerPort: 30002
+        hostPort: 30002
+        protocol: TCP
+
+  # Worker Node 1 - Infrastructure (MySQL, Redis)
+  - role: worker
+    labels:
+      node-role: infrastructure
+      dawning.io/node-type: stateful
+
+  # Worker Node 2 - Messaging (Zookeeper, Kafka)
+  - role: worker
+    labels:
+      node-role: messaging
+      dawning.io/node-type: stateful
+
+  # Worker Node 3 - Application (Gateway, Identity API)
+  - role: worker
+    labels:
+      node-role: application
+      dawning.io/node-type: stateless
+
+networking:
+  # Pod subnet
+  podSubnet: "10.244.0.0/16"
+  # Service subnet
+  serviceSubnet: "10.96.0.0/12"
+  # Disable default CNI to use custom one if needed
+  disableDefaultCNI: false
