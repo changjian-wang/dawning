@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `status_code` INT DEFAULT NULL COMMENT 'HTTP status code',
   `old_values` JSON DEFAULT NULL COMMENT 'Values before modification (JSON)',
   `new_values` JSON DEFAULT NULL COMMENT 'Values after modification (JSON)',
-  `timestamp` BIGINT NOT NULL COMMENT 'Timestamp (millisecond Unix timestamp)',
+  `timestamp` BIGINT NOT NULL DEFAULT 0 COMMENT 'Timestamp (millisecond Unix timestamp)',
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Created time',
   PRIMARY KEY (`id`),
   KEY `idx_audit_logs_user_id` (`user_id`),
