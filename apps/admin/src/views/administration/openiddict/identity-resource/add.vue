@@ -167,7 +167,7 @@
     displayName: [{ required: true, message: '请输入显示名称' }],
   };
   
-  // 声明类型选项
+  // Claim type options
   const claimTypeOptions = reactive<IClaimType[]>([]);
 
   const handleGetAllClaimType = async () => {

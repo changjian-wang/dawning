@@ -390,7 +390,7 @@
 
   const { t } = useI18n();
 
-  // 状态
+  // State
   const activeTab = ref('rules');
   const rulesLoading = ref(false);
   const historyLoading = ref(false);
@@ -400,7 +400,7 @@
   const isEditMode = ref(false);
   const editingRuleId = ref<number | null>(null);
 
-  // 数据
+  // Data
   const rules = ref<AlertRuleDto[]>([]);
   const historyList = ref<AlertHistoryDto[]>([]);
   const statistics = ref<AlertStatisticsDto>({
@@ -414,21 +414,21 @@
     alertsBySeverity: {},
   });
 
-  // 分页
+  // Pagination
   const historyPagination = reactive({
     current: 1,
     pageSize: 10,
     total: 0,
   });
 
-  // 过滤
+  // Filter
   const historyFilter = reactive({
     severity: undefined as string | undefined,
     status: undefined as string | undefined,
     dateRange: undefined as [string, string] | undefined,
   });
 
-  // 表单
+  // Form
   const ruleFormRef = ref();
   const ruleForm = reactive<CreateAlertRuleRequest>({
     name: '',
@@ -453,7 +453,7 @@
     severity: [{ required: true, message: t('alert.validation.severity') }],
   }));
 
-  // 本地化选项
+  // Localized options
   const localMetricTypeOptions = computed(() => [
     { label: t('alert.metricType.cpu'), value: 'cpu' },
     { label: t('alert.metricType.memory'), value: 'memory' },
@@ -488,7 +488,7 @@
     { label: t('alert.notify.webhook'), value: 'webhook' },
   ]);
 
-  // 表格列定义
+  // Table column definitions
   const ruleColumns = computed<TableColumnData[]>(() => [
     { title: t('alert.column.ruleName'), dataIndex: 'name', ellipsis: true, width: 150 },
     { title: t('alert.column.metricType'), slotName: 'metricType', width: 120 },
@@ -516,7 +516,7 @@
     { title: t('common.actions'), slotName: 'actions', width: 160 },
   ]);
 
-  // 工具函数
+  // Utility functions
   const formatDateTime = (dateStr: string) => {
     if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('zh-CN');
@@ -564,7 +564,7 @@
     return colors[status] || 'gray';
   };
 
-  // 加载数据
+  // Load data
   const loadRules = async () => {
     rulesLoading.value = true;
     try {
@@ -607,11 +607,11 @@
       const { data } = await getAlertStatistics();
       statistics.value = data;
     } catch {
-      // 加载统计数据失败，不影响主流程
+      // Loading statistics failed, does not affect main flow
     }
   };
 
-  // 事件处理
+  // Event handlers
   const handleAddRule = () => {
     isEditMode.value = false;
     editingRuleId.value = null;
@@ -748,7 +748,7 @@
     loadHistory();
   };
 
-  // 初始化
+  // Initialize
   onMounted(() => {
     loadRules();
     loadHistory();

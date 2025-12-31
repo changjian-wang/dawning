@@ -55,5 +55,5 @@
 
   const activeKey = ref(1);
   const form = reactive<any>({});
-  const formRef = ref<FormInstance | null>(null); // 明确表单引用类型
+  const formRef = ref<FormInstance | null>(null); // Explicit form reference type
 </script>

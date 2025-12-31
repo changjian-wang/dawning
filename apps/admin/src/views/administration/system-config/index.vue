@@ -180,7 +180,7 @@
   const configsByGroup = ref<Record<string, SystemConfigItem[]>>({});
   const modifiedConfigs = ref<Set<string>>(new Set());
 
-  // 添加配置弹窗
+  // Add configuration modal
   const addModalVisible = ref(false);
   const addForm = ref({
     group: '',
@@ -200,7 +200,7 @@
     return configsByGroup.value[group]?.length || 0;
   };
 
-  // 加载分组配置
+  // Load group configurations
   const loadGroupConfigs = async (group: string) => {
     loading.value = true;
     try {
@@ -213,15 +213,15 @@
     }
   };
 
-  // 加载分组
+  // Load groups
   const loadGroups = async () => {
     try {
       const res = await getConfigGroups();
       if (res.data.success) {
         groups.value = res.data.data;
-        // 预加载所有分组的配置数据以显示正确的数量
+        // Preload all group configurations to display correct counts
         await Promise.all(groups.value.map((group) => loadGroupConfigs(group)));
-        // 自动选择第一个分组
+        // Auto-select first group
         if (groups.value.length > 0 && !selectedGroup.value) {
           selectedGroupKeys.value = [groups.value[0]];
         }
@@ -231,19 +231,19 @@
     }
   };
 
-  // 处理分组点击
+  // Handle group click
   const handleGroupClick = async (key: string) => {
     if (!configsByGroup.value[key]) {
       await loadGroupConfigs(key);
     }
   };
 
-  // 处理值变更
+  // Handle value change
   const handleValueChange = (config: SystemConfigItem) => {
     modifiedConfigs.value.add(`${config.group}:${config.key}`);
   };
 
-  // 保存所有修改
+  // Save all changes
   const handleSaveAll = async () => {
     if (modifiedConfigs.value.size === 0) {
       Message.info(t('systemConfig.noChanges'));
@@ -265,7 +265,7 @@
     }
   };
 
-  // 删除配置
+  // Delete configuration
   const handleDeleteConfig = (config: SystemConfigItem) => {
     Modal.confirm({
       title: t('systemConfig.deleteConfirm'),
@@ -276,7 +276,7 @@
       onOk: async () => {
         try {
           await deleteConfig(config.group, config.key);
-          // 刷新当前分组
+          // Refresh current group
           await loadGroupConfigs(config.group);
           Message.success(t('systemConfig.deleteSuccess'));
         } catch (error) {
@@ -286,7 +286,7 @@
     });
   };
 
-  // 添加配置
+  // Add configuration
   const handleAddConfig = () => {
     addForm.value = {
       group: selectedGroup.value || '',
@@ -314,7 +314,7 @@
         addForm.value.value,
         addForm.value.description
       );
-      // 刷新分组列表和配置
+      // Refresh group list and configurations
       await loadGroups();
       if (addForm.value.group) {
         selectedGroupKeys.value = [addForm.value.group];
@@ -330,7 +330,7 @@
     }
   };
 
-  // 初始化默认配置
+  // Initialize default configurations
   const handleInitDefaults = () => {
     Modal.confirm({
       title: t('systemConfig.initDefaultsConfirm'),
@@ -341,7 +341,7 @@
         try {
           await initDefaultConfigs();
           await loadGroups();
-          // 重新加载所有已加载的分组
+          // Reload all loaded groups
           const loadedGroups = Object.keys(configsByGroup.value);
           await Promise.all(loadedGroups.map((group) => loadGroupConfigs(group)));
           Message.success(t('systemConfig.initDefaultsSuccess'));

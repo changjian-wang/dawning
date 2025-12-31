@@ -305,7 +305,7 @@
   const { t } = useI18n();
   const userStore = useUserStore();
 
-  // 检查是否是超级管理员
+  // Check if user is super admin
   const isSuperAdmin = computed(() => {
     return (
       userStore.role === 'super_admin' ||
@@ -313,7 +313,7 @@
     );
   });
 
-  // 查询参数
+  // Query parameters
   const queryParams = reactive<SystemLogQueryParams>({
     level: '',
     keyword: '',
@@ -326,10 +326,10 @@
     pageSize: 20,
   });
 
-  // 日期范围
+  // Date range
   const dateRange = ref<[string, string] | []>([]);
 
-  // 表格列定义
+  // Table column definitions
   const columns = computed(() => [
     {
       title: t('systemLog.level'),
@@ -376,11 +376,11 @@
     },
   ]);
 
-  // 表格数据
+  // Table data
   const data = ref<SystemLog[]>([]);
   const loading = ref(false);
 
-  // 分页配置
+  // Pagination configuration
   const pagination = reactive({
     current: 1,
     pageSize: 20,
@@ -389,21 +389,21 @@
     showPageSize: true,
   });
 
-  // 详情
+  // Details
   const detailVisible = ref(false);
   const currentLog = ref<SystemLog | null>(null);
 
-  // 清理
+  // Cleanup
   const cleanupVisible = ref(false);
   const cleanupForm = reactive({
     beforeDate: '',
   });
 
-  // 加载数据
+  // Load data
   const fetchData = async () => {
     loading.value = true;
     try {
-      // 格式化日期范围
+      // Format date range
       let startDate: string | undefined;
       let endDate: string | undefined;
 
@@ -446,13 +446,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     pagination.current = 1;
     fetchData();
   };
 
-  // 重置
+  // Reset
   const handleReset = () => {
     Object.assign(queryParams, {
       level: '',
@@ -467,13 +467,13 @@
     handleSearch();
   };
 
-  // 日期范围变化
+  // Date range change
   const handleDateRangeChange = () => {
-    // 日期范围变化后自动搜索
+    // Auto search after date range change
     handleSearch();
   };
 
-  // 分页变化
+  // Pagination change
   const handlePageChange = (page: number) => {
     pagination.current = page;
     fetchData();
@@ -485,13 +485,13 @@
     fetchData();
   };
 
-  // 查看详情
+  // View details
   const handleDetail = (record: SystemLog) => {
     currentLog.value = record;
     detailVisible.value = true;
   };
 
-  // 清理日志
+  // Cleanup logs
   const handleCleanup = () => {
     cleanupForm.beforeDate = dayjs()
       .subtract(30, 'day')
@@ -519,12 +519,12 @@
     }
   };
 
-  // 格式化日期时间
+  // Format date time
   const formatDateTime = (dateStr: string) => {
     return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
   };
 
-  // 初始化
+  // Initialize
   onMounted(() => {
     fetchData();
   });

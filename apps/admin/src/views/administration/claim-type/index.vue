@@ -343,8 +343,8 @@
 
       data.value = result.items || [];
     } catch (error) {
-      console.error('加载声明类型数据失败:', error);
-      // 不显示错误消息，因为后端API可能还未实现
+      console.error('Failed to load claim type data:', error);
+      // Do not show error message, because the backend API may not be implemented yet
     }
   };
 

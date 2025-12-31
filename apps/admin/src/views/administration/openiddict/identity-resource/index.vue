@@ -224,7 +224,7 @@
 
   const { t } = useI18n();
 
-  // 声明类型选项
+  // Claim type options
   const claimTypeOptions = reactive<IClaimType[]>([]);
 
   const handleGetAllClaimType = async () => {
@@ -233,7 +233,7 @@
     result.forEach((item) => claimTypeOptions.push(item));
   };
 
-  // 搜索表单
+  // Search form
   const searchForm = reactive<IIdentityResourceModel>({});
   const loading = ref(false);
   const data = ref<IIdentityResource[]>([]);
@@ -241,7 +241,7 @@
   const pageIndex = ref(1);
   const pageSize = ref(10);
 
-  // 弹窗
+  // Modal
   const modalVisible = ref(false);
   const modalTitle = ref('');
   const isEdit = ref(false);
@@ -266,7 +266,7 @@
     { title: t('common.actions'), slotName: 'optional', width: 100, align: 'center' },
   ]);
 
-  // 加载数据
+  // Load data
   async function loadData() {
     loading.value = true;
     try {

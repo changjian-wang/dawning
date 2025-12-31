@@ -991,7 +991,7 @@
   const form = reactive<IClientWithLoginURI>({
     ...client.form.createWithLoginURI(),
   });
-  const formRef = ref<FormInstance | null>(null); // 明确表单引用类型
+  const formRef = ref<FormInstance | null>(null); // Explicit form reference type
   const initClaimForm: IClientClaim = {
     id: '',
     type: '',
@@ -1070,7 +1070,7 @@
   };
   const handleEditUriFocusInput = async (index: number) => {
     await nextTick();
-    editInputRefs.value[index]?.focus(); // ✅ 类型安全
+    editInputRefs.value[index]?.focus(); // ✅ Type safe
   };
   const redirectUriForm = reactive<IRedirectUri>({
     uri: '',
@@ -1200,7 +1200,7 @@
           form.redirectUris.push(redirectUri);
         });
 
-        // 调用 API 创建客户端
+        // Call API to create client
         await client.create(form);
         Message.success('客户端创建成功');
         router.push({ name: 'OpenIddictClient' });
@@ -1222,7 +1222,7 @@
 </script>
 
 <style lang="less" scoped>
-  // 表格标题不加粗
+  // Table header without bold font
   :deep(.arco-table-th) {
     font-weight: normal !important;
   }

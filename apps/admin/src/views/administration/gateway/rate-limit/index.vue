@@ -312,7 +312,7 @@
     { value: 'concurrency', label: t('rateLimit.policyType.concurrency') },
   ]);
 
-  // ==================== 限流策略 ====================
+  // ==================== Rate Limit Policies ====================
   const policyLoading = ref(false);
   const policies = ref<RateLimitPolicy[]>([]);
   const policyModalVisible = ref(false);
@@ -456,7 +456,7 @@
     }
   };
 
-  // ==================== IP 访问规则 ====================
+  // ==================== IP Access Rules ====================
   const ipLoading = ref(false);
   const ipRules = ref<IpAccessRule[]>([]);
   const ipModalVisible = ref(false);

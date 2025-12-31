@@ -88,14 +88,14 @@
       return;
     }
 
-    // Shift + ? 显示快捷键帮助
+    // Shift + ? to show keyboard shortcuts help
     if (event.shiftKey && event.key === '?') {
       event.preventDefault();
       showKeyboardHelp.value = true;
       return;
     }
 
-    // Alt + 字母导航
+    // Alt + letter navigation
     if (event.altKey && !event.ctrlKey && !event.shiftKey) {
       const key = event.key.toLowerCase();
       const routes: Record<string, string> = {

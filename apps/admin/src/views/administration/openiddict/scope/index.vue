@@ -266,13 +266,13 @@
 
   const { t } = useI18n();
 
-  // 搜索表单
+  // Search form
   const searchForm = reactive<IScopeQuery>({
     name: '',
     displayName: '',
   });
 
-  // 表格数据
+  // Table data
   const tableData = ref<IScope[]>([]);
   const loading = ref(false);
   const pagination = reactive({
@@ -281,7 +281,7 @@
     total: 0,
   });
 
-  // 表格列定义
+  // Table column definitions
   const columns = computed(() => [
     { title: t('scope.name'), dataIndex: 'name', width: 150 },
     { title: t('scope.displayName'), dataIndex: 'displayName', width: 150 },
@@ -301,19 +301,19 @@
     { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center', fixed: 'right' },
   ]);
 
-  // 对话框状态
+  // Modal state
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const detailVisible = ref(false);
   const currentRecord = ref<IScope | null>(null);
   const submitting = ref(false);
 
-  // 对话框标题
+  // Modal title
   const modalTitle = computed(() =>
     isEdit.value ? t('scope.edit') : t('scope.add')
   );
 
-  // 表单数据
+  // Form data
   const formData = reactive<ICreateScopeDto>({
     name: '',
     displayName: '',
@@ -321,13 +321,13 @@
     resources: [],
   });
 
-  // 表单验证规则
+  // Form validation rules
   const formRules = computed(() => ({
     name: [{ required: true, message: t('scope.name.required') }],
     displayName: [{ required: true, message: t('scope.displayName.required') }],
   }));
 
-  // 加载数据
+  // Load data
   const loadData = async () => {
     loading.value = true;
     try {
@@ -346,20 +346,20 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     pagination.current = 1;
     loadData();
   };
 
-  // 重置
+  // Reset
   const handleReset = () => {
     searchForm.name = '';
     searchForm.displayName = '';
     handleSearch();
   };
 
-  // 分页变化
+  // Pagination change
   const handlePageChange = (page: number) => {
     pagination.current = page;
     loadData();
@@ -371,7 +371,7 @@
     loadData();
   };
 
-  // 重置表单
+  // Reset form
   const resetForm = () => {
     formData.name = '';
     formData.displayName = '';
@@ -379,19 +379,19 @@
     formData.resources = [];
   };
 
-  // 新增
+  // Add
   const handleAdd = () => {
     isEdit.value = false;
     resetForm();
     modalVisible.value = true;
   };
 
-  // 编辑
+  // Edit
   const handleEdit = (record: IScope) => {
     isEdit.value = true;
     currentRecord.value = record;
 
-    // 填充表单
+    // Fill form
     formData.name = record.name;
     formData.displayName = record.displayName || '';
     formData.description = record.description || '';
@@ -400,13 +400,13 @@
     modalVisible.value = true;
   };
 
-  // 查看
+  // View
   const handleView = (record: IScope) => {
     currentRecord.value = record;
     detailVisible.value = true;
   };
 
-  // 删除
+  // Delete
   const handleDelete = async (record: IScope) => {
     try {
       if (record.id) {
@@ -420,7 +420,7 @@
     }
   };
 
-  // 提交表单
+  // Submit form
   const handleSubmit = async () => {
     if (submitting.value) return;
     submitting.value = true;
@@ -446,7 +446,7 @@
     }
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
     resetForm();
@@ -458,7 +458,7 @@
 </script>
 
 <style scoped lang="less">
-  // 表格标题不加粗
+  // Table header without bold font
   :deep(.arco-table-th) {
     font-weight: normal !important;
   }
@@ -535,7 +535,7 @@
     }
   }
 
-  // 极简列表风格
+  // Minimal list style
   .detail-content {
     .detail-row {
       display: flex;

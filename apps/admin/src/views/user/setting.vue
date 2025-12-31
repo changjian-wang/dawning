@@ -233,7 +233,7 @@
     if (userStore.accountId) {
       try {
         const userInfo = await userApi.api.get(userStore.accountId);
-        // 更新 store 和表单
+        // Update store and form
         userStore.setInfo({
           name: userInfo.username,
           email: userInfo.email,

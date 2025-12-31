@@ -387,37 +387,37 @@
   const { loading, setLoading } = useLoading(true);
   const userStore = useUserStore();
 
-  // 判断角色是否是受保护的系统角色
+  // Check if role is a protected system role
   const isProtectedRole = (record: RoleModel) => {
     return record.isSystem === true;
   };
 
-  // 判断当前用户是否可以编辑/删除指定角色
-  // 规则：系统角色不可删除/禁用，super_admin 角色只能被 super_admin 用户编辑
+  // Check if current user can edit/delete the specified role
+  // Rules: System roles cannot be deleted/disabled, super_admin role can only be edited by super_admin user
   const canEditRole = (record: RoleModel) => {
-    // 系统角色不可删除
+    // System roles cannot be deleted
     if (record.isSystem) {
-      // 如果是 super_admin 角色，只有 super_admin 用户可以编辑（但不能删除）
+      // If it's super_admin role, only super_admin user can edit (but cannot delete)
       if (record.name === 'super_admin') {
         return userStore.role === 'super_admin';
       }
-      // 其他系统角色可以编辑权限，但不能删除
+      // Other system roles can have permissions edited, but cannot be deleted
       return true;
     }
-    // 非系统角色，admin 和 super_admin 都可以编辑/删除
+    // Non-system roles can be edited/deleted by both admin and super_admin
     return true;
   };
 
-  // 判断当前用户是否可以删除指定角色
+  // Check if current user can delete the specified role
   const canDeleteRole = (record: RoleModel) => {
-    // 系统角色不可删除
+    // System roles cannot be deleted
     if (record.isSystem) {
       return false;
     }
     return true;
   };
 
-  // 表格数据
+  // Table data
   const tableData = ref<RoleModel[]>([]);
   const pagination = reactive({
     current: 1,
@@ -427,13 +427,13 @@
     showPageSize: true,
   });
 
-  // 搜索表单
+  // Search form
   const searchForm = reactive<RoleQueryParams>({
     name: '',
     isActive: undefined,
   });
 
-  // 表格列配置
+  // Table column configuration
   const columns = computed<TableColumnData[]>(() => [
     {
       title: t('role.columns.name'),
@@ -483,7 +483,7 @@
     },
   ]);
 
-  // 模态框
+  // Modal
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const formRef = ref();
@@ -496,7 +496,7 @@
     permissions: [],
   });
 
-  // 权限分配
+  // Permission assignment
   const permissionModalVisible = ref(false);
   const permissionLoading = ref(false);
   const roleSubmitting = ref(false);
@@ -507,19 +507,19 @@
   const selectedPermissionIds = ref<string[]>([]);
   const permissionSearchText = ref('');
 
-  // Transfer组件标题
+  // Transfer component titles
   const transferTitles = computed(() => [
     t('role.permission.available'),
     t('role.permission.assigned'),
   ]);
 
-  // 格式化日期时间
+  // Format date and time
   const formatDateTime = (dateStr: string) => {
     if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('zh-CN');
   };
 
-  // 加载数据
+  // Load data
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -529,7 +529,7 @@
         pageSize: pagination.pageSize,
       };
       const result = await getRoleList(params);
-      // API 已返回标准化的 IPagedData 格式
+      // API returns standardized IPagedData format
       tableData.value = result.items;
       pagination.total = result.totalCount;
     } catch (err: any) {
@@ -545,20 +545,20 @@
     }
   };
 
-  // 搜索
+  // Search
   const search = () => {
     pagination.current = 1;
     fetchData();
   };
 
-  // 重置
+  // Reset
   const reset = () => {
     searchForm.name = '';
     searchForm.isActive = undefined;
     search();
   };
 
-  // 分页变化
+  // Pagination change
   const onPageChange = (page: number) => {
     pagination.current = page;
     fetchData();
@@ -569,7 +569,7 @@
     fetchData();
   };
 
-  // 创建角色
+  // Create role
   const handleCreate = () => {
     isEdit.value = false;
     Object.assign(formData, {
@@ -583,7 +583,7 @@
     modalVisible.value = true;
   };
 
-  // 编辑角色
+  // Edit role
   const handleEdit = (record: RoleModel) => {
     if (!canEditRole(record)) {
       Message.warning(t('role.message.superAdminRoleCannotModify'));
@@ -597,9 +597,9 @@
     modalVisible.value = true;
   };
 
-  // 删除角色
+  // Delete role
   const handleDelete = (record: RoleModel) => {
-    // 系统角色不可删除
+    // System roles cannot be deleted
     if (!canDeleteRole(record)) {
       Message.warning(t('role.message.systemRoleNoDelete'));
       return;
@@ -622,7 +622,7 @@
     });
   };
 
-  // 提交表单
+  // Submit form
   const handleSubmit = async () => {
     if (roleSubmitting.value) return false;
     roleSubmitting.value = true;
@@ -660,7 +660,7 @@
     }
   };
 
-  // 表单验证和提交
+  // Form validation and submit
   const handleBeforeOk = async () => {
     const errors = await formRef.value?.validate();
     if (errors) {
@@ -669,22 +669,22 @@
     return handleSubmit();
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
   };
 
-  // 添加权限
+  // Add permission
   const addPermission = () => {
     formData.permissions.push('');
   };
 
-  // 移除权限
+  // Remove permission
   const removePermission = (index: number) => {
     formData.permissions.splice(index, 1);
   };
 
-  // 分配权限
+  // Assign permissions
   const handleAssignPermissions = async (record: RoleModel) => {
     if (!canEditRole(record)) {
       Message.warning(t('role.message.superAdminRoleCannotModify'));
@@ -695,7 +695,7 @@
     permissionLoading.value = true;
 
     try {
-      // 加载所有权限
+      // Load all permissions
       const permissions = await getAllActivePermissions();
       allPermissions.value = permissions.map((p) => ({
         key: p.id,
@@ -704,7 +704,7 @@
         code: p.code,
       }));
 
-      // 加载角色已有权限
+      // Load role's existing permissions
       const rolePermissions = await getRolePermissions(record.id!);
       selectedPermissionIds.value = rolePermissions.map((p) => p.id);
     } catch (error) {
@@ -714,12 +714,12 @@
     }
   };
 
-  // 权限选择变化
+  // Permission selection change
   const handlePermissionChange = (newTargetKeys: string[]) => {
     selectedPermissionIds.value = newTargetKeys;
   };
 
-  // 切换权限选择
+  // Toggle permission selection
   const togglePermission = (permissionId: string) => {
     const index = selectedPermissionIds.value.indexOf(permissionId);
     if (index > -1) {
@@ -729,7 +729,7 @@
     }
   };
 
-  // 权限分配验证和提交
+  // Permission assignment validation and submit
   const handlePermissionBeforeOk = async () => {
     if (!currentRole.value) return false;
 
@@ -739,7 +739,7 @@
         selectedPermissionIds.value
       );
       Message.success(t('role.permission.assignSuccess'));
-      fetchData(); // 刷新列表
+      fetchData(); // Refresh list
       return true;
     } catch (error) {
       Message.error(t('role.permission.assignFailed'));
@@ -747,19 +747,19 @@
     }
   };
 
-  // 取消权限分配
+  // Cancel permission assignment
   const handlePermissionCancel = () => {
     permissionModalVisible.value = false;
     selectedPermissionIds.value = [];
   };
 
-  // 初始化
+  // Initialize
   fetchData();
 </script>
 
 <style scoped lang="less">
   .role-management {
-    // 表格标题不加粗
+    // Table header without bold font
     :deep(.arco-table-th) {
       font-weight: normal !important;
     }
@@ -835,7 +835,7 @@
     }
   }
 
-  // 权限单元格样式
+  // Permission cell styles
   .permissions-cell {
     max-width: 100%;
 
@@ -852,7 +852,7 @@
     }
   }
 
-  // 权限popover样式
+  // Permission popover styles
   .permissions-popover {
     .permission-header {
       font-weight: 600;
@@ -904,7 +904,7 @@
     }
   }
 
-  // 权限分配样式
+  // Permission assignment styles
   .permission-assignment {
     :deep(.arco-transfer) {
       .arco-transfer-view {

@@ -382,7 +382,7 @@
     { value: 'SlidingWindowPolicy', label: t('gateway.route.rateLimiterPolicy.slidingWindow') },
   ]);
 
-  // 查询参数
+  // Query parameters
   const queryParams = reactive<GatewayRouteQueryParams>({
     keyword: '',
     clusterId: undefined,
@@ -391,15 +391,15 @@
     pageSize: 10,
   });
 
-  // 集群选项
+  // Cluster options
   const clusterOptions = ref<ClusterOption[]>([]);
 
-  // 表格数据
+  // Table data
   const tableData = ref<GatewayRoute[]>([]);
   const loading = ref(false);
   const total = ref(0);
 
-  // 分页配置
+  // Pagination configuration
   const pagination = computed(() => ({
     total: total.value,
     current: queryParams.page,
@@ -409,7 +409,7 @@
     showPageSize: true,
   }));
 
-  // 表格列配置
+  // Table column configuration
   const columns = computed(() => [
     { title: t('gateway.route.routeId'), slotName: 'routeId', width: 150 },
     { title: t('gateway.route.name'), slotName: 'name', width: 120, ellipsis: true },
@@ -426,13 +426,13 @@
     { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
   ]);
 
-  // 弹窗相关
+  // Modal related
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const submitLoading = ref(false);
   const formRef = ref();
 
-  // 表单数据
+  // Form data
   const formData = reactive({
     id: '',
     routeId: '',
@@ -458,7 +458,7 @@
     metadata: '',
   });
 
-  // 监听 matchMethodsArray 变化，同步到 matchMethods
+  // Watch matchMethodsArray changes and sync to matchMethods
   watch(
     () => formData.matchMethodsArray,
     (val) => {
@@ -466,7 +466,7 @@
     }
   );
 
-  // 表单验证规则
+  // Form validation rules
   const formRules = {
     routeId: [{ required: true, message: t('gateway.route.routeIdRequired') }],
     name: [{ required: true, message: t('gateway.route.nameRequired') }],
@@ -478,7 +478,7 @@
     ],
   };
 
-  // 获取HTTP方法颜色
+  // Get HTTP method color
   const getMethodColor = (method: string) => {
     const colors: Record<string, string> = {
       GET: 'green',
@@ -492,7 +492,7 @@
     return colors[method.toUpperCase()] || 'gray';
   };
 
-  // 加载集群选项
+  // Load cluster options
   const loadClusterOptions = async () => {
     try {
       clusterOptions.value = await getClusterOptions();
@@ -501,7 +501,7 @@
     }
   };
 
-  // 加载数据
+  // Load data
   const loadData = async () => {
     loading.value = true;
     try {
@@ -515,13 +515,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     queryParams.page = 1;
     loadData();
   };
 
-  // 重置
+  // Reset
   const handleReset = () => {
     queryParams.keyword = '';
     queryParams.clusterId = undefined;
@@ -530,7 +530,7 @@
     loadData();
   };
 
-  // 分页
+  // Pagination
   const handlePageChange = (page: number) => {
     queryParams.page = page;
     loadData();
@@ -542,7 +542,7 @@
     loadData();
   };
 
-  // 重置表单
+  // Reset form
   const resetForm = () => {
     formData.id = '';
     formData.routeId = '';
@@ -562,14 +562,14 @@
     formRef.value?.resetFields();
   };
 
-  // 创建
+  // Create
   const handleCreate = () => {
     isEdit.value = false;
     resetForm();
     modalVisible.value = true;
   };
 
-  // 编辑
+  // Edit
   const handleEdit = (record: GatewayRoute) => {
     isEdit.value = true;
     Object.assign(formData, record);
@@ -579,7 +579,7 @@
     modalVisible.value = true;
   };
 
-  // 删除
+  // Delete
   const handleDelete = async (record: GatewayRoute) => {
     try {
       await deleteRoute(record.id);
@@ -590,7 +590,7 @@
     }
   };
 
-  // 切换启用状态
+  // Toggle enabled state
   const handleToggleEnabled = async (
     record: GatewayRoute,
     isEnabled: boolean
@@ -606,7 +606,7 @@
     }
   };
 
-  // 提交表单
+  // Submit form
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate();
     if (valid) return;
@@ -634,7 +634,7 @@
     }
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
     resetForm();

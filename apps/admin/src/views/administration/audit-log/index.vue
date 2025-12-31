@@ -384,7 +384,7 @@
 
   const { t } = useI18n();
 
-  // 搜索表单（包含前端专用的dateRange字段）
+  // Search form (includes frontend-specific dateRange field)
   interface SearchFormData extends AuditLogQueryParams {
     dateRange?: [string, string];
   }
@@ -397,7 +397,7 @@
     dateRange: undefined,
   });
 
-  // 表格数据
+  // Table data
   const loading = ref(false);
   const tableData = ref<AuditLog[]>([]);
   const pagination = reactive({
@@ -408,11 +408,11 @@
     showPageSize: true,
   });
 
-  // 详情对话框
+  // Detail dialog
   const detailVisible = ref(false);
   const currentLog = ref<AuditLog | null>(null);
 
-  // 表格列定义
+  // Table column definitions
   const columns = computed<TableColumnData[]>(() => [
     {
       title: t('auditLog.columns.username'),
@@ -464,11 +464,11 @@
     },
   ]);
 
-  // 加载数据
+  // Load data
   const fetchData = async () => {
     loading.value = true;
     try {
-      // 格式化日期范围
+      // Format date range
       let startDate: string | undefined;
       let endDate: string | undefined;
 
@@ -512,13 +512,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     pagination.current = 1;
     fetchData();
   };
 
-  // 重置
+  // Reset
   const handleReset = () => {
     searchForm.username = '';
     searchForm.action = undefined;
@@ -529,16 +529,16 @@
     fetchData();
   };
 
-  // 导出审计日志
+  // Export audit logs
   const handleExport = async (format: 'csv' | 'xlsx') => {
     try {
       Message.loading({ content: '正在导出...', id: 'export' });
 
-      // 构建查询参数
+      // Build query parameters
       const params: AuditLogQueryParams = {
         ...searchForm,
         page: 1,
-        pageSize: 10000, // 获取最多10000条
+        pageSize: 10000, // Get up to 10000 records
       };
 
       if (searchForm.dateRange?.length === 2) {
@@ -590,7 +590,7 @@
     }
   };
 
-  // 分页变化
+  // Pagination change
   const handlePageChange = (page: number) => {
     pagination.current = page;
     fetchData();
@@ -602,13 +602,13 @@
     fetchData();
   };
 
-  // 查看详情
+  // View details
   const handleViewDetail = (record: AuditLog) => {
     currentLog.value = record;
     detailVisible.value = true;
   };
 
-  // 辅助函数
+  // Helper functions
   const getActionColor = (action: string) => {
     const colorMap: Record<string, string> = {
       Create: 'green',
@@ -648,7 +648,7 @@
 </script>
 
 <style scoped lang="less">
-  // 表格标题不加粗
+  // Table header without bold font
   :deep(.arco-table-th) {
     font-weight: normal !important;
   }
@@ -657,7 +657,7 @@
     padding: 0 20px 20px 20px;
   }
 
-  // 极简列表风格
+  // Minimal list style
   .detail-content {
     .detail-row {
       display: flex;

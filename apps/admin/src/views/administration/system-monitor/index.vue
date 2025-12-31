@@ -233,10 +233,10 @@
   const metrics = ref<Metrics | null>(null);
   const services = ref<ServiceStatus[]>([]);
 
-  // 自动刷新定时器
+  // Auto refresh timer
   let refreshTimer: number | null = null;
 
-  // 计算属性
+  // Computed properties
   const systemStatus = computed(() => detailedHealth.value?.status || '未知');
   const isHealthy = computed(() => detailedHealth.value?.status === 'Healthy');
   const statusColor = computed(() => (isHealthy.value ? '#00b42a' : '#f53f3f'));
@@ -244,7 +244,7 @@
   const memoryUsage = computed(() => metrics.value?.memory?.workingSet || '-');
   const threadCount = computed(() => metrics.value?.threads?.count ?? '-');
 
-  // 健康检查表格列
+  // Health check table columns
   const healthColumns = computed(() => [
     { title: t('systemMonitor.column.checkItem'), dataIndex: 'name', width: 180 },
     { title: t('systemMonitor.column.status'), dataIndex: 'status', slotName: 'status', width: 90 },
@@ -257,7 +257,7 @@
     { title: t('systemMonitor.column.detail'), dataIndex: 'detail' },
   ]);
 
-  // 服务端点表格列
+  // Service endpoint table columns
   const serviceColumns = computed(() => [
     { title: t('systemMonitor.column.serviceName'), dataIndex: 'name', width: 140 },
     { title: 'URL', dataIndex: 'url', width: 200 },
@@ -277,7 +277,7 @@
     { title: t('common.actions'), slotName: 'optional', width: 100 },
   ]);
 
-  // 健康检查数据
+  // Health check data
   const healthChecks = computed(() => {
     if (!detailedHealth.value?.checks) return [];
 
@@ -306,7 +306,7 @@
     ];
   });
 
-  // 预定义的服务端点
+  // Predefined service endpoints
   const defaultServices = computed(() => [
     { name: 'Identity API', url: '/api/health' },
     { name: t('systemMonitor.service.healthDetailed'), url: '/api/health/detailed' },
@@ -314,7 +314,7 @@
     { name: t('systemMonitor.service.healthLive'), url: '/api/health/live' },
   ]);
 
-  // 获取状态颜色
+  // Get status color
   function getStatusColor(status: string): string {
     switch (status) {
       case 'Healthy':
@@ -328,7 +328,7 @@
     }
   }
 
-  // 获取响应时间样式类
+  // Get response time style class
   function getResponseTimeClass(responseTime?: string): string {
     if (!responseTime) return '';
     const ms = parseInt(responseTime, 10);
@@ -337,14 +337,14 @@
     return 'response-slow';
   }
 
-  // 格式化日期时间
+  // Format date and time
   function formatDateTime(dateStr?: string): string {
     if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('zh-CN');
   }
 
-  // 刷新所有数据
-  // 检查所有服务端点
+  // Refresh all data
+  // Check all service endpoints
   async function checkAllServices() {
     const results = await Promise.all(
       defaultServices.value.map((s) => healthApi.checkService(s.name, s.url))
@@ -363,14 +363,14 @@
       detailedHealth.value = health;
       metrics.value = metricsData;
 
-      // 检查所有服务端点
+      // Check all service endpoints
       await checkAllServices();
     } finally {
       loading.value = false;
     }
   }
 
-  // 检查单个服务
+  // Check single service
   async function checkSingleService(service: ServiceStatus) {
     const index = services.value.findIndex((s) => s.url === service.url);
     if (index !== -1) {
@@ -380,10 +380,10 @@
     }
   }
 
-  // 初始化
+  // Initialize
   onMounted(() => {
     refreshAll();
-    // 每30秒自动刷新
+    // Auto refresh every 30 seconds
     refreshTimer = window.setInterval(refreshAll, 30000);
   });
 
@@ -439,7 +439,7 @@
       font-weight: 500;
     }
 
-    // 内存和CPU指标网格样式
+    // Memory and CPU metrics grid style
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -498,7 +498,7 @@
           }
         }
 
-        // 内存类型图标颜色
+        // Memory type icon colors
         &.memory-working .metric-icon {
           background: linear-gradient(135deg, #165dff 0%, #0fc6c2 100%);
         }
@@ -515,7 +515,7 @@
           background: linear-gradient(135deg, #ff7d00 0%, #fadb14 100%);
         }
 
-        // CPU类型图标颜色
+        // CPU type icon colors
         &.cpu-total .metric-icon {
           background: linear-gradient(135deg, #f53f3f 0%, #ff7d00 100%);
         }
@@ -524,7 +524,7 @@
           background: linear-gradient(135deg, #165dff 0%, #722ed1 100%);
         }
 
-        // GC徽章样式
+        // GC badge styles
         &.gc-gen0 .metric-icon,
         &.gc-gen1 .metric-icon,
         &.gc-gen2 .metric-icon {

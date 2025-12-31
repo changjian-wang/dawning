@@ -329,7 +329,7 @@
 
   const { t } = useI18n();
 
-  // 查询参数
+  // Query parameters
   const queryParams = reactive<GatewayClusterQueryParams>({
     keyword: '',
     loadBalancingPolicy: undefined,
@@ -338,12 +338,12 @@
     pageSize: 10,
   });
 
-  // 表格数据
+  // Table data
   const tableData = ref<GatewayCluster[]>([]);
   const loading = ref(false);
   const total = ref(0);
 
-  // 分页配置
+  // Pagination configuration
   const pagination = computed(() => ({
     total: total.value,
     current: queryParams.page,
@@ -353,7 +353,7 @@
     showPageSize: true,
   }));
 
-  // 表格列配置
+  // Table column configuration
   const columns = computed(() => [
     {
       title: t('gateway.cluster.clusterId'),
@@ -380,13 +380,13 @@
     { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
   ]);
 
-  // 弹窗相关
+  // Modal related
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const submitLoading = ref(false);
   const formRef = ref();
 
-  // 表单数据
+  // Form data
   const formData = reactive({
     id: '',
     clusterId: '',
@@ -410,7 +410,7 @@
     isEnabled: true,
   });
 
-  // 表单验证规则
+  // Form validation rules
   const formRules = {
     clusterId: [
       { required: true, message: t('gateway.cluster.clusterIdRequired') },
@@ -418,21 +418,21 @@
     name: [{ required: true, message: t('gateway.cluster.nameRequired') }],
   };
 
-  // 获取负载均衡策略标签
+  // Get load balancing policy label
   const getLoadBalancingLabel = (value: string) => {
     const policy = loadBalancingPolicies.find((p) => p.value === value);
     return policy?.label || value;
   };
 
-  // 获取目标服务器数量
+  // Get destination server count
   const getDestinationCount = (destinations: string) => {
     try {
       const parsed = JSON.parse(destinations);
-      // 如果是数组，返回数组长度
+      // If it's an array, return array length
       if (Array.isArray(parsed)) {
         return parsed.length;
       }
-      // 如果是对象（YARP格式），返回对象键的数量
+      // If it's an object (YARP format), return the number of object keys
       if (typeof parsed === 'object' && parsed !== null) {
         return Object.keys(parsed).length;
       }
@@ -442,7 +442,7 @@
     }
   };
 
-  // 格式化目标服务器列表
+  // Format destination server list
   const formatDestinations = (destinations: string) => {
     try {
       return JSON.stringify(JSON.parse(destinations), null, 2);
@@ -451,7 +451,7 @@
     }
   };
 
-  // 加载数据
+  // Load data
   const loadData = async () => {
     loading.value = true;
     try {
@@ -465,13 +465,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     queryParams.page = 1;
     loadData();
   };
 
-  // 重置
+  // Reset
   const handleReset = () => {
     queryParams.keyword = '';
     queryParams.loadBalancingPolicy = undefined;
@@ -480,7 +480,7 @@
     loadData();
   };
 
-  // 分页
+  // Pagination
   const handlePageChange = (page: number) => {
     queryParams.page = page;
     loadData();
@@ -492,7 +492,7 @@
     loadData();
   };
 
-  // 重置表单
+  // Reset form
   const resetForm = () => {
     formData.id = '';
     formData.clusterId = '';
@@ -511,21 +511,21 @@
     formRef.value?.resetFields();
   };
 
-  // 创建
+  // Create
   const handleCreate = () => {
     isEdit.value = false;
     resetForm();
     modalVisible.value = true;
   };
 
-  // 编辑
+  // Edit
   const handleEdit = (record: GatewayCluster) => {
     isEdit.value = true;
     Object.assign(formData, record);
     modalVisible.value = true;
   };
 
-  // 删除
+  // Delete
   const handleDelete = async (record: GatewayCluster) => {
     try {
       await deleteCluster(record.id);
@@ -536,7 +536,7 @@
     }
   };
 
-  // 切换启用状态
+  // Toggle enabled state
   const handleToggleEnabled = async (
     record: GatewayCluster,
     isEnabled: boolean
@@ -552,7 +552,7 @@
     }
   };
 
-  // 提交表单
+  // Submit form
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate();
     if (valid) return;
@@ -577,7 +577,7 @@
     }
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
     resetForm();

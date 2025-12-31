@@ -242,7 +242,7 @@
 
   const { t } = useI18n();
 
-  // 搜索表单
+  // Search form
   const searchForm = reactive<IAuthorizationModel>({});
   const loading = ref(false);
   const data = ref<IAuthorization[]>([]);
@@ -250,7 +250,7 @@
   const pageIndex = ref(1);
   const pageSize = ref(10);
 
-  // 详情
+  // Details
   const detailVisible = ref(false);
   const currentRecord = ref<IAuthorization | null>(null);
 
@@ -275,7 +275,7 @@
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
 
-  // 加载数据
+  // Load data
   async function loadData() {
     loading.value = true;
     try {

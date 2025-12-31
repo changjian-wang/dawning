@@ -318,7 +318,7 @@
         }
       }
 
-      // 弹出菜单内的子菜单标题
+      // Submenu title inside popup menu
       .arco-menu-inline-header {
         display: flex;
         align-items: center;

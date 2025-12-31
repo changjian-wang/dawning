@@ -526,7 +526,7 @@
   const currentUserId = ref<string>('');
   const currentUser = ref<IUser | null>(null);
 
-  // 批量选择相关状态
+  // Batch selection related state
   const selectedRowKeys = ref<string[]>([]);
   const rowSelection = reactive({
     type: 'checkbox' as const,
@@ -534,12 +534,12 @@
     onlyCurrent: false,
   });
 
-  // 判断用户是否是受保护的系统用户
+  // Check if user is a protected system user
   const isProtectedUser = (record: IUser) => {
     return record.isSystem === true;
   };
 
-  // 角色分配相关状态
+  // Role assignment related state
   const roleLoading = ref(false);
   const roleSearchText = ref('');
   const allRolesRaw = ref<
@@ -548,7 +548,7 @@
   const selectedRoleIds = ref<string[]>([]);
   const initialRoleIds = ref<string[]>([]);
 
-  // 过滤后的角色列表
+  // Filtered roles list
   const allRoles = computed(() => {
     if (!roleSearchText.value) {
       return allRolesRaw.value;
@@ -730,17 +730,17 @@
 
   const handleBeforeOk = async (done: (closed: boolean) => void) => {
     try {
-      // 先验证表单
+      // Validate form first
       const errors = await formRef.value?.validate();
       if (errors) {
-        // 验证失败，不关闭弹窗
+        // Validation failed, don't close modal
         done(false);
         return;
       }
 
       submitLoading.value = true;
 
-      // 提交数据
+      // Submit data
       if (isEdit.value) {
         await user.api.update(form as IUpdateUserModel);
         Message.success(t('user.message.updateSuccess'));
@@ -749,7 +749,7 @@
         Message.success(t('user.message.createSuccess'));
       }
 
-      // 成功后关闭弹窗并刷新数据
+      // Close modal and refresh data on success
       done(true);
       fetchData();
     } catch (error: any) {
@@ -758,7 +758,7 @@
         (isEdit.value ? t('user.message.updateFailed') : t('user.message.createFailed'));
       Message.error(errorMsg);
       console.error(error);
-      // 提交失败，不关闭弹窗
+      // Submit failed, don't close modal
       done(false);
     } finally {
       submitLoading.value = false;
@@ -783,13 +783,13 @@
     fetchData();
   };
 
-  // 导出用户数据
+  // Export user data
   const handleExport = async (format: 'csv' | 'xlsx') => {
     try {
       Message.loading({ content: t('user.message.exporting'), id: 'export' });
 
-      // 获取所有数据（或当前筛选条件下的数据）
-      const result = await user.api.getPagedList(model, 1, 10000); // 获取最多10000条
+      // Get all data (or data under current filter conditions)
+      const result = await user.api.getPagedList(model, 1, 10000); // Get up to 10000 records
       const exportColumns: ExportColumn[] = [
         { field: 'username', title: t('user.export.username') },
         { field: 'email', title: t('user.export.email') },
@@ -830,7 +830,7 @@
   const handleDelete = (record: IUser) => {
     if (!record.id) return;
 
-    // 保护 admin 用户
+    // Protect admin user
     if (isProtectedUser(record)) {
       Message.warning(t('user.delete.adminProtected'));
       return;
@@ -893,15 +893,15 @@
     }
   };
 
-  // 角色分配相关处理函数
+  // Role assignment related handler functions
   const handleAssignRoles = async (record: IUser) => {
     currentUser.value = record;
     roleLoading.value = true;
     roleModalVisible.value = true;
-    roleSearchText.value = ''; // 重置搜索
+    roleSearchText.value = ''; // Reset search
 
     try {
-      // 加载所有活动角色
+      // Load all active roles
       const roles = await getAllActiveRoles();
       allRolesRaw.value = roles.map((role) => ({
         value: role.id!,
@@ -909,7 +909,7 @@
         name: role.name,
       }));
 
-      // 加载用户当前角色
+      // Load user's current roles
       const userRoles = await user.api.getUserRoles(record.id);
       const userRoleIds = userRoles.map((role: any) => role.id);
       selectedRoleIds.value = [...userRoleIds];
@@ -928,7 +928,7 @@
   };
 
   const handleRoleBeforeOk = async () => {
-    // 检查是否有变化
+    // Check if there are changes
     const hasChanges =
       selectedRoleIds.value.length !== initialRoleIds.value.length ||
       !selectedRoleIds.value.every((id) => initialRoleIds.value.includes(id));
@@ -959,7 +959,7 @@
     currentUser.value = null;
   };
 
-  // 批量操作相关处理函数
+  // Batch operation related handler functions
   const handleSelectionChange = (rowKeys: string[]) => {
     selectedRowKeys.value = rowKeys;
   };
@@ -974,7 +974,7 @@
       return;
     }
 
-    // 过滤掉受保护的 admin 用户
+    // Filter out protected admin users
     const protectedUsers = data.value.filter(
       (u: IUser) => selectedRowKeys.value.includes(u.id) && isProtectedUser(u)
     );
@@ -1062,7 +1062,7 @@
       return;
     }
 
-    // 过滤掉受保护的 admin 用户
+    // Filter out protected admin users
     const protectedUsers = data.value.filter(
       (u: IUser) => selectedRowKeys.value.includes(u.id) && isProtectedUser(u)
     );
@@ -1117,7 +1117,7 @@
       margin-bottom: 16px;
     }
 
-    // 表格标题不加粗
+    // Table header without bold font
     :deep(.arco-table-th) {
       font-weight: normal !important;
     }
@@ -1225,7 +1225,7 @@
     }
   }
 
-  // 用户表单弹窗样式 - 防止标签换行
+  // User form modal style - prevent label wrapping
   :deep(.arco-modal) {
     .arco-form-item-label {
       white-space: nowrap;
@@ -1263,7 +1263,7 @@
     }
   }
 
-  // 角色分配样式
+  // Role assignment styles
   .role-assignment {
     :deep(.arco-transfer) {
       .arco-transfer-view {

@@ -318,13 +318,13 @@
 
   const { t } = useI18n();
 
-  // 表格数据
+  // Table data
   const loading = ref(false);
   const tableData = ref<Tenant[]>([]);
   const searchKeyword = ref('');
   const filterStatus = ref<boolean | undefined>(undefined);
 
-  // 分页
+  // Pagination
   const pagination = reactive({
     current: 1,
     pageSize: 20,
@@ -333,7 +333,7 @@
     showPageSize: true,
   });
 
-  // 表格列定义
+  // Table column definitions
   const columns = computed(() => [
     {
       title: t('tenant.column.code'),
@@ -394,7 +394,7 @@
     },
   ]);
 
-  // 弹窗状态
+  // Modal state
   const modalVisible = ref(false);
   const viewModalVisible = ref(false);
   const viewRecord = ref<Tenant | null>(null);
@@ -403,7 +403,7 @@
   const formRef = ref();
   const editingId = ref<string | null>(null);
 
-  // 表单数据
+  // Form data
   const formData = reactive<CreateTenantRequest & { isActive: boolean }>({
     code: '',
     name: '',
@@ -417,7 +417,7 @@
     isActive: true,
   });
 
-  // 表单验证规则
+  // Form validation rules
   const formRules = {
     code: [
       { required: true, message: t('tenant.validation.codeRequired') },
@@ -431,7 +431,7 @@
     email: [{ type: 'email', message: t('tenant.validation.emailInvalid') }],
   };
 
-  // 获取订阅计划颜色
+  // Get subscription plan color
   const getPlanColor = (plan: string) => {
     const colors: Record<string, string> = {
       free: 'gray',
@@ -442,12 +442,12 @@
     return colors[plan] || 'gray';
   };
 
-  // 格式化日期时间
+  // Format date and time
   const formatDateTime = (dateStr: string) => {
     return dayjs(dateStr).format('YYYY-MM-DD HH:mm');
   };
 
-  // 获取数据
+  // Fetch data
   const fetchData = async () => {
     loading.value = true;
     try {
@@ -457,7 +457,7 @@
         page: pagination.current,
         pageSize: pagination.pageSize,
       });
-      // 拦截器已经解包了 data，response 直接是 {list, pagination}
+      // Interceptor already unpacked data, response is directly {list, pagination}
       tableData.value = response?.list || [];
       pagination.total = response?.pagination?.total || 0;
     } catch (error) {
@@ -467,13 +467,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     pagination.current = 1;
     fetchData();
   };
 
-  // 分页变化
+  // Pagination change
   const handlePageChange = (page: number) => {
     pagination.current = page;
     fetchData();
@@ -485,7 +485,7 @@
     fetchData();
   };
 
-  // 重置表单
+  // Reset form
   const resetForm = () => {
     formData.code = '';
     formData.name = '';
@@ -499,13 +499,13 @@
     formData.isActive = true;
   };
 
-  // 查看详情
+  // View details
   const handleView = (record: Tenant) => {
     viewRecord.value = record;
     viewModalVisible.value = true;
   };
 
-  // 新建租户
+  // Create new tenant
   const handleCreate = () => {
     isEdit.value = false;
     editingId.value = null;
@@ -513,7 +513,7 @@
     modalVisible.value = true;
   };
 
-  // 编辑租户
+  // Edit tenant
   const handleEdit = (record: Tenant) => {
     isEdit.value = true;
     editingId.value = record.id;
@@ -530,7 +530,7 @@
     modalVisible.value = true;
   };
 
-  // 提交表单
+  // Submit form
   const handleSubmit = async () => {
     const valid = await formRef.value?.validate();
     if (valid) return;
@@ -564,13 +564,13 @@
     }
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
     formRef.value?.resetFields();
   };
 
-  // 删除租户
+  // Delete tenant
   const handleDelete = async (record: Tenant) => {
     Modal.warning({
       title: t('tenant.modal.delete.title'),
@@ -590,7 +590,7 @@
     });
   };
 
-  // 切换启用状态
+  // Toggle active state
   const handleToggleActive = async (record: Tenant, isActive: boolean) => {
     try {
       await setTenantActive(record.id, isActive);
@@ -607,14 +607,14 @@
     fetchData();
   });
 
-  // 处理从缓存激活时重新加载数据
+  // Handle reload when activated from cache
   onActivated(() => {
     fetchData();
   });
 </script>
 
 <style lang="less" scoped>
-  // 表格标题不加粗
+  // Table header without bold font
   :deep(.arco-table-th) {
     font-weight: normal !important;
   }

@@ -9,7 +9,6 @@ import directive from './directive';
 import './mock';
 import App from './App.vue';
 // Import Arco Design full styles to ensure CSS variables are defined
-// 导入 Arco Design 完整样式以确保 CSS 变量被定义
 import '@arco-design/web-vue/dist/arco.css';
 // https://arco.design/docs/designlab/use-theme-package
 import '@/assets/style/global.less';

@@ -369,7 +369,7 @@
   } from '@/api/openiddict/application';
   import { formatDateTime } from '@/utils/date';
 
-  // 搜索表单
+  // Search form
   const searchForm = reactive<IApplicationQuery>({
     clientId: '',
     displayName: '',
@@ -378,7 +378,7 @@
 
   const { t } = useI18n();
 
-  // 表格数据
+  // Table data
   const tableData = ref<IApplication[]>([]);
   const loading = ref(false);
   const pagination = reactive({
@@ -387,7 +387,7 @@
     total: 0,
   });
 
-  // 表格列定义
+  // Table column definitions
   const columns = computed(() => [
     { title: t('application.column.clientId'), dataIndex: 'clientId', width: 100, ellipsis: true, tooltip: true },
     { title: t('application.column.displayName'), dataIndex: 'displayName', width: 110, ellipsis: true, tooltip: true },
@@ -413,14 +413,14 @@
     { title: t('common.actions'), slotName: 'actions', width: 100, align: 'center' },
   ]);
 
-  // 对话框状态
+  // Modal state
   const modalVisible = ref(false);
   const modalTitle = ref('');
   const isEdit = ref(false);
   const detailVisible = ref(false);
   const currentRecord = ref<IApplication | null>(null);
 
-  // 表单数据
+  // Form data
   const formData = reactive<ICreateApplicationDto>({
     clientId: '',
     clientSecret: '',
@@ -432,22 +432,22 @@
     postLogoutRedirectUris: [],
   });
 
-  // 选中的授权类型和作用域
+  // Selected grant types and scopes
   const selectedGrantTypes = ref<string[]>([]);
   const selectedScopes = ref<string[]>([]);
   const redirectUrisText = ref('');
   const postLogoutRedirectUrisText = ref('');
 
-  // 表单验证规则
+  // Form validation rules
   const formRules = computed(() => ({
     clientId: [{ required: true, message: t('application.form.clientId.required') }],
     displayName: [{ required: true, message: t('application.form.displayName.required') }],
     type: [{ required: true, message: t('application.form.type.required') }],
   }));
 
-  // ========== 辅助函数（定义在使用之前） ==========
+  // ========== Helper functions (defined before usage) ==========
 
-  // 重置表单
+  // Reset form
   const resetForm = () => {
     formData.clientId = '';
     formData.clientSecret = '';
@@ -460,22 +460,22 @@
     postLogoutRedirectUrisText.value = '';
   };
 
-  // 构建权限列表
+  // Build permissions list
   const buildPermissions = (): string[] => {
     const permissions: string[] = [];
 
-    // 授权类型
+    // Grant types
     selectedGrantTypes.value.forEach((grant) => {
       permissions.push(`gt:${grant}`);
     });
 
-    // 端点
+    // Endpoints
     permissions.push('ept:token');
     if (selectedGrantTypes.value.includes('authorization_code')) {
       permissions.push('ept:authorization');
     }
 
-    // 作用域
+    // Scopes
     selectedScopes.value.forEach((scope) => {
       permissions.push(`scp:${scope}`);
     });
@@ -483,7 +483,7 @@
     return permissions;
   };
 
-  // 解析权限列表
+  // Parse permissions list
   const parsePermissions = (permissions: string[]) => {
     selectedGrantTypes.value = [];
     selectedScopes.value = [];
@@ -497,7 +497,7 @@
     });
   };
 
-  // 格式化权限显示
+  // Format permission display
   const formatPermission = (perm: string): string => {
     if (perm.startsWith('gt:')) return `${t('application.permission.grantType')}:${perm.substring(3)}`;
     if (perm.startsWith('ept:')) return `${t('application.permission.endpoint')}:${perm.substring(4)}`;
@@ -505,7 +505,7 @@
     return perm;
   };
 
-  // 加载数据
+  // Load data
   const loadData = async () => {
     loading.value = true;
     try {
@@ -523,13 +523,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const handleSearch = () => {
     pagination.current = 1;
     loadData();
   };
 
-  // 重置
+  // Reset
   const handleReset = () => {
     searchForm.clientId = '';
     searchForm.displayName = '';
@@ -537,7 +537,7 @@
     handleSearch();
   };
 
-  // 分页变化
+  // Pagination change
   const handlePageChange = (page: number) => {
     pagination.current = page;
     loadData();
@@ -549,7 +549,7 @@
     loadData();
   };
 
-  // 新增
+  // Add
   const handleAdd = () => {
     isEdit.value = false;
     modalTitle.value = t('application.modal.add');
@@ -557,22 +557,22 @@
     modalVisible.value = true;
   };
 
-  // 编辑
+  // Edit
   const handleEdit = (record: IApplication) => {
     isEdit.value = true;
     modalTitle.value = t('application.modal.edit');
     currentRecord.value = record;
 
-    // 填充表单
+    // Fill form
     formData.clientId = record.clientId;
     formData.displayName = record.displayName || '';
     formData.type = (record.type as any) || 'public';
     formData.consentType = (record.consentType as any) || 'implicit';
 
-    // 解析权限
+    // Parse permissions
     parsePermissions(record.permissions || []);
 
-    // URI列表
+    // URI lists
     redirectUrisText.value = (record.redirectUris || []).join('\n');
     postLogoutRedirectUrisText.value = (
       record.postLogoutRedirectUris || []
@@ -581,13 +581,13 @@
     modalVisible.value = true;
   };
 
-  // 查看
+  // View
   const handleView = (record: IApplication) => {
     currentRecord.value = record;
     detailVisible.value = true;
   };
 
-  // 删除
+  // Delete
   const handleDelete = async (record: IApplication) => {
     try {
       if (record.id) {
@@ -601,13 +601,13 @@
     }
   };
 
-  // 提交表单
+  // Submit form
   const handleSubmit = async () => {
     try {
-      // 构建权限列表
+      // Build permissions list
       formData.permissions = buildPermissions();
 
-      // 解析URI
+      // Parse URIs
       formData.redirectUris = redirectUrisText.value
         .split('\n')
         .filter((uri) => uri.trim());
@@ -634,7 +634,7 @@
     }
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
     resetForm();
@@ -646,7 +646,7 @@
 </script>
 
 <style scoped lang="less">
-  // 表格标题不加粗
+  // Table header without bold font
   :deep(.arco-table-th) {
     font-weight: normal !important;
   }
@@ -723,7 +723,7 @@
     }
   }
 
-  // 极简列表风格
+  // Minimal list style
   .detail-content {
     .detail-row {
       display: flex;

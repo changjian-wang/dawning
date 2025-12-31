@@ -324,7 +324,7 @@
 
   const { t } = useI18n();
 
-  // 搜索表单
+  // Search form
   const searchForm = reactive<PermissionQueryParams>({
     code: '',
     resource: '',
@@ -334,7 +334,7 @@
     pageSize: 10,
   });
 
-  // 表格数据
+  // Table data
   const loading = ref(false);
   const tableData = ref<PermissionModel[]>([]);
   const pagination = reactive({
@@ -345,12 +345,12 @@
     showPageSize: true,
   });
 
-  // 资源选项（从后端获取）
+  // Resource options (fetched from backend)
   const resourceOptions = ref<string[]>([]);
-  // 分类选项（从后端获取）
+  // Category options (fetched from backend)
   const categoryOptions = ref<string[]>([]);
 
-  // 表格列定义
+  // Table column definitions
   const columns = computed(() => [
     {
       title: t('permission.columns.code'),
@@ -401,7 +401,7 @@
     },
   ]);
 
-  // 分组查看的列定义
+  // Grouped view column definitions
   const groupedColumns = [
     {
       title: '代码',
@@ -423,7 +423,7 @@
     },
   ];
 
-  // 对话框
+  // Modal
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const formRef = ref();
@@ -439,12 +439,12 @@
     displayOrder: 0,
   });
 
-  // 分组查看
+  // Grouped view
   const groupedModalVisible = ref(false);
   const groupedLoading = ref(false);
   const groupedPermissions = ref<PermissionGroup[]>([]);
 
-  // 加载数据
+  // Load data
   const fetchData = async () => {
     loading.value = true;
     try {
@@ -464,7 +464,7 @@
     }
   };
 
-  // 加载下拉选项（资源类型和分类）
+  // Load dropdown options (resource types and categories)
   const loadOptions = async () => {
     try {
       const [resources, categories] = await Promise.all([
@@ -478,13 +478,13 @@
     }
   };
 
-  // 搜索
+  // Search
   const search = () => {
     pagination.current = 1;
     fetchData();
   };
 
-  // 重置
+  // Reset
   const reset = () => {
     Object.assign(searchForm, {
       code: '',
@@ -496,7 +496,7 @@
     fetchData();
   };
 
-  // 分页
+  // Pagination
   const onPageChange = (page: number) => {
     pagination.current = page;
     fetchData();
@@ -508,7 +508,7 @@
     fetchData();
   };
 
-  // 创建
+  // Create
   const handleCreate = () => {
     isEdit.value = false;
     Object.assign(formData, {
@@ -525,14 +525,14 @@
     modalVisible.value = true;
   };
 
-  // 编辑
+  // Edit
   const handleEdit = (record: PermissionModel) => {
     isEdit.value = true;
     Object.assign(formData, record);
     modalVisible.value = true;
   };
 
-  // 删除
+  // Delete
   const handleDelete = (record: PermissionModel) => {
     Modal.confirm({
       title: '确认删除',
@@ -553,7 +553,7 @@
 
   const submitLoading = ref(false);
 
-  // 提交表单
+  // Submit form
   const handleBeforeOk = async (done: (closed: boolean) => void) => {
     const errors = await formRef.value?.validate();
     if (errors) {
@@ -596,12 +596,12 @@
     }
   };
 
-  // 取消
+  // Cancel
   const handleCancel = () => {
     modalVisible.value = false;
   };
 
-  // 按资源查看
+  // View by resource
   const handleViewGrouped = async () => {
     groupedModalVisible.value = true;
     groupedLoading.value = true;
@@ -615,13 +615,13 @@
     }
   };
 
-  // 格式化时间
+  // Format date time
   const formatDateTime = (dateStr: string | undefined) => {
     if (!dateStr) return '-';
     return dayjs(dateStr).format('YYYY-MM-DD HH:mm:ss');
   };
 
-  // 获取分类颜色
+  // Get category color
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
       administration: 'purple',
@@ -631,16 +631,16 @@
     return colors[category] || 'gray';
   };
 
-  // 初始化
+  // Initialize
   onMounted(() => {
-    loadOptions(); // 加载下拉选项
+    loadOptions(); // Load dropdown options
     fetchData();
   });
 </script>
 
 <style scoped lang="less">
   .permission-management {
-    // 表格标题不加粗
+    // Table header without bold font
     :deep(.arco-table-th) {
       font-weight: normal !important;
     }

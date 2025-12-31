@@ -91,7 +91,7 @@ export const OPENIDDICT: AppRouteRecordRaw = {
       component: () =>
         import('@/views/administration/openiddict/api-resource/index.vue'),
       meta: {
-        locale: 'menu.administration.apiResource',
+        locale: 'menu.administration.openiddict.api-resource',
         requiresAuth: true,
         icon: 'icon-code-block',
         roles: ['admin', 'super_admin'],
@@ -103,7 +103,7 @@ export const OPENIDDICT: AppRouteRecordRaw = {
       component: () =>
         import('@/views/administration/openiddict/identity-resource/index.vue'),
       meta: {
-        locale: 'menu.administration.identityResource',
+        locale: 'menu.administration.openiddict.identity-resource',
         requiresAuth: true,
         icon: 'icon-relation',
         roles: ['admin', 'super_admin'],
@@ -115,7 +115,7 @@ export const OPENIDDICT: AppRouteRecordRaw = {
       component: () =>
         import('@/views/administration/openiddict/authorization/index.vue'),
       meta: {
-        locale: 'menu.administration.authorization',
+        locale: 'menu.administration.openiddict.authorization',
         requiresAuth: true,
         icon: 'icon-stamp',
         roles: ['admin', 'super_admin'],
