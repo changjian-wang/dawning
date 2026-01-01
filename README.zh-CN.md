@@ -274,7 +274,51 @@ kind delete cluster --name dawning
 
 详见 [K8s 部署指南](deploy/k8s/README.zh-CN.md)。
 
-## 🔗 业务系统接入
+## � GitOps 部署 (ArgoCD + Kustomize)
+
+使用 ArgoCD 实现基于 Git 仓库的自动化持续交付。
+
+### 前置条件
+
+- Kind 集群运行中
+- kubectl 已配置
+- ArgoCD CLI (`brew install argocd`)
+
+### 一键部署
+
+```bash
+# 1. 安装 ArgoCD
+chmod +x deploy/argocd/install-argocd.sh
+./deploy/argocd/install-argocd.sh
+
+# 2. 访问 ArgoCD UI
+# 地址: https://localhost:8080
+# 用户名: admin
+# 密码: (安装脚本会显示)
+
+# 3. 部署应用
+kubectl apply -f deploy/argocd/application-dev.yaml      # 开发环境（自动同步）
+kubectl apply -f deploy/argocd/application-staging.yaml  # 测试环境（手动同步）
+kubectl apply -f deploy/argocd/application-prod.yaml     # 生产环境（手动同步）
+```
+
+### GitOps 工作流
+
+```
+开发者 → Git Push → ArgoCD 检测变更 → 自动/手动同步 → K8s 集群
+```
+
+**优势：**
+- ✅ Git 作为唯一真实来源
+- ✅ 开发环境自动同步部署
+- ✅ 测试/生产环境手动审批
+- ✅ 可视化部署跟踪
+- ✅ 一键回滚到任意版本
+- ✅ 完整的操作审计日志
+
+详见 [ArgoCD 部署指南](deploy/argocd/README.md)。
+
+## �🔗 业务系统接入
 
 其他业务系统可以通过 Dawning SDK 轻松接入统一认证：
 

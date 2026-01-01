@@ -267,7 +267,51 @@ kind delete cluster --name dawning
 
 See [K8s Deployment Guide](deploy/k8s/README.md) for details.
 
-## 🔗 Business System Integration
+## � GitOps Deployment (ArgoCD + Kustomize)
+
+Automate deployments using ArgoCD for continuous delivery from Git repository.
+
+### Prerequisites
+
+- Kind cluster running
+- kubectl configured
+- ArgoCD CLI (`brew install argocd`)
+
+### One-Click Setup
+
+```bash
+# 1. Install ArgoCD
+chmod +x deploy/argocd/install-argocd.sh
+./deploy/argocd/install-argocd.sh
+
+# 2. Access ArgoCD UI
+# Open: https://localhost:8080
+# Username: admin
+# Password: (displayed by install script)
+
+# 3. Deploy Applications
+kubectl apply -f deploy/argocd/application-dev.yaml      # Dev (auto-sync)
+kubectl apply -f deploy/argocd/application-staging.yaml  # Staging (manual)
+kubectl apply -f deploy/argocd/application-prod.yaml     # Production (manual)
+```
+
+### GitOps Workflow
+
+```
+Developer → Git Push → ArgoCD Detects Change → Auto/Manual Sync → K8s Cluster
+```
+
+**Benefits:**
+- ✅ Git as single source of truth
+- ✅ Automated sync for dev environment
+- ✅ Manual approval for staging/prod
+- ✅ Visual deployment tracking
+- ✅ One-click rollback
+- ✅ Complete audit trail
+
+See [ArgoCD Guide](deploy/argocd/README.md) for details.
+
+## �🔗 Business System Integration
 
 Other business systems can easily integrate with unified authentication via Dawning SDK:
 

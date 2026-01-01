@@ -1,0 +1,46 @@
+# ArgoCD Application for Dawning Gateway
+# This defines how ArgoCD should deploy the Dawning application
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dawning-dev
+  namespace: argocd
+  # Finalizer ensures proper cleanup
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  # Project (default or create custom)
+  project: default
+  
+  # Source - where the manifests are
+  source:
+    repoURL: https://github.com/changjian-wang/dawning
+    targetRevision: main  # 或 HEAD
+    path: deploy/k8s/overlays/dev
+  
+  # Destination - where to deploy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dawning
+  
+  # Sync policy
+  syncPolicy:
+    # Auto-create namespace if not exists
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+    
+    # Automated sync (optional - comment out for manual sync)
+    automated:
+      # Auto-sync when Git changes
+      prune: true        # Delete resources not in Git
+      selfHeal: true     # Revert manual changes
+      allowEmpty: false  # Don't sync if no resources
+    
+    # Retry strategy
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

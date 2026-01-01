@@ -1,0 +1,41 @@
+# ArgoCD AppProject for Dawning
+# Defines RBAC, allowed repos, destinations, and resources
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dawning
+  namespace: argocd
+spec:
+  description: Dawning Identity Gateway Project
+  
+  # Allow deploying from these Git repos
+  sourceRepos:
+    - https://github.com/changjian-wang/dawning
+    - '*'  # Remove this in production
+  
+  # Allow deploying to these clusters
+  destinations:
+    - namespace: dawning
+      server: https://kubernetes.default.svc
+    - namespace: dawning-*  # Allow all dawning-prefixed namespaces
+      server: https://kubernetes.default.svc
+  
+  # Allowed K8s resource types
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+    - group: ''
+      kind: PersistentVolume
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRole
+    - group: 'rbac.authorization.k8s.io'
+      kind: ClusterRoleBinding
+  
+  # Namespace-scoped resources (all allowed)
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  
+  # Orphaned resources monitoring
+  orphanedResources:
+    warn: true
