@@ -51,6 +51,10 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "200m"
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
           livenessProbe:
             httpGet:
               path: /health
@@ -65,3 +69,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 3
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: admin-frontend-nginx-config

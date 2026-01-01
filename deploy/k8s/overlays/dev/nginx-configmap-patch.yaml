@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: admin-frontend-nginx-config
+  namespace: dawning
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        root /usr/share/nginx/html;
+        index index.html;
+        
+        # Kubernetes DNS resolver (CoreDNS)
+        resolver kube-dns.kube-system.svc.cluster.local valid=30s ipv6=off;
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_comp_level 6;
+        gzip_proxied any;
+        gzip_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/javascript
+            application/x-javascript
+            application/json
+            application/xml
+            application/rss+xml
+            application/atom+xml
+            image/svg+xml
+            font/truetype
+            font/opentype
+            application/font-woff
+            application/font-woff2;
+        gzip_disable "MSIE [1-6]\.";
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+        
+        # Cache static assets - immutable files (hashed filenames)
+        location ~* \.(?:js|css)$ {
+            expires 1y;
+            add_header Cache-Control "public, max-age=31536000, immutable";
+            add_header X-Content-Type-Options "nosniff" always;
+            access_log off;
+            gzip_static on;
+        }
+
+        # Cache fonts with long expiry
+        location ~* \.(?:woff|woff2|ttf|eot|otf)$ {
+            expires 1y;
+            add_header Cache-Control "public, max-age=31536000, immutable";
+            add_header Access-Control-Allow-Origin "*";
+            access_log off;
+        }
+
+        # Cache images
+        location ~* \.(?:png|jpg|jpeg|gif|ico|svg|webp|avif)$ {
+            expires 6M;
+            add_header Cache-Control "public, max-age=15552000";
+            access_log off;
+        }
+
+        # No cache for HTML files (SPA entry point)
+        location ~* \.html$ {
+            expires -1;
+            add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate";
+            add_header Pragma "no-cache";
+        }
+        
+        # OpenID Discovery endpoints (dev environment)
+        location /.well-known/ {
+            set $identity_upstream http://dev-identity-api.dawning.svc.cluster.local:5001;
+            proxy_pass $identity_upstream;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # API proxy - Identity Service (dev environment)
+        location /api/ {
+            set $identity_upstream http://dev-identity-api.dawning.svc.cluster.local:5001;
+            proxy_pass $identity_upstream;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_cache_bypass $http_upgrade;
+            proxy_read_timeout 300s;
+            proxy_connect_timeout 75s;
+        }
+        
+        # OpenIddict connect endpoints (dev environment)
+        location /connect/ {
+            set $identity_upstream http://dev-identity-api.dawning.svc.cluster.local:5001;
+            proxy_pass $identity_upstream;
+            proxy_http_version 1.1;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Gateway API proxy (dev environment)
+        location /gateway/ {
+            set $gateway_upstream http://dev-gateway-api.dawning.svc.cluster.local:5000;
+            proxy_pass $gateway_upstream;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_cache_bypass $http_upgrade;
+        }
+        
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        
+        # Vue Router - SPA fallback
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+        
+        # Deny access to hidden files (except .well-known)
+        location ~ /\.(?!well-known) {
+            deny all;
+            access_log off;
+            log_not_found off;
+        }
+        
+        # Error pages
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+            root /usr/share/nginx/html;
+        }
+    }

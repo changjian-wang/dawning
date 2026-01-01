@@ -117,3 +117,7 @@ patches:
       - op: replace
         path: /stringData/KAFKA_BOOTSTRAP_SERVERS
         value: "dev-kafka:9093"
+
+# Strategic merge patch for nginx ConfigMap
+patchesStrategicMerge:
+  - nginx-configmap-patch.yaml
