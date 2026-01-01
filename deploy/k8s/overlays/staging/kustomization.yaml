@@ -66,7 +66,7 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/env/1/value
         value: "staging-zookeeper:2181"
-  # Fix connection strings with namePrefix (staging-mysql, staging-redis, staging-kafka)
+  # Fix connection strings with namePrefix
   - target:
       kind: Secret
       name: dawning-secrets

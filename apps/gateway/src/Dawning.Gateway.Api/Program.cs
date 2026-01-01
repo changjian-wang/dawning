@@ -2,6 +2,7 @@ using Dawning.Gateway.Api.Configuration;
 using Dawning.Identity.Infra.CrossCutting.IoC;
 using Dawning.Identity.Infra.CrossCutting.Mapping;
 using Dawning.Identity.Infra.Data.Context;
+using Dawning.Identity.Infra.Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
@@ -27,10 +28,24 @@ if (!string.IsNullOrWhiteSpace(connectionString))
     Log.Information("Database connection configured");
 }
 
+// ===== Required Infrastructure Services =====
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
+
+// ===== MediatR (进程内领域事件) =====
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssembly(
+        typeof(Dawning.Identity.Application.EventHandlers.UserCreatedEventHandler).Assembly
+    )
+);
+
+// ===== Messaging Services (DDD Event-Driven Architecture) =====
+builder.Services.AddMessagingServices(builder.Configuration);
+
 // ===== Register Application Services (Dependency Injection) =====
 builder.Services.AddApplicationServices();
 
-// ===== Register AutoMapper =====
+// ===== AutoMapper Configuration =====
 AutoMapperProfileBootStrapper.RegisterServices(builder.Services);
 
 // ===== YARP =====

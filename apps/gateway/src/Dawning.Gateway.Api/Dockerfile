@@ -26,6 +26,8 @@ COPY ["apps/gateway/src/Dawning.Identity.Domain/Dawning.Identity.Domain.csproj",
 COPY ["apps/gateway/src/Dawning.Identity.Domain.Core/Dawning.Identity.Domain.Core.csproj", "apps/gateway/src/Dawning.Identity.Domain.Core/"]
 COPY ["apps/gateway/src/Dawning.Identity.Infra.Data/Dawning.Identity.Infra.Data.csproj", "apps/gateway/src/Dawning.Identity.Infra.Data/"]
 COPY ["apps/gateway/src/Dawning.Identity.Infra.CrossCutting.IoC/Dawning.Identity.Infra.CrossCutting.IoC.csproj", "apps/gateway/src/Dawning.Identity.Infra.CrossCutting.IoC/"]
+COPY ["apps/gateway/src/Dawning.Identity.Infra.CrossCutting.Mapping/Dawning.Identity.Infra.CrossCutting.Mapping.csproj", "apps/gateway/src/Dawning.Identity.Infra.CrossCutting.Mapping/"]
+COPY ["apps/gateway/src/Dawning.Identity.Infra.Messaging/Dawning.Identity.Infra.Messaging.csproj", "apps/gateway/src/Dawning.Identity.Infra.Messaging/"]
 
 # Copy nuget.config if exists
 COPY ["nuget.config", "./"]

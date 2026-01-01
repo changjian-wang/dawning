@@ -109,7 +109,7 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/env/1/value
         value: "prod-zookeeper:2181"
-  # Fix connection strings with namePrefix (prod-mysql, prod-redis, prod-kafka)
+  # Fix connection strings with namePrefix
   - target:
       kind: Secret
       name: dawning-secrets

@@ -81,6 +81,11 @@ spec:
               value: "http://identity-api:5001"
             - name: Gateway__UseDatabase
               value: "false"
+            # YARP ReverseProxy cluster destinations
+            - name: ReverseProxy__Clusters__identity-cluster__Destinations__destination1__Address
+              value: "http://identity-api:5001"
+            - name: ReverseProxy__Clusters__api-cluster__Destinations__destination1__Address
+              value: "http://identity-api:5001"
             - name: TZ
               valueFrom:
                 configMapKeyRef:
