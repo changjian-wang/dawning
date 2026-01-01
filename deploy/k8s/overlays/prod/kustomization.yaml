@@ -98,3 +98,14 @@ patches:
       - op: replace
         path: /spec/template/spec/initContainers/2/command
         value: ['sh', '-c', 'until nc -z prod-kafka 9092; do echo waiting for kafka; sleep 2; done']
+  # Fix Kafka init container and env with namePrefix
+  - target:
+      kind: StatefulSet
+      name: kafka
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/command
+        value: ['sh', '-c', 'until nc -z prod-zookeeper 2181; do echo waiting for zookeeper; sleep 2; done']
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/value
+        value: "prod-zookeeper:2181"
