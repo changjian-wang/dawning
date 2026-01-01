@@ -78,6 +78,34 @@ kubectl get pods -n dawning -w
 
 ### 4. 访问服务
 
+#### 方式一：使用端口转发脚本（推荐）
+
+使用项目提供的端口转发管理脚本，无需修改 hosts 文件：
+
+```bash
+# 启动端口转发
+./deploy/scripts/port-forward.sh start
+
+# 查看状态
+./deploy/scripts/port-forward.sh status
+
+# 停止端口转发
+./deploy/scripts/port-forward.sh stop
+
+# 重启端口转发
+./deploy/scripts/port-forward.sh restart
+
+# 查看日志
+./deploy/scripts/port-forward.sh logs
+```
+
+端口转发成功后，可以通过以下地址访问：
+- 前端: http://localhost:8088
+- Identity API: http://localhost:5001
+- Gateway API: http://localhost:5000
+
+#### 方式二：使用 Ingress（需配置 hosts）
+
 添加到 `/etc/hosts`:
 ```
 127.0.0.1 dawning.local api.dawning.local auth.dawning.local
@@ -87,6 +115,41 @@ kubectl get pods -n dawning -w
 - 前端: http://dawning.local
 - API 网关: http://api.dawning.local
 - 认证 API: http://auth.dawning.local
+
+### 5. 数据库初始化
+
+首次部署时，需要等待数据库表自动创建。Identity API 启动时会自动运行 DatabaseSeeder 初始化以下数据：
+
+- OpenIddict Scopes（权限范围）
+- OpenIddict Applications（客户端应用）
+- 默认用户和角色
+
+如果需要手动初始化数据库，可以执行 SQL 脚本：
+
+```bash
+# 进入 SQL 目录
+cd apps/gateway/docs/sql
+
+# 执行所有 schema 脚本
+for f in schema/*.sql; do
+  kubectl exec -n dawning dev-mysql-0 -- mysql -u dawning -pdawning_password_2024 dawning_identity < "$f"
+done
+
+# 重启 Identity API 以运行 seeder
+kubectl rollout restart deployment/dev-identity-api -n dawning
+```
+
+验证数据库初始化成功：
+```bash
+kubectl exec -n dawning dev-mysql-0 -- mysql -u dawning -pdawning_password_2024 dawning_identity \
+  -e "SELECT client_id, display_name FROM openiddict_applications;"
+```
+
+### 6. 登录测试
+
+默认登录凭据：
+- **用户名**: `admin`
+- **密码**: `Admin@123`
 
 ## 集群架构
 

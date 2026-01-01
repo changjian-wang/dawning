@@ -78,6 +78,34 @@ kubectl get pods -n dawning -w
 
 ### 4. Access Services
 
+#### Option 1: Using Port-Forward Script (Recommended)
+
+Use the provided port-forward management script, no hosts file modification needed:
+
+```bash
+# Start port forwarding
+./deploy/scripts/port-forward.sh start
+
+# Check status
+./deploy/scripts/port-forward.sh status
+
+# Stop port forwarding
+./deploy/scripts/port-forward.sh stop
+
+# Restart port forwarding
+./deploy/scripts/port-forward.sh restart
+
+# View logs
+./deploy/scripts/port-forward.sh logs
+```
+
+After port forwarding is started, access services at:
+- Frontend: http://localhost:8088
+- Identity API: http://localhost:5001
+- Gateway API: http://localhost:5000
+
+#### Option 2: Using Ingress (requires hosts configuration)
+
 Add to `/etc/hosts`:
 ```
 127.0.0.1 dawning.local api.dawning.local auth.dawning.local
@@ -87,6 +115,41 @@ Then access:
 - Frontend: http://dawning.local
 - API Gateway: http://api.dawning.local
 - Identity API: http://auth.dawning.local
+
+### 5. Database Initialization
+
+On first deployment, wait for database tables to be auto-created. The Identity API runs DatabaseSeeder on startup to initialize:
+
+- OpenIddict Scopes
+- OpenIddict Applications (client apps)
+- Default users and roles
+
+To manually initialize the database, run the SQL scripts:
+
+```bash
+# Navigate to SQL directory
+cd apps/gateway/docs/sql
+
+# Execute all schema scripts
+for f in schema/*.sql; do
+  kubectl exec -n dawning dev-mysql-0 -- mysql -u dawning -pdawning_password_2024 dawning_identity < "$f"
+done
+
+# Restart Identity API to run seeder
+kubectl rollout restart deployment/dev-identity-api -n dawning
+```
+
+Verify database initialization:
+```bash
+kubectl exec -n dawning dev-mysql-0 -- mysql -u dawning -pdawning_password_2024 dawning_identity \
+  -e "SELECT client_id, display_name FROM openiddict_applications;"
+```
+
+### 6. Login Test
+
+Default login credentials:
+- **Username**: `admin`
+- **Password**: `Admin@123`
 
 ## Cluster Architecture
 
