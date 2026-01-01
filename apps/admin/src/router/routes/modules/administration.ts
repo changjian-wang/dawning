@@ -171,6 +171,30 @@ export const GATEWAY: AppRouteRecordRaw = {
         roles: ['admin', 'super_admin'],
       },
     },
+    {
+      path: 'monitor',
+      name: 'GatewayMonitor',
+      component: () =>
+        import('@/views/administration/gateway/monitor/index.vue'),
+      meta: {
+        locale: 'menu.gateway.monitor',
+        requiresAuth: true,
+        icon: 'icon-dashboard',
+        roles: ['admin', 'super_admin', 'auditor'],
+      },
+    },
+    {
+      path: 'request-log',
+      name: 'GatewayRequestLog',
+      component: () =>
+        import('@/views/administration/gateway/request-log/index.vue'),
+      meta: {
+        locale: 'menu.gateway.requestLog',
+        requiresAuth: true,
+        icon: 'icon-file',
+        roles: ['admin', 'super_admin', 'auditor'],
+      },
+    },
   ],
 };
 

@@ -2,6 +2,7 @@ using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Infra.Data.Stores;
 using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 using ApplicationEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Application;
 
 namespace Dawning.Identity.Api.Configurations
@@ -19,6 +20,9 @@ namespace Dawning.Identity.Api.Configurations
             IConfiguration configuration
         )
         {
+            // Disable default claim type mapping to preserve original claim names
+            System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
             // Add default Authentication Scheme
             services.AddAuthentication(options =>
             {
@@ -26,6 +30,13 @@ namespace Dawning.Identity.Api.Configurations
                     OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme =
                     OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+            });
+
+            // Configure Authorization to use OpenIddict claim types
+            services.AddAuthorization();
+            services.Configure<Microsoft.AspNetCore.Authentication.AuthenticationOptions>(options =>
+            {
+                // Ensure ClaimsPrincipal uses OpenIddict claim types
             });
 
             // Register custom Stores (based on Dapper Repository)
@@ -167,6 +178,13 @@ namespace Dawning.Identity.Api.Configurations
 
                     // Register ASP.NET Core integration
                     options.UseAspNetCore();
+
+                    // Configure claim mappings - map 'role' claim to be recognized by ASP.NET Core
+                    options.Configure(validationOptions =>
+                    {
+                        validationOptions.TokenValidationParameters.RoleClaimType = Claims.Role;
+                        validationOptions.TokenValidationParameters.NameClaimType = Claims.Name;
+                    });
                 });
 
             return services;

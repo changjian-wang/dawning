@@ -47,6 +47,7 @@ export default {
   'common.system': '系统',
   'common.operationFailed': '操作失败',
   'common.operationSuccess': '操作成功',
+  'common.error': '请求失败',
   'common.loadFailed': '加载数据失败',
   'common.createSuccess': '创建成功',
   'common.createFailed': '创建失败',

@@ -48,6 +48,7 @@ export default {
   'common.system': 'System',
   'common.operationFailed': 'Operation Failed',
   'common.operationSuccess': 'Operation Success',
+  'common.error': 'Request failed',
   'common.loadFailed': 'Failed to load data',
   'common.createSuccess': 'Created successfully',
   'common.createFailed': 'Failed to create',
