@@ -1,0 +1,42 @@
+# Ingress patch for dev environment - path-based routing on localhost
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dawning-ingress
+  namespace: dawning
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          # Identity API - /auth/ prefix
+          - path: /auth(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dev-identity-api
+                port:
+                  number: 5001
+          # Gateway API - /api/ prefix
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dev-gateway-api
+                port:
+                  number: 5000
+          # Frontend - everything else
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dev-admin-frontend
+                port:
+                  number: 80
