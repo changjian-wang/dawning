@@ -71,3 +71,30 @@ patches:
       - op: replace
         path: /data/ASPNETCORE_ENVIRONMENT
         value: "Production"
+  # Fix init container service names with namePrefix
+  - target:
+      kind: Deployment
+      name: identity-api
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/command
+        value: ['sh', '-c', 'until nc -z prod-mysql 3306; do echo waiting for mysql; sleep 2; done']
+      - op: replace
+        path: /spec/template/spec/initContainers/1/command
+        value: ['sh', '-c', 'until nc -z prod-redis 6379; do echo waiting for redis; sleep 2; done']
+      - op: replace
+        path: /spec/template/spec/initContainers/2/command
+        value: ['sh', '-c', 'until nc -z prod-kafka 9092; do echo waiting for kafka; sleep 2; done']
+  - target:
+      kind: Deployment
+      name: gateway-api
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/initContainers/0/command
+        value: ['sh', '-c', 'until nc -z prod-mysql 3306; do echo waiting for mysql; sleep 2; done']
+      - op: replace
+        path: /spec/template/spec/initContainers/1/command
+        value: ['sh', '-c', 'until nc -z prod-redis 6379; do echo waiting for redis; sleep 2; done']
+      - op: replace
+        path: /spec/template/spec/initContainers/2/command
+        value: ['sh', '-c', 'until nc -z prod-kafka 9092; do echo waiting for kafka; sleep 2; done']
