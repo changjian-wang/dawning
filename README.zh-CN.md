@@ -13,7 +13,6 @@
 ![Redis](https://img.shields.io/badge/Redis-7.x-DC382D?logo=redis&logoColor=white)
 ![Kafka](https://img.shields.io/badge/Kafka-3.x-231F20?logo=apachekafka)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
-![Kubernetes](https://img.shields.io/badge/Kubernetes-Helm-326CE5?logo=kubernetes)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 **企业级统一身份认证与 API 网关管理平台**
@@ -88,7 +87,6 @@ dawning/
 ├── sdk/                             # Dawning SDK 组件
 ├── deploy/
 │   ├── docker/                      # Docker Compose 配置
-│   ├── helm/                        # Kubernetes Helm Chart
 │   │   └── dawning/
 │   │       ├── Chart.yaml
 │   │       ├── values.yaml          # 默认配置
@@ -187,113 +185,6 @@ docker compose down
 docker compose down -v
 ```
 
-## ☸️ Kubernetes 一键部署
-
-一条命令部署到本地 Kubernetes 集群。
-
-### 前置条件
-
-- Docker Desktop 或 Colima（运行中）
-- Kind (`brew install kind`)
-- kubectl (`brew install kubectl`)
-
-### 一键启动
-
-```bash
-# 运行一键部署脚本
-chmod +x deploy/k8s/setup-cluster.sh
-./deploy/k8s/setup-cluster.sh
-```
-
-该脚本将自动完成：
-1. 创建名为 `dawning` 的 Kind 集群（1 控制平面 + 3 工作节点）
-2. 构建并加载所有 Docker 镜像
-3. 部署基础设施（MySQL、Redis、Zookeeper、Kafka）
-4. 部署应用服务（Identity API、Gateway API、前端）
-5. 配置 Ingress 以供本地访问
-
-### 访问服务
-
-部署完成后，添加 hosts 条目：
-
-```bash
-# 使用命令（推荐）
-sudo sh -c 'echo "127.0.0.1 dawning.local api.dawning.local auth.dawning.local" >> /etc/hosts'
-```
-
-访问地址：
-- 前端: http://dawning.local
-- API 网关: http://api.dawning.local
-- 认证 API: http://auth.dawning.local
-
-### 常用命令
-
-```bash
-# 检查集群状态
-kubectl get nodes
-
-# 检查所有 Pod
-kubectl get pods -n dawning -o wide
-
-# 查看日志
-kubectl logs -n dawning -l app=identity-api -f
-
-# 删除集群并清理
-kind delete cluster --name dawning
-```
-
-详见 [K8s 部署指南](deploy/k8s/README.zh-CN.md) 了解更多高级配置。
-
-## 🔄 GitOps 部署 (ArgoCD + Kustomize)
-
-使用 ArgoCD 实现基于 Git 仓库的自动化持续交付。
-
-### 前置条件
-
-- Kind 集群运行中（参见上面的 Kubernetes 一键部署章节）
-- kubectl 已配置
-- ArgoCD CLI (`brew install argocd`)
-
-### 快速部署
-
-**⚠️ 重要提示：** 确保 Kind 集群 `dawning` 已经运行后再继续。
-
-```bash
-# 1. 先创建 Kind 集群（如果还没创建）
-chmod +x deploy/k8s/setup-cluster.sh
-./deploy/k8s/setup-cluster.sh
-
-# 2. 安装 ArgoCD
-chmod +x deploy/argocd/install-argocd.sh
-./deploy/argocd/install-argocd.sh
-
-# 3. 访问 ArgoCD UI
-# 地址: https://localhost:8080
-# 用户名: admin
-# 密码: (安装脚本会显示)
-
-# 4. 部署应用
-kubectl apply -f deploy/argocd/application-dev.yaml      # 开发环境（自动同步）
-kubectl apply -f deploy/argocd/application-staging.yaml  # 测试环境（手动同步）
-kubectl apply -f deploy/argocd/application-prod.yaml     # 生产环境（手动同步）
-```
-
-### GitOps 工作流
-
-```
-开发者 → Git Push → ArgoCD 检测变更 → 自动/手动同步 → K8s 集群
-```
-
-**优势：**
-- ✅ Git 作为唯一真实来源
-- ✅ 开发环境自动同步部署
-- ✅ 测试/生产环境手动审批
-- ✅ 可视化部署跟踪
-- ✅ 一键回滚到任意版本
-- ✅ 完整的操作审计日志
-
-详见 [ArgoCD 部署指南](deploy/argocd/README.md)。
-
 ## �🔗 业务系统接入
 
 其他业务系统可以通过 Dawning SDK 轻松接入统一认证：
@@ -348,7 +239,6 @@ dotnet test
 | [Identity API](apps/gateway/docs/IDENTITY_API.zh-CN.md) | OAuth2/OIDC 端点说明 |
 | [开发者指南](docs/DEVELOPER_GUIDE.zh-CN.md) | 开发规范与约定 |
 | [部署文档](docs/DEPLOYMENT.zh-CN.md) | 生产环境部署 |
-| [Helm 部署](deploy/helm/README.zh-CN.md) | Kubernetes 部署指南 |
 | [用户指南](docs/USER_GUIDE.zh-CN.md) | 管理后台使用说明 |
 
 ## 🔧 配置说明
