@@ -34,23 +34,21 @@ patches:
           nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
           nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
           nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
-          nginx.ingress.kubernetes.io/use-regex: "true"
-          nginx.ingress.kubernetes.io/rewrite-target: /$2
       - op: replace
         path: /spec/rules
         value:
           - host: localhost
             http:
               paths:
-                - path: /auth(/|$)(.*)
-                  pathType: ImplementationSpecific
+                - path: /auth
+                  pathType: Prefix
                   backend:
                     service:
                       name: dev-identity-api
                       port:
                         number: 5001
-                - path: /api(/|$)(.*)
-                  pathType: ImplementationSpecific
+                - path: /api
+                  pathType: Prefix
                   backend:
                     service:
                       name: dev-gateway-api
