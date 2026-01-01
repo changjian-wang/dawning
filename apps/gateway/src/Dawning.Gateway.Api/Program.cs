@@ -1,5 +1,6 @@
 using Dawning.Gateway.Api.Configuration;
 using Dawning.Identity.Infra.CrossCutting.IoC;
+using Dawning.Identity.Infra.CrossCutting.Mapping;
 using Dawning.Identity.Infra.Data.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
@@ -28,6 +29,9 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 
 // ===== Register Application Services (Dependency Injection) =====
 builder.Services.AddApplicationServices();
+
+// ===== Register AutoMapper =====
+AutoMapperProfileBootStrapper.RegisterServices(builder.Services);
 
 // ===== YARP =====
 var useDatabase = builder.Configuration.GetValue<bool>("Gateway:UseDatabase");

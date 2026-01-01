@@ -90,3 +90,17 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/env/1/value
         value: "dev-zookeeper:2181"
+  # Fix connection strings with namePrefix (dev-mysql, dev-redis, dev-kafka)
+  - target:
+      kind: Secret
+      name: dawning-secrets
+    patch: |-
+      - op: replace
+        path: /stringData/MYSQL_CONNECTION_STRING
+        value: "Server=dev-mysql;Port=3306;Database=dawning_identity;Uid=dawning;Pwd=dawning_password_2024;"
+      - op: replace
+        path: /stringData/REDIS_CONNECTION_STRING
+        value: "dev-redis:6379"
+      - op: replace
+        path: /stringData/KAFKA_BOOTSTRAP_SERVERS
+        value: "dev-kafka:9093"

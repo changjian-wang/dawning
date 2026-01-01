@@ -42,6 +42,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Dawning.Identity.Application\Dawning.Identity.Application.csproj" />
     <ProjectReference Include="..\Dawning.Identity.Infra.CrossCutting.IoC\Dawning.Identity.Infra.CrossCutting.IoC.csproj" />
+    <ProjectReference Include="..\Dawning.Identity.Infra.CrossCutting.Mapping\Dawning.Identity.Infra.CrossCutting.Mapping.csproj" />
     <ProjectReference Include="..\Dawning.Identity.Infra.Data\Dawning.Identity.Infra.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
