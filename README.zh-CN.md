@@ -187,71 +187,41 @@ docker compose down
 docker compose down -v
 ```
 
-## ☸️ Kubernetes 部署 (多节点)
+## ☸️ Kubernetes 一键部署
 
-使用 Kind 和 Kustomize 部署到本地多节点 Kubernetes 集群。
+一条命令部署到本地 Kubernetes 集群。
 
 ### 前置条件
 
-- Docker Desktop 或 Colima
+- Docker Desktop 或 Colima（运行中）
 - Kind (`brew install kind`)
 - kubectl (`brew install kubectl`)
 
-### 1. 创建多节点集群
+### 一键启动
 
 ```bash
-# 使用安装脚本
+# 运行一键部署脚本
 chmod +x deploy/k8s/setup-cluster.sh
 ./deploy/k8s/setup-cluster.sh
-
-# 或手动创建
-kind create cluster --name dawning --config deploy/k8s/kind-config.yaml
 ```
 
-这将创建 1 个控制平面 + 3 个工作节点的集群：
-- Worker 1: 基础设施 (MySQL, Redis)
-- Worker 2: 消息队列 (Zookeeper, Kafka)
-- Worker 3: 应用服务 (Gateway, Identity API, Frontend)
+该脚本将自动完成：
+1. 创建名为 `dawning` 的 Kind 集群（1 控制平面 + 3 工作节点）
+2. 构建并加载所有 Docker 镜像
+3. 部署基础设施（MySQL、Redis、Zookeeper、Kafka）
+4. 部署应用服务（Identity API、Gateway API、前端）
+5. 配置 Ingress 以供本地访问
 
-### 2. 构建并加载镜像
+### 访问服务
+
+部署完成后，添加 hosts 条目：
 
 ```bash
-# 构建镜像
-cd apps/gateway
-docker build -t dawning-identity-api:latest -f src/Dawning.Identity.Api/Dockerfile ../..
-docker build -t dawning-gateway-api:latest -f src/Dawning.Gateway.Api/Dockerfile ../..
-cd ../admin
-docker build -t dawning-admin-frontend:latest .
-
-# 加载到 Kind 集群
-kind load docker-image dawning-identity-api:latest --name dawning
-kind load docker-image dawning-gateway-api:latest --name dawning
-kind load docker-image dawning-admin-frontend:latest --name dawning
+# 使用命令（推荐）
+sudo sh -c 'echo "127.0.0.1 dawning.local api.dawning.local auth.dawning.local" >> /etc/hosts'
 ```
 
-### 3. 部署
-
-```bash
-# 部署开发环境 (1 副本, 低资源)
-kubectl apply -k deploy/k8s/overlays/dev
-
-# 或测试环境 (2 副本)
-kubectl apply -k deploy/k8s/overlays/staging
-
-# 或生产模拟 (3 副本, 高资源)
-kubectl apply -k deploy/k8s/overlays/prod
-
-# 监控 Pod 启动
-kubectl get pods -n dawning -w
-```
-
-### 4. 访问服务
-
-添加到 `/etc/hosts`:
-```
-127.0.0.1 dawning.local api.dawning.local auth.dawning.local
-```
-
+访问地址：
 - 前端: http://dawning.local
 - API 网关: http://api.dawning.local
 - 认证 API: http://auth.dawning.local
@@ -259,44 +229,50 @@ kubectl get pods -n dawning -w
 ### 常用命令
 
 ```bash
-# 查看 Pod 在各节点的分布
+# 检查集群状态
+kubectl get nodes
+
+# 检查所有 Pod
 kubectl get pods -n dawning -o wide
 
 # 查看日志
 kubectl logs -n dawning -l app=identity-api -f
 
-# 扩缩容
-kubectl scale deployment -n dawning gateway-api --replicas=5
-
-# 删除集群
+# 删除集群并清理
 kind delete cluster --name dawning
 ```
 
-详见 [K8s 部署指南](deploy/k8s/README.zh-CN.md)。
+详见 [K8s 部署指南](deploy/k8s/README.zh-CN.md) 了解更多高级配置。
 
-## � GitOps 部署 (ArgoCD + Kustomize)
+## 🔄 GitOps 部署 (ArgoCD + Kustomize)
 
 使用 ArgoCD 实现基于 Git 仓库的自动化持续交付。
 
 ### 前置条件
 
-- Kind 集群运行中
+- Kind 集群运行中（参见上面的 Kubernetes 一键部署章节）
 - kubectl 已配置
 - ArgoCD CLI (`brew install argocd`)
 
-### 一键部署
+### 快速部署
+
+**⚠️ 重要提示：** 确保 Kind 集群 `dawning` 已经运行后再继续。
 
 ```bash
-# 1. 安装 ArgoCD
+# 1. 先创建 Kind 集群（如果还没创建）
+chmod +x deploy/k8s/setup-cluster.sh
+./deploy/k8s/setup-cluster.sh
+
+# 2. 安装 ArgoCD
 chmod +x deploy/argocd/install-argocd.sh
 ./deploy/argocd/install-argocd.sh
 
-# 2. 访问 ArgoCD UI
+# 3. 访问 ArgoCD UI
 # 地址: https://localhost:8080
 # 用户名: admin
 # 密码: (安装脚本会显示)
 
-# 3. 部署应用
+# 4. 部署应用
 kubectl apply -f deploy/argocd/application-dev.yaml      # 开发环境（自动同步）
 kubectl apply -f deploy/argocd/application-staging.yaml  # 测试环境（手动同步）
 kubectl apply -f deploy/argocd/application-prod.yaml     # 生产环境（手动同步）

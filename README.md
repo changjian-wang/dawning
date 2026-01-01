@@ -180,71 +180,41 @@ docker compose down
 docker compose down -v
 ```
 
-## ☸️ Kubernetes Deployment (Multi-Node)
+## ☸️ Kubernetes One-Click Deployment
 
-Deploy to a local multi-node Kubernetes cluster using Kind and Kustomize.
+Deploy to a local Kubernetes cluster with a single command.
 
 ### Prerequisites
 
-- Docker Desktop or Colima
+- Docker Desktop or Colima (running)
 - Kind (`brew install kind`)
 - kubectl (`brew install kubectl`)
 
-### 1. Create Multi-Node Cluster
+### One-Click Start
 
 ```bash
-# Using setup script
+# Run the one-click deployment script
 chmod +x deploy/k8s/setup-cluster.sh
 ./deploy/k8s/setup-cluster.sh
-
-# Or manually
-kind create cluster --name dawning --config deploy/k8s/kind-config.yaml
 ```
 
-This creates a cluster with 1 control-plane + 3 worker nodes:
-- Worker 1: Infrastructure (MySQL, Redis)
-- Worker 2: Messaging (Zookeeper, Kafka)
-- Worker 3: Application (Gateway, Identity API, Frontend)
+This script will automatically:
+1. Create a Kind cluster named `dawning` (1 control-plane + 3 worker nodes)
+2. Build and load all Docker images
+3. Deploy infrastructure (MySQL, Redis, Zookeeper, Kafka)
+4. Deploy application services (Identity API, Gateway API, Frontend)
+5. Configure Ingress for local access
 
-### 2. Build and Load Images
+### Access Services
+
+After deployment completes, add hosts entries:
 
 ```bash
-# Build images
-cd apps/gateway
-docker build -t dawning-identity-api:latest -f src/Dawning.Identity.Api/Dockerfile ../..
-docker build -t dawning-gateway-api:latest -f src/Dawning.Gateway.Api/Dockerfile ../..
-cd ../admin
-docker build -t dawning-admin-frontend:latest .
-
-# Load to Kind cluster
-kind load docker-image dawning-identity-api:latest --name dawning
-kind load docker-image dawning-gateway-api:latest --name dawning
-kind load docker-image dawning-admin-frontend:latest --name dawning
+# Using command (recommended)
+sudo sh -c 'echo "127.0.0.1 dawning.local api.dawning.local auth.dawning.local" >> /etc/hosts'
 ```
 
-### 3. Deploy
-
-```bash
-# Deploy dev environment (1 replica, low resources)
-kubectl apply -k deploy/k8s/overlays/dev
-
-# Or staging (2 replicas)
-kubectl apply -k deploy/k8s/overlays/staging
-
-# Or prod simulation (3 replicas, high resources)
-kubectl apply -k deploy/k8s/overlays/prod
-
-# Watch pods coming up
-kubectl get pods -n dawning -w
-```
-
-### 4. Access Services
-
-Add to `/etc/hosts`:
-```
-127.0.0.1 dawning.local api.dawning.local auth.dawning.local
-```
-
+Access URLs:
 - Frontend: http://dawning.local
 - API Gateway: http://api.dawning.local
 - Identity API: http://auth.dawning.local
@@ -252,44 +222,50 @@ Add to `/etc/hosts`:
 ### Useful Commands
 
 ```bash
-# Check pod distribution across nodes
+# Check cluster status
+kubectl get nodes
+
+# Check all pods
 kubectl get pods -n dawning -o wide
 
 # View logs
 kubectl logs -n dawning -l app=identity-api -f
 
-# Scale deployment
-kubectl scale deployment -n dawning gateway-api --replicas=5
-
-# Delete cluster
+# Delete cluster and clean up
 kind delete cluster --name dawning
 ```
 
-See [K8s Deployment Guide](deploy/k8s/README.md) for details.
+See [K8s Deployment Guide](deploy/k8s/README.md) for advanced configuration.
 
-## � GitOps Deployment (ArgoCD + Kustomize)
+## 🔄 GitOps Deployment (ArgoCD + Kustomize)
 
 Automate deployments using ArgoCD for continuous delivery from Git repository.
 
 ### Prerequisites
 
-- Kind cluster running
+- Kind cluster running (see Kubernetes One-Click Deployment above)
 - kubectl configured
 - ArgoCD CLI (`brew install argocd`)
 
-### One-Click Setup
+### Quick Setup
+
+**⚠️ Important:** Make sure the Kind cluster `dawning` is running before proceeding.
 
 ```bash
-# 1. Install ArgoCD
+# 1. Create Kind cluster first (if not done yet)
+chmod +x deploy/k8s/setup-cluster.sh
+./deploy/k8s/setup-cluster.sh
+
+# 2. Install ArgoCD
 chmod +x deploy/argocd/install-argocd.sh
 ./deploy/argocd/install-argocd.sh
 
-# 2. Access ArgoCD UI
+# 3. Access ArgoCD UI
 # Open: https://localhost:8080
 # Username: admin
 # Password: (displayed by install script)
 
-# 3. Deploy Applications
+# 4. Deploy Applications
 kubectl apply -f deploy/argocd/application-dev.yaml      # Dev (auto-sync)
 kubectl apply -f deploy/argocd/application-staging.yaml  # Staging (manual)
 kubectl apply -f deploy/argocd/application-prod.yaml     # Production (manual)
