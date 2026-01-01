@@ -44,3 +44,12 @@ spec:
         duration: 5s
         factor: 2
         maxDuration: 3m
+
+  # Info - display URLs in ArgoCD UI
+  info:
+    - name: Frontend
+      value: http://localhost/
+    - name: Identity API
+      value: http://localhost/auth/
+    - name: Gateway API
+      value: http://localhost/api/
