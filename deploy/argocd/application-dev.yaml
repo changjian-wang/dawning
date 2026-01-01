@@ -50,6 +50,6 @@ spec:
     - name: Frontend
       value: http://localhost/
     - name: Identity API
-      value: http://localhost/auth/
+      value: http://localhost/auth
     - name: Gateway API
-      value: http://localhost/api/
+      value: http://localhost/api
