@@ -20,8 +20,11 @@ replicas:
   - name: admin-frontend
     count: 2
 
-configMapGenerator:
-  - name: dawning-config
-    behavior: merge
-    literals:
-      - ASPNETCORE_ENVIRONMENT=Staging
+patches:
+  - target:
+      kind: ConfigMap
+      name: dawning-config
+    patch: |-
+      - op: replace
+        path: /data/ASPNETCORE_ENVIRONMENT
+        value: "Staging"

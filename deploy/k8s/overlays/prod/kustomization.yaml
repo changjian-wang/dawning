@@ -64,9 +64,10 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/resources/limits/cpu
         value: "2000m"
-
-configMapGenerator:
-  - name: dawning-config
-    behavior: merge
-    literals:
-      - ASPNETCORE_ENVIRONMENT=Production
+  - target:
+      kind: ConfigMap
+      name: dawning-config
+    patch: |-
+      - op: replace
+        path: /data/ASPNETCORE_ENVIRONMENT
+        value: "Production"

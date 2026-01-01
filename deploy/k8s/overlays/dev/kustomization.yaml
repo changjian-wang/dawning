@@ -45,9 +45,10 @@ patches:
       - op: replace
         path: /spec/template/spec/containers/0/resources/limits/memory
         value: "512Mi"
-
-configMapGenerator:
-  - name: dawning-config
-    behavior: merge
-    literals:
-      - ASPNETCORE_ENVIRONMENT=Development
+  - target:
+      kind: ConfigMap
+      name: dawning-config
+    patch: |-
+      - op: replace
+        path: /data/ASPNETCORE_ENVIRONMENT
+        value: "Development"
