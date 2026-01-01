@@ -10,7 +10,7 @@ spec:
   project: default
   
   source:
-    repoURL: https://github.com/changjian-wang/dawning
+    repoURL: https://gitee.com/aluneth_wang/dawning.git
     targetRevision: release  # Use release branch for prod
     path: deploy/k8s/overlays/prod
   

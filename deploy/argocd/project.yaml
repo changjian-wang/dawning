@@ -10,7 +10,7 @@ spec:
   
   # Allow deploying from these Git repos
   sourceRepos:
-    - https://github.com/changjian-wang/dawning
+    - https://gitee.com/aluneth_wang/dawning.git
     - '*'  # Remove this in production
   
   # Allow deploying to these clusters

@@ -14,7 +14,7 @@ spec:
   
   # Source - where the manifests are
   source:
-    repoURL: https://github.com/changjian-wang/dawning
+    repoURL: https://gitee.com/aluneth_wang/dawning.git
     targetRevision: main  # 或 HEAD
     path: deploy/k8s/overlays/dev
   
