@@ -10,10 +10,19 @@ on:
         description: 'Package version (e.g., 1.0.0)'
         required: true
         default: '1.0.0'
+      publish_to_nuget:
+        description: 'Publish to NuGet.org'
+        type: boolean
+        default: true
+      publish_to_github:
+        description: 'Publish to GitHub Packages'
+        type: boolean
+        default: false
 
 env:
   DOTNET_VERSION: '8.0.x'
   NUGET_SOURCE: 'https://nuget.pkg.github.com/changjian-wang/index.json'
+  NUGET_ORG_SOURCE: 'https://api.nuget.org/v3/index.json'
 
 jobs:
   build-and-publish:
@@ -76,7 +85,19 @@ jobs:
         working-directory: ./sdk
         run: ls -la ./nupkgs
 
+      # 发布到 NuGet.org（公开仓库，无需认证即可使用）
+      - name: Publish to NuGet.org
+        if: ${{ github.event_name == 'push' || github.event.inputs.publish_to_nuget == 'true' }}
+        working-directory: ./sdk
+        run: |
+          for package in ./nupkgs/*.nupkg; do
+            echo "Publishing $package to NuGet.org..."
+            dotnet nuget push "$package" --api-key ${{ secrets.NUGET_API_KEY }} --source "${{ env.NUGET_ORG_SOURCE }}" --skip-duplicate
+          done
+
+      # 发布到 GitHub Packages（可选）
       - name: Publish to GitHub Packages
+        if: ${{ github.event.inputs.publish_to_github == 'true' }}
         working-directory: ./sdk
         run: |
           # 移除已存在的源（如果有）
@@ -85,7 +106,7 @@ jobs:
           dotnet nuget add source --username changjian-wang --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "${{ env.NUGET_SOURCE }}"
           # 发布所有包
           for package in ./nupkgs/*.nupkg; do
-            echo "Publishing $package..."
+            echo "Publishing $package to GitHub Packages..."
             dotnet nuget push "$package" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github" --skip-duplicate
           done
 
