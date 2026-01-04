@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 创建新的 Vue 3 页面组件
-tools: ["semantic_search", "read_file", "create_file", "replace_string_in_file"]
 ---
 
 # 创建 Vue 3 页面组件

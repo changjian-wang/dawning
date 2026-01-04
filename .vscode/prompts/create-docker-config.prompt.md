@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 创建 Docker 配置和部署文件
-tools: ["read_file", "create_file", "semantic_search"]
 ---
 
 # 创建 Docker 配置

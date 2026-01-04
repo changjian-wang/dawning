@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 创建 SDK 包的新功能或扩展方法
-tools: ["semantic_search", "read_file", "create_file", "runTests"]
 ---
 
 # 创建 SDK 功能

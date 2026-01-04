@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 代码审查 - 检查代码质量和规范
-tools: ["read_file", "grep_search", "semantic_search"]
 ---
 
 # 代码审查

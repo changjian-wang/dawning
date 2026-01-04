@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 编写单元测试
-tools: ["semantic_search", "read_file", "create_file", "runTests"]
 ---
 
 # 编写单元测试

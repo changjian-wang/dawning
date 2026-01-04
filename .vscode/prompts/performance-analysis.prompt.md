@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 性能分析与优化建议
-tools: ["read_file", "grep_search", "semantic_search"]
 ---
 
 # 性能分析与优化

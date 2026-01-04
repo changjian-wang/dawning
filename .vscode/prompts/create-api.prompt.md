@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 创建新的后端 API 端点
-tools: ["semantic_search", "read_file", "create_file", "replace_string_in_file"]
 ---
 
 # 创建 ASP.NET Core API 端点

@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: Git 提交代码并遵循 Conventional Commits 规范
-tools: ["run_in_terminal", "get_changed_files"]
 ---
 
 # Git 提交

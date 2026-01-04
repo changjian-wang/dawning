@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 调试问题并找出根本原因
-tools: ["read_file", "grep_search", "semantic_search", "run_in_terminal", "get_errors"]
 ---
 
 # 问题调试

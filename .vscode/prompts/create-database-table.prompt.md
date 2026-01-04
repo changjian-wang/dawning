@@ -1,7 +1,5 @@
 ---
-mode: agent
 description: 创建数据库表和实体类
-tools: ["semantic_search", "read_file", "create_file"]
 ---
 
 # 创建数据库表和实体类
