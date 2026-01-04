@@ -5,17 +5,17 @@ using Dawning.Identity.Infra.Data.PersistentObjects.Administration;
 namespace Dawning.Identity.Infra.Data.Mapping.Administration
 {
     /// <summary>
-    /// User entity and domain model mapping configuration
+    /// AuditLog entity and domain model mapping configuration
     /// </summary>
-    public class UserProfile : Profile
+    public class AuditLogProfile : Profile
     {
-        public UserProfile()
+        public AuditLogProfile()
         {
             // Entity -> Domain Model
-            CreateMap<UserEntity, User>();
+            CreateMap<AuditLogEntity, AuditLog>();
 
             // Domain Model -> Entity
-            CreateMap<User, UserEntity>();
+            CreateMap<AuditLog, AuditLogEntity>();
         }
     }
 }

@@ -1,19 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using AutoMapper;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
 using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
     /// <summary>
-    /// 身份资源映射器
+    /// Identity resource entity and domain model mapper
     /// </summary>
     public static class IdentityResourceMappers
     {
+        private static IMapper Mapper { get; }
+
+        static IdentityResourceMappers()
+        {
+            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<IdentityResourceProfile>()).CreateMapper();
+        }
+
         /// <summary>
-        /// Entity转Model
+        /// Convert entity to domain model with optional claims
         /// </summary>
         public static IdentityResource ToModel(
             this IdentityResourceEntity entity,
@@ -23,78 +30,28 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
 
-            return new IdentityResource
-            {
-                Id = entity.Id,
-                Name = entity.Name,
-                DisplayName = entity.DisplayName,
-                Description = entity.Description,
-                Enabled = entity.Enabled,
-                Required = entity.Required,
-                Emphasize = entity.Emphasize,
-                ShowInDiscoveryDocument = entity.ShowInDiscoveryDocument,
-                UserClaims = claims?.Select(c => c.Type).ToList() ?? new List<string>(),
-                Properties = ParseJsonObject(entity.Properties),
-                CreatedAt = entity.CreatedAt,
-                UpdatedAt = entity.UpdatedAt,
-            };
+            var model = Mapper.Map<IdentityResource>(entity);
+            model.UserClaims = claims?.Select(c => c.Type).ToList() ?? new List<string>();
+            return model;
         }
 
         /// <summary>
-        /// Model转Entity
+        /// Convert domain model to entity
         /// </summary>
         public static IdentityResourceEntity ToEntity(this IdentityResource model)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            return new IdentityResourceEntity
-            {
-                Id = model.Id,
-                Name = model.Name,
-                DisplayName = model.DisplayName,
-                Description = model.Description,
-                Enabled = model.Enabled,
-                Required = model.Required,
-                Emphasize = model.Emphasize,
-                ShowInDiscoveryDocument = model.ShowInDiscoveryDocument,
-                Properties = SerializeJsonObject(model.Properties),
-                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                CreatedAt = model.CreatedAt,
-                UpdatedAt = model.UpdatedAt,
-            };
+            return Mapper.Map<IdentityResourceEntity>(model);
         }
 
         /// <summary>
-        /// 批量Entity转Model
+        /// Convert entity collection to domain model collection
         /// </summary>
-        public static IEnumerable<IdentityResource> ToModels(
-            this IEnumerable<IdentityResourceEntity> entities
-        )
+        public static IEnumerable<IdentityResource> ToModels(this IEnumerable<IdentityResourceEntity> entities)
         {
             return entities?.Select(e => e.ToModel()) ?? Enumerable.Empty<IdentityResource>();
-        }
-
-        private static Dictionary<string, string> ParseJsonObject(string? json)
-        {
-            if (string.IsNullOrWhiteSpace(json))
-                return new Dictionary<string, string>();
-            try
-            {
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
-                    ?? new Dictionary<string, string>();
-            }
-            catch
-            {
-                return new Dictionary<string, string>();
-            }
-        }
-
-        private static string? SerializeJsonObject(Dictionary<string, string>? dict)
-        {
-            if (dict == null || !dict.Any())
-                return null;
-            return JsonSerializer.Serialize(dict);
         }
     }
 }
