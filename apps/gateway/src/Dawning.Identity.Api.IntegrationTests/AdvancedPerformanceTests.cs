@@ -258,6 +258,9 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var pageSizes = new[] { 10, 20, 50, 100 };
         var results = new Dictionary<int, long>();
 
+        // Warmup request to handle cold start
+        await Client.GetAsync("/api/user?page=1&pageSize=10");
+
         // Act - Test performance of different pagination sizes
         foreach (var pageSize in pageSizes)
         {

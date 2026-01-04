@@ -65,6 +65,9 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
     [Fact]
     public async Task RoleList_Unauthorized_ShouldRespondWithin500ms()
     {
+        // Warmup request to handle cold start
+        await Client.GetAsync("/api/role");
+
         // Act
         var (response, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/role"));
 
