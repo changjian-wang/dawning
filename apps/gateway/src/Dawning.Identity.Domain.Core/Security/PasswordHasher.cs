@@ -4,22 +4,22 @@ using System.Text;
 namespace Dawning.Identity.Domain.Core.Security
 {
     /// <summary>
-    /// 密码哈希工具（使用 PBKDF2）
+    /// Password hashing utility (using PBKDF2)
     /// </summary>
     public static class PasswordHasher
     {
         private const int SaltSize = 16; // 128 bits
         private const int KeySize = 32; // 256 bits
-        private const int Iterations = 100000; // OWASP 推荐的迭代次数
+        private const int Iterations = 100000; // OWASP recommended iteration count
         private static readonly HashAlgorithmName Algorithm = HashAlgorithmName.SHA256;
 
         private const char Delimiter = ';';
 
         /// <summary>
-        /// 哈希密码
+        /// Hashes a password
         /// </summary>
-        /// <param name="password">明文密码</param>
-        /// <returns>格式: iterations;salt;hash</returns>
+        /// <param name="password">Plain text password</param>
+        /// <returns>Format: iterations;salt;hash</returns>
         public static string Hash(string password)
         {
             if (string.IsNullOrEmpty(password))
@@ -39,11 +39,11 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 验证密码
+        /// Verifies a password
         /// </summary>
-        /// <param name="password">待验证的明文密码</param>
-        /// <param name="passwordHash">存储的哈希值</param>
-        /// <returns>验证是否成功</returns>
+        /// <param name="password">Plain text password to verify</param>
+        /// <param name="passwordHash">Stored hash value</param>
+        /// <returns>Whether verification succeeded</returns>
         public static bool Verify(string password, string passwordHash)
         {
             if (string.IsNullOrEmpty(password))
@@ -85,7 +85,7 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 检查密码是否需要重新哈希（例如迭代次数已更新）
+        /// Checks whether the password needs to be rehashed (e.g., iteration count has been updated)
         /// </summary>
         public static bool NeedsRehash(string passwordHash)
         {

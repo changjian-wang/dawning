@@ -111,7 +111,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
         public async Task<IEnumerable<Permission>> GetByRoleIdAsync(Guid roleId)
         {
-            // 先获取角色的权限关联
+            // First get role permission associations
             var rolePermissions = await _context
                 .Connection.Builder<RolePermissionEntity>(_context.Transaction)
                 .Where(rp => rp.RoleId == roleId)
@@ -122,7 +122,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
             var permissionIds = rolePermissions.Select(rp => rp.PermissionId).ToList();
 
-            // 获取权限详情
+            // Get permission details
             var entities = await _context
                 .Connection.Builder<PermissionEntity>(_context.Transaction)
                 .Where(p => permissionIds.Contains(p.Id) && p.IsActive == true)
@@ -221,14 +221,14 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
             var now = DateTime.UtcNow;
 
-            // 获取已存在的权限关联
+            // Get existing permission associations
             var existingEntities = await _context
                 .Connection.Builder<RolePermissionEntity>(_context.Transaction)
                 .Where(rp => rp.RoleId == roleId)
                 .ToListAsync();
             var existingPermissionIds = existingEntities.Select(e => e.PermissionId).ToHashSet();
 
-            // 只插入不存在的关联
+            // Only insert associations that don't exist
             var newPermissionIds = permissionIdList
                 .Where(id => !existingPermissionIds.Contains(id))
                 .ToList();
@@ -258,7 +258,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             if (!permissionIdList.Any())
                 return true;
 
-            // 查找需要删除的实体
+            // Find entities to delete
             var entitiesToDelete = await _context
                 .Connection.Builder<RolePermissionEntity>(_context.Transaction)
                 .Where(rp => rp.RoleId == roleId && permissionIdList.Contains(rp.PermissionId))
@@ -289,7 +289,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
         public async Task<bool> HasPermissionAsync(Guid roleId, string permissionCode)
         {
-            // 先获取权限
+            // First get the permission
             var permission = await _context
                 .Connection.Builder<PermissionEntity>(_context.Transaction)
                 .Where(p => p.Code == permissionCode)
@@ -298,7 +298,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             if (permission == null)
                 return false;
 
-            // 检查角色是否有该权限
+            // Check if the role has this permission
             var rolePermission = await _context
                 .Connection.Builder<RolePermissionEntity>(_context.Transaction)
                 .Where(rp => rp.RoleId == roleId && rp.PermissionId == permission.Id)

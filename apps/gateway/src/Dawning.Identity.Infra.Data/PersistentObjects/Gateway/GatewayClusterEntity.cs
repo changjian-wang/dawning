@@ -4,152 +4,152 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Gateway
 {
     /// <summary>
-    /// 网关集群数据库实体
+    /// Gateway cluster database entity
     /// </summary>
     [Table("gateway_clusters")]
     public class GatewayClusterEntity
     {
         /// <summary>
-        /// 集群唯一标识
+        /// Cluster unique identifier
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 集群ID（YARP配置中使用的标识符）
+        /// Cluster ID (identifier used in YARP configuration)
         /// </summary>
         [Column("cluster_id")]
         public string ClusterId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 集群名称
+        /// Cluster name
         /// </summary>
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 集群描述
+        /// Cluster description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 负载均衡策略
+        /// Load balancing policy
         /// </summary>
         [Column("load_balancing_policy")]
         public string LoadBalancingPolicy { get; set; } = "RoundRobin";
 
         /// <summary>
-        /// 目标地址列表（JSON格式）
+        /// Destination addresses list (JSON format)
         /// </summary>
         [Column("destinations")]
         public string Destinations { get; set; } = "[]";
 
         /// <summary>
-        /// 健康检查配置 - 是否启用
+        /// Health check configuration - whether enabled
         /// </summary>
         [Column("health_check_enabled")]
         public bool HealthCheckEnabled { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 检查间隔（秒）
+        /// Health check configuration - check interval (seconds)
         /// </summary>
         [Column("health_check_interval")]
         public int? HealthCheckInterval { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 超时时间（秒）
+        /// Health check configuration - timeout (seconds)
         /// </summary>
         [Column("health_check_timeout")]
         public int? HealthCheckTimeout { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 健康检查路径
+        /// Health check configuration - health check path
         /// </summary>
         [Column("health_check_path")]
         public string? HealthCheckPath { get; set; }
 
         /// <summary>
-        /// 被动健康检查策略
+        /// Passive health check policy
         /// </summary>
         [Column("passive_health_policy")]
         public string? PassiveHealthPolicy { get; set; }
 
         /// <summary>
-        /// 会话亲和性配置 - 是否启用
+        /// Session affinity configuration - whether enabled
         /// </summary>
         [Column("session_affinity_enabled")]
         public bool SessionAffinityEnabled { get; set; }
 
         /// <summary>
-        /// 会话亲和性配置 - 策略
+        /// Session affinity configuration - policy
         /// </summary>
         [Column("session_affinity_policy")]
         public string? SessionAffinityPolicy { get; set; }
 
         /// <summary>
-        /// 会话亲和性配置 - 亲和键名
+        /// Session affinity configuration - affinity key name
         /// </summary>
         [Column("session_affinity_key_name")]
         public string? SessionAffinityKeyName { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 最大连接数
+        /// HTTP client configuration - maximum connections
         /// </summary>
         [Column("max_connections_per_server")]
         public int? MaxConnectionsPerServer { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 请求超时（秒）
+        /// HTTP client configuration - request timeout (seconds)
         /// </summary>
         [Column("request_timeout_seconds")]
         public int? RequestTimeoutSeconds { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 允许的HTTP版本
+        /// HTTP client configuration - allowed HTTP versions
         /// </summary>
         [Column("allowed_http_versions")]
         public string? AllowedHttpVersions { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 是否验证SSL证书
+        /// HTTP client configuration - whether to validate SSL certificate
         /// </summary>
         [Column("dangerous_accept_any_server_certificate")]
         public bool DangerousAcceptAnyServerCertificate { get; set; }
 
         /// <summary>
-        /// 元数据（JSON格式）
+        /// Metadata (JSON format)
         /// </summary>
         [Column("metadata")]
         public string? Metadata { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_enabled")]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者
+        /// Creator
         /// </summary>
         [Column("created_by")]
         public string? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者
+        /// Updater
         /// </summary>
         [Column("updated_by")]
         public string? UpdatedBy { get; set; }

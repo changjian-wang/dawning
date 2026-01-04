@@ -4,61 +4,61 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Application.Interfaces.Security
 {
     /// <summary>
-    /// 登录锁定服务接口
+    /// Login lockout service interface
     /// </summary>
     public interface ILoginLockoutService
     {
         /// <summary>
-        /// 检查用户是否被锁定
+        /// Check if user is locked out
         /// </summary>
-        /// <param name="username">用户名</param>
-        /// <returns>如果被锁定，返回锁定结束时间；否则返回 null</returns>
+        /// <param name="username">Username</param>
+        /// <returns>If locked out, returns the lockout end time; otherwise returns null</returns>
         Task<DateTime?> IsLockedOutAsync(string username);
 
         /// <summary>
-        /// 记录登录失败
+        /// Record failed login attempt
         /// </summary>
-        /// <param name="username">用户名</param>
-        /// <returns>返回当前失败次数和是否被锁定</returns>
+        /// <param name="username">Username</param>
+        /// <returns>Returns the current failed count and whether the user is locked out</returns>
         Task<(int failedCount, bool isLockedOut, DateTime? lockoutEnd)> RecordFailedLoginAsync(
             string username
         );
 
         /// <summary>
-        /// 重置登录失败计数（登录成功后调用）
+        /// Reset failed login count (called after successful login)
         /// </summary>
-        /// <param name="username">用户名</param>
+        /// <param name="username">Username</param>
         Task ResetFailedCountAsync(string username);
 
         /// <summary>
-        /// 解锁用户账户
+        /// Unlock user account
         /// </summary>
-        /// <param name="userId">用户ID</param>
+        /// <param name="userId">User ID</param>
         Task UnlockUserAsync(Guid userId);
 
         /// <summary>
-        /// 获取锁定配置
+        /// Get lockout settings
         /// </summary>
         Task<LockoutSettings> GetLockoutSettingsAsync();
     }
 
     /// <summary>
-    /// 锁定配置
+    /// Lockout settings
     /// </summary>
     public class LockoutSettings
     {
         /// <summary>
-        /// 是否启用登录锁定
+        /// Whether login lockout is enabled
         /// </summary>
         public bool Enabled { get; set; } = true;
 
         /// <summary>
-        /// 最大失败次数
+        /// Maximum failed attempts
         /// </summary>
         public int MaxFailedAttempts { get; set; } = 5;
 
         /// <summary>
-        /// 锁定时长（分钟）
+        /// Lockout duration (minutes)
         /// </summary>
         public int LockoutDurationMinutes { get; set; } = 15;
     }

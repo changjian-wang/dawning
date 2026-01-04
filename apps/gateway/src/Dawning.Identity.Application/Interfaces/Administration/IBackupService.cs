@@ -6,160 +6,160 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 namespace Dawning.Identity.Application.Interfaces.Administration
 {
     /// <summary>
-    /// 数据库备份服务接口
+    /// Database backup service interface
     /// </summary>
     public interface IBackupService
     {
         /// <summary>
-        /// 创建数据库备份
+        /// Create database backup
         /// </summary>
-        /// <param name="options">备份选项</param>
-        /// <returns>备份结果</returns>
+        /// <param name="options">Backup options</param>
+        /// <returns>Backup result</returns>
         Task<BackupResult> CreateBackupAsync(BackupOptions? options = null);
 
         /// <summary>
-        /// 获取备份历史列表
+        /// Get backup history list
         /// </summary>
-        /// <param name="count">返回数量</param>
-        /// <returns>备份记录列表</returns>
+        /// <param name="count">Number of records to return</param>
+        /// <returns>List of backup records</returns>
         Task<List<BackupRecord>> GetBackupHistoryAsync(int count = 20);
 
         /// <summary>
-        /// 删除指定备份
+        /// Delete specified backup
         /// </summary>
-        /// <param name="backupId">备份ID</param>
-        /// <returns>是否成功</returns>
+        /// <param name="backupId">Backup ID</param>
+        /// <returns>Whether successful</returns>
         Task<bool> DeleteBackupAsync(Guid backupId);
 
         /// <summary>
-        /// 清理过期备份
+        /// Clean up expired backups
         /// </summary>
-        /// <param name="retentionDays">保留天数</param>
-        /// <returns>删除的备份数量</returns>
+        /// <param name="retentionDays">Retention days</param>
+        /// <returns>Number of deleted backups</returns>
         Task<int> CleanupOldBackupsAsync(int retentionDays);
 
         /// <summary>
-        /// 获取备份配置
+        /// Get backup configuration
         /// </summary>
-        /// <returns>备份配置</returns>
+        /// <returns>Backup configuration</returns>
         Task<BackupConfiguration> GetConfigurationAsync();
 
         /// <summary>
-        /// 更新备份配置
+        /// Update backup configuration
         /// </summary>
-        /// <param name="config">新配置</param>
+        /// <param name="config">New configuration</param>
         Task UpdateConfigurationAsync(BackupConfiguration config);
     }
 
     /// <summary>
-    /// 备份选项
+    /// Backup options
     /// </summary>
     public class BackupOptions
     {
         /// <summary>
-        /// 备份类型（full=完整备份，incremental=增量备份）
+        /// Backup type (full=full backup, incremental=incremental backup)
         /// </summary>
         public string BackupType { get; set; } = "full";
 
         /// <summary>
-        /// 是否压缩备份文件
+        /// Whether to compress backup file
         /// </summary>
         public bool Compress { get; set; } = true;
 
         /// <summary>
-        /// 是否包含配置表
+        /// Whether to include configuration tables
         /// </summary>
         public bool IncludeConfigs { get; set; } = true;
 
         /// <summary>
-        /// 是否包含日志表
+        /// Whether to include log tables
         /// </summary>
         public bool IncludeLogs { get; set; } = false;
 
         /// <summary>
-        /// 备份说明
+        /// Backup description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否为手动触发
+        /// Whether manually triggered
         /// </summary>
         public bool IsManual { get; set; } = true;
     }
 
     /// <summary>
-    /// 备份结果
+    /// Backup result
     /// </summary>
     public class BackupResult
     {
         /// <summary>
-        /// 是否成功
+        /// Whether successful
         /// </summary>
         public bool Success { get; set; }
 
         /// <summary>
-        /// 备份记录
+        /// Backup record
         /// </summary>
         public BackupRecord? Backup { get; set; }
 
         /// <summary>
-        /// 错误消息（如果失败）
+        /// Error message (if failed)
         /// </summary>
         public string? ErrorMessage { get; set; }
 
         /// <summary>
-        /// 备份耗时（秒）
+        /// Backup duration (seconds)
         /// </summary>
         public double DurationSeconds { get; set; }
     }
 
     /// <summary>
-    /// 备份配置
+    /// Backup configuration
     /// </summary>
     public class BackupConfiguration
     {
         /// <summary>
-        /// 是否启用自动备份
+        /// Whether auto backup is enabled
         /// </summary>
         public bool AutoBackupEnabled { get; set; } = true;
 
         /// <summary>
-        /// 自动备份间隔（小时）
+        /// Auto backup interval (hours)
         /// </summary>
         public int AutoBackupIntervalHours { get; set; } = 24;
 
         /// <summary>
-        /// 自动备份 Cron 表达式
+        /// Auto backup Cron expression
         /// </summary>
         public string AutoBackupCron { get; set; } = "0 2 * * *";
 
         /// <summary>
-        /// 备份保留天数
+        /// Backup retention days
         /// </summary>
         public int RetentionDays { get; set; } = 30;
 
         /// <summary>
-        /// 最大备份数量
+        /// Maximum backup count
         /// </summary>
         public int MaxBackupCount { get; set; } = 50;
 
         /// <summary>
-        /// 备份存储路径
+        /// Backup storage path
         /// </summary>
         public string BackupPath { get; set; } = "backups";
 
         /// <summary>
-        /// 是否压缩备份
+        /// Whether to compress backups
         /// </summary>
         public bool CompressBackups { get; set; } = true;
 
         /// <summary>
-        /// 自动备份包含日志
+        /// Auto backup includes logs
         /// </summary>
         public bool AutoBackupIncludeLogs { get; set; } = false;
 
         /// <summary>
-        /// 上次自动备份时间
+        /// Last auto backup time
         /// </summary>
         public DateTime? LastAutoBackupAt { get; set; }
     }

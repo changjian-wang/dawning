@@ -5,163 +5,163 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Application.Interfaces.Token
 {
     /// <summary>
-    /// Token 管理服务接口
+    /// Token management service interface
     /// </summary>
     public interface ITokenManagementService
     {
         /// <summary>
-        /// 撤销用户的所有令牌
+        /// Revokes all tokens of a user
         /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <returns>撤销的令牌数量</returns>
+        /// <param name="userId">User ID</param>
+        /// <returns>Number of revoked tokens</returns>
         Task<int> RevokeAllUserTokensAsync(Guid userId);
 
         /// <summary>
-        /// 撤销指定令牌
+        /// Revokes a specified token
         /// </summary>
-        /// <param name="tokenId">令牌ID</param>
+        /// <param name="tokenId">Token ID</param>
         Task<bool> RevokeTokenAsync(Guid tokenId);
 
         /// <summary>
-        /// 撤销指定设备的令牌
+        /// Revokes tokens of a specified device
         /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <param name="deviceId">设备ID</param>
+        /// <param name="userId">User ID</param>
+        /// <param name="deviceId">Device ID</param>
         Task<int> RevokeDeviceTokensAsync(Guid userId, string deviceId);
 
         /// <summary>
-        /// 获取用户的活跃会话列表
+        /// Gets the list of active sessions for a user
         /// </summary>
-        /// <param name="userId">用户ID</param>
+        /// <param name="userId">User ID</param>
         Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(Guid userId);
 
         /// <summary>
-        /// 记录用户登录会话
+        /// Records a user login session
         /// </summary>
         Task RecordLoginSessionAsync(LoginSessionInfo session);
 
         /// <summary>
-        /// 检查是否允许登录（基于设备策略）
+        /// Checks whether login is allowed (based on device policy)
         /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <param name="deviceId">设备ID</param>
+        /// <param name="userId">User ID</param>
+        /// <param name="deviceId">Device ID</param>
         Task<(bool allowed, string? message)> CheckLoginPolicyAsync(Guid userId, string deviceId);
 
         /// <summary>
-        /// 获取登录策略设置
+        /// Gets the login policy settings
         /// </summary>
         Task<LoginPolicySettings> GetLoginPolicyAsync();
     }
 
     /// <summary>
-    /// 用户会话信息
+    /// User session information
     /// </summary>
     public class UserSessionDto
     {
         /// <summary>
-        /// 会话ID
+        /// Session ID
         /// </summary>
         public Guid SessionId { get; set; }
 
         /// <summary>
-        /// 设备ID
+        /// Device ID
         /// </summary>
         public string DeviceId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 设备类型（web, mobile, desktop）
+        /// Device type (web, mobile, desktop)
         /// </summary>
         public string DeviceType { get; set; } = "unknown";
 
         /// <summary>
-        /// 设备名称/用户代理
+        /// Device name/user agent
         /// </summary>
         public string DeviceName { get; set; } = string.Empty;
 
         /// <summary>
-        /// IP 地址
+        /// IP address
         /// </summary>
         public string IpAddress { get; set; } = string.Empty;
 
         /// <summary>
-        /// 登录时间
+        /// Login time
         /// </summary>
         public DateTime LoginTime { get; set; }
 
         /// <summary>
-        /// 最后活跃时间
+        /// Last active time
         /// </summary>
         public DateTime LastActiveTime { get; set; }
 
         /// <summary>
-        /// 是否为当前会话
+        /// Whether this is the current session
         /// </summary>
         public bool IsCurrent { get; set; }
     }
 
     /// <summary>
-    /// 登录会话信息（用于记录）
+    /// Login session information (for recording)
     /// </summary>
     public class LoginSessionInfo
     {
         /// <summary>
-        /// 用户ID
+        /// User ID
         /// </summary>
         public Guid UserId { get; set; }
 
         /// <summary>
-        /// 令牌ID
+        /// Token ID
         /// </summary>
         public Guid TokenId { get; set; }
 
         /// <summary>
-        /// 设备ID
+        /// Device ID
         /// </summary>
         public string DeviceId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 设备类型
+        /// Device type
         /// </summary>
         public string DeviceType { get; set; } = "web";
 
         /// <summary>
-        /// 设备名称/用户代理
+        /// Device name/user agent
         /// </summary>
         public string DeviceName { get; set; } = string.Empty;
 
         /// <summary>
-        /// IP 地址
+        /// IP address
         /// </summary>
         public string IpAddress { get; set; } = string.Empty;
     }
 
     /// <summary>
-    /// 登录策略设置
+    /// Login policy settings
     /// </summary>
     public class LoginPolicySettings
     {
         /// <summary>
-        /// 是否允许多设备登录
+        /// Whether multiple device login is allowed
         /// </summary>
         public bool AllowMultipleDevices { get; set; } = true;
 
         /// <summary>
-        /// 最大允许设备数（0表示不限制）
+        /// Maximum allowed devices (0 means no limit)
         /// </summary>
         public int MaxDevices { get; set; } = 0;
 
         /// <summary>
-        /// 新设备登录时的策略（allow, deny, kick_oldest）
+        /// Policy for new device login (allow, deny, kick_oldest)
         /// </summary>
         public string NewDevicePolicy { get; set; } = "allow";
 
         /// <summary>
-        /// 刷新令牌有效期（天）
+        /// Refresh token lifetime (days)
         /// </summary>
         public int RefreshTokenLifetimeDays { get; set; } = 30;
 
         /// <summary>
-        /// 访问令牌有效期（分钟）
+        /// Access token lifetime (minutes)
         /// </summary>
         public int AccessTokenLifetimeMinutes { get; set; } = 60;
     }

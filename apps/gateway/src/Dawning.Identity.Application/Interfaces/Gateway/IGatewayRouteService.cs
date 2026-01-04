@@ -8,27 +8,27 @@ using Dawning.Identity.Domain.Models.Gateway;
 namespace Dawning.Identity.Application.Interfaces.Gateway
 {
     /// <summary>
-    /// 网关路由服务接口
+    /// Gateway route service interface
     /// </summary>
     public interface IGatewayRouteService
     {
         /// <summary>
-        /// 根据ID获取路由
+        /// Get route by ID
         /// </summary>
         Task<GatewayRouteDto?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据RouteId获取路由
+        /// Get route by RouteId
         /// </summary>
         Task<GatewayRouteDto?> GetByRouteIdAsync(string routeId);
 
         /// <summary>
-        /// 获取所有启用的路由（用于YARP配置）
+        /// Get all enabled routes (for YARP configuration)
         /// </summary>
         Task<IEnumerable<GatewayRouteDto>> GetAllEnabledAsync();
 
         /// <summary>
-        /// 获取分页路由列表
+        /// Get paginated route list
         /// </summary>
         Task<PagedData<GatewayRouteDto>> GetPagedListAsync(
             GatewayRouteQueryModel queryModel,
@@ -37,22 +37,22 @@ namespace Dawning.Identity.Application.Interfaces.Gateway
         );
 
         /// <summary>
-        /// 创建路由
+        /// Create route
         /// </summary>
         Task<GatewayRouteDto> CreateAsync(CreateGatewayRouteDto dto, string? username = null);
 
         /// <summary>
-        /// 更新路由
+        /// Update route
         /// </summary>
         Task<GatewayRouteDto?> UpdateAsync(UpdateGatewayRouteDto dto, string? username = null);
 
         /// <summary>
-        /// 删除路由
+        /// Delete route
         /// </summary>
         Task<bool> DeleteAsync(Guid id);
 
         /// <summary>
-        /// 切换路由启用状态
+        /// Toggle route enabled status
         /// </summary>
         Task<bool> ToggleEnabledAsync(Guid id, bool isEnabled, string? username = null);
     }

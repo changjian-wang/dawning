@@ -143,7 +143,7 @@ public class PermissionServiceTests
 
         // Act & Assert
         var action = async () => await _permissionService.CreateAsync(createDto, null);
-        await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("*已存在*");
+        await action.Should().ThrowAsync<InvalidOperationException>().WithMessage("*already exists*");
     }
 
     [Fact]

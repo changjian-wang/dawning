@@ -15,7 +15,7 @@ using Dawning.Identity.Domain.Models.OpenIddict;
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
     /// <summary>
-    /// API资源服务实现
+    /// API resource service implementation
     /// </summary>
     public class ApiResourceService : IApiResourceService
     {
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         }
 
         /// <summary>
-        /// 记录审计日志
+        /// Record audit log
         /// </summary>
         private async Task LogAuditAsync(
             Guid userId,
@@ -95,7 +95,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<int> InsertAsync(ApiResourceDto dto)
         {
-            // 验证必填字段
+            // Validate required fields
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
                 throw new ArgumentException("API Resource name is required");
@@ -106,7 +106,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new ArgumentException("API Resource display name is required");
             }
 
-            // 检查名称唯一性
+            // Check name uniqueness
             var existingResource = await _unitOfWork.ApiResource.GetByNameAsync(dto.Name);
             if (existingResource != null)
             {
@@ -115,12 +115,12 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 );
             }
 
-            // 映射并准备模型
+            // Map and prepare model
             var model = _mapper.Map<ApiResource>(dto);
             model.Id = Guid.NewGuid();
             model.CreatedAt = DateTime.UtcNow;
 
-            // 去重Scopes和Claims
+            // Deduplicate Scopes and Claims
             if (model.Scopes != null && model.Scopes.Any())
             {
                 model.Scopes = model.Scopes.Distinct().ToList();
@@ -133,7 +133,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             int result = await _unitOfWork.ApiResource.InsertAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             if (dto.OperatorId.HasValue)
             {
                 await LogAuditAsync(
@@ -150,20 +150,20 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<bool> UpdateAsync(ApiResourceDto dto)
         {
-            // 验证ID
+            // Validate ID
             if (dto.Id == null || dto.Id == Guid.Empty)
             {
                 throw new ArgumentException("API Resource ID is required");
             }
 
-            // 检查资源是否存在
+            // Check if resource exists
             var existingResource = await _unitOfWork.ApiResource.GetAsync(dto.Id.Value);
             if (existingResource == null)
             {
                 throw new InvalidOperationException($"API Resource with ID '{dto.Id}' not found");
             }
 
-            // 如果名称被修改，检查唯一性
+            // If name was modified, check uniqueness
             if (!string.IsNullOrWhiteSpace(dto.Name) && dto.Name != existingResource.Name)
             {
                 var duplicateResource = await _unitOfWork.ApiResource.GetByNameAsync(dto.Name);
@@ -175,10 +175,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 }
             }
 
-            // 映射并更新
+            // Map and update
             var model = _mapper.Map<ApiResource>(dto);
 
-            // 去重Scopes和Claims
+            // Deduplicate Scopes and Claims
             if (model.Scopes != null && model.Scopes.Any())
             {
                 model.Scopes = model.Scopes.Distinct().ToList();
@@ -191,7 +191,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             bool result = await _unitOfWork.ApiResource.UpdateAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             if (dto.OperatorId.HasValue)
             {
                 await LogAuditAsync(
@@ -208,13 +208,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<bool> DeleteAsync(ApiResourceDto dto)
         {
-            // 验证ID
+            // Validate ID
             if (dto?.Id == null || dto.Id == Guid.Empty)
             {
                 throw new ArgumentException("API Resource ID is required");
             }
 
-            // 检查资源是否存在
+            // Check if resource exists
             var existingResource = await _unitOfWork.ApiResource.GetAsync(dto.Id.Value);
             if (existingResource == null)
             {
@@ -224,7 +224,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             var model = dto?.ToModel() ?? new ApiResource();
             bool result = await _unitOfWork.ApiResource.DeleteAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             if (dto?.OperatorId.HasValue == true)
             {
                 await LogAuditAsync(

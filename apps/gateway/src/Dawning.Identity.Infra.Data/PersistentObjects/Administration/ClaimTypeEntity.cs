@@ -11,64 +11,64 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
     public class ClaimTypeEntity
     {
         /// <summary>
-        /// 唯一ID
+        /// Unique ID
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 名称
+        /// Name
         /// </summary>
         [Column("name")]
         public string? Name { get; set; }
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         [Column("display_name")]
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 类型。String, Int, DateTime, Boolean, Enum
+        /// Type. String, Int, DateTime, Boolean, Enum
         /// </summary>
         [Column("type")]
         public string? Type { get; set; }
 
         /// <summary>
-        /// 描述说明
+        /// Description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否必须项
+        /// Whether required
         /// </summary>
         [Column("required")]
         public bool Required { get; set; } = false;
 
         /// <summary>
-        /// 用户是否可编辑
+        /// Whether non-editable by user
         /// </summary>
         [Column("non_editable")]
         public bool NonEditable { get; set; } = true;
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         [Column("timestamp")]
         [DefaultSortName]
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [IgnoreUpdate]
         [Column("created")]
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated")]
         public DateTime? Updated { get; set; }

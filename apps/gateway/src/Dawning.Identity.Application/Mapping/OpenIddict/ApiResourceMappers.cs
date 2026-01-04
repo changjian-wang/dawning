@@ -6,7 +6,7 @@ using Dawning.Identity.Domain.Aggregates.OpenIddict;
 namespace Dawning.Identity.Application.Mapping.OpenIddict
 {
     /// <summary>
-    /// API资源映射器
+    /// API resource mapper
     /// </summary>
     public static class ApiResourceMappers
     {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Application.Mapping.OpenIddict
     }
 
     /// <summary>
-    /// API资源AutoMapper配置
+    /// API resource AutoMapper configuration
     /// </summary>
     public class ApiResourceProfile : Profile
     {

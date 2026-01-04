@@ -13,7 +13,7 @@ using Dawning.Identity.Domain.Models.Gateway;
 namespace Dawning.Identity.Application.Services.Gateway
 {
     /// <summary>
-    /// 网关路由服务实现
+    /// Gateway route service implementation
     /// </summary>
     public class GatewayRouteService : IGatewayRouteService
     {
@@ -27,7 +27,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 根据ID获取路由
+        /// Get route by ID
         /// </summary>
         public async Task<GatewayRouteDto?> GetAsync(Guid id)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 根据RouteId获取路由
+        /// Get route by RouteId
         /// </summary>
         public async Task<GatewayRouteDto?> GetByRouteIdAsync(string routeId)
         {
@@ -45,7 +45,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 获取所有启用的路由
+        /// Get all enabled routes
         /// </summary>
         public async Task<IEnumerable<GatewayRouteDto>> GetAllEnabledAsync()
         {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 获取分页路由列表
+        /// Get paged route list
         /// </summary>
         public async Task<PagedData<GatewayRouteDto>> GetPagedListAsync(
             GatewayRouteQueryModel queryModel,
@@ -73,24 +73,24 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 创建路由
+        /// Create route
         /// </summary>
         public async Task<GatewayRouteDto> CreateAsync(
             CreateGatewayRouteDto dto,
             string? username = null
         )
         {
-            // 检查RouteId是否已存在
+            // Check if RouteId already exists
             if (await _uow.GatewayRoute.ExistsByRouteIdAsync(dto.RouteId))
             {
-                throw new InvalidOperationException($"路由ID '{dto.RouteId}' 已存在");
+                throw new InvalidOperationException($"Route ID '{dto.RouteId}' already exists");
             }
 
-            // 检查集群是否存在
+            // Check if cluster exists
             var cluster = await _uow.GatewayCluster.GetByClusterIdAsync(dto.ClusterId);
             if (cluster == null)
             {
-                throw new InvalidOperationException($"集群 '{dto.ClusterId}' 不存在");
+                throw new InvalidOperationException($"Cluster '{dto.ClusterId}' not found");
             }
 
             var route = _mapper.Map<GatewayRoute>(dto);
@@ -104,7 +104,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 更新路由
+        /// Update route
         /// </summary>
         public async Task<GatewayRouteDto?> UpdateAsync(
             UpdateGatewayRouteDto dto,
@@ -117,17 +117,17 @@ namespace Dawning.Identity.Application.Services.Gateway
                 return null;
             }
 
-            // 检查RouteId是否被其他记录使用
+            // Check if RouteId is used by other records
             if (await _uow.GatewayRoute.ExistsByRouteIdAsync(dto.RouteId, dto.Id))
             {
-                throw new InvalidOperationException($"路由ID '{dto.RouteId}' 已被其他路由使用");
+                throw new InvalidOperationException($"Route ID '{dto.RouteId}' is already used by another route");
             }
 
-            // 检查集群是否存在
+            // Check if cluster exists
             var cluster = await _uow.GatewayCluster.GetByClusterIdAsync(dto.ClusterId);
             if (cluster == null)
             {
-                throw new InvalidOperationException($"集群 '{dto.ClusterId}' 不存在");
+                throw new InvalidOperationException($"Cluster '{dto.ClusterId}' not found");
             }
 
             _mapper.Map(dto, existing);
@@ -140,7 +140,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 删除路由
+        /// Delete route
         /// </summary>
         public async Task<bool> DeleteAsync(Guid id)
         {
@@ -149,7 +149,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 切换路由启用状态
+        /// Toggle route enabled status
         /// </summary>
         public async Task<bool> ToggleEnabledAsync(Guid id, bool isEnabled, string? username = null)
         {

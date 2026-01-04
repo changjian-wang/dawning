@@ -1,27 +1,27 @@
 namespace Dawning.Identity.Domain.Models.OpenIddict
 {
     /// <summary>
-    /// API资源查询模型
+    /// API resource query model
     /// </summary>
     public class ApiResourceModel
     {
         /// <summary>
-        /// 资源名称(模糊匹配)
+        /// Resource name (fuzzy match)
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 显示名称(模糊匹配)
+        /// Display name (fuzzy match)
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Is enabled
         /// </summary>
         public bool? Enabled { get; set; }
 
         /// <summary>
-        /// 关联的作用域(精确匹配)
+        /// Associated scope (exact match)
         /// </summary>
         public string? Scope { get; set; }
     }

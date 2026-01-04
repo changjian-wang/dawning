@@ -9,27 +9,27 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Application.Interfaces.Administration
 {
     /// <summary>
-    /// 用户应用服务接口
+    /// User application service interface
     /// </summary>
     public interface IUserService
     {
         /// <summary>
-        /// 根据ID获取用户
+        /// Get user by ID
         /// </summary>
         Task<UserDto?> GetByIdAsync(Guid id);
 
         /// <summary>
-        /// 根据用户名获取用户
+        /// Get user by username
         /// </summary>
         Task<UserDto?> GetByUsernameAsync(string username);
 
         /// <summary>
-        /// 获取分页用户列表
+        /// Get paged user list
         /// </summary>
         Task<PagedData<UserDto>> GetPagedListAsync(UserModel model, int page, int itemsPerPage);
 
         /// <summary>
-        /// 获取用户列表（Cursor 分页）
+        /// Get user list (Cursor pagination)
         /// </summary>
         Task<CursorPagedData<UserDto>> GetPagedListByCursorAsync(
             UserModel model,
@@ -38,67 +38,67 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         );
 
         /// <summary>
-        /// 创建用户
+        /// Create user
         /// </summary>
         Task<UserDto> CreateAsync(CreateUserDto dto, Guid? operatorId = null);
 
         /// <summary>
-        /// 更新用户
+        /// Update user
         /// </summary>
         Task<UserDto> UpdateAsync(UpdateUserDto dto, Guid? operatorId = null);
 
         /// <summary>
-        /// 删除用户
+        /// Delete user
         /// </summary>
         Task<bool> DeleteAsync(Guid id, Guid? operatorId = null);
 
         /// <summary>
-        /// 修改密码
+        /// Change password
         /// </summary>
         Task<bool> ChangePasswordAsync(ChangePasswordDto dto);
 
         /// <summary>
-        /// 重置密码（管理员功能）
+        /// Reset password (admin function)
         /// </summary>
         Task<bool> ResetPasswordAsync(Guid userId, string newPassword);
 
         /// <summary>
-        /// 检查用户名是否存在
+        /// Check if username exists
         /// </summary>
         Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null);
 
         /// <summary>
-        /// 检查邮箱是否存在
+        /// Check if email exists
         /// </summary>
         Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null);
 
         /// <summary>
-        /// 更新最后登录时间
+        /// Update last login time
         /// </summary>
         Task UpdateLastLoginAsync(Guid userId);
 
         /// <summary>
-        /// 验证用户密码
+        /// Validate user password
         /// </summary>
         Task<UserDto?> ValidatePasswordAsync(string username, string password);
 
         /// <summary>
-        /// 验证用户凭据并更新登录时间
+        /// Validate user credentials and update login time
         /// </summary>
         Task<UserDto?> ValidateCredentialsAndUpdateLoginAsync(string username, string password);
 
         /// <summary>
-        /// 获取用户的所有角色
+        /// Get all roles for user
         /// </summary>
         Task<IEnumerable<RoleDto>> GetUserRolesAsync(Guid userId);
 
         /// <summary>
-        /// 获取用户详情（含角色）
+        /// Get user details (with roles)
         /// </summary>
         Task<UserWithRolesDto?> GetUserWithRolesAsync(Guid userId);
 
         /// <summary>
-        /// 为用户分配角色
+        /// Assign roles to user
         /// </summary>
         Task<bool> AssignRolesAsync(
             Guid userId,
@@ -107,53 +107,53 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         );
 
         /// <summary>
-        /// 移除用户的角色
+        /// Remove role from user
         /// </summary>
         Task<bool> RemoveRoleAsync(Guid userId, Guid roleId);
 
         /// <summary>
-        /// 获取用户统计信息
+        /// Get user statistics
         /// </summary>
         Task<UserStatisticsDto> GetUserStatisticsAsync();
 
         /// <summary>
-        /// 获取最近活跃用户（基于最后登录时间）
+        /// Get recently active users (based on last login time)
         /// </summary>
         Task<IEnumerable<RecentActiveUserDto>> GetRecentActiveUsersAsync(int count = 10);
     }
 
     /// <summary>
-    /// 用户统计信息 DTO
+    /// User statistics DTO
     /// </summary>
     public class UserStatisticsDto
     {
-        /// <summary>总用户数</summary>
+        /// <summary>Total user count</summary>
         public int TotalUsers { get; set; }
 
-        /// <summary>活跃用户数（is_active = true）</summary>
+        /// <summary>Active user count (is_active = true)</summary>
         public int ActiveUsers { get; set; }
 
-        /// <summary>今日登录用户数</summary>
+        /// <summary>Users logged in today</summary>
         public int TodayLoginUsers { get; set; }
 
-        /// <summary>本周登录用户数</summary>
+        /// <summary>Users logged in this week</summary>
         public int WeekLoginUsers { get; set; }
 
-        /// <summary>本月登录用户数</summary>
+        /// <summary>Users logged in this month</summary>
         public int MonthLoginUsers { get; set; }
 
-        /// <summary>从未登录用户数</summary>
+        /// <summary>Users who never logged in</summary>
         public int NeverLoginUsers { get; set; }
 
-        /// <summary>按角色统计</summary>
+        /// <summary>Statistics by role</summary>
         public Dictionary<string, int> UsersByRole { get; set; } = new();
 
-        /// <summary>统计时间</summary>
+        /// <summary>Statistics generation time</summary>
         public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
-    /// 最近活跃用户 DTO
+    /// Recently active user DTO
     /// </summary>
     public class RecentActiveUserDto
     {

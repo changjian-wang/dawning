@@ -8,16 +8,16 @@ using Microsoft.AspNetCore.Http;
 namespace Dawning.Identity.Application.Interfaces.Administration
 {
     /// <summary>
-    /// 系统日志服务接口
+    /// System log service interface
     /// </summary>
     public interface ISystemLogService
     {
         /// <summary>
-        /// 记录错误日志
+        /// Log error
         /// </summary>
-        /// <param name="exception">异常对象</param>
-        /// <param name="httpContext">HTTP上下文</param>
-        /// <param name="statusCode">HTTP状态码</param>
+        /// <param name="exception">Exception object</param>
+        /// <param name="httpContext">HTTP context</param>
+        /// <param name="statusCode">HTTP status code</param>
         Task LogErrorAsync(
             Exception exception,
             HttpContext? httpContext = null,
@@ -25,37 +25,37 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         );
 
         /// <summary>
-        /// 记录警告日志
+        /// Log warning
         /// </summary>
-        /// <param name="message">日志消息</param>
-        /// <param name="httpContext">HTTP上下文</param>
+        /// <param name="message">Log message</param>
+        /// <param name="httpContext">HTTP context</param>
         Task LogWarningAsync(string message, HttpContext? httpContext = null);
 
         /// <summary>
-        /// 记录信息日志
+        /// Log information
         /// </summary>
-        /// <param name="message">日志消息</param>
-        /// <param name="httpContext">HTTP上下文</param>
+        /// <param name="message">Log message</param>
+        /// <param name="httpContext">HTTP context</param>
         Task LogInfoAsync(string message, HttpContext? httpContext = null);
 
         /// <summary>
-        /// 创建系统日志
+        /// Create system log
         /// </summary>
-        /// <param name="dto">创建系统日志DTO</param>
+        /// <param name="dto">Create system log DTO</param>
         Task<SystemLogDto> CreateAsync(CreateSystemLogDto dto);
 
         /// <summary>
-        /// 根据ID获取系统日志
+        /// Get system log by ID
         /// </summary>
-        /// <param name="id">日志ID</param>
+        /// <param name="id">Log ID</param>
         Task<SystemLogDto?> GetAsync(Guid id);
 
         /// <summary>
-        /// 分页获取系统日志列表
+        /// Get paged system log list
         /// </summary>
-        /// <param name="queryModel">查询模型</param>
-        /// <param name="page">页码</param>
-        /// <param name="itemsPerPage">每页条数</param>
+        /// <param name="queryModel">Query model</param>
+        /// <param name="page">Page number</param>
+        /// <param name="itemsPerPage">Items per page</param>
         Task<PagedData<SystemLogDto>> GetPagedListAsync(
             SystemLogQueryModel queryModel,
             int page,
@@ -63,9 +63,9 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         );
 
         /// <summary>
-        /// 删除指定日期之前的日志
+        /// Delete logs before specified date
         /// </summary>
-        /// <param name="beforeDate">截止日期</param>
+        /// <param name="beforeDate">Cutoff date</param>
         Task<int> DeleteOlderThanAsync(DateTime beforeDate);
     }
 }

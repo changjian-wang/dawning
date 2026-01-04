@@ -6,7 +6,7 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 namespace Dawning.Identity.Application.Mapping.Administration
 {
     /// <summary>
-    /// 审计日志映射Profile
+    /// Audit log mapping profile
     /// </summary>
     public class AuditLogProfile : Profile
     {
@@ -46,7 +46,7 @@ namespace Dawning.Identity.Application.Mapping.Administration
             }
             catch
             {
-                return json; // 如果反序列化失败，返回原始字符串
+                return json; // If deserialization fails, return the original string
             }
         }
 

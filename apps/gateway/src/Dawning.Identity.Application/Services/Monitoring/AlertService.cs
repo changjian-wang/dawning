@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Monitoring;
 
 /// <summary>
-/// 告警服务实现
+/// Alert service implementation
 /// </summary>
 public class AlertService : IAlertService
 {
@@ -19,7 +19,7 @@ public class AlertService : IAlertService
     private readonly IAlertNotificationService _notificationService;
     private readonly ILogger<AlertService> _logger;
 
-    // 用于存储指标值的内存缓存（简单实现）
+    // In-memory cache for storing metric values (simple implementation)
     private static readonly Dictionary<string, List<MetricSample>> _metricHistory = new();
     private static readonly object _metricLock = new();
 
@@ -34,7 +34,7 @@ public class AlertService : IAlertService
         _logger = logger;
     }
 
-    #region 告警规则管理
+    #region Alert Rule Management
 
     public async Task<IEnumerable<AlertRuleDto>> GetAllRulesAsync()
     {
@@ -119,7 +119,7 @@ public class AlertService : IAlertService
 
     #endregion
 
-    #region 告警历史管理
+    #region Alert History Management
 
     public async Task<PagedData<AlertHistoryDto>> GetAlertHistoryAsync(
         AlertHistoryQueryParams queryParams
@@ -177,7 +177,7 @@ public class AlertService : IAlertService
 
     #endregion
 
-    #region 告警检查与触发
+    #region Alert Check and Trigger
 
     public async Task CheckAlertsAsync()
     {
@@ -194,7 +194,7 @@ public class AlertService : IAlertService
             var rulesList = enabledRules.ToList();
             result.RulesChecked = rulesList.Count;
 
-            // 收集当前系统指标
+            // Collect current system metrics
             var metrics = await CollectCurrentMetricsAsync();
 
             foreach (var rule in rulesList)
@@ -204,7 +204,7 @@ public class AlertService : IAlertService
                     if (!metrics.TryGetValue(rule.MetricType, out var currentValue))
                         continue;
 
-                    // 检查是否在冷却期
+                    // Check if in cooldown period
                     if (
                         rule.LastTriggeredAt.HasValue
                         && DateTime.UtcNow - rule.LastTriggeredAt.Value
@@ -214,10 +214,10 @@ public class AlertService : IAlertService
                         continue;
                     }
 
-                    // 检查是否满足告警条件
+                    // Check if alert condition is met
                     if (ShouldTriggerAlert(rule, currentValue))
                     {
-                        // 检查持续时间
+                        // Check duration
                         if (
                             HasExceededDuration(
                                 rule.MetricType,
@@ -233,11 +233,11 @@ public class AlertService : IAlertService
                                 $"{rule.Name}: {currentValue:F2} {rule.Operator} {rule.Threshold}"
                             );
 
-                            // 发送通知
+                            // Send notification
                             await SendAlertNotificationAsync(rule, alert, currentValue);
                             result.NotificationsSent++;
 
-                            // 更新规则最后触发时间
+                            // Update rule last triggered time
                             await _unitOfWork.AlertRule.UpdateLastTriggeredAsync(
                                 rule.Id,
                                 DateTime.UtcNow
@@ -286,21 +286,21 @@ public class AlertService : IAlertService
     {
         var metrics = new Dictionary<string, decimal>();
 
-        // CPU 使用率 (模拟 - 实际应从系统获取)
+        // CPU usage (simulated - should get from system in production)
         var process = Process.GetCurrentProcess();
-        // 简单计算 CPU 使用率
+        // Simple CPU usage calculation
         metrics["cpu"] = (decimal)Math.Min(100, process.TotalProcessorTime.TotalSeconds % 100);
 
-        // 内存使用率
+        // Memory usage
         var totalMemory = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
         var usedMemory = process.WorkingSet64;
         metrics["memory"] = totalMemory > 0 ? (decimal)usedMemory / totalMemory * 100 : 0;
 
-        // 响应时间和错误率默认返回0（实际应从请求日志仓储获取）
+        // Response time and error rate default to 0 (should get from request log repository in production)
         metrics["response_time"] = 0;
         metrics["error_rate"] = 0;
 
-        // 记录指标历史
+        // Record metric history
         RecordMetricHistory(metrics);
 
         return await Task.FromResult(metrics);
@@ -320,7 +320,7 @@ public class AlertService : IAlertService
 
                 _metricHistory[metricType].Add(new MetricSample { Timestamp = now, Value = value });
 
-                // 只保留最近10分钟的数据
+                // Only keep data from the last 10 minutes
                 _metricHistory[metricType] = _metricHistory[metricType]
                     .Where(s => now - s.Timestamp < TimeSpan.FromMinutes(10))
                     .ToList();
@@ -338,7 +338,7 @@ public class AlertService : IAlertService
         lock (_metricLock)
         {
             if (!_metricHistory.TryGetValue(metricType, out var samples))
-                return true; // 没有历史数据，直接触发
+                return true; // No history data, trigger immediately
 
             var cutoff = DateTime.UtcNow.AddSeconds(-durationSeconds);
             var relevantSamples = samples.Where(s => s.Timestamp >= cutoff).ToList();
@@ -346,7 +346,7 @@ public class AlertService : IAlertService
             if (relevantSamples.Count == 0)
                 return true;
 
-            // 检查是否所有样本都满足条件
+            // Check if all samples meet the condition
             return relevantSamples.All(s => CompareValue(s.Value, threshold, op));
         }
     }
@@ -372,7 +372,7 @@ public class AlertService : IAlertService
     private async Task<AlertHistory> CreateAlertHistoryAsync(AlertRule rule, decimal currentValue)
     {
         var message =
-            $"告警规则 [{rule.Name}] 触发: {GetMetricTypeDisplay(rule.MetricType)} 当前值 {currentValue:F2} {GetOperatorDisplay(rule.Operator)} 阈值 {rule.Threshold}";
+            $"Alert rule [{rule.Name}] triggered: {GetMetricTypeDisplay(rule.MetricType)} current value {currentValue:F2} {GetOperatorDisplay(rule.Operator)} threshold {rule.Threshold}";
 
         var history = new AlertHistory
         {
@@ -431,7 +431,7 @@ public class AlertService : IAlertService
 
         var result = await _notificationService.SendNotificationsAsync(context);
 
-        // 更新通知发送状态
+        // Update notification send status
         await _unitOfWork.AlertHistory.UpdateNotifyResultAsync(
             history.Id,
             result.Success,
@@ -499,11 +499,11 @@ public class AlertService : IAlertService
     private static string GetMetricTypeDisplay(string metricType) =>
         metricType switch
         {
-            "cpu" => "CPU 使用率",
-            "memory" => "内存使用率",
-            "response_time" => "响应时间",
-            "error_rate" => "错误率",
-            "request_count" => "请求数量",
+            "cpu" => "CPU Usage",
+            "memory" => "Memory Usage",
+            "response_time" => "Response Time",
+            "error_rate" => "Error Rate",
+            "request_count" => "Request Count",
             _ => metricType,
         };
 

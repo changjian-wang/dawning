@@ -15,7 +15,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Monitoring;
 
 /// <summary>
-/// 请求日志仓储实现
+/// Request log repository implementation
 /// </summary>
 public class RequestLogRepository : IRequestLogRepository
 {
@@ -27,7 +27,7 @@ public class RequestLogRepository : IRequestLogRepository
     }
 
     /// <summary>
-    /// 插入请求日志
+    /// Insert request log
     /// </summary>
     public async Task InsertAsync(RequestLog log)
     {
@@ -36,7 +36,7 @@ public class RequestLogRepository : IRequestLogRepository
     }
 
     /// <summary>
-    /// 分页查询请求日志
+    /// Get paged request logs
     /// </summary>
     public async Task<PagedData<RequestLog>> GetPagedListAsync(
         RequestLogQueryModel query,
@@ -46,7 +46,7 @@ public class RequestLogRepository : IRequestLogRepository
     {
         var builder = _context.Connection.Builder<RequestLogEntity>(_context.Transaction);
 
-        // 应用过滤条件
+        // Apply filter conditions
         builder = builder
             .WhereIf(query.StartTime.HasValue, x => x.RequestTime >= query.StartTime!.Value)
             .WhereIf(query.EndTime.HasValue, x => x.RequestTime <= query.EndTime!.Value)
@@ -63,7 +63,7 @@ public class RequestLogRepository : IRequestLogRepository
                 x => x.ResponseTimeMs >= query.SlowRequestThresholdMs!.Value
             );
 
-        // 按请求时间降序排序
+        // Order by request time descending
         var result = await builder
             .OrderByDescending(x => x.RequestTime)
             .AsPagedListAsync(page, pageSize);
@@ -78,13 +78,13 @@ public class RequestLogRepository : IRequestLogRepository
     }
 
     /// <summary>
-    /// 获取请求统计信息
+    /// Get request statistics
     /// </summary>
     public async Task<RequestLogStatistics> GetStatisticsAsync(DateTime startTime, DateTime endTime)
     {
         var statistics = new RequestLogStatistics { StartTime = startTime, EndTime = endTime };
 
-        // 获取基础统计
+        // Get basic statistics
         var builder = _context
             .Connection.Builder<RequestLogEntity>(_context.Transaction)
             .Where(x => x.RequestTime >= startTime)
@@ -105,12 +105,12 @@ public class RequestLogRepository : IRequestLogRepository
         statistics.MaxResponseTimeMs = allLogs.Max(x => x.ResponseTimeMs);
         statistics.MinResponseTimeMs = allLogs.Min(x => x.ResponseTimeMs);
 
-        // 状态码分布
+        // Status code distribution
         statistics.StatusCodeDistribution = allLogs
             .GroupBy(x => x.StatusCode)
             .ToDictionary(g => g.Key, g => (long)g.Count());
 
-        // Top 10 路径统计
+        // Top 10 path statistics
         statistics.TopPaths = allLogs
             .GroupBy(x => x.Path)
             .Select(g => new PathStatisticModel
@@ -124,12 +124,12 @@ public class RequestLogRepository : IRequestLogRepository
             .Take(10)
             .ToList();
 
-        // 按小时统计请求数
+        // Request count by hour
         statistics.HourlyRequests = allLogs
             .GroupBy(x => x.RequestTime.ToString("yyyy-MM-dd HH:00"))
             .ToDictionary(g => g.Key, g => (long)g.Count());
 
-        // P95 和 P99
+        // P95 and P99
         var sortedResponseTimes = allLogs.Select(x => x.ResponseTimeMs).OrderBy(x => x).ToList();
         if (sortedResponseTimes.Count > 0)
         {
@@ -148,7 +148,7 @@ public class RequestLogRepository : IRequestLogRepository
     }
 
     /// <summary>
-    /// 清理过期日志
+    /// Clean up expired logs
     /// </summary>
     public async Task<int> CleanupOldLogsAsync(DateTime cutoffDate)
     {

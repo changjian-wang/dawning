@@ -6,7 +6,7 @@ using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
     /// <summary>
-    /// Application 映射器
+    /// Application mapper
     /// </summary>
     public static class ApplicationMappers
     {

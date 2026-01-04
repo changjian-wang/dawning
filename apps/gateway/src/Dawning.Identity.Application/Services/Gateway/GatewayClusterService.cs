@@ -13,7 +13,7 @@ using Dawning.Identity.Domain.Models.Gateway;
 namespace Dawning.Identity.Application.Services.Gateway
 {
     /// <summary>
-    /// 网关集群服务实现
+    /// Gateway cluster service implementation
     /// </summary>
     public class GatewayClusterService : IGatewayClusterService
     {
@@ -27,7 +27,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 根据ID获取集群
+        /// Get cluster by ID
         /// </summary>
         public async Task<GatewayClusterDto?> GetAsync(Guid id)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 根据ClusterId获取集群
+        /// Get cluster by ClusterId
         /// </summary>
         public async Task<GatewayClusterDto?> GetByClusterIdAsync(string clusterId)
         {
@@ -45,7 +45,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 获取所有启用的集群
+        /// Get all enabled clusters
         /// </summary>
         public async Task<IEnumerable<GatewayClusterDto>> GetAllEnabledAsync()
         {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 获取集群选项列表
+        /// Get cluster options list
         /// </summary>
         public async Task<IEnumerable<ClusterOptionDto>> GetOptionsAsync()
         {
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 获取分页集群列表
+        /// Get paged cluster list
         /// </summary>
         public async Task<PagedData<GatewayClusterDto>> GetPagedListAsync(
             GatewayClusterQueryModel queryModel,
@@ -87,17 +87,17 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 创建集群
+        /// Create cluster
         /// </summary>
         public async Task<GatewayClusterDto> CreateAsync(
             CreateGatewayClusterDto dto,
             string? username = null
         )
         {
-            // 检查ClusterId是否已存在
+            // Check if ClusterId already exists
             if (await _uow.GatewayCluster.ExistsByClusterIdAsync(dto.ClusterId))
             {
-                throw new InvalidOperationException($"集群ID '{dto.ClusterId}' 已存在");
+                throw new InvalidOperationException($"Cluster ID '{dto.ClusterId}' already exists");
             }
 
             var cluster = _mapper.Map<GatewayCluster>(dto);
@@ -111,7 +111,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 更新集群
+        /// Update cluster
         /// </summary>
         public async Task<GatewayClusterDto?> UpdateAsync(
             UpdateGatewayClusterDto dto,
@@ -124,19 +124,19 @@ namespace Dawning.Identity.Application.Services.Gateway
                 return null;
             }
 
-            // 检查ClusterId是否被其他记录使用
+            // Check if ClusterId is used by other records
             if (await _uow.GatewayCluster.ExistsByClusterIdAsync(dto.ClusterId, dto.Id))
             {
-                throw new InvalidOperationException($"集群ID '{dto.ClusterId}' 已被其他集群使用");
+                throw new InvalidOperationException($"Cluster ID '{dto.ClusterId}' is already used by another cluster");
             }
 
-            // 如果ClusterId发生变化，需要检查是否有路由引用
+            // If ClusterId changes, check if routes reference it
             if (existing.ClusterId != dto.ClusterId)
             {
                 if (await _uow.GatewayCluster.IsReferencedByRoutesAsync(existing.ClusterId))
                 {
                     throw new InvalidOperationException(
-                        $"集群 '{existing.ClusterId}' 正在被路由引用，无法更改集群ID"
+                        $"Cluster '{existing.ClusterId}' is being referenced by routes, cannot change cluster ID"
                     );
                 }
             }
@@ -151,20 +151,20 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 删除集群
+        /// Delete cluster
         /// </summary>
         public async Task<(bool Success, string? ErrorMessage)> DeleteAsync(Guid id)
         {
             var cluster = await _uow.GatewayCluster.GetAsync(id);
             if (cluster == null)
             {
-                return (false, "集群不存在");
+                return (false, "Cluster not found");
             }
 
-            // 检查是否有路由引用
+            // Check if routes reference this cluster
             if (await _uow.GatewayCluster.IsReferencedByRoutesAsync(cluster.ClusterId))
             {
-                return (false, $"集群 '{cluster.ClusterId}' 正在被路由引用，无法删除");
+                return (false, $"Cluster '{cluster.ClusterId}' is being referenced by routes, cannot be deleted");
             }
 
             var result = await _uow.GatewayCluster.DeleteAsync(id);
@@ -172,7 +172,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         }
 
         /// <summary>
-        /// 切换集群启用状态
+        /// Toggle cluster enabled status
         /// </summary>
         public async Task<bool> ToggleEnabledAsync(Guid id, bool isEnabled, string? username = null)
         {

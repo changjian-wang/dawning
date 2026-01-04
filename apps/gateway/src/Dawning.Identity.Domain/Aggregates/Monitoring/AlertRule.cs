@@ -1,62 +1,62 @@
 namespace Dawning.Identity.Domain.Aggregates.Monitoring;
 
 /// <summary>
-/// 告警规则聚合根
+/// Alert Rule Aggregate Root
 /// </summary>
 public class AlertRule
 {
     /// <summary>
-    /// 规则ID
+    /// Rule ID
     /// </summary>
     public long Id { get; set; }
 
     /// <summary>
-    /// 规则名称
+    /// Rule name
     /// </summary>
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// 规则描述
+    /// Rule description
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// 指标类型: cpu, memory, response_time, error_rate, request_count
+    /// Metric type: cpu, memory, response_time, error_rate, request_count
     /// </summary>
     public string MetricType { get; set; } = string.Empty;
 
     /// <summary>
-    /// 比较操作符: gt, gte, lt, lte, eq
+    /// Comparison operator: gt, gte, lt, lte, eq
     /// </summary>
     public string Operator { get; set; } = "gt";
 
     /// <summary>
-    /// 阈值
+    /// Threshold
     /// </summary>
     public decimal Threshold { get; set; }
 
     /// <summary>
-    /// 持续时间(秒)，超过此时间才触发告警
+    /// Duration (seconds), alert is triggered only after this time is exceeded
     /// </summary>
     public int DurationSeconds { get; set; } = 60;
 
     /// <summary>
-    /// 严重程度: info, warning, error, critical
+    /// Severity: info, warning, error, critical
     /// </summary>
     public string Severity { get; set; } = "warning";
 
     /// <summary>
-    /// 是否启用
+    /// Whether enabled
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 
     /// <summary>
-    /// 通知渠道，JSON数组: ["email", "webhook"]
+    /// Notification channels, JSON array: ["email", "webhook"]
     /// </summary>
     public string? NotifyChannels { get; set; }
 
     /// <summary>
-    /// 通知邮箱，逗号分隔
+    /// Notification emails, comma-separated
     /// </summary>
     public string? NotifyEmails { get; set; }
 
@@ -66,22 +66,22 @@ public class AlertRule
     public string? WebhookUrl { get; set; }
 
     /// <summary>
-    /// 冷却时间(分钟)，避免重复告警
+    /// Cooldown time (minutes), to avoid repeated alerts
     /// </summary>
     public int CooldownMinutes { get; set; } = 5;
 
     /// <summary>
-    /// 上次触发时间
+    /// Last triggered time
     /// </summary>
     public DateTime? LastTriggeredAt { get; set; }
 
     /// <summary>
-    /// 创建时间
+    /// Created time
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// 更新时间
+    /// Updated time
     /// </summary>
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

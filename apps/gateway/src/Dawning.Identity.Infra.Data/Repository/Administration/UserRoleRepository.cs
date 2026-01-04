@@ -12,7 +12,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
     /// <summary>
-    /// 用户角色关联仓储实现
+    /// User-role association repository implementation
     /// </summary>
     public class UserRoleRepository : IUserRoleRepository
     {
@@ -24,11 +24,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取用户的所有角色
+        /// Get all roles for a user
         /// </summary>
         public async Task<IEnumerable<Role>> GetUserRolesAsync(Guid userId)
         {
-            // Step 1: 获取用户的角色ID列表
+            // Step 1: Get the role ID list for the user
             var userRoles = await _context
                 .Connection.Builder<UserRoleEntity>(_context.Transaction)
                 .Where(ur => ur.UserId == userId)
@@ -41,7 +41,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
             var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
 
-            // Step 2: 获取角色详情
+            // Step 2: Get role details
             var roles = await _context
                 .Connection.Builder<RoleEntity>(_context.Transaction)
                 .Where(r => roleIds.Contains(r.Id) && r.DeletedAt == null)
@@ -52,11 +52,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取拥有指定角色的所有用户
+        /// Get all users with the specified role
         /// </summary>
         public async Task<IEnumerable<User>> GetRoleUsersAsync(Guid roleId)
         {
-            // Step 1: 获取拥有该角色的用户ID列表
+            // Step 1: Get the user ID list that have this role
             var userRoles = await _context
                 .Connection.Builder<UserRoleEntity>(_context.Transaction)
                 .Where(ur => ur.RoleId == roleId)
@@ -69,7 +69,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
             var userIds = userRoles.Select(ur => ur.UserId).ToList();
 
-            // Step 2: 获取用户详情
+            // Step 2: Get user details
             var users = await _context
                 .Connection.Builder<UserEntity>(_context.Transaction)
                 .Where(u => userIds.Contains(u.Id))
@@ -80,14 +80,14 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 为用户分配角色
+        /// Assign role to user
         /// </summary>
         public async Task<bool> AssignRoleAsync(Guid userId, Guid roleId, Guid? operatorId = null)
         {
-            // 检查是否已存在
+            // Check if already exists
             if (await HasRoleAsync(userId, roleId))
             {
-                return true; // 已存在，返回成功
+                return true; // Already exists, return success
             }
 
             var entity = new UserRoleEntity
@@ -104,7 +104,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 批量为用户分配角色
+        /// Batch assign roles to user
         /// </summary>
         public async Task<bool> AssignRolesAsync(
             Guid userId,
@@ -115,10 +115,10 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             if (!roleIds.Any())
                 return true;
 
-            // 先移除所有现有角色
+            // First remove all existing roles
             await RemoveAllRolesAsync(userId);
 
-            // 批量插入新角色
+            // Batch insert new roles
             var entities = roleIds
                 .Select(roleId => new UserRoleEntity
                 {
@@ -139,11 +139,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 移除用户的角色
+        /// Remove role from user
         /// </summary>
         public async Task<bool> RemoveRoleAsync(Guid userId, Guid roleId)
         {
-            // 查找要删除的记录
+            // Find the record to delete
             var entity = await _context
                 .Connection.Builder<UserRoleEntity>(_context.Transaction)
                 .Where(ur => ur.UserId == userId && ur.RoleId == roleId)
@@ -159,17 +159,17 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 移除用户的所有角色
+        /// Remove all roles from user
         /// </summary>
         public async Task<bool> RemoveAllRolesAsync(Guid userId)
         {
-            // 查找用户的所有角色关联
+            // Find all role associations for the user
             var entities = await _context
                 .Connection.Builder<UserRoleEntity>(_context.Transaction)
                 .Where(ur => ur.UserId == userId)
                 .ToListAsync();
 
-            // 逐个删除
+            // Delete one by one
             foreach (var entity in entities)
             {
                 await _context.Connection.DeleteAsync(entity, _context.Transaction);
@@ -179,7 +179,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 检查用户是否拥有指定角色
+        /// Check if user has the specified role
         /// </summary>
         public async Task<bool> HasRoleAsync(Guid userId, Guid roleId)
         {
@@ -192,11 +192,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 检查用户是否拥有指定角色（按角色名称）
+        /// Check if user has the specified role (by role name)
         /// </summary>
         public async Task<bool> HasRoleByNameAsync(Guid userId, string roleName)
         {
-            // Step 1: 获取用户的角色ID列表
+            // Step 1: Get the role ID list for the user
             var userRoles = await _context
                 .Connection.Builder<UserRoleEntity>(_context.Transaction)
                 .Where(ur => ur.UserId == userId)
@@ -209,7 +209,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
 
             var roleIds = userRoles.Select(ur => ur.RoleId).ToList();
 
-            // Step 2: 检查是否有匹配的角色
+            // Step 2: Check if there is a matching role
             var role = await _context
                 .Connection.Builder<RoleEntity>(_context.Transaction)
                 .Where(r => roleIds.Contains(r.Id) && r.Name == roleName && r.DeletedAt == null)

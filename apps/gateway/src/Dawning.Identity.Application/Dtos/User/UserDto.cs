@@ -3,97 +3,97 @@ using System;
 namespace Dawning.Identity.Application.Dtos.User
 {
     /// <summary>
-    /// 用户DTO（返回给客户端）
+    /// User DTO (returned to client)
     /// </summary>
     public class UserDto
     {
-        /// <summary>用户唯一标识</summary>
+        /// <summary>User unique identifier</summary>
         public Guid Id { get; set; }
 
-        /// <summary>用户名（登录名）</summary>
+        /// <summary>Username (login name)</summary>
         public string Username { get; set; } = string.Empty;
 
-        /// <summary>邮箱</summary>
+        /// <summary>Email</summary>
         public string? Email { get; set; }
 
-        /// <summary>手机号</summary>
+        /// <summary>Phone number</summary>
         public string? PhoneNumber { get; set; }
 
-        /// <summary>显示名称</summary>
+        /// <summary>Display name</summary>
         public string? DisplayName { get; set; }
 
-        /// <summary>头像URL</summary>
+        /// <summary>Avatar URL</summary>
         public string? Avatar { get; set; }
 
-        /// <summary>角色</summary>
+        /// <summary>Role</summary>
         public string Role { get; set; } = "user";
 
-        /// <summary>是否激活</summary>
+        /// <summary>Is active</summary>
         public bool IsActive { get; set; }
 
-        /// <summary>是否为系统用户（系统用户不可删除/禁用）</summary>
+        /// <summary>Is system user (system users cannot be deleted/disabled)</summary>
         public bool IsSystem { get; set; }
 
-        /// <summary>邮箱是否已验证</summary>
+        /// <summary>Is email confirmed</summary>
         public bool EmailConfirmed { get; set; }
 
-        /// <summary>手机号是否已验证</summary>
+        /// <summary>Is phone number confirmed</summary>
         public bool PhoneNumberConfirmed { get; set; }
 
-        /// <summary>最后登录时间</summary>
+        /// <summary>Last login time</summary>
         public DateTime? LastLoginAt { get; set; }
 
-        /// <summary>创建时间</summary>
+        /// <summary>Created time</summary>
         public DateTime CreatedAt { get; set; }
 
-        /// <summary>更新时间</summary>
+        /// <summary>Updated time</summary>
         public DateTime? UpdatedAt { get; set; }
 
-        /// <summary>备注</summary>
+        /// <summary>Remark</summary>
         public string? Remark { get; set; }
 
-        /// <summary>乐观锁时间戳</summary>
+        /// <summary>Optimistic locking timestamp</summary>
         public long Timestamp { get; set; }
     }
 
     /// <summary>
-    /// 创建用户请求DTO
+    /// Create User Request DTO
     /// </summary>
     public class CreateUserDto
     {
-        /// <summary>用户名（登录名）</summary>
+        /// <summary>Username (login name)</summary>
         public string Username { get; set; } = string.Empty;
 
-        /// <summary>密码</summary>
+        /// <summary>Password</summary>
         public string Password { get; set; } = string.Empty;
 
-        /// <summary>邮箱</summary>
+        /// <summary>Email</summary>
         public string? Email { get; set; }
 
-        /// <summary>手机号</summary>
+        /// <summary>Phone number</summary>
         public string? PhoneNumber { get; set; }
 
-        /// <summary>显示名称</summary>
+        /// <summary>Display name</summary>
         public string? DisplayName { get; set; }
 
-        /// <summary>头像URL</summary>
+        /// <summary>Avatar URL</summary>
         public string? Avatar { get; set; }
 
-        /// <summary>角色</summary>
+        /// <summary>Role</summary>
         public string Role { get; set; } = "user";
 
-        /// <summary>是否激活</summary>
+        /// <summary>Is active</summary>
         public bool IsActive { get; set; } = true;
 
-        /// <summary>是否为系统用户（系统用户不可删除/禁用，仅系统初始化时使用）</summary>
+        /// <summary>Is system user (system users cannot be deleted/disabled, only used during system initialization)</summary>
         public bool IsSystem { get; set; } = false;
 
-        /// <summary>备注</summary>
+        /// <summary>Remark</summary>
         public string? Remark { get; set; }
     }
 
     /// <summary>
-    /// 更新用户请求DTO
+    /// Update User Request DTO
     /// </summary>
     public class UpdateUserDto
     {
@@ -108,7 +108,7 @@ namespace Dawning.Identity.Application.Dtos.User
     }
 
     /// <summary>
-    /// 修改密码请求DTO
+    /// Change Password Request DTO
     /// </summary>
     public class ChangePasswordDto
     {
@@ -118,7 +118,7 @@ namespace Dawning.Identity.Application.Dtos.User
     }
 
     /// <summary>
-    /// 重置密码请求（简化版，用于API路由参数）
+    /// Reset Password Request (simplified, for API route parameters)
     /// </summary>
     public class ResetPasswordRequest
     {

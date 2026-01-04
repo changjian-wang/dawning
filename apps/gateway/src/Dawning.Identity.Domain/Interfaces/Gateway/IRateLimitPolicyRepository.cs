@@ -7,42 +7,42 @@ using Dawning.Identity.Domain.Models;
 namespace Dawning.Identity.Domain.Interfaces.Gateway
 {
     /// <summary>
-    /// 限流策略仓储接口
+    /// Rate limit policy repository interface
     /// </summary>
     public interface IRateLimitPolicyRepository
     {
         /// <summary>
-        /// 根据ID获取策略
+        /// Get policy by ID
         /// </summary>
         Task<RateLimitPolicy?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据名称获取策略
+        /// Get policy by name
         /// </summary>
         Task<RateLimitPolicy?> GetByNameAsync(string name);
 
         /// <summary>
-        /// 获取所有策略
+        /// Get all policies
         /// </summary>
         Task<IEnumerable<RateLimitPolicy>> GetAllAsync();
 
         /// <summary>
-        /// 获取所有启用的策略
+        /// Get all enabled policies
         /// </summary>
         Task<IEnumerable<RateLimitPolicy>> GetAllEnabledAsync();
 
         /// <summary>
-        /// 插入策略
+        /// Insert policy
         /// </summary>
         ValueTask<int> InsertAsync(RateLimitPolicy model);
 
         /// <summary>
-        /// 更新策略
+        /// Update policy
         /// </summary>
         ValueTask<bool> UpdateAsync(RateLimitPolicy model);
 
         /// <summary>
-        /// 删除策略
+        /// Delete policy
         /// </summary>
         ValueTask<bool> DeleteAsync(Guid id);
     }

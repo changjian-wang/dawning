@@ -4,83 +4,83 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {
     /// <summary>
-    /// 权限聚合根
+    /// Permission Aggregate Root
     /// </summary>
     public class Permission : IAggregateRoot
     {
         /// <summary>
-        /// 权限唯一标识
+        /// Permission unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 权限代码（唯一标识，格式：resource:action）
-        /// 例如：user:create, role:update, audit-log:read
+        /// Permission code (unique identifier, format: resource:action)
+        /// Examples: user:create, role:update, audit-log:read
         /// </summary>
         public string Code { get; set; } = string.Empty;
 
         /// <summary>
-        /// 权限名称
+        /// Permission name
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 权限描述
+        /// Permission description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 资源类型（如：user, role, audit-log等）
+        /// Resource type (e.g., user, role, audit-log, etc.)
         /// </summary>
         public string Resource { get; set; } = string.Empty;
 
         /// <summary>
-        /// 操作类型（如：create, read, update, delete等）
+        /// Action type (e.g., create, read, update, delete, etc.)
         /// </summary>
         public string Action { get; set; } = string.Empty;
 
         /// <summary>
-        /// 权限分类（如：administration, system, business等）
+        /// Permission category (e.g., administration, system, business, etc.)
         /// </summary>
         public string? Category { get; set; }
 
         /// <summary>
-        /// 是否为系统权限（系统权限不可删除）
+        /// Whether it is a system permission (system permissions cannot be deleted)
         /// </summary>
         public bool IsSystem { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 显示顺序
+        /// Display order
         /// </summary>
         public int DisplayOrder { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Created by ID
         /// </summary>
         public Guid? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 更新者ID
+        /// Updated by ID
         /// </summary>
         public Guid? UpdatedBy { get; set; }
 
         /// <summary>
-        /// 时间戳（用于并发控制）
+        /// Timestamp (for concurrency control)
         /// </summary>
         public long Timestamp { get; set; }
     }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 namespace Dawning.Identity.Application.Services.Security
 {
     /// <summary>
-    /// 登录锁定服务实现
+    /// Login lockout service implementation
     /// </summary>
     public class LoginLockoutService : ILoginLockoutService
     {
@@ -24,7 +24,7 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 检查用户是否被锁定
+        /// Check if user is locked out
         /// </summary>
         public async Task<DateTime?> IsLockedOutAsync(string username)
         {
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 记录登录失败
+        /// Record failed login attempt
         /// </summary>
         public async Task<(
             int failedCount,
@@ -60,7 +60,7 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 重置登录失败计数
+        /// Reset failed login count
         /// </summary>
         public async Task ResetFailedCountAsync(string username)
         {
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 解锁用户账户
+        /// Unlock user account
         /// </summary>
         public async Task UnlockUserAsync(Guid userId)
         {
@@ -76,11 +76,11 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 获取锁定配置
+        /// Get lockout configuration
         /// </summary>
         public Task<LockoutSettings> GetLockoutSettingsAsync()
         {
-            // 使用简单缓存避免频繁读取配置
+            // Use simple cache to avoid frequent config reads
             if (
                 _cachedSettings != null
                 && DateTime.UtcNow - _settingsCacheTime < SettingsCacheDuration
@@ -91,7 +91,7 @@ namespace Dawning.Identity.Application.Services.Security
 
             var settings = new LockoutSettings();
 
-            // 从 appsettings.json 读取配置
+            // Read configuration from appsettings.json
             var securitySection = _configuration.GetSection("Security:Lockout");
             if (securitySection.Exists())
             {

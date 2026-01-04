@@ -5,7 +5,7 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 namespace Dawning.Identity.Application.Mapping.Administration
 {
     /// <summary>
-    /// 系统日志AutoMapper配置
+    /// System log AutoMapper configuration
     /// </summary>
     public class SystemLogProfile : Profile
     {

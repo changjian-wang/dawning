@@ -4,86 +4,86 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {
     /// <summary>
-    /// 角色数据库实体
+    /// Role database entity
     /// </summary>
     [Table("roles")]
     public class RoleEntity
     {
         /// <summary>
-        /// 角色ID
+        /// Role ID
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 角色名称
+        /// Role name
         /// </summary>
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         [Column("display_name")]
         public string DisplayName { get; set; } = string.Empty;
 
         /// <summary>
-        /// 描述
+        /// Description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否为系统角色
+        /// Whether system role
         /// </summary>
         [Column("is_system")]
         public bool IsSystem { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_active")]
         public bool IsActive { get; set; }
 
         /// <summary>
-        /// 权限列表（JSON字符串）
+        /// Permissions list (JSON string)
         /// </summary>
         [Column("permissions")]
         public string? Permissions { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Creator ID
         /// </summary>
         [Column("created_by")]
         public Guid? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 更新者ID
+        /// Updater ID
         /// </summary>
         [Column("updated_by")]
         public Guid? UpdatedBy { get; set; }
 
         /// <summary>
-        /// 软删除时间
+        /// Soft delete time
         /// </summary>
         [Column("deleted_at")]
         public DateTime? DeletedAt { get; set; }
 
         /// <summary>
-        /// 时间戳（计算字段，不映射到数据库）
+        /// Timestamp (computed field, not mapped to database)
         /// </summary>
         [Computed]
         public long Timestamp { get; set; }

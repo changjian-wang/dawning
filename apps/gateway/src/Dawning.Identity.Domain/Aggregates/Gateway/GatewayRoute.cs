@@ -4,135 +4,135 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Gateway
 {
     /// <summary>
-    /// 网关路由聚合根
-    /// 用于管理 YARP 反向代理的路由配置
+    /// Gateway Route Aggregate Root
+    /// Used for managing YARP reverse proxy route configuration
     /// </summary>
     public class GatewayRoute : IAggregateRoot
     {
         /// <summary>
-        /// 路由唯一标识
+        /// Route unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 路由ID（YARP配置中使用的标识符）
+        /// Route ID (identifier used in YARP configuration)
         /// </summary>
         public string RouteId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 路由名称
+        /// Route name
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 路由描述
+        /// Route description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 关联的集群ID
+        /// Associated cluster ID
         /// </summary>
         public string ClusterId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 匹配路径模式 (例如: "/api/{**catch-all}")
+        /// Match path pattern (e.g., "/api/{**catch-all}")
         /// </summary>
         public string MatchPath { get; set; } = string.Empty;
 
         /// <summary>
-        /// 匹配的HTTP方法（逗号分隔，例如: "GET,POST,PUT,DELETE"）
-        /// 为空表示匹配所有方法
+        /// Matched HTTP methods (comma-separated, e.g., "GET,POST,PUT,DELETE")
+        /// Empty means match all methods
         /// </summary>
         public string? MatchMethods { get; set; }
 
         /// <summary>
-        /// 匹配的主机头（逗号分隔）
-        /// 为空表示匹配所有主机
+        /// Matched host headers (comma-separated)
+        /// Empty means match all hosts
         /// </summary>
         public string? MatchHosts { get; set; }
 
         /// <summary>
-        /// 匹配的请求头（JSON格式）
+        /// Matched request headers (JSON format)
         /// </summary>
         public string? MatchHeaders { get; set; }
 
         /// <summary>
-        /// 匹配的查询参数（JSON格式）
+        /// Matched query parameters (JSON format)
         /// </summary>
         public string? MatchQueryParameters { get; set; }
 
         /// <summary>
-        /// 转换配置 - 路径前缀（例如: "/api"）
+        /// Transform configuration - Path prefix (e.g., "/api")
         /// </summary>
         public string? TransformPathPrefix { get; set; }
 
         /// <summary>
-        /// 转换配置 - 路径移除前缀
+        /// Transform configuration - Path remove prefix
         /// </summary>
         public string? TransformPathRemovePrefix { get; set; }
 
         /// <summary>
-        /// 转换配置 - 请求头（JSON格式）
+        /// Transform configuration - Request headers (JSON format)
         /// </summary>
         public string? TransformRequestHeaders { get; set; }
 
         /// <summary>
-        /// 转换配置 - 响应头（JSON格式）
+        /// Transform configuration - Response headers (JSON format)
         /// </summary>
         public string? TransformResponseHeaders { get; set; }
 
         /// <summary>
-        /// 授权策略
+        /// Authorization policy
         /// </summary>
         public string? AuthorizationPolicy { get; set; }
 
         /// <summary>
-        /// 限流策略
+        /// Rate limiter policy
         /// </summary>
         public string? RateLimiterPolicy { get; set; }
 
         /// <summary>
-        /// CORS策略
+        /// CORS policy
         /// </summary>
         public string? CorsPolicy { get; set; }
 
         /// <summary>
-        /// 超时时间（秒）
+        /// Timeout (seconds)
         /// </summary>
         public int? TimeoutSeconds { get; set; }
 
         /// <summary>
-        /// 路由顺序（越小越优先）
+        /// Route order (smaller value has higher priority)
         /// </summary>
         public int SortOrder { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 元数据（JSON格式）
+        /// Metadata (JSON format)
         /// </summary>
         public string? Metadata { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者
+        /// Created by
         /// </summary>
         public string? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者
+        /// Updated by
         /// </summary>
         public string? UpdatedBy { get; set; }
     }

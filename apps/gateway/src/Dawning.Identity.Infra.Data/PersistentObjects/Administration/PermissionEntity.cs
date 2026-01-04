@@ -4,7 +4,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {
     /// <summary>
-    /// 权限持久化对象
+    /// Permission persistent object
     /// </summary>
     [Table("permissions")]
     public class PermissionEntity
@@ -57,7 +57,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
     }
 
     /// <summary>
-    /// 角色权限关联持久化对象
+    /// Role-permission association persistent object
     /// </summary>
     [Table("role_permissions")]
     public class RolePermissionEntity

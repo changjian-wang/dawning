@@ -11,7 +11,7 @@ using Dawning.Identity.Domain.Interfaces.UoW;
 namespace Dawning.Identity.Application.Services.RateLimit
 {
     /// <summary>
-    /// 限流和访问控制服务实现
+    /// Rate limiting and access control service implementation
     /// </summary>
     public class RateLimitService : IRateLimitService
     {

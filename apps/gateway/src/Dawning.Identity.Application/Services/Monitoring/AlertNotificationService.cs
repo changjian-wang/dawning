@@ -11,7 +11,7 @@ using MimeKit;
 namespace Dawning.Identity.Application.Services.Monitoring;
 
 /// <summary>
-/// 告警通知服务实现
+/// Alert notification service implementation
 /// </summary>
 public class AlertNotificationService : IAlertNotificationService
 {
@@ -38,13 +38,13 @@ public class AlertNotificationService : IAlertNotificationService
         var results = new List<NotificationResult>();
         var errors = new List<string>();
 
-        // 首先发送实时推送通知（SignalR）
+        // First send real-time push notification (SignalR)
         try
         {
             await _realTimeNotificationService.SendAlertNotificationAsync(
                 new RealTimeAlertNotification
                 {
-                    Title = $"告警: {context.RuleName}",
+                    Title = $"Alert: {context.RuleName}",
                     Message = context.Message,
                     Severity = context.Severity,
                     RuleId = context.AlertId,
@@ -64,7 +64,7 @@ public class AlertNotificationService : IAlertNotificationService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "实时推送告警失败，继续其他通知渠道");
+            _logger.LogWarning(ex, "Real-time alert push failed, continuing with other notification channels");
         }
 
         foreach (var channel in context.NotifyChannels)
@@ -124,7 +124,7 @@ public class AlertNotificationService : IAlertNotificationService
 
         try
         {
-            // 获取邮件配置
+            // Get email configuration
             var smtpConfig = _configuration.GetSection("Email:Smtp");
             var smtpEnabled = smtpConfig.GetValue<bool>("Enabled");
 
@@ -143,7 +143,7 @@ public class AlertNotificationService : IAlertNotificationService
                 };
             }
 
-            // 使用 MailKit 发送真实邮件
+            // Use MailKit to send real email
             var smtpHost = smtpConfig.GetValue<string>("Host") ?? "localhost";
             var smtpPort = smtpConfig.GetValue<int>("Port", 587);
             var smtpUsername = smtpConfig.GetValue<string>("Username");
@@ -152,14 +152,14 @@ public class AlertNotificationService : IAlertNotificationService
             var fromName = smtpConfig.GetValue<string>("FromName") ?? "Dawning Alert System";
             var useSsl = smtpConfig.GetValue<bool>("UseSsl", true);
 
-            var subject = $"[{context.Severity.ToUpper()}] 告警: {context.RuleName}";
+            var subject = $"[{context.Severity.ToUpper()}] Alert: {context.RuleName}";
             var body = BuildEmailBody(context);
 
-            // 构建邮件消息
+            // Build email message
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress(fromName, fromEmail));
 
-            // 解析收件人邮箱（逗号分隔）
+            // Parse recipient email addresses (comma-separated)
             var emailAddresses = context.NotifyEmails.Split(
                 ',',
                 StringSplitOptions.RemoveEmptyEntries
@@ -175,7 +175,7 @@ public class AlertNotificationService : IAlertNotificationService
 
             message.Subject = subject;
 
-            // 创建 HTML 正文
+            // Create HTML body
             var bodyBuilder = new BodyBuilder
             {
                 HtmlBody = body,
@@ -189,7 +189,7 @@ public class AlertNotificationService : IAlertNotificationService
                 subject
             );
 
-            // 发送邮件
+            // Send email
             using var client = new SmtpClient();
 
             var secureSocketOptions = useSsl
@@ -320,7 +320,7 @@ public class AlertNotificationService : IAlertNotificationService
             <body>
                 <div class="container">
                     <div class="header">
-                        <h2 style="margin:0;">⚠️ 系统告警通知</h2>
+                        <h2 style="margin:0;">⚠️ System Alert Notification</h2>
                         <p style="margin:10px 0 0 0;">{{context.RuleName}}</p>
                     </div>
                     <div class="content">
@@ -329,21 +329,21 @@ public class AlertNotificationService : IAlertNotificationService
             )}}: {{context.MetricValue:F2}}</p>
                         <p>{{context.Message}}</p>
                         <table>
-                            <tr><td class="label">告警级别:</td><td>{{GetSeverityDisplay(
+                            <tr><td class="label">Severity:</td><td>{{GetSeverityDisplay(
                 context.Severity
             )}}</td></tr>
-                            <tr><td class="label">指标类型:</td><td>{{GetMetricTypeDisplay(
+                            <tr><td class="label">Metric Type:</td><td>{{GetMetricTypeDisplay(
                 context.MetricType
             )}}</td></tr>
-                            <tr><td class="label">当前值:</td><td>{{context.MetricValue:F2}}</td></tr>
-                            <tr><td class="label">阈值:</td><td>{{GetOperatorDisplay(
+                            <tr><td class="label">Current Value:</td><td>{{context.MetricValue:F2}}</td></tr>
+                            <tr><td class="label">Threshold:</td><td>{{GetOperatorDisplay(
                 context.Operator
             )}} {{context.Threshold}}</td></tr>
-                            <tr><td class="label">触发时间:</td><td>{{context.TriggeredAt:yyyy-MM-dd HH:mm:ss}} UTC</td></tr>
+                            <tr><td class="label">Trigger Time:</td><td>{{context.TriggeredAt:yyyy-MM-dd HH:mm:ss}} UTC</td></tr>
                         </table>
                     </div>
                     <div class="footer">
-                        <p>此邮件由 Dawning Gateway 系统自动发送，请勿直接回复。</p>
+                        <p>This email is automatically sent by Dawning Gateway. Please do not reply directly.</p>
                     </div>
                 </div>
             </body>
@@ -354,21 +354,21 @@ public class AlertNotificationService : IAlertNotificationService
     private static string GetMetricTypeDisplay(string metricType) =>
         metricType switch
         {
-            "cpu" => "CPU 使用率 (%)",
-            "memory" => "内存使用率 (%)",
-            "response_time" => "响应时间 (ms)",
-            "error_rate" => "错误率 (%)",
-            "request_count" => "请求数量",
+            "cpu" => "CPU Usage (%)",
+            "memory" => "Memory Usage (%)",
+            "response_time" => "Response Time (ms)",
+            "error_rate" => "Error Rate (%)",
+            "request_count" => "Request Count",
             _ => metricType,
         };
 
     private static string GetSeverityDisplay(string severity) =>
         severity switch
         {
-            "critical" => "🔴 严重",
-            "error" => "🟠 错误",
-            "warning" => "🟡 警告",
-            "info" => "🔵 信息",
+            "critical" => "🔴 Critical",
+            "error" => "🟠 Error",
+            "warning" => "🟡 Warning",
+            "info" => "🔵 Info",
             _ => severity,
         };
 
@@ -386,21 +386,21 @@ public class AlertNotificationService : IAlertNotificationService
     private static string BuildPlainTextBody(AlertNotificationContext context)
     {
         return $"""
-            ⚠️ 系统告警通知
+            ⚠️ System Alert Notification
             ================
 
-            规则名称: {context.RuleName}
+            Rule Name: {context.RuleName}
             {context.Message}
 
-            详细信息:
-            - 告警级别: {GetSeverityDisplay(context.Severity)}
-            - 指标类型: {GetMetricTypeDisplay(context.MetricType)}
-            - 当前值: {context.MetricValue:F2}
-            - 阈值: {GetOperatorDisplay(context.Operator)} {context.Threshold}
-            - 触发时间: {context.TriggeredAt:yyyy-MM-dd HH:mm:ss} UTC
+            Details:
+            - Severity: {GetSeverityDisplay(context.Severity)}
+            - Metric Type: {GetMetricTypeDisplay(context.MetricType)}
+            - Current Value: {context.MetricValue:F2}
+            - Threshold: {GetOperatorDisplay(context.Operator)} {context.Threshold}
+            - Trigger Time: {context.TriggeredAt:yyyy-MM-dd HH:mm:ss} UTC
 
             ---
-            此邮件由 Dawning Gateway 系统自动发送，请勿直接回复。
+            This email is automatically sent by Dawning Gateway. Please do not reply directly.
             """;
     }
 }

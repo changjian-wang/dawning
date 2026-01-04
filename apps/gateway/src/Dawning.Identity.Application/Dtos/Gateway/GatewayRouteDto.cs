@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Dawning.Identity.Application.Dtos.Gateway
 {
     /// <summary>
-    /// 网关路由 DTO
+    /// Gateway Route DTO
     /// </summary>
     public class GatewayRouteDto
     {
@@ -36,27 +36,27 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 创建网关路由 DTO
+    /// Create Gateway Route DTO
     /// </summary>
     public class CreateGatewayRouteDto
     {
-        [Required(ErrorMessage = "路由ID不能为空")]
-        [StringLength(100, ErrorMessage = "路由ID长度不能超过100")]
+        [Required(ErrorMessage = "Route ID is required")]
+        [StringLength(100, ErrorMessage = "Route ID cannot exceed 100 characters")]
         public string RouteId { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "路由名称不能为空")]
-        [StringLength(200, ErrorMessage = "路由名称长度不能超过200")]
+        [Required(ErrorMessage = "Route name is required")]
+        [StringLength(200, ErrorMessage = "Route name cannot exceed 200 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(1000, ErrorMessage = "描述长度不能超过1000")]
+        [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "集群ID不能为空")]
-        [StringLength(100, ErrorMessage = "集群ID长度不能超过100")]
+        [Required(ErrorMessage = "Cluster ID is required")]
+        [StringLength(100, ErrorMessage = "Cluster ID cannot exceed 100 characters")]
         public string ClusterId { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "匹配路径不能为空")]
-        [StringLength(500, ErrorMessage = "匹配路径长度不能超过500")]
+        [Required(ErrorMessage = "Match path is required")]
+        [StringLength(500, ErrorMessage = "Match path cannot exceed 500 characters")]
         public string MatchPath { get; set; } = string.Empty;
 
         public string? MatchMethods { get; set; }
@@ -77,30 +77,30 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 更新网关路由 DTO
+    /// Update Gateway Route DTO
     /// </summary>
     public class UpdateGatewayRouteDto
     {
-        [Required(ErrorMessage = "ID不能为空")]
+        [Required(ErrorMessage = "ID is required")]
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "路由ID不能为空")]
-        [StringLength(100, ErrorMessage = "路由ID长度不能超过100")]
+        [Required(ErrorMessage = "Route ID is required")]
+        [StringLength(100, ErrorMessage = "Route ID cannot exceed 100 characters")]
         public string RouteId { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "路由名称不能为空")]
-        [StringLength(200, ErrorMessage = "路由名称长度不能超过200")]
+        [Required(ErrorMessage = "Route name is required")]
+        [StringLength(200, ErrorMessage = "Route name cannot exceed 200 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(1000, ErrorMessage = "描述长度不能超过1000")]
+        [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
         public string? Description { get; set; }
 
-        [Required(ErrorMessage = "集群ID不能为空")]
-        [StringLength(100, ErrorMessage = "集群ID长度不能超过100")]
+        [Required(ErrorMessage = "Cluster ID is required")]
+        [StringLength(100, ErrorMessage = "Cluster ID cannot exceed 100 characters")]
         public string ClusterId { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "匹配路径不能为空")]
-        [StringLength(500, ErrorMessage = "匹配路径长度不能超过500")]
+        [Required(ErrorMessage = "Match path is required")]
+        [StringLength(500, ErrorMessage = "Match path cannot exceed 500 characters")]
         public string MatchPath { get; set; } = string.Empty;
 
         public string? MatchMethods { get; set; }

@@ -11,42 +11,42 @@ namespace Dawning.Identity.Application.Dtos.OpenIddict
         public Guid? Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// 关联的应用程序 ID
+        /// Associated Application ID
         /// </summary>
         public Guid? ApplicationId { get; set; }
 
         /// <summary>
-        /// 用户标识
+        /// User Subject
         /// </summary>
         public string? Subject { get; set; }
 
         /// <summary>
-        /// 授权类型
+        /// Authorization Type
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
-        /// 授权状态（valid, revoked）
+        /// Authorization Status (valid, revoked)
         /// </summary>
         public string? Status { get; set; }
 
         /// <summary>
-        /// 授权的作用域列表
+        /// Authorized Scope List
         /// </summary>
         public List<string> Scopes { get; set; } = new();
 
         /// <summary>
-        /// 扩展属性
+        /// Extended Properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     }

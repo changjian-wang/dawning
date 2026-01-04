@@ -1,7 +1,7 @@
 namespace Dawning.Identity.Domain.Models.Monitoring;
 
 /// <summary>
-/// 告警历史查询模型
+/// Alert history query model
 /// </summary>
 public class AlertHistoryQueryModel
 {
@@ -14,7 +14,7 @@ public class AlertHistoryQueryModel
 }
 
 /// <summary>
-/// 告警统计
+/// Alert statistics
 /// </summary>
 public class AlertStatistics
 {

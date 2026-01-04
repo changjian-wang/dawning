@@ -12,7 +12,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Gateway
 {
     /// <summary>
-    /// 限流策略仓储实现
+    /// Rate limit policy repository implementation
     /// </summary>
     public class RateLimitPolicyRepository : IRateLimitPolicyRepository
     {
@@ -24,7 +24,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据ID获取策略
+        /// Get policy by ID
         /// </summary>
         public async Task<RateLimitPolicy?> GetAsync(Guid id)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据名称获取策略
+        /// Get policy by name
         /// </summary>
         public async Task<RateLimitPolicy?> GetByNameAsync(string name)
         {
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取所有策略
+        /// Get all policies
         /// </summary>
         public async Task<IEnumerable<RateLimitPolicy>> GetAllAsync()
         {
@@ -62,7 +62,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取所有启用的策略
+        /// Get all enabled policies
         /// </summary>
         public async Task<IEnumerable<RateLimitPolicy>> GetAllEnabledAsync()
         {
@@ -76,7 +76,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 插入策略
+        /// Insert policy
         /// </summary>
         public async ValueTask<int> InsertAsync(RateLimitPolicy model)
         {
@@ -88,7 +88,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 更新策略
+        /// Update policy
         /// </summary>
         public async ValueTask<bool> UpdateAsync(RateLimitPolicy model)
         {
@@ -100,7 +100,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 删除策略
+        /// Delete policy
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Guid id)
         {

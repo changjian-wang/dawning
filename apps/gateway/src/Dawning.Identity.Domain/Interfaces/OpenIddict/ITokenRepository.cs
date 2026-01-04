@@ -24,17 +24,17 @@ namespace Dawning.Identity.Domain.Interfaces.OpenIddict
         Task<int> PruneExpiredTokensAsync();
 
         /// <summary>
-        /// 获取用户的有效令牌列表
+        /// Get valid tokens for a user
         /// </summary>
         Task<IEnumerable<Token>> GetValidTokensBySubjectAsync(string subject);
 
         /// <summary>
-        /// 撤销用户的所有有效令牌
+        /// Revoke all valid tokens for a user
         /// </summary>
         Task<int> RevokeAllBySubjectAsync(string subject);
 
         /// <summary>
-        /// 撤销指定令牌
+        /// Revoke a specific token
         /// </summary>
         Task<bool> RevokeByIdAsync(Guid tokenId);
     }

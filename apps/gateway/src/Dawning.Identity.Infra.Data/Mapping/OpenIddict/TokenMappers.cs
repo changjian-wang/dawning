@@ -10,7 +10,7 @@ using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
     /// <summary>
-    /// Token 映射器
+    /// Token mapper
     /// </summary>
     public static class TokenMappers
     {

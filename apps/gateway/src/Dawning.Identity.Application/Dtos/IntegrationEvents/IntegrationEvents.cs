@@ -3,7 +3,7 @@ using Dawning.Identity.Domain.Core.Events;
 namespace Dawning.Identity.Application.Dtos.IntegrationEvents;
 
 /// <summary>
-/// 审计日志集成事件（发送到 Kafka 用于异步持久化）
+/// Audit Log Integration Event (sent to Kafka for asynchronous persistence)
 /// </summary>
 public class AuditLogIntegrationEvent : IntegrationEvent
 {
@@ -23,7 +23,7 @@ public class AuditLogIntegrationEvent : IntegrationEvent
 }
 
 /// <summary>
-/// 告警通知集成事件（发送到 Kafka 用于广播通知）
+/// Alert Notification Integration Event (sent to Kafka for broadcast notifications)
 /// </summary>
 public class AlertNotificationIntegrationEvent : IntegrationEvent
 {
@@ -37,7 +37,7 @@ public class AlertNotificationIntegrationEvent : IntegrationEvent
 }
 
 /// <summary>
-/// 邮件发送集成事件（发送到 Kafka 邮件队列）
+/// Email Integration Event (sent to Kafka email queue)
 /// </summary>
 public class EmailIntegrationEvent : IntegrationEvent
 {
@@ -52,7 +52,7 @@ public class EmailIntegrationEvent : IntegrationEvent
 }
 
 /// <summary>
-/// 配置变更集成事件（用于多实例配置同步）
+/// Configuration Changed Integration Event (for multi-instance configuration sync)
 /// </summary>
 public class ConfigChangedIntegrationEvent : IntegrationEvent
 {
@@ -64,7 +64,7 @@ public class ConfigChangedIntegrationEvent : IntegrationEvent
 }
 
 /// <summary>
-/// 缓存失效集成事件（用于分布式缓存一致性）
+/// Cache Invalidation Integration Event (for distributed cache consistency)
 /// </summary>
 public class CacheInvalidationIntegrationEvent : IntegrationEvent
 {
@@ -75,7 +75,7 @@ public class CacheInvalidationIntegrationEvent : IntegrationEvent
 }
 
 /// <summary>
-/// 用户事件集成事件（跨服务用户行为通知）
+/// User Event Integration Event (cross-service user behavior notification)
 /// </summary>
 public class UserEventIntegrationEvent : IntegrationEvent
 {
@@ -89,7 +89,7 @@ public class UserEventIntegrationEvent : IntegrationEvent
 }
 
 /// <summary>
-/// 系统事件集成事件
+/// System Event Integration Event
 /// </summary>
 public class SystemEventIntegrationEvent : IntegrationEvent
 {

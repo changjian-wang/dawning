@@ -9,7 +9,7 @@ using Microsoft.Extensions.Configuration;
 namespace Dawning.Identity.Application.Services.Token
 {
     /// <summary>
-    /// Token 管理服务实现
+    /// Token management service implementation
     /// </summary>
     public class TokenManagementService : ITokenManagementService
     {
@@ -32,11 +32,11 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 撤销用户的所有令牌
+        /// Revoke all tokens for a user
         /// </summary>
         public async Task<int> RevokeAllUserTokensAsync(Guid userId)
         {
-            // 获取用户的所有有效令牌用于黑名单
+            // Get all valid tokens for the user to add to blacklist
             var validTokens = await _unitOfWork.Token.GetValidTokensBySubjectAsync(
                 userId.ToString()
             );
@@ -47,10 +47,10 @@ namespace Dawning.Identity.Application.Services.Token
                 return 0;
             }
 
-            // 撤销所有令牌
+            // Revoke all tokens
             var affected = await _unitOfWork.Token.RevokeAllBySubjectAsync(userId.ToString());
 
-            // 将令牌加入黑名单（用于快速验证）
+            // Add tokens to blacklist (for fast validation)
             if (_blacklistService != null)
             {
                 foreach (var token in tokenList)
@@ -64,11 +64,11 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 撤销指定令牌
+        /// Revoke a specified token
         /// </summary>
         public async Task<bool> RevokeTokenAsync(Guid tokenId)
         {
-            // 获取令牌信息用于黑名单
+            // Get token information for blacklist
             var token = await _unitOfWork.Token.GetAsync(tokenId);
             if (token == null || token.Id == Guid.Empty || token.Status != "valid")
             {
@@ -77,10 +77,10 @@ namespace Dawning.Identity.Application.Services.Token
 
             var expirationDate = token.ExpiresAt;
 
-            // 撤销令牌
+            // Revoke token
             var result = await _unitOfWork.Token.RevokeByIdAsync(tokenId);
 
-            // 加入黑名单
+            // Add to blacklist
             if (_blacklistService != null && result)
             {
                 await _blacklistService.AddToBlacklistAsync(
@@ -93,34 +93,34 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 撤销指定设备的令牌（暂不支持，user_sessions 表不存在）
+        /// Revoke tokens for a specified device (not supported - user_sessions table does not exist)
         /// </summary>
         public Task<int> RevokeDeviceTokensAsync(Guid userId, string deviceId)
         {
-            // user_sessions 表不存在，返回 0
+            // user_sessions table does not exist, return 0
             return Task.FromResult(0);
         }
 
         /// <summary>
-        /// 获取用户的活跃会话列表（暂不支持，user_sessions 表不存在）
+        /// Get user's active session list (not supported - user_sessions table does not exist)
         /// </summary>
         public Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(Guid userId)
         {
-            // user_sessions 表不存在，返回空列表
+            // user_sessions table does not exist, return empty list
             return Task.FromResult<IEnumerable<UserSessionDto>>(new List<UserSessionDto>());
         }
 
         /// <summary>
-        /// 记录用户登录会话（暂不支持，user_sessions 表不存在）
+        /// Record user login session (not supported - user_sessions table does not exist)
         /// </summary>
         public Task RecordLoginSessionAsync(LoginSessionInfo session)
         {
-            // user_sessions 表不存在，不做任何操作
+            // user_sessions table does not exist, do nothing
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// 检查是否允许登录（基于设备策略）
+        /// Check if login is allowed (based on device policy)
         /// </summary>
         public async Task<(bool allowed, string? message)> CheckLoginPolicyAsync(
             Guid userId,
@@ -129,8 +129,8 @@ namespace Dawning.Identity.Application.Services.Token
         {
             var policy = await GetLoginPolicyAsync();
 
-            // user_sessions 表不存在，默认允许登录
-            // 如果不允许多设备，则检查用户是否已有有效令牌
+            // user_sessions table does not exist, allow login by default
+            // If multiple devices not allowed, check if user already has valid tokens
             if (!policy.AllowMultipleDevices)
             {
                 var validTokens = await _unitOfWork.Token.GetValidTokensBySubjectAsync(
@@ -138,7 +138,7 @@ namespace Dawning.Identity.Application.Services.Token
                 );
                 if (validTokens.Any() && policy.NewDevicePolicy == "deny")
                 {
-                    return (false, "不允许在多个设备上同时登录");
+                    return (false, "Simultaneous login from multiple devices is not allowed");
                 }
             }
 
@@ -146,7 +146,7 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 获取登录策略设置
+        /// Get login policy settings
         /// </summary>
         public Task<LoginPolicySettings> GetLoginPolicyAsync()
         {
@@ -157,7 +157,7 @@ namespace Dawning.Identity.Application.Services.Token
 
             var policy = new LoginPolicySettings();
 
-            // 从 appsettings.json 读取配置
+            // Read configuration from appsettings.json
             var tokenSection = _configuration.GetSection("Security:Token");
             if (tokenSection.Exists())
             {

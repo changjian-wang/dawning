@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.MultiTenancy
 {
     /// <summary>
-    /// 租户服务实现
+    /// Tenant service implementation
     /// </summary>
     public class TenantService : ITenantService
     {
@@ -114,26 +114,26 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<Tenant> CreateAsync(Tenant tenant)
         {
-            // 验证代码唯一性
+            // Validate code uniqueness
             if (await _uow.Tenant.ExistsCodeAsync(tenant.Code))
             {
-                throw new InvalidOperationException($"租户代码 '{tenant.Code}' 已存在");
+                throw new InvalidOperationException($"Tenant code '{tenant.Code}' already exists");
             }
 
-            // 验证域名唯一性
+            // Validate domain uniqueness
             if (
                 !string.IsNullOrWhiteSpace(tenant.Domain)
                 && await _uow.Tenant.ExistsDomainAsync(tenant.Domain)
             )
             {
-                throw new InvalidOperationException($"域名 '{tenant.Domain}' 已被使用");
+                throw new InvalidOperationException($"Domain '{tenant.Domain}' is already in use");
             }
 
             tenant.Id = Guid.NewGuid();
             tenant.CreatedAt = DateTime.UtcNow;
 
             await _uow.Tenant.InsertAsync(tenant);
-            _logger.LogInformation("创建租户: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
+            _logger.LogInformation("Created tenant: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
 
             return tenant;
         }
@@ -144,31 +144,31 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             var existing = await _uow.Tenant.GetAsync(tenant.Id);
             if (existing == null)
             {
-                throw new InvalidOperationException($"租户不存在: {tenant.Id}");
+                throw new InvalidOperationException($"Tenant not found: {tenant.Id}");
             }
 
-            // 验证代码唯一性
+            // Validate code uniqueness
             if (await _uow.Tenant.ExistsCodeAsync(tenant.Code, tenant.Id))
             {
-                throw new InvalidOperationException($"租户代码 '{tenant.Code}' 已存在");
+                throw new InvalidOperationException($"Tenant code '{tenant.Code}' already exists");
             }
 
-            // 验证域名唯一性
+            // Validate domain uniqueness
             if (
                 !string.IsNullOrWhiteSpace(tenant.Domain)
                 && await _uow.Tenant.ExistsDomainAsync(tenant.Domain, tenant.Id)
             )
             {
-                throw new InvalidOperationException($"域名 '{tenant.Domain}' 已被使用");
+                throw new InvalidOperationException($"Domain '{tenant.Domain}' is already in use");
             }
 
             tenant.UpdatedAt = DateTime.UtcNow;
             await _uow.Tenant.UpdateAsync(tenant);
 
-            // 清除缓存
+            // Clear cache
             await InvalidateCacheAsync(existing);
 
-            _logger.LogInformation("更新租户: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
+            _logger.LogInformation("Updated tenant: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
             return tenant;
         }
 
@@ -186,7 +186,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             {
                 await InvalidateCacheAsync(tenant);
                 _logger.LogInformation(
-                    "删除租户: {TenantCode} ({TenantId})",
+                    "Deleted tenant: {TenantCode} ({TenantId})",
                     tenant.Code,
                     tenant.Id
                 );
@@ -209,7 +209,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             await InvalidateCacheAsync(tenant);
 
             _logger.LogInformation(
-                "设置租户状态: {TenantCode} ({TenantId}) -> {IsActive}",
+                "Set tenant status: {TenantCode} ({TenantId}) -> {IsActive}",
                 tenant.Code,
                 tenant.Id,
                 isActive
@@ -234,7 +234,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<Tenant?> ResolveTenantAsync(string? tenantCode, string? host)
         {
-            // 1. 优先通过租户代码解析
+            // 1. Prioritize resolution by tenant code
             if (!string.IsNullOrWhiteSpace(tenantCode))
             {
                 var tenant = await GetByCodeAsync(tenantCode);
@@ -244,20 +244,20 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
                 }
             }
 
-            // 2. 通过域名解析
+            // 2. Resolve by domain
             if (!string.IsNullOrWhiteSpace(host))
             {
-                // 移除端口号
+                // Remove port number
                 var domain = host.Split(':')[0];
 
-                // 尝试完整域名匹配
+                // Try full domain matching
                 var tenant = await GetByDomainAsync(domain);
                 if (tenant != null && tenant.IsActive)
                 {
                     return tenant;
                 }
 
-                // 尝试子域名匹配 (如 tenant1.example.com -> tenant1)
+                // Try subdomain matching (e.g., tenant1.example.com -> tenant1)
                 var parts = domain.Split('.');
                 if (parts.Length >= 2)
                 {

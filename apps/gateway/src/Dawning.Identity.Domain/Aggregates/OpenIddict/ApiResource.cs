@@ -5,68 +5,68 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.OpenIddict
 {
     /// <summary>
-    /// API资源聚合根
+    /// API Resource Aggregate Root
     /// Represents a protected API resource that can be accessed using tokens
     /// </summary>
     public class ApiResource : IAggregateRoot
     {
         /// <summary>
-        /// 唯一标识
+        /// Unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 资源名称(唯一标识符)
+        /// Resource name (unique identifier)
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 描述信息
+        /// Description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool Enabled { get; set; } = true;
 
         /// <summary>
-        /// 允许的访问令牌签名算法
+        /// Allowed access token signing algorithms
         /// </summary>
         public List<string> AllowedAccessTokenSigningAlgorithms { get; set; } = new();
 
         /// <summary>
-        /// 是否在发现文档中显示
+        /// Whether to show in discovery document
         /// </summary>
         public bool ShowInDiscoveryDocument { get; set; } = true;
 
         /// <summary>
-        /// 关联的作用域
+        /// Associated scopes
         /// </summary>
         public List<string> Scopes { get; set; } = new();
 
         /// <summary>
-        /// 用户声明类型
+        /// User claim types
         /// </summary>
         public List<string> UserClaims { get; set; } = new();
 
         /// <summary>
-        /// 扩展属性
+        /// Extension properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
     }

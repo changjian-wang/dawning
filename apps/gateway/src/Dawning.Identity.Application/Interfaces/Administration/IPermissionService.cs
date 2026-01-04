@@ -8,7 +8,7 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Application.Interfaces.Administration
 {
     /// <summary>
-    /// 权限服务接口
+    /// Permission service interface
     /// </summary>
     public interface IPermissionService
     {
@@ -24,12 +24,12 @@ namespace Dawning.Identity.Application.Interfaces.Administration
         Task<IEnumerable<PermissionGroupDto>> GetGroupedPermissionsAsync();
 
         /// <summary>
-        /// 获取所有资源类型
+        /// Get all resource types
         /// </summary>
         Task<IEnumerable<string>> GetResourceTypesAsync();
 
         /// <summary>
-        /// 获取所有分类
+        /// Get all categories
         /// </summary>
         Task<IEnumerable<string>> GetCategoriesAsync();
 

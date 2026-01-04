@@ -55,7 +55,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         }
 
         /// <summary>
-        /// 反序列化 JSON 为 List
+        /// Deserialize JSON to List
         /// </summary>
         private static List<string> DeserializeList(string? json)
         {
@@ -73,7 +73,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         }
 
         /// <summary>
-        /// 反序列化 JSON 为 Dictionary
+        /// Deserialize JSON to Dictionary
         /// </summary>
         private static Dictionary<string, string> DeserializeDictionary(string? json)
         {
@@ -92,7 +92,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         }
 
         /// <summary>
-        /// 序列化 List 为 JSON
+        /// Serialize List to JSON
         /// </summary>
         private static string? SerializeList(List<string>? list)
         {
@@ -103,7 +103,7 @@ namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
         }
 
         /// <summary>
-        /// 序列化 Dictionary 为 JSON
+        /// Serialize Dictionary to JSON
         /// </summary>
         private static string? SerializeDictionary(Dictionary<string, string>? dict)
         {

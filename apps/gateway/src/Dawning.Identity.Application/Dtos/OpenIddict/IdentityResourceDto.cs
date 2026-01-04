@@ -4,74 +4,74 @@ using System.Collections.Generic;
 namespace Dawning.Identity.Application.Dtos.OpenIddict
 {
     /// <summary>
-    /// 身份资源DTO
+    /// Identity Resource DTO
     /// </summary>
     public class IdentityResourceDto
     {
         public Guid? Id { get; set; }
 
         /// <summary>
-        /// 资源名称
+        /// Resource Name
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 显示名称
+        /// Display Name
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 描述信息
+        /// Description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Is Enabled
         /// </summary>
         public bool Enabled { get; set; } = true;
 
         /// <summary>
-        /// 用户是否必须同意
+        /// User Must Consent
         /// </summary>
         public bool Required { get; set; } = false;
 
         /// <summary>
-        /// 是否在同意界面中强调
+        /// Emphasize in Consent Screen
         /// </summary>
         public bool Emphasize { get; set; } = false;
 
         /// <summary>
-        /// 是否在发现文档中显示
+        /// Show in Discovery Document
         /// </summary>
         public bool ShowInDiscoveryDocument { get; set; } = true;
 
         /// <summary>
-        /// 用户声明类型
+        /// User Claim Types
         /// </summary>
         public List<string> UserClaims { get; set; } = new();
 
         /// <summary>
-        /// 扩展属性
+        /// Extended Properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime? CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated Time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 操作者ID (用于审计日志)
+        /// Operator ID (for audit log)
         /// </summary>
         public Guid? OperatorId { get; set; }
     }

@@ -15,7 +15,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
     /// <summary>
-    /// 角色仓储实现
+    /// Role repository implementation
     /// </summary>
     public class RoleRepository : IRoleRepository
     {
@@ -27,7 +27,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据ID异步获取角色
+        /// Asynchronously get role by ID
         /// </summary>
         public async Task<Role?> GetAsync(Guid id)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据角色名称获取角色
+        /// Get role by role name
         /// </summary>
         public async Task<Role?> GetByNameAsync(string name)
         {
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取分页角色列表
+        /// Get paged role list
         /// </summary>
         public async Task<PagedData<Role>> GetPagedListAsync(
             RoleModel model,
@@ -59,7 +59,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         {
             var builder = _context.Connection.Builder<RoleEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(
                     !string.IsNullOrWhiteSpace(model.Name),
@@ -72,7 +72,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 .WhereIf(model.IsActive.HasValue, r => r.IsActive == model.IsActive!.Value)
                 .WhereIf(model.IsSystem.HasValue, r => r.IsSystem == model.IsSystem!.Value);
 
-            // 按创建时间降序排序
+            // Order by created time descending
             var result = await builder
                 .OrderByDescending(r => r.CreatedAt)
                 .AsPagedListAsync(page, itemsPerPage);
@@ -87,7 +87,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取所有角色
+        /// Get all roles
         /// </summary>
         public async Task<IEnumerable<Role>> GetAllAsync()
         {
@@ -101,7 +101,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步插入角色
+        /// Asynchronously insert role
         /// </summary>
         public async ValueTask<int> InsertAsync(Role model)
         {
@@ -113,7 +113,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步更新角色
+        /// Asynchronously update role
         /// </summary>
         public async ValueTask<bool> UpdateAsync(Role model)
         {
@@ -125,7 +125,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步删除角色（软删除）
+        /// Asynchronously delete role (soft delete)
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Role model)
         {
@@ -145,7 +145,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 检查角色名称是否存在
+        /// Check if role name exists
         /// </summary>
         public async Task<bool> NameExistsAsync(string name, Guid? excludeRoleId = null)
         {

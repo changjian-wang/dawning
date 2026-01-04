@@ -109,11 +109,11 @@ namespace Dawning.Identity.Application.Services.Administration
             Guid? operatorId = null
         )
         {
-            // 验证代码唯一性
+            // Validate code uniqueness
             var exists = await _unitOfWork.Permission.CodeExistsAsync(dto.Code);
             if (exists)
             {
-                throw new InvalidOperationException($"权限代码 '{dto.Code}' 已存在");
+                throw new InvalidOperationException($"Permission code '{dto.Code}' already exists");
             }
 
             var permission = new Permission
@@ -137,7 +137,7 @@ namespace Dawning.Identity.Application.Services.Administration
             {
                 await _unitOfWork.Permission.InsertAsync(permission);
 
-                // 记录审计日志
+                // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
                     new Domain.Aggregates.Administration.AuditLog
                     {
@@ -145,7 +145,7 @@ namespace Dawning.Identity.Application.Services.Administration
                         Action = "Create",
                         EntityType = "Permission",
                         EntityId = permission.Id,
-                        Description = $"创建权限: {permission.Name} ({permission.Code})",
+                        Description = $"Created permission: {permission.Name} ({permission.Code})",
                         IpAddress = null,
                         UserAgent = null,
                         StatusCode = 200,
@@ -173,13 +173,13 @@ namespace Dawning.Identity.Application.Services.Administration
             var permission = await _unitOfWork.Permission.GetAsync(dto.Id);
             if (permission == null)
             {
-                throw new InvalidOperationException($"权限 ID '{dto.Id}' 不存在");
+                throw new InvalidOperationException($"Permission ID '{dto.Id}' not found");
             }
 
-            // 系统权限不允许修改代码和关键属性
+            // System permissions cannot have key properties modified
             if (permission.IsSystem)
             {
-                throw new InvalidOperationException("系统权限不允许修改");
+                throw new InvalidOperationException("System permissions cannot be modified");
             }
 
             var oldValues = $"{permission.Name}|{permission.Description}";
@@ -196,7 +196,7 @@ namespace Dawning.Identity.Application.Services.Administration
             {
                 await _unitOfWork.Permission.UpdateAsync(permission);
 
-                // 记录审计日志
+                // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
                     new Domain.Aggregates.Administration.AuditLog
                     {
@@ -205,7 +205,7 @@ namespace Dawning.Identity.Application.Services.Administration
                         EntityType = "Permission",
                         EntityId = permission.Id,
                         Description =
-                            $"更新权限: {oldValues} -> {permission.Name}|{permission.Description}",
+                            $"Updated permission: {oldValues} -> {permission.Name}|{permission.Description}",
                         IpAddress = null,
                         UserAgent = null,
                         StatusCode = 200,
@@ -230,21 +230,21 @@ namespace Dawning.Identity.Application.Services.Administration
             var permission = await _unitOfWork.Permission.GetAsync(id);
             if (permission == null)
             {
-                throw new InvalidOperationException($"权限 ID '{id}' 不存在");
+                throw new InvalidOperationException($"Permission ID '{id}' not found");
             }
 
-            // 系统权限不允许删除
+            // System permissions cannot be deleted
             if (permission.IsSystem)
             {
-                throw new InvalidOperationException("系统权限不允许删除");
+                throw new InvalidOperationException("System permissions cannot be deleted");
             }
 
-            // 检查是否有角色使用此权限
+            // Check if any role is using this permission
             var rolePermissions = await _unitOfWork.RolePermission.GetByPermissionIdAsync(id);
             if (rolePermissions.Any())
             {
                 throw new InvalidOperationException(
-                    $"权限 '{permission.Name}' 正在被 {rolePermissions.Count()} 个角色使用,无法删除"
+                    $"Permission '{permission.Name}' is being used by {rolePermissions.Count()} role(s), cannot be deleted"
                 );
             }
 
@@ -253,7 +253,7 @@ namespace Dawning.Identity.Application.Services.Administration
             {
                 await _unitOfWork.Permission.DeleteAsync(permission);
 
-                // 记录审计日志
+                // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
                     new Domain.Aggregates.Administration.AuditLog
                     {
@@ -261,7 +261,7 @@ namespace Dawning.Identity.Application.Services.Administration
                         Action = "Delete",
                         EntityType = "Permission",
                         EntityId = id,
-                        Description = $"删除权限: {permission.Name} ({permission.Code})",
+                        Description = $"Deleted permission: {permission.Name} ({permission.Code})",
                         IpAddress = null,
                         UserAgent = null,
                         StatusCode = 200,
@@ -290,7 +290,7 @@ namespace Dawning.Identity.Application.Services.Administration
             var role = await _unitOfWork.Role.GetAsync(roleId);
             if (role == null)
             {
-                throw new InvalidOperationException($"角色 ID '{roleId}' 不存在");
+                throw new InvalidOperationException($"Role ID '{roleId}' not found");
             }
 
             var permissions = await _unitOfWork.Permission.GetByIdsAsync(permissionIds);
@@ -300,7 +300,7 @@ namespace Dawning.Identity.Application.Services.Administration
             if (missingIds.Any())
             {
                 throw new InvalidOperationException(
-                    $"权限 ID {string.Join(", ", missingIds)} 不存在"
+                    $"Permission ID {string.Join(", ", missingIds)} not found"
                 );
             }
 
@@ -313,7 +313,7 @@ namespace Dawning.Identity.Application.Services.Administration
                     operatorId
                 );
 
-                // 记录审计日志
+                // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
                     new Domain.Aggregates.Administration.AuditLog
                     {
@@ -321,7 +321,7 @@ namespace Dawning.Identity.Application.Services.Administration
                         Action = "AssignPermissions",
                         EntityType = "Role",
                         EntityId = roleId,
-                        Description = $"为角色 '{role.Name}' 分配 {permissionIds.Count()} 个权限",
+                        Description = $"Assigned {permissionIds.Count()} permission(s) to role '{role.Name}'",
                         IpAddress = null,
                         UserAgent = null,
                         StatusCode = 200,
@@ -349,7 +349,7 @@ namespace Dawning.Identity.Application.Services.Administration
             var role = await _unitOfWork.Role.GetAsync(roleId);
             if (role == null)
             {
-                throw new InvalidOperationException($"角色 ID '{roleId}' 不存在");
+                throw new InvalidOperationException($"Role ID '{roleId}' not found");
             }
 
             _unitOfWork.BeginTransaction();
@@ -357,7 +357,7 @@ namespace Dawning.Identity.Application.Services.Administration
             {
                 await _unitOfWork.RolePermission.RemoveRolePermissionsAsync(roleId, permissionIds);
 
-                // 记录审计日志
+                // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
                     new Domain.Aggregates.Administration.AuditLog
                     {
@@ -365,7 +365,7 @@ namespace Dawning.Identity.Application.Services.Administration
                         Action = "RemovePermissions",
                         EntityType = "Role",
                         EntityId = roleId,
-                        Description = $"从角色 '{role.Name}' 移除 {permissionIds.Count()} 个权限",
+                        Description = $"Removed {permissionIds.Count()} permission(s) from role '{role.Name}'",
                         IpAddress = null,
                         UserAgent = null,
                         StatusCode = 200,
@@ -392,7 +392,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<IEnumerable<string>> GetUserPermissionCodesAsync(Guid userId)
         {
-            // 获取用户的所有角色
+            // Get all roles for the user
             var userRoles = await _unitOfWork.UserRole.GetUserRolesAsync(userId);
 
             if (!userRoles.Any())
@@ -400,7 +400,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 return new List<string>();
             }
 
-            // 获取所有角色的权限(去重)
+            // Get permissions for all roles (deduplicated)
             var allPermissions = new List<Permission>();
             foreach (var role in userRoles)
             {
@@ -408,12 +408,12 @@ namespace Dawning.Identity.Application.Services.Administration
                 allPermissions.AddRange(rolePermissions);
             }
 
-            // 去重并返回权限代码
+            // Deduplicate and return permission codes
             return allPermissions.Where(p => p.IsActive).Select(p => p.Code).Distinct().ToList();
         }
     }
 
-    // 扩展方法
+    // Extension methods
     public static class PermissionExtensions
     {
         public static PermissionDto ToDto(this Permission permission)

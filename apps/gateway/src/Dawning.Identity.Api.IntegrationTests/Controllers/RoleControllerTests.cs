@@ -5,14 +5,14 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 角色控制器集成测试
+/// Role controller integration tests
 /// </summary>
 public class RoleControllerTests : IntegrationTestBase
 {
     public RoleControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetRoleById_WithoutAuth_ReturnsUnauthorized()
@@ -105,7 +105,7 @@ public class RoleControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点可达性测试
+    #region Endpoint reachability tests
 
     [Fact]
     public async Task GetRoleById_WithInvalidGuid_ReturnsBadRequest()
@@ -113,7 +113,7 @@ public class RoleControllerTests : IntegrationTestBase
         // Act
         var response = await Client.GetAsync("/api/role/invalid-guid");
 
-        // Assert - 路由约束会拒绝无效的 GUID
+        // Assert - Route constraint will reject invalid GUID
         response
             .StatusCode.Should()
             .BeOneOf(

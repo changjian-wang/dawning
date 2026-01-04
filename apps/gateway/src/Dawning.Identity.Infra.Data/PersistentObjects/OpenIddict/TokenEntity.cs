@@ -8,7 +8,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
 {
     /// <summary>
-    /// OpenIddict 令牌持久化对象
+    /// OpenIddict token persistent object
     /// </summary>
     [Table("openiddict_tokens")]
     public class TokenEntity

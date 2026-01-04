@@ -10,8 +10,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Caching
 {
     /// <summary>
-    /// 缓存预热服务
-    /// 在应用启动时预加载热点数据到缓存
+    /// Cache warmup service.
+    /// Pre-loads hot data into cache when the application starts.
     /// </summary>
     public class CacheWarmupService : BackgroundService
     {
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Application.Services.Caching
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // 延迟启动，等待应用完全初始化
+            // Delay startup, wait for application to fully initialize
             await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
 
             _logger.LogInformation("Starting cache warmup...");
@@ -48,7 +48,7 @@ namespace Dawning.Identity.Application.Services.Caching
 
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-                // 顺序预热缓存（MySQL 不支持在同一连接上并行执行多个查询）
+                // Warm up cache sequentially (MySQL does not support parallel queries on the same connection)
                 await WarmupSystemConfigAsync(cacheService, unitOfWork, stoppingToken);
                 await WarmupRolesAsync(cacheService, unitOfWork, stoppingToken);
                 await WarmupPermissionsAsync(cacheService, unitOfWork, stoppingToken);
@@ -72,7 +72,7 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <summary>
-        /// 预热系统配置
+        /// Warm up system configuration cache
         /// </summary>
         private async Task WarmupSystemConfigAsync(
             ICacheService cacheService,
@@ -82,7 +82,7 @@ namespace Dawning.Identity.Application.Services.Caching
         {
             try
             {
-                // 获取所有系统配置（分页获取前1000条）
+                // Get all system configs (paginated, first 1000 records)
                 var result = await unitOfWork.SystemConfig.GetPagedListAsync(
                     new Dawning.Identity.Domain.Models.Administration.SystemConfigModel(),
                     1,
@@ -115,7 +115,7 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <summary>
-        /// 预热角色数据
+        /// Warm up roles cache
         /// </summary>
         private async Task WarmupRolesAsync(
             ICacheService cacheService,
@@ -128,7 +128,7 @@ namespace Dawning.Identity.Application.Services.Caching
                 var roles = await unitOfWork.Role.GetAllAsync();
                 var roleList = roles.ToList();
 
-                // 缓存所有角色列表
+                // Cache all roles list
                 await cacheService.SetAsync(
                     CacheKeys.AllRoles,
                     roleList,
@@ -136,7 +136,7 @@ namespace Dawning.Identity.Application.Services.Caching
                     cancellationToken
                 );
 
-                // 缓存单个角色
+                // Cache individual roles
                 foreach (var role in roleList)
                 {
                     await cacheService.SetAsync(
@@ -163,7 +163,7 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <summary>
-        /// 预热权限数据
+        /// Warm up permissions cache
         /// </summary>
         private async Task WarmupPermissionsAsync(
             ICacheService cacheService,
@@ -176,7 +176,7 @@ namespace Dawning.Identity.Application.Services.Caching
                 var permissions = await unitOfWork.Permission.GetAllAsync();
                 var permissionList = permissions.ToList();
 
-                // 缓存所有权限列表
+                // Cache all permissions list
                 await cacheService.SetAsync(
                     CacheKeys.AllPermissions,
                     permissionList,
@@ -193,7 +193,7 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <summary>
-        /// 预热限流策略
+        /// Warm up rate limit policies cache
         /// </summary>
         private async Task WarmupRateLimitPoliciesAsync(
             ICacheService cacheService,
@@ -222,7 +222,7 @@ namespace Dawning.Identity.Application.Services.Caching
         }
 
         /// <summary>
-        /// 预热 IP 规则
+        /// Warm up IP rules cache
         /// </summary>
         private async Task WarmupIpRulesAsync(
             ICacheService cacheService,
@@ -232,7 +232,7 @@ namespace Dawning.Identity.Application.Services.Caching
         {
             try
             {
-                // 获取黑名单和白名单规则
+                // Get blacklist and whitelist rules
                 var blacklistRules = await unitOfWork.IpAccessRule.GetActiveRulesByTypeAsync(
                     "blacklist"
                 );

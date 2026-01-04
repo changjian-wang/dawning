@@ -2,10 +2,10 @@ using Dawning.Identity.Domain.Core.Events;
 
 namespace Dawning.Identity.Domain.Events;
 
-#region User Events (用户相关事件)
+#region User Events
 
 /// <summary>
-/// 用户创建事件
+/// User created event
 /// </summary>
 public class UserCreatedEvent : DomainEvent
 {
@@ -22,7 +22,7 @@ public class UserCreatedEvent : DomainEvent
 }
 
 /// <summary>
-/// 用户删除事件
+/// User deleted event
 /// </summary>
 public class UserDeletedEvent : DomainEvent
 {
@@ -37,7 +37,7 @@ public class UserDeletedEvent : DomainEvent
 }
 
 /// <summary>
-/// 用户密码变更事件
+/// User password changed event
 /// </summary>
 public class UserPasswordChangedEvent : DomainEvent
 {
@@ -54,7 +54,7 @@ public class UserPasswordChangedEvent : DomainEvent
 }
 
 /// <summary>
-/// 用户登录事件
+/// User logged in event
 /// </summary>
 public class UserLoggedInEvent : DomainEvent
 {
@@ -84,7 +84,7 @@ public class UserLoggedInEvent : DomainEvent
 }
 
 /// <summary>
-/// 用户登出事件
+/// User logged out event
 /// </summary>
 public class UserLoggedOutEvent : DomainEvent
 {
@@ -99,7 +99,7 @@ public class UserLoggedOutEvent : DomainEvent
 }
 
 /// <summary>
-/// 用户锁定事件
+/// User locked out event
 /// </summary>
 public class UserLockedOutEvent : DomainEvent
 {
@@ -119,10 +119,10 @@ public class UserLockedOutEvent : DomainEvent
 
 #endregion
 
-#region Role Events (角色相关事件)
+#region Role Events
 
 /// <summary>
-/// 角色分配事件
+/// Role assigned event
 /// </summary>
 public class RoleAssignedEvent : DomainEvent
 {
@@ -141,7 +141,7 @@ public class RoleAssignedEvent : DomainEvent
 }
 
 /// <summary>
-/// 角色移除事件
+/// Role revoked event
 /// </summary>
 public class RoleRevokedEvent : DomainEvent
 {
@@ -160,7 +160,7 @@ public class RoleRevokedEvent : DomainEvent
 }
 
 /// <summary>
-/// 权限变更事件
+/// Permission changed event
 /// </summary>
 public class PermissionChangedEvent : DomainEvent
 {
@@ -185,10 +185,10 @@ public class PermissionChangedEvent : DomainEvent
 
 #endregion
 
-#region Configuration Events (配置相关事件)
+#region Configuration Events
 
 /// <summary>
-/// 系统配置变更事件
+/// System configuration changed event
 /// </summary>
 public class ConfigurationChangedEvent : DomainEvent
 {
@@ -216,10 +216,10 @@ public class ConfigurationChangedEvent : DomainEvent
 
 #endregion
 
-#region Alert Events (告警相关事件)
+#region Alert Events
 
 /// <summary>
-/// 告警触发事件
+/// Alert triggered event
 /// </summary>
 public class AlertTriggeredEvent : DomainEvent
 {
@@ -249,7 +249,7 @@ public class AlertTriggeredEvent : DomainEvent
 }
 
 /// <summary>
-/// 告警恢复事件
+/// Alert resolved event
 /// </summary>
 public class AlertResolvedEvent : DomainEvent
 {
@@ -267,10 +267,10 @@ public class AlertResolvedEvent : DomainEvent
 
 #endregion
 
-#region Audit Events (审计相关事件)
+#region Audit Events
 
 /// <summary>
-/// 实体变更事件（通用审计）
+/// Entity changed event (generic audit)
 /// </summary>
 public class EntityChangedEvent : DomainEvent
 {

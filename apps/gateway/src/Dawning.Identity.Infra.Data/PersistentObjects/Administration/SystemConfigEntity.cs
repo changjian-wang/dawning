@@ -11,58 +11,58 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
     public class SystemConfigEntity
     {
         /// <summary>
-        /// 主键
+        /// Primary key
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 类型：Client，IdentityResource，ApiResource，ApiScope，也可以存储上级key来形成上下级联动查询
+        /// Type: Client, IdentityResource, ApiResource, ApiScope, or parent key for hierarchical linked queries
         /// </summary>
         [Column("name")]
         public string? Name { get; set; }
 
         /// <summary>
-        /// 键
+        /// Key
         /// </summary>
         [Column("key")]
         public string? Key { get; set; }
 
         /// <summary>
-        /// 值
+        /// Value
         /// </summary>
         [Column("value")]
         public string? Value { get; set; }
 
         /// <summary>
-        /// 描述说明
+        /// Description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 用户是否可编辑
+        /// Whether non-editable by user
         /// </summary>
         [Column("non_editable")]
         public bool NonEditable { get; set; } = true;
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         [Column("timestamp")]
         [DefaultSortName]
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [IgnoreUpdate]
         [Column("created_at")]
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? Updated { get; set; }

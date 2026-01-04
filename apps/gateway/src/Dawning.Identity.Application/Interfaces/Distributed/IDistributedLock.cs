@@ -1,17 +1,17 @@
 namespace Dawning.Identity.Application.Interfaces.Distributed;
 
 /// <summary>
-/// 分布式锁接口
+/// Distributed lock interface
 /// </summary>
-public interface IDistributedLock
+ public interface IDistributedLock
 {
     /// <summary>
-    /// 尝试获取锁
+    /// Try to acquire a lock
     /// </summary>
-    /// <param name="lockKey">锁键</param>
-    /// <param name="expiry">锁过期时间</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>锁句柄（如果获取成功），null（如果获取失败）</returns>
+    /// <param name="lockKey">Lock key</param>
+    /// <param name="expiry">Lock expiration time</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Lock handle (if acquired successfully), null (if acquisition failed)</returns>
     Task<IDistributedLockHandle?> TryAcquireAsync(
         string lockKey,
         TimeSpan expiry,
@@ -19,13 +19,13 @@ public interface IDistributedLock
     );
 
     /// <summary>
-    /// 获取锁（阻塞直到获取成功或超时）
+    /// Acquire a lock (blocks until acquired or timeout)
     /// </summary>
-    /// <param name="lockKey">锁键</param>
-    /// <param name="expiry">锁过期时间</param>
-    /// <param name="timeout">等待超时时间</param>
-    /// <param name="cancellationToken">取消令牌</param>
-    /// <returns>锁句柄</returns>
+    /// <param name="lockKey">Lock key</param>
+    /// <param name="expiry">Lock expiration time</param>
+    /// <param name="timeout">Wait timeout</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Lock handle</returns>
     Task<IDistributedLockHandle> AcquireAsync(
         string lockKey,
         TimeSpan expiry,
@@ -35,27 +35,27 @@ public interface IDistributedLock
 }
 
 /// <summary>
-/// 分布式锁句柄
+/// Distributed lock handle
 /// </summary>
 public interface IDistributedLockHandle : IAsyncDisposable
 {
     /// <summary>
-    /// 锁键
+    /// Lock key
     /// </summary>
     string LockKey { get; }
 
     /// <summary>
-    /// 锁是否仍然有效
+    /// Whether the lock is still valid
     /// </summary>
     bool IsAcquired { get; }
 
     /// <summary>
-    /// 延长锁过期时间
+    /// Extend lock expiration time
     /// </summary>
     Task<bool> ExtendAsync(TimeSpan extension, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 释放锁
+    /// Release the lock
     /// </summary>
     Task ReleaseAsync(CancellationToken cancellationToken = default);
 }

@@ -13,8 +13,8 @@ public class PasswordPolicyServiceTests
 
     public PasswordPolicyServiceTests()
     {
-        // 使用真实配置而非 Mock（extension methods 不能被 mock）
-        // 注意：实际服务使用的配置路径是 Security:Password
+        // Use real configuration instead of Mock (extension methods cannot be mocked)
+        // Note: The actual service uses the configuration path Security:Password
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddInMemoryCollection(
             new Dictionary<string, string?>
@@ -55,7 +55,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain("密码不能为空");
+        result.Errors.Should().Contain("Password cannot be empty");
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain("密码不能为空");
+        result.Errors.Should().Contain("Password cannot be empty");
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Contains("不能少于"));
+        result.Errors.Should().Contain(e => e.Contains("at least"));
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Contains("大写字母"));
+        result.Errors.Should().Contain(e => e.Contains("uppercase"));
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Contains("小写字母"));
+        result.Errors.Should().Contain(e => e.Contains("lowercase"));
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Contains("数字"));
+        result.Errors.Should().Contain(e => e.Contains("digit"));
     }
 
     [Fact]
@@ -136,13 +136,13 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Contains("特殊字符"));
+        result.Errors.Should().Contain(e => e.Contains("special character"));
     }
 
     [Fact]
     public async Task ValidatePasswordAsync_Should_Fail_Common_Password()
     {
-        // Arrange - 使用真正的弱密码，password123 在弱密码列表中
+        // Arrange - Use a real weak password, password123 is in the weak password list
         var password = "password123";
 
         // Act
@@ -150,7 +150,7 @@ public class PasswordPolicyServiceTests
 
         // Assert
         result.IsValid.Should().BeFalse();
-        result.Errors.Should().Contain(e => e.Contains("过于简单"));
+        result.Errors.Should().Contain(e => e.Contains("too simple"));
     }
 
     [Fact]

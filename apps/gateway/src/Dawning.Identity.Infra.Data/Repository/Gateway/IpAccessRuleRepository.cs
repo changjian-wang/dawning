@@ -13,7 +13,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Gateway
 {
     /// <summary>
-    /// IP 访问规则仓储实现
+    /// IP access rule repository implementation
     /// </summary>
     public class IpAccessRuleRepository : IIpAccessRuleRepository
     {
@@ -25,7 +25,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据ID获取规则
+        /// Get rule by ID
         /// </summary>
         public async Task<IpAccessRule?> GetAsync(Guid id)
         {
@@ -37,7 +37,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取分页规则列表
+        /// Get paged rule list
         /// </summary>
         public async Task<PagedData<IpAccessRule>> GetPagedListAsync(
             string? ruleType,
@@ -48,12 +48,12 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         {
             var builder = _context.Connection.Builder<IpAccessRuleEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(!string.IsNullOrEmpty(ruleType), r => r.RuleType == ruleType)
                 .WhereIf(isEnabled.HasValue, r => r.IsEnabled == isEnabled!.Value);
 
-            // 按创建时间降序排序
+            // Order by created time descending
             var result = await builder
                 .OrderByDescending(r => r.CreatedAt)
                 .AsPagedListAsync(page, pageSize);
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取指定类型的活跃规则
+        /// Get active rules by type
         /// </summary>
         public async Task<IEnumerable<IpAccessRule>> GetActiveRulesByTypeAsync(string ruleType)
         {
@@ -84,7 +84,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 检查IP是否在黑名单中
+        /// Check if IP is in blacklist
         /// </summary>
         public async Task<bool> IsIpBlacklistedAsync(string ipAddress)
         {
@@ -100,7 +100,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 检查IP是否在白名单中
+        /// Check if IP is in whitelist
         /// </summary>
         public async Task<bool> IsIpWhitelistedAsync(string ipAddress)
         {
@@ -116,7 +116,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 插入规则
+        /// Insert rule
         /// </summary>
         public async ValueTask<int> InsertAsync(IpAccessRule model)
         {
@@ -128,7 +128,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 更新规则
+        /// Update rule
         /// </summary>
         public async ValueTask<bool> UpdateAsync(IpAccessRule model)
         {
@@ -140,7 +140,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 删除规则
+        /// Delete rule
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Guid id)
         {
@@ -156,14 +156,14 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 匹配IP地址（支持通配符）
+        /// Match IP address (supports wildcards)
         /// </summary>
         private static bool MatchIpAddress(string ipAddress, string pattern)
         {
             if (ipAddress == pattern)
                 return true;
 
-            // 支持通配符匹配，如 192.168.1.*
+            // Support wildcard matching, e.g., 192.168.1.*
             if (pattern.Contains('*'))
             {
                 var regex = "^" + pattern.Replace(".", "\\.").Replace("*", ".*") + "$";

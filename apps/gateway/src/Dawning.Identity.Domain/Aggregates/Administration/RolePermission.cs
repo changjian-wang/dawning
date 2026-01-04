@@ -4,32 +4,32 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {
     /// <summary>
-    /// 角色权限关联实体
+    /// Role permission association entity
     /// </summary>
     public class RolePermission : IAggregateRoot
     {
         /// <summary>
-        /// 唯一标识
+        /// Unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 角色ID
+        /// Role ID
         /// </summary>
         public Guid RoleId { get; set; }
 
         /// <summary>
-        /// 权限ID
+        /// Permission ID
         /// </summary>
         public Guid PermissionId { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Creator ID
         /// </summary>
         public Guid? CreatedBy { get; set; }
     }

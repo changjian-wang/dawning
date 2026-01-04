@@ -4,140 +4,140 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {
     /// <summary>
-    /// 用户持久化对象（对应数据库表）
+    /// User persistent object (corresponds to database table)
     /// </summary>
     [Table("users")]
     public class UserEntity
     {
         /// <summary>
-        /// 主键
+        /// Primary key
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 用户名
+        /// Username
         /// </summary>
         [Column("username")]
         public string Username { get; set; } = string.Empty;
 
         /// <summary>
-        /// 密码哈希
+        /// Password hash
         /// </summary>
         [Column("password_hash")]
         public string PasswordHash { get; set; } = string.Empty;
 
         /// <summary>
-        /// 邮箱
+        /// Email
         /// </summary>
         [Column("email")]
         public string? Email { get; set; }
 
         /// <summary>
-        /// 手机号
+        /// Phone number
         /// </summary>
         [Column("phone_number")]
         public string? PhoneNumber { get; set; }
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         [Column("display_name")]
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 头像URL
+        /// Avatar URL
         /// </summary>
         [Column("avatar")]
         public string? Avatar { get; set; }
 
         /// <summary>
-        /// 角色
+        /// Role
         /// </summary>
         [Column("role")]
         public string Role { get; set; } = "user";
 
         /// <summary>
-        /// 是否激活
+        /// Whether active
         /// </summary>
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 是否为系统用户（系统用户不可删除/禁用）
+        /// Whether system user (system users cannot be deleted/disabled)
         /// </summary>
         [Column("is_system")]
         public bool IsSystem { get; set; } = false;
 
         /// <summary>
-        /// 邮箱是否已验证
+        /// Whether email is confirmed
         /// </summary>
         [Column("email_confirmed")]
         public bool EmailConfirmed { get; set; } = false;
 
         /// <summary>
-        /// 手机号是否已验证
+        /// Whether phone number is confirmed
         /// </summary>
         [Column("phone_number_confirmed")]
         public bool PhoneNumberConfirmed { get; set; } = false;
 
         /// <summary>
-        /// 最后登录时间
+        /// Last login time
         /// </summary>
         [Column("last_login_at")]
         public DateTime? LastLoginAt { get; set; }
 
         /// <summary>
-        /// 连续登录失败次数
+        /// Consecutive failed login attempts count
         /// </summary>
         [Column("failed_login_count")]
         public int FailedLoginCount { get; set; } = 0;
 
         /// <summary>
-        /// 锁定结束时间
+        /// Lockout end time
         /// </summary>
         [Column("lockout_end")]
         public DateTime? LockoutEnd { get; set; }
 
         /// <summary>
-        /// 是否启用锁定功能
+        /// Whether lockout is enabled
         /// </summary>
         [Column("lockout_enabled")]
         public bool LockoutEnabled { get; set; } = true;
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Creator ID
         /// </summary>
         [Column("created_by")]
         public Guid? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者ID
+        /// Updater ID
         /// </summary>
         [Column("updated_by")]
         public Guid? UpdatedBy { get; set; }
 
         /// <summary>
-        /// 备注
+        /// Remark
         /// </summary>
         [Column("remark")]
         public string? Remark { get; set; }
 
         /// <summary>
-        /// 时间戳（用于分页查询）
+        /// Timestamp (used for pagination queries)
         /// </summary>
         [Column("timestamp")]
         public long Timestamp { get; set; }

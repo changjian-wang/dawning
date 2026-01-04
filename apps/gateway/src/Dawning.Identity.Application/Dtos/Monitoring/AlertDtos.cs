@@ -1,9 +1,9 @@
 namespace Dawning.Identity.Application.Dtos.Monitoring;
 
 /// <summary>
-/// 告警规则 DTO
+/// Alert Rule DTO
 /// </summary>
-public class AlertRuleDto
+ public class AlertRuleDto
 {
     public long Id { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -26,11 +26,11 @@ public class AlertRuleDto
     private static string GetMetricTypeDisplay(string metricType) =>
         metricType switch
         {
-            "cpu" => "CPU 使用率",
-            "memory" => "内存使用率",
-            "response_time" => "响应时间",
-            "error_rate" => "错误率",
-            "request_count" => "请求数量",
+            "cpu" => "CPU Usage",
+            "memory" => "Memory Usage",
+            "response_time" => "Response Time",
+            "error_rate" => "Error Rate",
+            "request_count" => "Request Count",
             _ => metricType,
         };
 
@@ -47,7 +47,7 @@ public class AlertRuleDto
 }
 
 /// <summary>
-/// 创建告警规则请求
+/// Create Alert Rule Request
 /// </summary>
 public class CreateAlertRuleRequest
 {
@@ -66,7 +66,7 @@ public class CreateAlertRuleRequest
 }
 
 /// <summary>
-/// 更新告警规则请求
+/// Update Alert Rule Request
 /// </summary>
 public class UpdateAlertRuleRequest
 {
@@ -85,7 +85,7 @@ public class UpdateAlertRuleRequest
 }
 
 /// <summary>
-/// 告警历史 DTO
+/// Alert History DTO
 /// </summary>
 public class AlertHistoryDto
 {
@@ -110,26 +110,26 @@ public class AlertHistoryDto
     private static string GetMetricTypeDisplay(string metricType) =>
         metricType switch
         {
-            "cpu" => "CPU 使用率",
-            "memory" => "内存使用率",
-            "response_time" => "响应时间",
-            "error_rate" => "错误率",
-            "request_count" => "请求数量",
+            "cpu" => "CPU Usage",
+            "memory" => "Memory Usage",
+            "response_time" => "Response Time",
+            "error_rate" => "Error Rate",
+            "request_count" => "Request Count",
             _ => metricType,
         };
 
     private static string GetStatusDisplay(string status) =>
         status switch
         {
-            "triggered" => "已触发",
-            "acknowledged" => "已确认",
-            "resolved" => "已解决",
+            "triggered" => "Triggered",
+            "acknowledged" => "Acknowledged",
+            "resolved" => "Resolved",
             _ => status,
         };
 }
 
 /// <summary>
-/// 告警历史查询参数
+/// Alert History Query Parameters
 /// </summary>
 public class AlertHistoryQueryParams
 {
@@ -144,7 +144,7 @@ public class AlertHistoryQueryParams
 }
 
 /// <summary>
-/// 告警统计 DTO
+/// Alert Statistics DTO
 /// </summary>
 public class AlertStatisticsDto
 {
@@ -159,7 +159,7 @@ public class AlertStatisticsDto
 }
 
 /// <summary>
-/// 确认/解决告警请求
+/// Acknowledge/Resolve Alert Request
 /// </summary>
 public class UpdateAlertStatusRequest
 {

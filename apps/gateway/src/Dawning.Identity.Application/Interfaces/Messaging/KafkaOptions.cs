@@ -1,194 +1,194 @@
 namespace Dawning.Identity.Application.Interfaces.Messaging;
 
 /// <summary>
-/// Kafka 配置选项
+/// Kafka configuration options
 /// </summary>
 public class KafkaOptions
 {
     public const string SectionName = "Kafka";
 
     /// <summary>
-    /// Kafka Broker 地址列表
+    /// Kafka broker address list
     /// </summary>
     public string BootstrapServers { get; set; } = "localhost:9092";
 
     /// <summary>
-    /// 消费者组 ID
+    /// Consumer group ID
     /// </summary>
     public string ConsumerGroupId { get; set; } = "dawning-identity-group";
 
     /// <summary>
-    /// 是否启用 Kafka
+    /// Whether to enable Kafka
     /// </summary>
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// 生产者配置
+    /// Producer configuration
     /// </summary>
     public KafkaProducerOptions Producer { get; set; } = new();
 
     /// <summary>
-    /// 消费者配置
+    /// Consumer configuration
     /// </summary>
     public KafkaConsumerOptions Consumer { get; set; } = new();
 
     /// <summary>
-    /// 主题配置
+    /// Topic configuration
     /// </summary>
     public KafkaTopicOptions Topics { get; set; } = new();
 
-    // 根级别的消费者配置属性（便于直接访问）
+    // Root-level consumer configuration properties (for direct access)
 
     /// <summary>
-    /// 自动偏移量重置策略: Earliest, Latest
+    /// Auto offset reset policy: Earliest, Latest
     /// </summary>
     public string AutoOffsetReset { get; set; } = "Earliest";
 
     /// <summary>
-    /// 自动提交偏移量
+    /// Auto commit offset
     /// </summary>
     public bool EnableAutoCommit { get; set; } = false;
 
     /// <summary>
-    /// 会话超时（毫秒）
+    /// Session timeout (milliseconds)
     /// </summary>
     public int SessionTimeoutMs { get; set; } = 45000;
 
     /// <summary>
-    /// 心跳间隔（毫秒）
+    /// Heartbeat interval (milliseconds)
     /// </summary>
     public int HeartbeatIntervalMs { get; set; } = 15000;
 
     /// <summary>
-    /// 最大轮询间隔（毫秒）
+    /// Max poll interval (milliseconds)
     /// </summary>
     public int MaxPollIntervalMs { get; set; } = 300000;
 }
 
 /// <summary>
-/// Kafka 生产者配置
+/// Kafka producer configuration
 /// </summary>
 public class KafkaProducerOptions
 {
     /// <summary>
-    /// 消息确认模式: None=不等待, Leader=Leader确认, All=所有副本确认
+    /// Message acknowledgment mode: None=no wait, Leader=Leader acknowledged, All=all replicas acknowledged
     /// </summary>
     public string Acks { get; set; } = "All";
 
     /// <summary>
-    /// 启用幂等性
+    /// Enable idempotence
     /// </summary>
     public bool EnableIdempotence { get; set; } = true;
 
     /// <summary>
-    /// 最大飞行请求数
+    /// Max in-flight requests
     /// </summary>
     public int MaxInFlight { get; set; } = 5;
 
     /// <summary>
-    /// 消息最大大小（字节）
+    /// Max message size (bytes)
     /// </summary>
     public int MaxMessageBytes { get; set; } = 1048576;
 
     /// <summary>
-    /// 发送超时（毫秒）
+    /// Send timeout (milliseconds)
     /// </summary>
     public int MessageTimeoutMs { get; set; } = 30000;
 
     /// <summary>
-    /// 重试次数
+    /// Retry count
     /// </summary>
     public int Retries { get; set; } = 3;
 
     /// <summary>
-    /// 批量发送延迟（毫秒）
+    /// Batch send delay (milliseconds)
     /// </summary>
     public int LingerMs { get; set; } = 5;
 
     /// <summary>
-    /// 批量大小（字节）
+    /// Batch size (bytes)
     /// </summary>
     public int BatchSize { get; set; } = 16384;
 
     /// <summary>
-    /// 启用压缩类型: none, gzip, snappy, lz4, zstd
+    /// Compression type: none, gzip, snappy, lz4, zstd
     /// </summary>
     public string CompressionType { get; set; } = "snappy";
 }
 
 /// <summary>
-/// Kafka 消费者配置
+/// Kafka consumer configuration
 /// </summary>
 public class KafkaConsumerOptions
 {
     /// <summary>
-    /// 自动提交偏移量
+    /// Auto commit offset
     /// </summary>
     public bool EnableAutoCommit { get; set; } = false;
 
     /// <summary>
-    /// 自动偏移量重置策略: earliest, latest
+    /// Auto offset reset policy: earliest, latest
     /// </summary>
     public string AutoOffsetReset { get; set; } = "earliest";
 
     /// <summary>
-    /// 会话超时（毫秒）
+    /// Session timeout (milliseconds)
     /// </summary>
     public int SessionTimeoutMs { get; set; } = 30000;
 
     /// <summary>
-    /// 心跳间隔（毫秒）
+    /// Heartbeat interval (milliseconds)
     /// </summary>
     public int HeartbeatIntervalMs { get; set; } = 3000;
 
     /// <summary>
-    /// 最大拉取记录数
+    /// Max poll records
     /// </summary>
     public int MaxPollRecords { get; set; } = 500;
 
     /// <summary>
-    /// 拉取最大等待时间（毫秒）
+    /// Fetch max wait time (milliseconds)
     /// </summary>
     public int FetchWaitMaxMs { get; set; } = 500;
 }
 
 /// <summary>
-/// Kafka 主题配置
+/// Kafka topic configuration
 /// </summary>
 public class KafkaTopicOptions
 {
     /// <summary>
-    /// 审计日志主题
+    /// Audit log topic
     /// </summary>
     public string AuditLog { get; set; } = "dawning.audit-log";
 
     /// <summary>
-    /// 告警通知主题
+    /// Alert notification topic
     /// </summary>
     public string AlertNotification { get; set; } = "dawning.alert-notification";
 
     /// <summary>
-    /// 邮件队列主题
+    /// Email queue topic
     /// </summary>
     public string Email { get; set; } = "dawning.email";
 
     /// <summary>
-    /// 用户事件主题
+    /// User event topic
     /// </summary>
     public string UserEvent { get; set; } = "dawning.user-event";
 
     /// <summary>
-    /// 系统事件主题
+    /// System event topic
     /// </summary>
     public string SystemEvent { get; set; } = "dawning.system-event";
 
     /// <summary>
-    /// 配置变更主题
+    /// Config changed topic
     /// </summary>
     public string ConfigChanged { get; set; } = "dawning.config-changed";
 
     /// <summary>
-    /// 缓存失效主题
+    /// Cache invalidation topic
     /// </summary>
     public string CacheInvalidation { get; set; } = "dawning.cache-invalidation";
 }

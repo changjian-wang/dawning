@@ -4,87 +4,87 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {
     /// <summary>
-    /// 审计日志聚合根
+    /// Audit log aggregate root
     /// </summary>
     public class AuditLog : IAggregateRoot
     {
         /// <summary>
-        /// 审计日志唯一标识
+        /// Audit log unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 操作用户ID
+        /// Operating user ID
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 操作用户名
+        /// Operating username
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// 操作类型 (Create, Update, Delete, Login, Logout等)
+        /// Action type (Create, Update, Delete, Login, Logout, etc.)
         /// </summary>
         public string Action { get; set; } = string.Empty;
 
         /// <summary>
-        /// 实体类型 (User, Role, Application等)
+        /// Entity type (User, Role, Application, etc.)
         /// </summary>
         public string? EntityType { get; set; }
 
         /// <summary>
-        /// 实体ID
+        /// Entity ID
         /// </summary>
         public Guid? EntityId { get; set; }
 
         /// <summary>
-        /// 操作描述
+        /// Operation description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP address
         /// </summary>
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User agent
         /// </summary>
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// Request path
         /// </summary>
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 请求方法
+        /// Request method
         /// </summary>
         public string? RequestMethod { get; set; }
 
         /// <summary>
-        /// HTTP状态码
+        /// HTTP status code
         /// </summary>
         public int? StatusCode { get; set; }
 
         /// <summary>
-        /// 修改前的值 (JSON字符串)
+        /// Value before modification (JSON string)
         /// </summary>
         public string? OldValues { get; set; }
 
         /// <summary>
-        /// 修改后的值 (JSON字符串)
+        /// Value after modification (JSON string)
         /// </summary>
         public string? NewValues { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; }
     }

@@ -5,7 +5,7 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 认证控制器集成测试
+/// Authentication controller integration tests
 /// </summary>
 public class AuthControllerTests : IntegrationTestBase
 {
@@ -30,7 +30,7 @@ public class AuthControllerTests : IntegrationTestBase
         // Act
         var response = await Client.PostAsync("/connect/token", content);
 
-        // Assert - OpenIddict 在测试环境中返回 401 （客户端未注册）
+        // Assert - OpenIddict returns 401 in test environment (client not registered)
         response
             .StatusCode.Should()
             .BeOneOf(HttpStatusCode.BadRequest, HttpStatusCode.Unauthorized);
@@ -82,7 +82,7 @@ public class AuthControllerTests : IntegrationTestBase
         var response = await Client.PostAsync("/connect/logout", null);
 
         // Assert
-        // Logout 端点应该处理未认证的请求
+        // Logout endpoint should handle unauthenticated requests
         response.StatusCode.Should().NotBe(HttpStatusCode.InternalServerError);
     }
 }

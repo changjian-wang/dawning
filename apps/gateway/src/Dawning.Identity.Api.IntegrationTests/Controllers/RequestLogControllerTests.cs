@@ -4,8 +4,8 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 请求日志控制器集成测试
-/// 端点:
+/// Request log controller integration tests
+/// Endpoints:
 ///   GET /api/request-logs
 ///   GET /api/request-logs/statistics
 ///   GET /api/request-logs/errors
@@ -17,7 +17,7 @@ public class RequestLogControllerTests : IntegrationTestBase
     public RequestLogControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetRequestLogs_WithoutAuth_ReturnsUnauthorized()
@@ -71,7 +71,7 @@ public class RequestLogControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点存在性测试
+    #region Endpoint existence tests
 
     [Fact]
     public async Task RequestLogsEndpoint_Exists()
@@ -125,7 +125,7 @@ public class RequestLogControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 查询参数测试
+    #region Query parameter tests
 
     [Fact]
     public async Task RequestLogs_WithPagination_ReturnsUnauthorized()
@@ -231,12 +231,12 @@ public class RequestLogControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 错误响应测试
+    #region Error response tests
 
     [Fact]
     public async Task RequestLogs_WithInvalidPage_ReturnsUnauthorized()
     {
-        // Act (页码小于1会被自动修正，但需要先通过认证)
+        // Act (page number less than 1 will be auto-corrected, but authentication is required first)
         var response = await Client.GetAsync("/api/request-logs?page=-1");
 
         // Assert
@@ -246,7 +246,7 @@ public class RequestLogControllerTests : IntegrationTestBase
     [Fact]
     public async Task RequestLogs_WithLargePageSize_ReturnsUnauthorized()
     {
-        // Act (大于100的pageSize会被限制为100，但需要先通过认证)
+        // Act (pageSize greater than 100 will be limited to 100, but authentication is required first)
         var response = await Client.GetAsync("/api/request-logs?pageSize=1000");
 
         // Assert

@@ -10,7 +10,7 @@ using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
     /// <summary>
-    /// Authorization 映射器
+    /// Authorization mapper
     /// </summary>
     public static class AuthorizationMappers
     {

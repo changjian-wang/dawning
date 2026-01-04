@@ -11,7 +11,7 @@ using Xunit;
 namespace Dawning.Identity.Application.Tests.Services;
 
 /// <summary>
-/// 系统配置服务测试（不使用缓存）
+/// System configuration service tests (without cache)
 /// </summary>
 public class SystemConfigServiceTests
 {
@@ -26,7 +26,7 @@ public class SystemConfigServiceTests
 
         _unitOfWorkMock.Setup(x => x.SystemConfig).Returns(_configRepoMock.Object);
 
-        // 不使用缓存的配置服务
+        // Configuration service without cache
         _configService = new SystemConfigService(_unitOfWorkMock.Object, null);
     }
 

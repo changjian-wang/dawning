@@ -7,37 +7,37 @@ using Dawning.Identity.Domain.Models;
 namespace Dawning.Identity.Domain.Interfaces.MultiTenancy
 {
     /// <summary>
-    /// 租户仓储接口
+    /// Tenant repository interface
     /// </summary>
     public interface ITenantRepository
     {
         /// <summary>
-        /// 根据ID获取租户
+        /// Get tenant by ID
         /// </summary>
         Task<Tenant?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据租户代码获取租户
+        /// Get tenant by code
         /// </summary>
         Task<Tenant?> GetByCodeAsync(string code);
 
         /// <summary>
-        /// 根据域名获取租户
+        /// Get tenant by domain
         /// </summary>
         Task<Tenant?> GetByDomainAsync(string domain);
 
         /// <summary>
-        /// 获取所有租户列表
+        /// Get all tenants
         /// </summary>
         Task<IEnumerable<Tenant>> GetAllAsync();
 
         /// <summary>
-        /// 获取所有启用的租户
+        /// Get all active tenants
         /// </summary>
         Task<IEnumerable<Tenant>> GetActiveTenantsAsync();
 
         /// <summary>
-        /// 分页获取租户列表
+        /// Get paginated tenant list
         /// </summary>
         Task<PagedData<Tenant>> GetPagedAsync(
             string? keyword,
@@ -47,27 +47,27 @@ namespace Dawning.Identity.Domain.Interfaces.MultiTenancy
         );
 
         /// <summary>
-        /// 创建租户
+        /// Create tenant
         /// </summary>
         Task<int> InsertAsync(Tenant tenant);
 
         /// <summary>
-        /// 更新租户
+        /// Update tenant
         /// </summary>
         Task<int> UpdateAsync(Tenant tenant);
 
         /// <summary>
-        /// 删除租户
+        /// Delete tenant
         /// </summary>
         Task<int> DeleteAsync(Guid id);
 
         /// <summary>
-        /// 检查租户代码是否存在
+        /// Check if tenant code exists
         /// </summary>
         Task<bool> ExistsCodeAsync(string code, Guid? excludeId = null);
 
         /// <summary>
-        /// 检查域名是否存在
+        /// Check if domain exists
         /// </summary>
         Task<bool> ExistsDomainAsync(string domain, Guid? excludeId = null);
     }

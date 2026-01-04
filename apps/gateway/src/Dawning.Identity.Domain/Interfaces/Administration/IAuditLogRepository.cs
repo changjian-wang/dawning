@@ -7,17 +7,17 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     /// <summary>
-    /// 审计日志仓储接口
+    /// Audit log repository interface
     /// </summary>
     public interface IAuditLogRepository
     {
         /// <summary>
-        /// 根据ID异步获取审计日志
+        /// Asynchronously get audit log by ID
         /// </summary>
         Task<AuditLog?> GetAsync(Guid id);
 
         /// <summary>
-        /// 获取分页审计日志列表
+        /// Get paginated audit log list
         /// </summary>
         Task<PagedData<AuditLog>> GetPagedListAsync(
             AuditLogModel model,
@@ -26,12 +26,12 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         );
 
         /// <summary>
-        /// 异步插入审计日志
+        /// Asynchronously insert audit log
         /// </summary>
         ValueTask<int> InsertAsync(AuditLog model);
 
         /// <summary>
-        /// 批量删除过期的审计日志（数据清理）
+        /// Batch delete expired audit logs (data cleanup)
         /// </summary>
         Task<int> DeleteOlderThanAsync(DateTime date);
     }

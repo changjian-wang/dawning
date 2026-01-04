@@ -15,7 +15,7 @@ using Dawning.Identity.Domain.Models.OpenIddict;
 namespace Dawning.Identity.Application.Services.OpenIddict
 {
     /// <summary>
-    /// 身份资源服务实现
+    /// Identity resource service implementation
     /// </summary>
     public class IdentityResourceService : IIdentityResourceService
     {
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         }
 
         /// <summary>
-        /// 记录审计日志
+        /// Record audit log
         /// </summary>
         private async Task LogAuditAsync(
             Guid userId,
@@ -101,7 +101,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<int> InsertAsync(IdentityResourceDto dto)
         {
-            // 验证必填字段
+            // Validate required fields
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
                 throw new ArgumentException("Identity Resource name is required");
@@ -112,7 +112,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new ArgumentException("Identity Resource display name is required");
             }
 
-            // 检查名称唯一性
+            // Check name uniqueness
             var existingResource = await _unitOfWork.IdentityResource.GetByNameAsync(dto.Name);
             if (existingResource != null)
             {
@@ -121,12 +121,12 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 );
             }
 
-            // 映射并准备模型
+            // Map and prepare model
             var model = _mapper.Map<IdentityResource>(dto);
             model.Id = Guid.NewGuid();
             model.CreatedAt = DateTime.UtcNow;
 
-            // 去重Claims
+            // Deduplicate Claims
             if (model.UserClaims != null && model.UserClaims.Any())
             {
                 model.UserClaims = model.UserClaims.Distinct().ToList();
@@ -134,7 +134,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             int result = await _unitOfWork.IdentityResource.InsertAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             if (dto.OperatorId.HasValue)
             {
                 await LogAuditAsync(
@@ -151,13 +151,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<bool> UpdateAsync(IdentityResourceDto dto)
         {
-            // 验证ID
+            // Validate ID
             if (dto.Id == null || dto.Id == Guid.Empty)
             {
                 throw new ArgumentException("Identity Resource ID is required");
             }
 
-            // 检查资源是否存在
+            // Check if resource exists
             var existingResource = await _unitOfWork.IdentityResource.GetAsync(dto.Id.Value);
             if (existingResource == null)
             {
@@ -166,7 +166,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 );
             }
 
-            // 如果名称被修改，检查唯一性
+            // If name was modified, check uniqueness
             if (!string.IsNullOrWhiteSpace(dto.Name) && dto.Name != existingResource.Name)
             {
                 var duplicateResource = await _unitOfWork.IdentityResource.GetByNameAsync(dto.Name);
@@ -178,10 +178,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 }
             }
 
-            // 映射并更新
+            // Map and update
             var model = _mapper.Map<IdentityResource>(dto);
 
-            // 去重Claims
+            // Deduplicate Claims
             if (model.UserClaims != null && model.UserClaims.Any())
             {
                 model.UserClaims = model.UserClaims.Distinct().ToList();
@@ -189,7 +189,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             bool result = await _unitOfWork.IdentityResource.UpdateAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             if (dto.OperatorId.HasValue)
             {
                 await LogAuditAsync(
@@ -206,13 +206,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<bool> DeleteAsync(IdentityResourceDto dto)
         {
-            // 验证ID
+            // Validate ID
             if (dto?.Id == null || dto.Id == Guid.Empty)
             {
                 throw new ArgumentException("Identity Resource ID is required");
             }
 
-            // 检查资源是否存在
+            // Check if resource exists
             var existingResource = await _unitOfWork.IdentityResource.GetAsync(dto.Id.Value);
             if (existingResource == null)
             {
@@ -224,7 +224,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             var model = dto?.ToModel() ?? new IdentityResource();
             bool result = await _unitOfWork.IdentityResource.DeleteAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             if (dto?.OperatorId.HasValue == true)
             {
                 await LogAuditAsync(

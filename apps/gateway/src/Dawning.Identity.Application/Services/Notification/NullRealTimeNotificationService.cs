@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Notification;
 
 /// <summary>
-/// 空实现的实时通知服务
-/// 当没有 SignalR 可用时使用此实现
+/// Null implementation of real-time notification service.
+/// Used when SignalR is not available.
 /// </summary>
 public class NullRealTimeNotificationService : IRealTimeNotificationService
 {
@@ -18,20 +18,20 @@ public class NullRealTimeNotificationService : IRealTimeNotificationService
 
     public Task SendAlertNotificationAsync(RealTimeAlertNotification alert)
     {
-        _logger.LogDebug("实时通知服务未配置，跳过告警推送: {Title}", alert.Title);
+        _logger.LogDebug("Real-time notification service not configured, skipping alert push: {Title}", alert.Title);
         return Task.CompletedTask;
     }
 
     public Task SendSystemMessageAsync(RealTimeSystemMessage message)
     {
-        _logger.LogDebug("实时通知服务未配置，跳过系统消息推送: {Title}", message.Title);
+        _logger.LogDebug("Real-time notification service not configured, skipping system message push: {Title}", message.Title);
         return Task.CompletedTask;
     }
 
     public Task SendLogEntryAsync(RealTimeLogEntry logEntry)
     {
         _logger.LogDebug(
-            "实时通知服务未配置，跳过日志推送: {Level} - {Message}",
+            "Real-time notification service not configured, skipping log entry push: {Level} - {Message}",
             logEntry.Level,
             logEntry.Message
         );
@@ -41,7 +41,7 @@ public class NullRealTimeNotificationService : IRealTimeNotificationService
     public Task SendToUserAsync(Guid userId, RealTimeNotification notification)
     {
         _logger.LogDebug(
-            "实时通知服务未配置，跳过用户通知推送: UserId={UserId}, Title={Title}",
+            "Real-time notification service not configured, skipping user notification push: UserId={UserId}, Title={Title}",
             userId,
             notification.Title
         );
@@ -51,7 +51,7 @@ public class NullRealTimeNotificationService : IRealTimeNotificationService
     public Task SendToRoleAsync(string role, RealTimeNotification notification)
     {
         _logger.LogDebug(
-            "实时通知服务未配置，跳过角色通知推送: Role={Role}, Title={Title}",
+            "Real-time notification service not configured, skipping role notification push: Role={Role}, Title={Title}",
             role,
             notification.Title
         );

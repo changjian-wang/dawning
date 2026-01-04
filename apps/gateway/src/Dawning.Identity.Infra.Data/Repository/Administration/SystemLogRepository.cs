@@ -14,7 +14,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
     /// <summary>
-    /// 系统日志仓储实现
+    /// System log repository implementation
     /// </summary>
     public class SystemLogRepository : ISystemLogRepository
     {
@@ -26,7 +26,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据ID异步获取系统日志
+        /// Asynchronously get system log by ID
         /// </summary>
         public async Task<SystemLog?> GetAsync(Guid id)
         {
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取分页系统日志列表
+        /// Get paged system log list
         /// </summary>
         public async Task<PagedData<SystemLog>> GetPagedListAsync(
             SystemLogQueryModel model,
@@ -48,7 +48,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         {
             var builder = _context.Connection.Builder<SystemLogEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Level), l => l.Level == model.Level)
                 .WhereIf(
@@ -71,7 +71,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 .WhereIf(model.StartDate.HasValue, l => l.CreatedAt >= model.StartDate!.Value)
                 .WhereIf(model.EndDate.HasValue, l => l.CreatedAt <= model.EndDate!.Value);
 
-            // 按创建时间降序排序（最新的在前）
+            // Order by created time descending (newest first)
             var result = await builder
                 .OrderByDescending(l => l.CreatedAt)
                 .AsPagedListAsync(page, itemsPerPage);
@@ -86,7 +86,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步插入系统日志
+        /// Asynchronously insert system log
         /// </summary>
         public async ValueTask<int> InsertAsync(SystemLog model)
         {
@@ -99,7 +99,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 批量删除过期的系统日志（数据清理）
+        /// Batch delete expired system logs (data cleanup)
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime date)
         {

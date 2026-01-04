@@ -3,28 +3,28 @@ using System;
 namespace Dawning.Identity.Domain.Interfaces.MultiTenancy
 {
     /// <summary>
-    /// 租户上下文接口
-    /// 用于获取当前请求的租户信息
+    /// Tenant context interface
+    /// Used to get tenant information for the current request
     /// </summary>
     public interface ITenantContext
     {
         /// <summary>
-        /// 当前租户ID
+        /// Current tenant ID
         /// </summary>
         Guid? TenantId { get; }
 
         /// <summary>
-        /// 当前租户名称
+        /// Current tenant name
         /// </summary>
         string? TenantName { get; }
 
         /// <summary>
-        /// 是否为主机租户（超级管理员，可以跨租户访问）
+        /// Whether this is a host tenant (super admin, can access across tenants)
         /// </summary>
         bool IsHost { get; }
 
         /// <summary>
-        /// 设置当前租户
+        /// Set current tenant
         /// </summary>
         void SetTenant(Guid? tenantId, string? tenantName = null, bool isHost = false);
     }

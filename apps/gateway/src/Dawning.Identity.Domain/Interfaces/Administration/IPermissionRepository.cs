@@ -8,7 +8,7 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     /// <summary>
-    /// 权限仓储接口
+    /// Permission repository interface
     /// </summary>
     public interface IPermissionRepository
     {
@@ -30,7 +30,7 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
     }
 
     /// <summary>
-    /// 角色权限仓储接口
+    /// Role permission repository interface
     /// </summary>
     public interface IRolePermissionRepository
     {

@@ -1,62 +1,62 @@
 namespace Dawning.Identity.Domain.Aggregates.Administration;
 
 /// <summary>
-/// 备份记录领域模型
+/// Backup record domain model
 /// </summary>
 public class BackupRecord
 {
     /// <summary>
-    /// 备份ID
+    /// Backup ID
     /// </summary>
     public Guid Id { get; set; }
 
     /// <summary>
-    /// 备份文件名
+    /// Backup file name
     /// </summary>
     public string FileName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 备份文件路径
+    /// Backup file path
     /// </summary>
     public string FilePath { get; set; } = string.Empty;
 
     /// <summary>
-    /// 文件大小（字节）
+    /// File size (bytes)
     /// </summary>
     public long FileSizeBytes { get; set; }
 
     /// <summary>
-    /// 备份类型
+    /// Backup type
     /// </summary>
     public string BackupType { get; set; } = string.Empty;
 
     /// <summary>
-    /// 创建时间
+    /// Created time
     /// </summary>
     public DateTime CreatedAt { get; set; }
 
     /// <summary>
-    /// 备份说明
+    /// Backup description
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// 是否为手动触发
+    /// Whether manually triggered
     /// </summary>
     public bool IsManual { get; set; }
 
     /// <summary>
-    /// 备份状态（success, failed, pending）
+    /// Backup status (success, failed, pending)
     /// </summary>
     public string Status { get; set; } = "success";
 
     /// <summary>
-    /// 错误消息
+    /// Error message
     /// </summary>
     public string? ErrorMessage { get; set; }
 
     /// <summary>
-    /// 文件大小（格式化）
+    /// File size (formatted)
     /// </summary>
     public string FileSizeFormatted => FormatFileSize(FileSizeBytes);
 

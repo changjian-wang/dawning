@@ -1,7 +1,7 @@
 namespace Dawning.Identity.Application.Dtos.Gateway
 {
     /// <summary>
-    /// IP 访问规则 DTO
+    /// IP Access Rule DTO
     /// </summary>
     public class IpAccessRuleDto
     {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 限流策略 DTO
+    /// Rate Limit Policy DTO
     /// </summary>
     public class RateLimitPolicyDto
     {

@@ -6,7 +6,7 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 namespace Dawning.Identity.Application.Mapping.Administration
 {
     /// <summary>
-    /// 用户DTO映射配置
+    /// User DTO mapping configuration
     /// </summary>
     public class UserProfile : Profile
     {

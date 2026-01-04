@@ -38,7 +38,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         }
 
         /// <summary>
-        /// 验证URI格式
+        /// Validate URI format
         /// </summary>
         private bool IsValidUri(string uri)
         {
@@ -49,13 +49,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         }
 
         /// <summary>
-        /// 验证重定向URI列表
+        /// Validate redirect URI list
         /// </summary>
         private void ValidateRedirectUris(List<string> uris, string fieldName)
         {
             if (uris == null || uris.Count == 0)
             {
-                return; // 允许为空
+                return; // Allow empty
             }
 
             foreach (var uri in uris)
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         }
 
         /// <summary>
-        /// 记录审计日志
+        /// Record audit log
         /// </summary>
         private async Task LogAuditAsync(
             Guid userId,
@@ -136,7 +136,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<int> InsertAsync(ApplicationDto dto)
         {
-            // 验证必填字段
+            // Validate required fields
             if (string.IsNullOrWhiteSpace(dto.ClientId))
             {
                 throw new ArgumentException("ClientId is required");
@@ -147,18 +147,18 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new ArgumentException("DisplayName is required");
             }
 
-            // 检查ClientId唯一性
+            // Check ClientId uniqueness
             var existing = await _unitOfWork.Application.GetByClientIdAsync(dto.ClientId);
             if (existing != null)
             {
                 throw new InvalidOperationException($"ClientId '{dto.ClientId}' already exists");
             }
 
-            // 验证重定向URI
+            // Validate redirect URIs
             ValidateRedirectUris(dto.RedirectUris, "RedirectUri");
             ValidateRedirectUris(dto.PostLogoutRedirectUris, "PostLogoutRedirectUri");
 
-            // 验证客户端类型
+            // Validate client type
             if (dto.Type != null && dto.Type != "confidential" && dto.Type != "public")
             {
                 throw new ArgumentException("Type must be 'confidential' or 'public'");
@@ -167,7 +167,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             Domain.Aggregates.OpenIddict.Application model =
                 _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
 
-            // 如果是confidential类型且有ClientSecret,使用PBKDF2哈希
+            // If confidential type and has ClientSecret, use PBKDF2 hash
             if (!string.IsNullOrEmpty(dto.ClientSecret) && dto.Type == "confidential")
             {
                 model.ClientSecret = PasswordHasher.Hash(dto.ClientSecret);
@@ -178,7 +178,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             var result = await _unitOfWork.Application.InsertAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             await LogAuditAsync(
                 _currentUserService.UserId ?? Guid.Empty,
                 "Create",
@@ -197,14 +197,14 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new ArgumentException("Id is required");
             }
 
-            // 验证应用存在
+            // Validate application exists
             var existing = await _unitOfWork.Application.GetAsync(dto.Id.Value);
             if (existing == null)
             {
                 throw new InvalidOperationException($"Application with ID '{dto.Id}' not found");
             }
 
-            // 如果ClientId被修改,检查新值的唯一性
+            // If ClientId was modified, check uniqueness of new value
             if (!string.IsNullOrWhiteSpace(dto.ClientId) && dto.ClientId != existing.ClientId)
             {
                 var duplicateCheck = await _unitOfWork.Application.GetByClientIdAsync(dto.ClientId);
@@ -216,17 +216,17 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 }
             }
 
-            // 验证重定向URI
+            // Validate redirect URIs
             ValidateRedirectUris(dto.RedirectUris, "RedirectUri");
             ValidateRedirectUris(dto.PostLogoutRedirectUris, "PostLogoutRedirectUri");
 
             Domain.Aggregates.OpenIddict.Application model =
                 _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
 
-            // 如果提供了新密钥,使用PBKDF2哈希
+            // If new secret is provided, use PBKDF2 hash
             if (!string.IsNullOrEmpty(dto.ClientSecret) && dto.Type == "confidential")
             {
-                // 只有当密钥不是已经哈希过的格式时才重新哈希
+                // Only re-hash if the secret is not already in hashed format
                 if (!dto.ClientSecret.StartsWith("$PBKDF2$"))
                 {
                     model.ClientSecret = PasswordHasher.Hash(dto.ClientSecret);
@@ -237,7 +237,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             var result = await _unitOfWork.Application.UpdateAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             await LogAuditAsync(
                 _currentUserService.UserId ?? Guid.Empty,
                 "Update",
@@ -256,7 +256,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
                 throw new ArgumentException("Id is required");
             }
 
-            // 验证应用存在
+            // Validate application exists
             var existing = await _unitOfWork.Application.GetAsync(dto.Id.Value);
             if (existing == null)
             {
@@ -268,7 +268,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
             var result = await _unitOfWork.Application.DeleteAsync(model);
 
-            // 记录审计日志
+            // Record audit log
             await LogAuditAsync(
                 _currentUserService.UserId ?? Guid.Empty,
                 "Delete",

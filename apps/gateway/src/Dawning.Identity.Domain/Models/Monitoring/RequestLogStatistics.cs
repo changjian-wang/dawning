@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Dawning.Identity.Domain.Models.Monitoring;
 
 /// <summary>
-/// 请求日志统计模型
+/// Request log statistics model
 /// </summary>
 public class RequestLogStatistics
 {
@@ -25,7 +25,7 @@ public class RequestLogStatistics
 }
 
 /// <summary>
-/// 路径统计模型
+/// Path statistics model
 /// </summary>
 public class PathStatisticModel
 {

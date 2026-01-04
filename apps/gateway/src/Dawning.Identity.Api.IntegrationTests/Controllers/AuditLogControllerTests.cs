@@ -5,15 +5,15 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 审计日志控制器集成测试
-/// 审计日志端点: GET /api/audit-log, GET /api/audit-log/{id}
+/// Audit log controller integration tests
+/// Audit log endpoints: GET /api/audit-log, GET /api/audit-log/{id}
 /// </summary>
 public class AuditLogControllerTests : IntegrationTestBase
 {
     public AuditLogControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetAuditLogs_WithoutAuth_ReturnsUnauthorized()
@@ -37,7 +37,7 @@ public class AuditLogControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点存在性测试
+    #region Endpoint existence tests
 
     [Fact]
     public async Task AuditLogEndpoint_Exists()

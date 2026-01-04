@@ -4,87 +4,87 @@ using Dawning.Identity.Domain.Models;
 namespace Dawning.Identity.Application.Interfaces.Monitoring;
 
 /// <summary>
-/// 告警服务接口
+/// Alert service interface
 /// </summary>
 public interface IAlertService
 {
-    #region 告警规则管理
+    #region Alert Rule Management
 
     /// <summary>
-    /// 获取所有告警规则
+    /// Get all alert rules
     /// </summary>
     Task<IEnumerable<AlertRuleDto>> GetAllRulesAsync();
 
     /// <summary>
-    /// 获取启用的告警规则
+    /// Get enabled alert rules
     /// </summary>
     Task<IEnumerable<AlertRuleDto>> GetEnabledRulesAsync();
 
     /// <summary>
-    /// 根据ID获取告警规则
+    /// Get alert rule by ID
     /// </summary>
     Task<AlertRuleDto?> GetRuleByIdAsync(long id);
 
     /// <summary>
-    /// 创建告警规则
+    /// Create alert rule
     /// </summary>
     Task<AlertRuleDto> CreateRuleAsync(CreateAlertRuleRequest request);
 
     /// <summary>
-    /// 更新告警规则
+    /// Update alert rule
     /// </summary>
     Task<AlertRuleDto?> UpdateRuleAsync(long id, UpdateAlertRuleRequest request);
 
     /// <summary>
-    /// 删除告警规则
+    /// Delete alert rule
     /// </summary>
     Task<bool> DeleteRuleAsync(long id);
 
     /// <summary>
-    /// 启用/禁用告警规则
+    /// Enable/disable alert rule
     /// </summary>
     Task<bool> SetRuleEnabledAsync(long id, bool isEnabled);
 
     #endregion
 
-    #region 告警历史管理
+    #region Alert History Management
 
     /// <summary>
-    /// 获取告警历史列表（分页）
+    /// Get alert history list (paginated)
     /// </summary>
     Task<PagedData<AlertHistoryDto>> GetAlertHistoryAsync(AlertHistoryQueryParams queryParams);
 
     /// <summary>
-    /// 根据ID获取告警历史
+    /// Get alert history by ID
     /// </summary>
     Task<AlertHistoryDto?> GetAlertHistoryByIdAsync(long id);
 
     /// <summary>
-    /// 更新告警状态（确认/解决）
+    /// Update alert status (acknowledge/resolve)
     /// </summary>
     Task<bool> UpdateAlertStatusAsync(long id, UpdateAlertStatusRequest request);
 
     /// <summary>
-    /// 获取未解决的告警列表
+    /// Get unresolved alerts list
     /// </summary>
     Task<IEnumerable<AlertHistoryDto>> GetUnresolvedAlertsAsync();
 
     #endregion
 
-    #region 告警检查与触发
+    #region Alert Check and Trigger
 
     /// <summary>
-    /// 检查所有启用的告警规则
+    /// Check all enabled alert rules
     /// </summary>
     Task CheckAlertsAsync();
 
     /// <summary>
-    /// 手动触发告警检查
+    /// Manually trigger alert check
     /// </summary>
     Task<AlertCheckResult> TriggerAlertCheckAsync();
 
     /// <summary>
-    /// 获取告警统计
+    /// Get alert statistics
     /// </summary>
     Task<AlertStatisticsDto> GetAlertStatisticsAsync();
 
@@ -92,7 +92,7 @@ public interface IAlertService
 }
 
 /// <summary>
-/// 告警检查结果
+/// Alert check result
 /// </summary>
 public class AlertCheckResult
 {

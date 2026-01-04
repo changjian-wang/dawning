@@ -5,8 +5,8 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// Token 控制器集成测试
-/// Token控制器端点: GET /api/token/sessions, DELETE /api/token/sessions/{deviceId},
+/// Token controller integration tests
+/// Token controller endpoints: GET /api/token/sessions, DELETE /api/token/sessions/{deviceId},
 /// POST /api/token/sessions/revoke-others, POST /api/token/revoke-all
 /// </summary>
 public class TokenControllerTests : IntegrationTestBase
@@ -14,7 +14,7 @@ public class TokenControllerTests : IntegrationTestBase
     public TokenControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetSessions_WithoutAuth_ReturnsUnauthorized()
@@ -49,7 +49,7 @@ public class TokenControllerTests : IntegrationTestBase
     [Fact]
     public async Task RevokeAllTokens_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act - 正确的端点是 /api/token/revoke-all
+        // Act - The correct endpoint is /api/token/revoke-all
         var response = await Client.PostAsync("/api/token/revoke-all", null);
 
         // Assert
@@ -68,7 +68,7 @@ public class TokenControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点存在性测试
+    #region Endpoint existence tests
 
     [Fact]
     public async Task SessionsEndpoint_Exists()
@@ -76,7 +76,7 @@ public class TokenControllerTests : IntegrationTestBase
         // Act
         var response = await Client.GetAsync("/api/token/sessions");
 
-        // Assert - 应返回 Unauthorized 而不是 NotFound
+        // Assert - Should return Unauthorized, not NotFound
         response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
     }
 

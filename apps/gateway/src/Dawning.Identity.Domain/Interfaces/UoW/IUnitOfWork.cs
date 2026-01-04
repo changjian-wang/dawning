@@ -12,7 +12,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
     public interface IUnitOfWork
     {
         /// <summary>
-        /// 获取数据库连接（用于直接执行 SQL）
+        /// Get database connection (for direct SQL execution)
         /// </summary>
         IDbConnection Connection { get; }
 
@@ -50,7 +50,7 @@ namespace Dawning.Identity.Domain.Interfaces.UoW
         // MultiTenancy
         ITenantRepository Tenant { get; }
 
-        // 添加事务管理方法
+        // Transaction management methods
         void BeginTransaction();
         void Commit();
         void Rollback();

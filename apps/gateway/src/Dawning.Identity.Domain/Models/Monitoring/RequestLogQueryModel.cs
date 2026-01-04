@@ -3,7 +3,7 @@ using System;
 namespace Dawning.Identity.Domain.Models.Monitoring;
 
 /// <summary>
-/// 请求日志查询模型
+/// Request log query model
 /// </summary>
 public class RequestLogQueryModel
 {

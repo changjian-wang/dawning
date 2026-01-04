@@ -4,38 +4,38 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Application.Interfaces.Token
 {
     /// <summary>
-    /// Token 黑名单服务接口
+    /// Token blacklist service interface
     /// </summary>
     public interface ITokenBlacklistService
     {
         /// <summary>
-        /// 将令牌加入黑名单
+        /// Adds a token to the blacklist
         /// </summary>
-        /// <param name="jti">令牌唯一标识 (JWT ID)</param>
-        /// <param name="expiration">过期时间</param>
+        /// <param name="jti">Token unique identifier (JWT ID)</param>
+        /// <param name="expiration">Expiration time</param>
         Task AddToBlacklistAsync(string jti, DateTime expiration);
 
         /// <summary>
-        /// 检查令牌是否在黑名单中
+        /// Checks whether a token is in the blacklist
         /// </summary>
-        /// <param name="jti">令牌唯一标识</param>
+        /// <param name="jti">Token unique identifier</param>
         Task<bool> IsBlacklistedAsync(string jti);
 
         /// <summary>
-        /// 将用户的所有令牌加入黑名单
+        /// Adds all tokens of a user to the blacklist
         /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <param name="expiration">过期时间</param>
+        /// <param name="userId">User ID</param>
+        /// <param name="expiration">Expiration time</param>
         Task BlacklistUserTokensAsync(Guid userId, DateTime expiration);
 
         /// <summary>
-        /// 检查用户是否在全局黑名单中
+        /// Checks whether a user is in the global blacklist
         /// </summary>
-        /// <param name="userId">用户ID</param>
+        /// <param name="userId">User ID</param>
         Task<bool> IsUserBlacklistedAsync(Guid userId);
 
         /// <summary>
-        /// 清理过期的黑名单条目
+        /// Cleans up expired blacklist entries
         /// </summary>
         Task CleanupExpiredEntriesAsync();
     }

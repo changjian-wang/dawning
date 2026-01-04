@@ -11,67 +11,67 @@ namespace Dawning.Identity.Application.Dtos.OpenIddict
         public Guid? Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// 客户端 ID
+        /// Client ID
         /// </summary>
         public string? ClientId { get; set; }
 
         /// <summary>
-        /// 客户端密钥
+        /// Client Secret
         /// </summary>
         public string? ClientSecret { get; set; }
 
         /// <summary>
-        /// 显示名称
+        /// Display Name
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 客户端类型（confidential, public）
+        /// Client Type (confidential, public)
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
-        /// 同意类型（explicit, implicit, systematic）
+        /// Consent Type (explicit, implicit, systematic)
         /// </summary>
         public string? ConsentType { get; set; }
 
         /// <summary>
-        /// 权限列表
+        /// Permission List
         /// </summary>
         public List<string> Permissions { get; set; } = new();
 
         /// <summary>
-        /// 重定向 URI 列表
+        /// Redirect URI List
         /// </summary>
         public List<string> RedirectUris { get; set; } = new();
 
         /// <summary>
-        /// 登出重定向 URI 列表
+        /// Post Logout Redirect URI List
         /// </summary>
         public List<string> PostLogoutRedirectUris { get; set; } = new();
 
         /// <summary>
-        /// 要求列表
+        /// Requirement List
         /// </summary>
         public List<string> Requirements { get; set; } = new();
 
         /// <summary>
-        /// 扩展属性
+        /// Extended Properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated Time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
     }

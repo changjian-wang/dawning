@@ -5,16 +5,16 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 系统配置控制器集成测试
-/// 注意: SystemConfigController 使用 [Authorize(Policy = "SystemAdmin")] 策略，
-/// 测试环境可能返回 409 Conflict (缺少策略配置) 或 500 Internal Server Error
+/// System configuration controller integration tests
+/// Note: SystemConfigController uses [Authorize(Policy = "SystemAdmin")] policy,
+/// test environment may return 409 Conflict (missing policy configuration) or 500 Internal Server Error
 /// </summary>
 public class SystemConfigControllerTests : IntegrationTestBase
 {
     public SystemConfigControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetConfigGroups_WithoutAuth_ReturnsUnauthorized()
@@ -48,7 +48,7 @@ public class SystemConfigControllerTests : IntegrationTestBase
             configValue
         );
 
-        // Assert - 由于策略配置问题，可能返回 409 或 401
+        // Assert - Due to policy configuration issues, may return 409 or 401
         response
             .StatusCode.Should()
             .BeOneOf(
@@ -64,7 +64,7 @@ public class SystemConfigControllerTests : IntegrationTestBase
         // Act
         var response = await Client.PostAsync("/api/system-config/init-defaults", null);
 
-        // Assert - 由于策略配置问题，可能返回 409 或 401
+        // Assert - Due to policy configuration issues, may return 409 or 401
         response
             .StatusCode.Should()
             .BeOneOf(
@@ -76,7 +76,7 @@ public class SystemConfigControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点存在性测试
+    #region Endpoint existence tests
 
     [Fact]
     public async Task ConfigGroupsEndpoint_Exists()

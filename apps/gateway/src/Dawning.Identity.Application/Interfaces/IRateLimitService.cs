@@ -6,7 +6,7 @@ using Dawning.Identity.Application.Dtos.Gateway;
 namespace Dawning.Identity.Application.Interfaces
 {
     /// <summary>
-    /// 限流和访问控制服务接口
+    /// Rate limiting and access control service interface
     /// </summary>
     public interface IRateLimitService
     {

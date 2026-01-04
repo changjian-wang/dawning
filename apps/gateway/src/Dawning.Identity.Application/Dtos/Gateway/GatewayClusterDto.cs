@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Dawning.Identity.Application.Dtos.Gateway
 {
     /// <summary>
-    /// 网关集群 DTO
+    /// Gateway Cluster DTO
     /// </summary>
     public class GatewayClusterDto
     {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 集群目标服务器配置
+    /// Cluster Destination Server Configuration
     /// </summary>
     public class ClusterDestinationDto
     {
@@ -47,19 +47,19 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 创建网关集群 DTO
+    /// Create Gateway Cluster DTO
     /// </summary>
     public class CreateGatewayClusterDto
     {
-        [Required(ErrorMessage = "集群ID不能为空")]
-        [StringLength(100, ErrorMessage = "集群ID长度不能超过100")]
+        [Required(ErrorMessage = "Cluster ID is required")]
+        [StringLength(100, ErrorMessage = "Cluster ID cannot exceed 100 characters")]
         public string ClusterId { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "集群名称不能为空")]
-        [StringLength(200, ErrorMessage = "集群名称长度不能超过200")]
+        [Required(ErrorMessage = "Cluster name is required")]
+        [StringLength(200, ErrorMessage = "Cluster name cannot exceed 200 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(1000, ErrorMessage = "描述长度不能超过1000")]
+        [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
         public string? Description { get; set; }
 
         public string LoadBalancingPolicy { get; set; } = "RoundRobin";
@@ -81,22 +81,22 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 更新网关集群 DTO
+    /// Update Gateway Cluster DTO
     /// </summary>
     public class UpdateGatewayClusterDto
     {
-        [Required(ErrorMessage = "ID不能为空")]
+        [Required(ErrorMessage = "ID is required")]
         public Guid Id { get; set; }
 
-        [Required(ErrorMessage = "集群ID不能为空")]
-        [StringLength(100, ErrorMessage = "集群ID长度不能超过100")]
+        [Required(ErrorMessage = "Cluster ID is required")]
+        [StringLength(100, ErrorMessage = "Cluster ID cannot exceed 100 characters")]
         public string ClusterId { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "集群名称不能为空")]
-        [StringLength(200, ErrorMessage = "集群名称长度不能超过200")]
+        [Required(ErrorMessage = "Cluster name is required")]
+        [StringLength(200, ErrorMessage = "Cluster name cannot exceed 200 characters")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(1000, ErrorMessage = "描述长度不能超过1000")]
+        [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
         public string? Description { get; set; }
 
         public string LoadBalancingPolicy { get; set; } = "RoundRobin";
@@ -118,7 +118,7 @@ namespace Dawning.Identity.Application.Dtos.Gateway
     }
 
     /// <summary>
-    /// 集群选项 DTO（用于下拉选择）
+    /// Cluster Option DTO (for dropdown selection)
     /// </summary>
     public class ClusterOptionDto
     {

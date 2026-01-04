@@ -15,7 +15,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
     /// <summary>
-    /// 用户仓储实现
+    /// User repository implementation
     /// </summary>
     public class UserRepository : IUserRepository
     {
@@ -27,7 +27,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据ID异步获取用户
+        /// Asynchronously get user by ID
         /// </summary>
         public async Task<User?> GetAsync(Guid id)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据用户名获取用户
+        /// Get user by username
         /// </summary>
         public async Task<User?> GetByUsernameAsync(string username)
         {
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据邮箱获取用户
+        /// Get user by email
         /// </summary>
         public async Task<User?> GetByEmailAsync(string email)
         {
@@ -62,7 +62,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取分页用户列表
+        /// Get paged user list
         /// </summary>
         public async Task<PagedData<User>> GetPagedListAsync(
             UserModel model,
@@ -72,7 +72,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         {
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(
                     !string.IsNullOrWhiteSpace(model.Username),
@@ -89,7 +89,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Role), u => u.Role == model.Role)
                 .WhereIf(model.IsActive.HasValue, u => u.IsActive == model.IsActive!.Value);
 
-            // 按timestamp降序排序（用于分页优化）
+            // Order by timestamp descending (for pagination optimization)
             var result = await builder
                 .OrderByDescending(u => u.Timestamp)
                 .AsPagedListAsync(page, itemsPerPage);
@@ -104,7 +104,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取用户列表（Cursor 分页）
+        /// Get user list (Cursor pagination)
         /// </summary>
         public async Task<CursorPagedData<User>> GetPagedListByCursorAsync(
             UserModel model,
@@ -114,7 +114,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         {
             var builder = _context.Connection.Builder<UserEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(
                     !string.IsNullOrWhiteSpace(model.Username),
@@ -131,13 +131,13 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 .WhereIf(!string.IsNullOrWhiteSpace(model.Role), u => u.Role == model.Role)
                 .WhereIf(model.IsActive.HasValue, u => u.IsActive == model.IsActive!.Value);
 
-            // 如果提供了游标，添加游标条件
+            // If cursor is provided, add cursor condition
             if (cursor.HasValue)
             {
                 builder = builder.Where(u => u.Timestamp < cursor.Value);
             }
 
-            // 按 Timestamp 降序排序，获取指定数量 + 1（用于判断是否有下一页）
+            // Order by Timestamp descending, get specified count + 1 (to determine if there is a next page)
             var items = builder.OrderByDescending(u => u.Timestamp).Take(pageSize + 1).AsList();
 
             var hasNextPage = items.Count() > pageSize;
@@ -155,7 +155,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步插入用户
+        /// Asynchronously insert user
         /// </summary>
         public async ValueTask<int> InsertAsync(User model)
         {
@@ -164,7 +164,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 throw new ArgumentNullException(nameof(model));
             }
 
-            // 确保设置创建时间
+            // Ensure created time is set
             if (model.CreatedAt == default)
             {
                 model.CreatedAt = DateTime.UtcNow;
@@ -175,7 +175,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步更新用户
+        /// Asynchronously update user
         /// </summary>
         public async ValueTask<bool> UpdateAsync(User model)
         {
@@ -184,7 +184,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 throw new ArgumentNullException(nameof(model));
             }
 
-            // 设置更新时间和timestamp
+            // Set update time and timestamp
             model.UpdatedAt = DateTime.UtcNow;
             model.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -193,7 +193,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步删除用户
+        /// Asynchronously delete user
         /// </summary>
         public async ValueTask<bool> DeleteAsync(User model)
         {
@@ -206,7 +206,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 检查用户名是否存在
+        /// Check if username exists
         /// </summary>
         public async Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null)
         {
@@ -232,7 +232,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 检查邮箱是否存在
+        /// Check if email exists
         /// </summary>
         public async Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null)
         {
@@ -258,7 +258,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取用户锁定结束时间（如果处于锁定状态）
+        /// Get user lockout end time (if in lockout state)
         /// </summary>
         public async Task<DateTime?> GetLockoutEndAsync(string username)
         {
@@ -272,7 +272,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 记录登录失败并返回更新后的状态
+        /// Record failed login and return updated status
         /// </summary>
         public async Task<(
             int FailedCount,
@@ -293,7 +293,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             user.FailedLoginCount++;
             user.UpdatedAt = DateTime.UtcNow;
 
-            // 检查是否需要锁定
+            // Check if lockout is needed
             if (user.FailedLoginCount >= maxFailedAttempts && user.LockoutEnabled)
             {
                 user.LockoutEnd = DateTime.UtcNow.AddMinutes(lockoutDurationMinutes);
@@ -306,7 +306,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 重置登录失败计数
+        /// Reset failed login count
         /// </summary>
         public async Task ResetFailedLoginCountAsync(string username)
         {
@@ -324,7 +324,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 解锁用户账户
+        /// Unlock user account
         /// </summary>
         public async Task UnlockUserAsync(Guid userId)
         {

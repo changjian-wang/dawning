@@ -5,68 +5,68 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.OpenIddict
 {
     /// <summary>
-    /// 身份资源聚合根
+    /// Identity Resource Aggregate Root
     /// Represents user identity information (OpenID Connect)
     /// </summary>
     public class IdentityResource : IAggregateRoot
     {
         /// <summary>
-        /// 唯一标识
+        /// Unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 资源名称(唯一标识符)
+        /// Resource name (unique identifier)
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 描述信息
+        /// Description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool Enabled { get; set; } = true;
 
         /// <summary>
-        /// 用户是否必须同意
+        /// Whether user consent is required
         /// </summary>
         public bool Required { get; set; } = false;
 
         /// <summary>
-        /// 是否在同意界面中强调
+        /// Whether to emphasize in consent screen
         /// </summary>
         public bool Emphasize { get; set; } = false;
 
         /// <summary>
-        /// 是否在发现文档中显示
+        /// Whether to show in discovery document
         /// </summary>
         public bool ShowInDiscoveryDocument { get; set; } = true;
 
         /// <summary>
-        /// 用户声明类型
+        /// User claim types
         /// </summary>
         public List<string> UserClaims { get; set; } = new();
 
         /// <summary>
-        /// 扩展属性
+        /// Extension properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
     }

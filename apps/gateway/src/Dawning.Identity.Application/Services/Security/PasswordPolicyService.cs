@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 namespace Dawning.Identity.Application.Services.Security
 {
     /// <summary>
-    /// 密码策略服务实现
+    /// Password policy service implementation
     /// </summary>
     public class PasswordPolicyService : IPasswordPolicyService
     {
@@ -23,61 +23,61 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 验证密码是否符合策略
+        /// Validate whether password complies with policy
         /// </summary>
         public async Task<PasswordValidationResult> ValidatePasswordAsync(string password)
         {
             if (string.IsNullOrEmpty(password))
             {
-                return PasswordValidationResult.Failure("密码不能为空");
+                return PasswordValidationResult.Failure("Password cannot be empty");
             }
 
             var policy = await GetPolicyAsync();
             var errors = new List<string>();
 
-            // 检查长度
+            // Check length
             if (password.Length < policy.MinLength)
             {
-                errors.Add($"密码长度不能少于 {policy.MinLength} 个字符");
+                errors.Add($"Password must be at least {policy.MinLength} characters");
             }
 
             if (password.Length > policy.MaxLength)
             {
-                errors.Add($"密码长度不能超过 {policy.MaxLength} 个字符");
+                errors.Add($"Password cannot exceed {policy.MaxLength} characters");
             }
 
-            // 检查大写字母
+            // Check uppercase letters
             if (policy.RequireUppercase && !Regex.IsMatch(password, "[A-Z]"))
             {
-                errors.Add("密码必须包含至少一个大写字母");
+                errors.Add("Password must contain at least one uppercase letter");
             }
 
-            // 检查小写字母
+            // Check lowercase letters
             if (policy.RequireLowercase && !Regex.IsMatch(password, "[a-z]"))
             {
-                errors.Add("密码必须包含至少一个小写字母");
+                errors.Add("Password must contain at least one lowercase letter");
             }
 
-            // 检查数字
+            // Check digits
             if (policy.RequireDigit && !Regex.IsMatch(password, "[0-9]"))
             {
-                errors.Add("密码必须包含至少一个数字");
+                errors.Add("Password must contain at least one digit");
             }
 
-            // 检查特殊字符
+            // Check special characters
             if (policy.RequireSpecialChar)
             {
                 var escapedChars = Regex.Escape(policy.SpecialCharacters);
                 if (!Regex.IsMatch(password, $"[{escapedChars}]"))
                 {
-                    errors.Add($"密码必须包含至少一个特殊字符 ({policy.SpecialCharacters})");
+                    errors.Add($"Password must contain at least one special character ({policy.SpecialCharacters})");
                 }
             }
 
-            // 检查常见弱密码模式
+            // Check common weak password patterns
             if (IsCommonWeakPassword(password))
             {
-                errors.Add("密码过于简单，请使用更复杂的密码");
+                errors.Add("Password is too simple, please use a more complex password");
             }
 
             return errors.Count == 0
@@ -86,11 +86,11 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 获取当前密码策略
+        /// Get current password policy
         /// </summary>
         public Task<PasswordPolicy> GetPolicyAsync()
         {
-            // 使用简单缓存避免频繁读取配置
+            // Use simple cache to avoid frequent config reads
             if (_cachedPolicy != null && DateTime.UtcNow - _policyCacheTime < PolicyCacheDuration)
             {
                 return Task.FromResult(_cachedPolicy);
@@ -98,7 +98,7 @@ namespace Dawning.Identity.Application.Services.Security
 
             var policy = new PasswordPolicy();
 
-            // 从 appsettings.json 读取配置
+            // Read configuration from appsettings.json
             var passwordSection = _configuration.GetSection("Security:Password");
             if (passwordSection.Exists())
             {
@@ -120,13 +120,13 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 检查是否为常见弱密码
+        /// Check if password is a common weak password
         /// </summary>
         private static bool IsCommonWeakPassword(string password)
         {
             var lowerPassword = password.ToLowerInvariant();
 
-            // 常见弱密码列表
+            // Common weak passwords list
             var weakPasswords = new HashSet<string>
             {
                 "password",
@@ -158,13 +158,13 @@ namespace Dawning.Identity.Application.Services.Security
                 return true;
             }
 
-            // 检查重复字符模式 (如 "aaaa", "1111")
+            // Check repeated character patterns (e.g., "aaaa", "1111")
             if (Regex.IsMatch(password, @"^(.)\1{3,}$"))
             {
                 return true;
             }
 
-            // 检查简单序列 (如 "abcd", "1234")
+            // Check simple sequences (e.g., "abcd", "1234")
             if (IsSequentialPattern(password))
             {
                 return true;
@@ -174,7 +174,7 @@ namespace Dawning.Identity.Application.Services.Security
         }
 
         /// <summary>
-        /// 检查是否为连续字符序列
+        /// Check if password is a sequential character pattern
         /// </summary>
         private static bool IsSequentialPattern(string password)
         {
@@ -184,7 +184,7 @@ namespace Dawning.Identity.Application.Services.Security
             var isSequential = true;
             for (int i = 1; i < password.Length && isSequential; i++)
             {
-                // 检查是否为连续递增或递减
+                // Check if consecutive ascending or descending
                 var diff = password[i] - password[i - 1];
                 if (i == 1)
                 {

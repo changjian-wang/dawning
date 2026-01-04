@@ -11,52 +11,52 @@ namespace Dawning.Identity.Application.Dtos.OpenIddict
         public Guid? Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// 关联的应用程序 ID
+        /// Associated Application ID
         /// </summary>
         public Guid? ApplicationId { get; set; }
 
         /// <summary>
-        /// 关联的授权 ID
+        /// Associated Authorization ID
         /// </summary>
         public Guid? AuthorizationId { get; set; }
 
         /// <summary>
-        /// 用户标识
+        /// User Subject
         /// </summary>
         public string? Subject { get; set; }
 
         /// <summary>
-        /// 令牌类型（access_token, refresh_token, id_token）
+        /// Token Type (access_token, refresh_token, id_token)
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
-        /// 令牌状态（valid, revoked, redeemed）
+        /// Token Status (valid, revoked, redeemed)
         /// </summary>
         public string? Status { get; set; }
 
         /// <summary>
-        /// 令牌负载（JWT）
+        /// Token Payload (JWT)
         /// </summary>
         public string? Payload { get; set; }
 
         /// <summary>
-        /// 引用 ID（用于令牌内省）
+        /// Reference ID (for token introspection)
         /// </summary>
         public string? ReferenceId { get; set; }
 
         /// <summary>
-        /// 过期时间
+        /// Expiration Time
         /// </summary>
         public DateTime? ExpiresAt { get; set; }
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
     }

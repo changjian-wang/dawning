@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Monitoring;
 
 /// <summary>
-/// 告警检查后台服务
-/// 定期检查系统指标并触发告警
+/// Alert check background service
+/// Periodically checks system metrics and triggers alerts
 /// </summary>
 public class AlertCheckBackgroundService : BackgroundService
 {
@@ -28,7 +28,7 @@ public class AlertCheckBackgroundService : BackgroundService
         _configuration = configuration;
         _logger = logger;
 
-        // 默认每分钟检查一次
+        // Default: check every minute
         _checkInterval = TimeSpan.FromMinutes(
             _configuration.GetValue("Alerting:CheckIntervalMinutes", 1)
         );
@@ -41,7 +41,7 @@ public class AlertCheckBackgroundService : BackgroundService
             _checkInterval
         );
 
-        // 等待应用启动完成
+        // Wait for application startup to complete
         await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -61,7 +61,7 @@ public class AlertCheckBackgroundService : BackgroundService
             }
             catch (TaskCanceledException)
             {
-                // 正常停止
+                // Normal shutdown
                 break;
             }
         }

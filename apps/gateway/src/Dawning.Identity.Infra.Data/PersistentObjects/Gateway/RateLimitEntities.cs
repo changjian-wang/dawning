@@ -3,7 +3,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Gateway
 {
     /// <summary>
-    /// IP 访问规则实体
+    /// IP access rule entity
     /// </summary>
     [Table("ip_access_rules")]
     public class IpAccessRuleEntity
@@ -13,56 +13,56 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Gateway
         public Guid Id { get; set; }
 
         /// <summary>
-        /// IP 地址或 CIDR 范围 (如 192.168.1.0/24)
+        /// IP address or CIDR range (e.g., 192.168.1.0/24)
         /// </summary>
         [Column("ip_address")]
         public string IpAddress { get; set; } = string.Empty;
 
         /// <summary>
-        /// 规则类型: whitelist, blacklist
+        /// Rule type: whitelist, blacklist
         /// </summary>
         [Column("rule_type")]
         public string RuleType { get; set; } = "blacklist";
 
         /// <summary>
-        /// 描述
+        /// Description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_enabled")]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 过期时间（可选，用于临时封禁）
+        /// Expiration time (optional, for temporary bans)
         /// </summary>
         [Column("expires_at")]
         public DateTime? ExpiresAt { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者
+        /// Creator
         /// </summary>
         [Column("created_by")]
         public string? CreatedBy { get; set; }
     }
 
     /// <summary>
-    /// 限流策略实体
+    /// Rate limit policy entity
     /// </summary>
     [Table("rate_limit_policies")]
     public class RateLimitPolicyEntity
@@ -72,79 +72,79 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Gateway
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 策略名称（唯一标识）
+        /// Policy name (unique identifier)
         /// </summary>
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         [Column("display_name")]
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 策略类型: fixed-window, sliding-window, token-bucket, concurrency
+        /// Policy type: fixed-window, sliding-window, token-bucket, concurrency
         /// </summary>
         [Column("policy_type")]
         public string PolicyType { get; set; } = "fixed-window";
 
         /// <summary>
-        /// 每窗口允许的请求数
+        /// Allowed requests per window
         /// </summary>
         [Column("permit_limit")]
         public int PermitLimit { get; set; } = 100;
 
         /// <summary>
-        /// 时间窗口（秒）
+        /// Time window (seconds)
         /// </summary>
         [Column("window_seconds")]
         public int WindowSeconds { get; set; } = 60;
 
         /// <summary>
-        /// 滑动窗口分段数（仅用于 sliding-window）
+        /// Sliding window segments count (only for sliding-window)
         /// </summary>
         [Column("segments_per_window")]
         public int SegmentsPerWindow { get; set; } = 6;
 
         /// <summary>
-        /// 队列限制
+        /// Queue limit
         /// </summary>
         [Column("queue_limit")]
         public int QueueLimit { get; set; } = 0;
 
         /// <summary>
-        /// 令牌补充速率（仅用于 token-bucket）
+        /// Token replenishment rate (only for token-bucket)
         /// </summary>
         [Column("tokens_per_period")]
         public int TokensPerPeriod { get; set; } = 10;
 
         /// <summary>
-        /// 令牌补充周期（秒，仅用于 token-bucket）
+        /// Token replenishment period (seconds, only for token-bucket)
         /// </summary>
         [Column("replenishment_period_seconds")]
         public int ReplenishmentPeriodSeconds { get; set; } = 1;
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_enabled")]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 描述
+        /// Description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }

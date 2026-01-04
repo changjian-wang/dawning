@@ -106,7 +106,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         }
 
         /// <summary>
-        /// 清理过期的令牌
+        /// Clean up expired tokens
         /// </summary>
         public async Task<int> PruneExpiredTokensAsync()
         {

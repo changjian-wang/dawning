@@ -7,87 +7,87 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Application.Interfaces.Security
 {
     /// <summary>
-    /// 密码策略服务接口
+    /// Password policy service interface
     /// </summary>
     public interface IPasswordPolicyService
     {
         /// <summary>
-        /// 验证密码是否符合策略
+        /// Validates whether the password meets the policy requirements
         /// </summary>
-        /// <param name="password">密码</param>
-        /// <returns>验证结果</returns>
+        /// <param name="password">Password</param>
+        /// <returns>Validation result</returns>
         Task<PasswordValidationResult> ValidatePasswordAsync(string password);
 
         /// <summary>
-        /// 获取当前密码策略
+        /// Gets the current password policy
         /// </summary>
         Task<PasswordPolicy> GetPolicyAsync();
     }
 
     /// <summary>
-    /// 密码策略配置
+    /// Password policy configuration
     /// </summary>
     public class PasswordPolicy
     {
         /// <summary>
-        /// 最小长度
+        /// Minimum length
         /// </summary>
         public int MinLength { get; set; } = 8;
 
         /// <summary>
-        /// 最大长度
+        /// Maximum length
         /// </summary>
         public int MaxLength { get; set; } = 128;
 
         /// <summary>
-        /// 是否要求大写字母
+        /// Whether uppercase letters are required
         /// </summary>
         public bool RequireUppercase { get; set; } = true;
 
         /// <summary>
-        /// 是否要求小写字母
+        /// Whether lowercase letters are required
         /// </summary>
         public bool RequireLowercase { get; set; } = true;
 
         /// <summary>
-        /// 是否要求数字
+        /// Whether digits are required
         /// </summary>
         public bool RequireDigit { get; set; } = true;
 
         /// <summary>
-        /// 是否要求特殊字符
+        /// Whether special characters are required
         /// </summary>
         public bool RequireSpecialChar { get; set; } = false;
 
         /// <summary>
-        /// 特殊字符集
+        /// Special character set
         /// </summary>
         public string SpecialCharacters { get; set; } = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
     }
 
     /// <summary>
-    /// 密码验证结果
+    /// Password validation result
     /// </summary>
     public class PasswordValidationResult
     {
         /// <summary>
-        /// 是否验证通过
+        /// Whether validation passed
         /// </summary>
         public bool IsValid { get; set; }
 
         /// <summary>
-        /// 错误消息列表
+        /// List of error messages
         /// </summary>
         public List<string> Errors { get; set; } = new List<string>();
 
         /// <summary>
-        /// 创建成功结果
+        /// Creates a success result
         /// </summary>
         public static PasswordValidationResult Success() =>
             new PasswordValidationResult { IsValid = true };
 
         /// <summary>
-        /// 创建失败结果
+        /// Creates a failure result
         /// </summary>
         public static PasswordValidationResult Failure(params string[] errors) =>
             new PasswordValidationResult { IsValid = false, Errors = errors.ToList() };

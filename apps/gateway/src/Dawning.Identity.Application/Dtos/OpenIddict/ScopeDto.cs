@@ -11,42 +11,42 @@ namespace Dawning.Identity.Application.Dtos.OpenIddict
         public Guid? Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// 作用域名称
+        /// Scope Name
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 显示名称
+        /// Display Name
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 描述
+        /// Description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 资源列表
+        /// Resource List
         /// </summary>
         public List<string> Resources { get; set; } = new();
 
         /// <summary>
-        /// 扩展属性
+        /// Extended Properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 操作者ID (用于审计日志)
+        /// Operator ID (for audit log)
         /// </summary>
         public Guid? OperatorId { get; set; }
     }

@@ -3,27 +3,27 @@ using System;
 namespace Dawning.Identity.Domain.Models.Administration
 {
     /// <summary>
-    /// 角色查询模型
+    /// Role query model
     /// </summary>
     public class RoleModel
     {
         /// <summary>
-        /// 角色名称（模糊查询）
+        /// Role name (fuzzy search)
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 显示名称（模糊查询）
+        /// Display name (fuzzy search)
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Is enabled
         /// </summary>
         public bool? IsActive { get; set; }
 
         /// <summary>
-        /// 是否为系统角色
+        /// Is system role
         /// </summary>
         public bool? IsSystem { get; set; }
     }

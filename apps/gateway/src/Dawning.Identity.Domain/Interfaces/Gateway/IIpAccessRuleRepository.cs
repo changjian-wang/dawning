@@ -7,17 +7,17 @@ using Dawning.Identity.Domain.Models;
 namespace Dawning.Identity.Domain.Interfaces.Gateway
 {
     /// <summary>
-    /// IP 访问规则仓储接口
+    /// IP access rule repository interface
     /// </summary>
     public interface IIpAccessRuleRepository
     {
         /// <summary>
-        /// 根据ID获取规则
+        /// Get rule by ID
         /// </summary>
         Task<IpAccessRule?> GetAsync(Guid id);
 
         /// <summary>
-        /// 获取分页规则列表
+        /// Get paginated rule list
         /// </summary>
         Task<PagedData<IpAccessRule>> GetPagedListAsync(
             string? ruleType,
@@ -27,32 +27,32 @@ namespace Dawning.Identity.Domain.Interfaces.Gateway
         );
 
         /// <summary>
-        /// 获取指定类型的活跃规则
+        /// Get active rules by type
         /// </summary>
         Task<IEnumerable<IpAccessRule>> GetActiveRulesByTypeAsync(string ruleType);
 
         /// <summary>
-        /// 检查IP是否在黑名单中
+        /// Check if IP is blacklisted
         /// </summary>
         Task<bool> IsIpBlacklistedAsync(string ipAddress);
 
         /// <summary>
-        /// 检查IP是否在白名单中
+        /// Check if IP is whitelisted
         /// </summary>
         Task<bool> IsIpWhitelistedAsync(string ipAddress);
 
         /// <summary>
-        /// 插入规则
+        /// Insert rule
         /// </summary>
         ValueTask<int> InsertAsync(IpAccessRule model);
 
         /// <summary>
-        /// 更新规则
+        /// Update rule
         /// </summary>
         ValueTask<bool> UpdateAsync(IpAccessRule model);
 
         /// <summary>
-        /// 删除规则
+        /// Delete rule
         /// </summary>
         ValueTask<bool> DeleteAsync(Guid id);
     }

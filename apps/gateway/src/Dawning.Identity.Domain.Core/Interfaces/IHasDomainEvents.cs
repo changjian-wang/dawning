@@ -3,33 +3,33 @@ using Dawning.Identity.Domain.Core.Events;
 namespace Dawning.Identity.Domain.Core.Interfaces;
 
 /// <summary>
-/// 可发布领域事件的聚合根接口
+/// Aggregate root interface that can publish domain events
 /// </summary>
 public interface IHasDomainEvents
 {
     /// <summary>
-    /// 获取待发布的领域事件
+    /// Gets the pending domain events to be published
     /// </summary>
     IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
 
     /// <summary>
-    /// 添加领域事件
+    /// Adds a domain event
     /// </summary>
     void AddDomainEvent(IDomainEvent domainEvent);
 
     /// <summary>
-    /// 移除领域事件
+    /// Removes a domain event
     /// </summary>
     void RemoveDomainEvent(IDomainEvent domainEvent);
 
     /// <summary>
-    /// 清空所有领域事件
+    /// Clears all domain events
     /// </summary>
     void ClearDomainEvents();
 }
 
 /// <summary>
-/// 支持领域事件的实体基类
+/// Base entity class that supports domain events
 /// </summary>
 public abstract class Entity : IHasDomainEvents
 {
@@ -53,7 +53,7 @@ public abstract class Entity : IHasDomainEvents
     }
 
     /// <summary>
-    /// 触发领域事件
+    /// Raises a domain event
     /// </summary>
     protected void RaiseDomainEvent(IDomainEvent domainEvent)
     {

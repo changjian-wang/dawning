@@ -8,22 +8,22 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Application.Services.Administration
 {
     /// <summary>
-    /// 系统配置服务接口
+    /// System configuration service interface
     /// </summary>
     public interface ISystemConfigService
     {
         /// <summary>
-        /// 获取配置值
+        /// Get configuration value
         /// </summary>
         Task<string?> GetValueAsync(string group, string key);
 
         /// <summary>
-        /// 获取配置值，带默认值
+        /// Get configuration value with default value
         /// </summary>
         Task<T> GetValueAsync<T>(string group, string key, T defaultValue);
 
         /// <summary>
-        /// 设置配置值
+        /// Set configuration value
         /// </summary>
         Task<bool> SetValueAsync(
             string group,
@@ -33,33 +33,33 @@ namespace Dawning.Identity.Application.Services.Administration
         );
 
         /// <summary>
-        /// 获取分组下的所有配置
+        /// Get all configurations under a group
         /// </summary>
         Task<IEnumerable<SystemConfigItemDto>> GetByGroupAsync(string group);
 
         /// <summary>
-        /// 获取所有配置分组
+        /// Get all configuration groups
         /// </summary>
         Task<IEnumerable<string>> GetGroupsAsync();
 
         /// <summary>
-        /// 批量更新配置
+        /// Batch update configurations
         /// </summary>
         Task<bool> BatchUpdateAsync(IEnumerable<SystemConfigItemDto> configs);
 
         /// <summary>
-        /// 删除配置
+        /// Delete configuration
         /// </summary>
         Task<bool> DeleteAsync(string group, string key);
 
         /// <summary>
-        /// 获取配置更新时间戳（用于热更新检测）
+        /// Get configuration update timestamp (for hot reload detection)
         /// </summary>
         Task<long> GetLastUpdateTimestampAsync();
     }
 
     /// <summary>
-    /// 系统配置项 DTO
+    /// System configuration item DTO
     /// </summary>
     public class SystemConfigItemDto
     {
@@ -74,7 +74,7 @@ namespace Dawning.Identity.Application.Services.Administration
     }
 
     /// <summary>
-    /// 系统配置服务实现
+    /// System configuration service implementation
     /// </summary>
     public class SystemConfigService : ISystemConfigService
     {
@@ -89,7 +89,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
         public async Task<string?> GetValueAsync(string group, string key)
         {
-            // 使用缓存（如果可用）
+            // Use cache (if available)
             if (_cacheService != null)
             {
                 var cacheKey = CacheKeys.SystemConfig(group, key);
@@ -101,12 +101,12 @@ namespace Dawning.Identity.Application.Services.Administration
                         var result = await _unitOfWork.SystemConfig.GetPagedListAsync(model, 1, 1);
                         return result.Items.FirstOrDefault()?.Value;
                     },
-                    CacheEntryOptions.Medium, // 15分钟缓存
-                    TimeSpan.FromMinutes(2) // 空值缓存2分钟
+                    CacheEntryOptions.Medium, // 15 minutes cache
+                    TimeSpan.FromMinutes(2) // Null value cache 2 minutes
                 );
             }
 
-            // 无缓存时直接查询
+            // Query directly without cache
             var queryModel = new SystemConfigModel { Name = group, Key = key };
             var queryResult = await _unitOfWork.SystemConfig.GetPagedListAsync(queryModel, 1, 1);
             return queryResult.Items.FirstOrDefault()?.Value;
@@ -161,7 +161,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 var success = await _unitOfWork.SystemConfig.UpdateAsync(existing);
 
-                // 更新后使缓存失效
+                // Invalidate cache after update
                 if (success && _cacheService != null)
                 {
                     await _cacheService.RemoveAsync(CacheKeys.SystemConfig(group, key));
@@ -185,7 +185,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 var success = await _unitOfWork.SystemConfig.InsertAsync(newItem) > 0;
 
-                // 新增后使缓存失效
+                // Invalidate cache after insert
                 if (success && _cacheService != null)
                 {
                     await _cacheService.RemoveAsync(CacheKeys.SystemConfig(group, key));
@@ -252,7 +252,7 @@ namespace Dawning.Identity.Application.Services.Administration
                     new SystemConfigAggregate { Id = existing.Id }
                 );
 
-                // 删除后使缓存失效
+                // Invalidate cache after delete
                 if (success && _cacheService != null)
                 {
                     await _cacheService.RemoveAsync(CacheKeys.SystemConfig(group, key));

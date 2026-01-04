@@ -5,7 +5,7 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 用户控制器集成测试
+/// User controller integration tests
 /// </summary>
 public class UserControllerTests : IntegrationTestBase
 {
@@ -35,7 +35,7 @@ public class UserControllerTests : IntegrationTestBase
     [Fact]
     public async Task GetUserById_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act - 使用有效的 GUID 格式
+        // Act - Use valid GUID format
         var response = await Client.GetAsync("/api/user/00000000-0000-0000-0000-000000000001");
 
         // Assert
@@ -66,7 +66,7 @@ public class UserControllerTests : IntegrationTestBase
         // Arrange
         var updateData = new { email = "updated@test.com" };
 
-        // Act - 使用有效的 GUID 格式
+        // Act - Use valid GUID format
         var response = await Client.PutAsJsonAsync(
             "/api/user/00000000-0000-0000-0000-000000000001",
             updateData
@@ -79,7 +79,7 @@ public class UserControllerTests : IntegrationTestBase
     [Fact]
     public async Task DeleteUser_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act - 使用有效的 GUID 格式
+        // Act - Use valid GUID format
         var response = await Client.DeleteAsync("/api/user/00000000-0000-0000-0000-000000000001");
 
         // Assert
@@ -102,7 +102,7 @@ public class UserControllerTests : IntegrationTestBase
     [Fact]
     public async Task GetUserRoles_WithoutAuth_ReturnsUnauthorized()
     {
-        // Act - 使用有效的 GUID 格式
+        // Act - Use valid GUID format
         var response = await Client.GetAsync(
             "/api/user/00000000-0000-0000-0000-000000000001/roles"
         );

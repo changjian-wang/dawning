@@ -3,18 +3,18 @@ using Dawning.Identity.Domain.Core.Events;
 namespace Dawning.Identity.Application.Interfaces.Events;
 
 /// <summary>
-/// 领域事件分发器接口
-/// 用于在进程内发布和处理领域事件（通过 MediatR 实现）
+/// Domain event dispatcher interface
+/// Used for publishing and handling domain events within a process (implemented via MediatR)
 /// </summary>
 public interface IDomainEventDispatcher
 {
     /// <summary>
-    /// 发布单个领域事件
+    /// Dispatch a single domain event
     /// </summary>
     Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 发布多个领域事件
+    /// Dispatch multiple domain events
     /// </summary>
     Task DispatchAsync(
         IEnumerable<IDomainEvent> domainEvents,
@@ -23,18 +23,18 @@ public interface IDomainEventDispatcher
 }
 
 /// <summary>
-/// 集成事件总线接口
-/// 用于跨进程/服务发布事件（通过 Kafka/RabbitMQ 等实现）
+/// Integration event bus interface
+/// Used for publishing events across processes/services (implemented via Kafka/RabbitMQ, etc.)
 /// </summary>
 public interface IIntegrationEventBus
 {
     /// <summary>
-    /// 发布集成事件到消息队列
+    /// Publish integration event to message queue
     /// </summary>
-    /// <typeparam name="TEvent">事件类型</typeparam>
-    /// <param name="event">事件实例</param>
-    /// <param name="topic">可选的主题名称（默认根据事件类型推断）</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <typeparam name="TEvent">Event type</typeparam>
+    /// <param name="event">Event instance</param>
+    /// <param name="topic">Optional topic name (defaults to event type inference)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     Task PublishAsync<TEvent>(
         TEvent @event,
         string? topic = null,
@@ -43,7 +43,7 @@ public interface IIntegrationEventBus
         where TEvent : IIntegrationEvent;
 
     /// <summary>
-    /// 批量发布集成事件
+    /// Batch publish integration events
     /// </summary>
     Task PublishManyAsync<TEvent>(
         IEnumerable<TEvent> events,
@@ -54,27 +54,27 @@ public interface IIntegrationEventBus
 }
 
 /// <summary>
-/// 事件处理结果
+/// Event handling result
 /// </summary>
 public enum EventHandleResult
 {
     /// <summary>
-    /// 处理成功
+    /// Processing succeeded
     /// </summary>
     Success,
 
     /// <summary>
-    /// 处理失败，需要重试
+    /// Processing failed, needs retry
     /// </summary>
     Retry,
 
     /// <summary>
-    /// 处理失败，跳过此消息
+    /// Processing failed, skip this message
     /// </summary>
     Skip,
 
     /// <summary>
-    /// 处理失败，发送到死信队列
+    /// Processing failed, send to dead letter queue
     /// </summary>
     DeadLetter,
 }

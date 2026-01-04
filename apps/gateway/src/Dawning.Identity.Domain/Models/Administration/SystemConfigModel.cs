@@ -9,12 +9,12 @@ namespace Dawning.Identity.Domain.Models.Administration
     public class SystemConfigModel
     {
         /// <summary>
-        /// 名称
+        /// Name
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 键
+        /// Key
         /// </summary>
         public string? Key { get; set; }
     }

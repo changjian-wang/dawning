@@ -3,32 +3,32 @@ using System;
 namespace Dawning.Identity.Domain.Models.Administration
 {
     /// <summary>
-    /// 用户查询过滤模型
+    /// User query filter model
     /// </summary>
     public class UserModel
     {
         /// <summary>
-        /// 用户名（模糊搜索）
+        /// Username (fuzzy search)
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// 邮箱（模糊搜索）
+        /// Email (fuzzy search)
         /// </summary>
         public string? Email { get; set; }
 
         /// <summary>
-        /// 显示名称（模糊搜索）
+        /// Display name (fuzzy search)
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 角色筛选
+        /// Role filter
         /// </summary>
         public string? Role { get; set; }
 
         /// <summary>
-        /// 是否激活
+        /// Is active
         /// </summary>
         public bool? IsActive { get; set; }
     }

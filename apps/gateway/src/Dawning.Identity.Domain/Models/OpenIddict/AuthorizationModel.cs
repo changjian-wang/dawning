@@ -7,27 +7,27 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Domain.Models.OpenIddict
 {
     /// <summary>
-    /// Authorization 查询模型
+    /// Authorization query model
     /// </summary>
     public class AuthorizationModel
     {
         /// <summary>
-        /// 关联的应用程序 ID
+        /// Associated application ID
         /// </summary>
         public Guid? ApplicationId { get; set; }
 
         /// <summary>
-        /// 用户标识
+        /// User subject
         /// </summary>
         public string? Subject { get; set; }
 
         /// <summary>
-        /// 授权类型
+        /// Authorization type
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
-        /// 授权状态（valid, revoked）
+        /// Authorization status (valid, revoked)
         /// </summary>
         public string? Status { get; set; }
     }

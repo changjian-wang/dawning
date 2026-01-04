@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Logging
 {
     /// <summary>
-    /// 请求日志服务实现（基于 Repository 模式）
+    /// Request logging service implementation (Repository pattern based)
     /// </summary>
     public class RequestLoggingService : IRequestLoggingService
     {

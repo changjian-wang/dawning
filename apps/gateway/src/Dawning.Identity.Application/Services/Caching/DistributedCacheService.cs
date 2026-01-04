@@ -10,15 +10,15 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Caching
 {
     /// <summary>
-    /// 基于 IDistributedCache 的缓存服务实现
-    /// 支持 Redis 和内存缓存的自动切换
+    /// Cache service implementation based on IDistributedCache.
+    /// Supports automatic switching between Redis and in-memory cache.
     /// </summary>
     public class DistributedCacheService : ICacheService
     {
         private readonly IDistributedCache _cache;
         private readonly ILogger<DistributedCacheService> _logger;
 
-        // 用于防止缓存击穿的锁
+        // Lock for preventing cache stampede
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _locks = new();
 
         private static readonly JsonSerializerOptions _jsonOptions = new()
@@ -44,30 +44,30 @@ namespace Dawning.Identity.Application.Services.Caching
             CancellationToken cancellationToken = default
         )
         {
-            // 先尝试从缓存获取
+            // First try to get from cache
             var cached = await GetAsync<T>(key, cancellationToken);
             if (cached != null)
             {
                 return cached;
             }
 
-            // 获取或创建该 key 的锁，防止缓存击穿
+            // Get or create lock for this key to prevent cache stampede
             var lockObj = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
 
             await lockObj.WaitAsync(cancellationToken);
             try
             {
-                // 双重检查：可能在等待锁期间其他线程已设置缓存
+                // Double-check: another thread may have set the cache while waiting for lock
                 cached = await GetAsync<T>(key, cancellationToken);
                 if (cached != null)
                 {
                     return cached;
                 }
 
-                // 调用工厂方法获取数据
+                // Call factory method to get data
                 var value = await factory(cancellationToken);
 
-                // 缓存结果
+                // Cache the result
                 if (value != null)
                 {
                     await SetAsync(
@@ -84,7 +84,7 @@ namespace Dawning.Identity.Application.Services.Caching
             {
                 lockObj.Release();
 
-                // 清理不再使用的锁对象
+                // Clean up unused lock objects
                 if (lockObj.CurrentCount == 1)
                 {
                     _locks.TryRemove(key, out _);
@@ -102,12 +102,12 @@ namespace Dawning.Identity.Application.Services.Caching
         )
             where T : class
         {
-            // 先尝试从缓存获取
+            // First try to get from cache
             var cachedString = await _cache.GetStringAsync(key, cancellationToken);
 
             if (!string.IsNullOrEmpty(cachedString))
             {
-                // 检查是否是空值标记
+                // Check if it's a null value marker
                 if (cachedString == CacheKeys.NullMarker)
                 {
                     _logger.LogDebug("Cache hit with null marker for key: {Key}", key);
@@ -124,13 +124,13 @@ namespace Dawning.Identity.Application.Services.Caching
                 }
             }
 
-            // 获取锁
+            // Get lock
             var lockObj = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
 
             await lockObj.WaitAsync(cancellationToken);
             try
             {
-                // 双重检查
+                // Double-check
                 cachedString = await _cache.GetStringAsync(key, cancellationToken);
                 if (!string.IsNullOrEmpty(cachedString))
                 {
@@ -145,11 +145,11 @@ namespace Dawning.Identity.Application.Services.Caching
                     }
                     catch
                     {
-                        // 忽略反序列化错误
+                        // Ignore deserialization errors
                     }
                 }
 
-                // 调用工厂方法
+                // Call factory method
                 var value = await factory(cancellationToken);
 
                 if (value != null)
@@ -163,7 +163,7 @@ namespace Dawning.Identity.Application.Services.Caching
                 }
                 else
                 {
-                    // 缓存空值以防止缓存穿透
+                    // Cache null value to prevent cache penetration
                     var nullTtl = nullValueTtl ?? TimeSpan.FromMinutes(1);
                     await _cache.SetStringAsync(
                         key,
@@ -264,9 +264,9 @@ namespace Dawning.Identity.Application.Services.Caching
             CancellationToken cancellationToken = default
         )
         {
-            // 注意：IDistributedCache 不原生支持按前缀删除
-            // 如果使用 Redis，可以通过 StackExchange.Redis 的 SCAN + DEL 实现
-            // 这里记录警告，实际生产环境应考虑使用 Redis 直接连接
+            // Note: IDistributedCache does not natively support deletion by prefix
+            // If using Redis, this can be implemented via StackExchange.Redis SCAN + DEL
+            // For production environments, consider using direct Redis connection
             _logger.LogWarning(
                 "RemoveByPrefixAsync is not fully supported with IDistributedCache. "
                     + "Consider using direct Redis connection for prefix deletion. Prefix: {Prefix}",

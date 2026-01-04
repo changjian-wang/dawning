@@ -3,33 +3,33 @@ using System;
 namespace Dawning.Identity.Application.Interfaces
 {
     /// <summary>
-    /// 当前用户服务接口
-    /// 用于在 Application 层获取当前登录用户信息
+    /// Current user service interface
+    /// Used to get current logged-in user information in the Application layer
     /// </summary>
     public interface ICurrentUserService
     {
         /// <summary>
-        /// 获取当前用户ID
+        /// Gets the current user ID
         /// </summary>
         Guid? UserId { get; }
 
         /// <summary>
-        /// 获取当前用户名
+        /// Gets the current username
         /// </summary>
         string? Username { get; }
 
         /// <summary>
-        /// 是否已认证
+        /// Whether the user is authenticated
         /// </summary>
         bool IsAuthenticated { get; }
 
         /// <summary>
-        /// 获取用户角色列表
+        /// Gets the list of user roles
         /// </summary>
         IEnumerable<string> Roles { get; }
 
         /// <summary>
-        /// 检查用户是否拥有指定角色
+        /// Checks whether the user has a specified role
         /// </summary>
         bool IsInRole(string role);
     }

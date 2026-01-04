@@ -8,17 +8,17 @@ using Dawning.Identity.Domain.Models.Monitoring;
 namespace Dawning.Identity.Domain.Interfaces.Monitoring;
 
 /// <summary>
-/// 请求日志仓储接口
+/// Request log repository interface
 /// </summary>
 public interface IRequestLogRepository
 {
     /// <summary>
-    /// 插入请求日志
+    /// Insert request log
     /// </summary>
     Task InsertAsync(RequestLog log);
 
     /// <summary>
-    /// 分页查询请求日志
+    /// Paginated query for request logs
     /// </summary>
     Task<PagedData<RequestLog>> GetPagedListAsync(
         RequestLogQueryModel query,
@@ -27,12 +27,12 @@ public interface IRequestLogRepository
     );
 
     /// <summary>
-    /// 获取请求统计信息
+    /// Get request statistics
     /// </summary>
     Task<RequestLogStatistics> GetStatisticsAsync(DateTime startTime, DateTime endTime);
 
     /// <summary>
-    /// 清理过期日志
+    /// Cleanup expired logs
     /// </summary>
     Task<int> CleanupOldLogsAsync(DateTime cutoffDate);
 }

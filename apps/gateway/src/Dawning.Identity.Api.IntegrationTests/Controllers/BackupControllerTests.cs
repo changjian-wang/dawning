@@ -5,15 +5,15 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 备份控制器集成测试
-/// 备份控制器端点: POST /api/backup, GET /api/backup/history, DELETE /api/backup/{id}, POST /api/backup/cleanup
+/// Backup controller integration tests
+/// Backup controller endpoints: POST /api/backup, GET /api/backup/history, DELETE /api/backup/{id}, POST /api/backup/cleanup
 /// </summary>
 public class BackupControllerTests : IntegrationTestBase
 {
     public BackupControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetBackupHistory_WithoutAuth_ReturnsUnauthorized()
@@ -57,7 +57,7 @@ public class BackupControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点存在性测试
+    #region Endpoint existence tests
 
     [Fact]
     public async Task BackupHistoryEndpoint_Exists()

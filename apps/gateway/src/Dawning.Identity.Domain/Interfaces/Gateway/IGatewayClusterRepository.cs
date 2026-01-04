@@ -8,32 +8,32 @@ using Dawning.Identity.Domain.Models.Gateway;
 namespace Dawning.Identity.Domain.Interfaces.Gateway
 {
     /// <summary>
-    /// 网关集群仓储接口
+    /// Gateway cluster repository interface
     /// </summary>
     public interface IGatewayClusterRepository
     {
         /// <summary>
-        /// 根据ID获取集群
+        /// Get cluster by ID
         /// </summary>
         Task<GatewayCluster?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据ClusterId获取集群
+        /// Get cluster by ClusterId
         /// </summary>
         Task<GatewayCluster?> GetByClusterIdAsync(string clusterId);
 
         /// <summary>
-        /// 获取所有启用的集群
+        /// Get all enabled clusters
         /// </summary>
         Task<IEnumerable<GatewayCluster>> GetAllEnabledAsync();
 
         /// <summary>
-        /// 获取所有集群（用于下拉选择）
+        /// Get all clusters (for dropdown selection)
         /// </summary>
         Task<IEnumerable<GatewayCluster>> GetAllAsync();
 
         /// <summary>
-        /// 获取分页集群列表
+        /// Get paginated cluster list
         /// </summary>
         Task<PagedData<GatewayCluster>> GetPagedListAsync(
             GatewayClusterQueryModel model,
@@ -42,27 +42,27 @@ namespace Dawning.Identity.Domain.Interfaces.Gateway
         );
 
         /// <summary>
-        /// 插入集群
+        /// Insert cluster
         /// </summary>
         ValueTask<int> InsertAsync(GatewayCluster model);
 
         /// <summary>
-        /// 更新集群
+        /// Update cluster
         /// </summary>
         ValueTask<int> UpdateAsync(GatewayCluster model);
 
         /// <summary>
-        /// 删除集群
+        /// Delete cluster
         /// </summary>
         ValueTask<int> DeleteAsync(Guid id);
 
         /// <summary>
-        /// 检查ClusterId是否已存在
+        /// Check if ClusterId already exists
         /// </summary>
         Task<bool> ExistsByClusterIdAsync(string clusterId, Guid? excludeId = null);
 
         /// <summary>
-        /// 检查集群是否被路由引用
+        /// Check if cluster is referenced by routes
         /// </summary>
         Task<bool> IsReferencedByRoutesAsync(string clusterId);
     }

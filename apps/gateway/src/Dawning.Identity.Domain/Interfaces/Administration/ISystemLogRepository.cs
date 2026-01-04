@@ -7,17 +7,17 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     /// <summary>
-    /// 系统日志仓储接口
+    /// System log repository interface
     /// </summary>
     public interface ISystemLogRepository
     {
         /// <summary>
-        /// 根据ID异步获取系统日志
+        /// Asynchronously get system log by ID
         /// </summary>
         Task<SystemLog?> GetAsync(Guid id);
 
         /// <summary>
-        /// 获取分页系统日志列表
+        /// Get paginated system log list
         /// </summary>
         Task<PagedData<SystemLog>> GetPagedListAsync(
             SystemLogQueryModel model,
@@ -26,12 +26,12 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         );
 
         /// <summary>
-        /// 异步插入系统日志
+        /// Asynchronously insert system log
         /// </summary>
         ValueTask<int> InsertAsync(SystemLog model);
 
         /// <summary>
-        /// 批量删除过期的系统日志（数据清理）
+        /// Batch delete expired system logs (data cleanup)
         /// </summary>
         Task<int> DeleteOlderThanAsync(DateTime date);
     }

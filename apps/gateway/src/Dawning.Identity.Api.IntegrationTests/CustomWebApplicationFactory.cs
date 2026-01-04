@@ -9,21 +9,21 @@ using Microsoft.Extensions.Hosting;
 namespace Dawning.Identity.Api.IntegrationTests;
 
 /// <summary>
-/// 自定义 WebApplicationFactory，用于配置集成测试环境
+/// Custom WebApplicationFactory for configuring integration test environment
 /// </summary>
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // 使用 Testing 环境，Program.cs 会跳过数据库种子
+        // Use Testing environment, Program.cs will skip database seeding
         builder.UseEnvironment("Testing");
 
         builder.ConfigureServices(services =>
         {
-            // 配置内存分布式缓存（替代 Redis）
+            // Configure in-memory distributed cache (replaces Redis)
             services.AddDistributedMemoryCache();
 
-            // 替换 RequestLoggingService 为空实现（避免连接真实数据库）
+            // Replace RequestLoggingService with null implementation (to avoid connecting to real database)
             services.RemoveAll<IRequestLoggingService>();
             services.AddSingleton<IRequestLoggingService, NullRequestLoggingService>();
         });
@@ -31,7 +31,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 }
 
 /// <summary>
-/// 空的请求日志服务实现（用于测试）
+/// Null request logging service implementation (for testing)
 /// </summary>
 public class NullRequestLoggingService : IRequestLoggingService
 {

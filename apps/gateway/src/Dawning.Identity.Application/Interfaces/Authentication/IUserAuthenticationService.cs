@@ -3,23 +3,23 @@ using Dawning.Identity.Application.Dtos.Authentication;
 namespace Dawning.Identity.Application.Interfaces.Authentication
 {
     /// <summary>
-    /// 用户认证服务接口
+    /// User authentication service interface
     /// </summary>
     public interface IUserAuthenticationService
     {
         /// <summary>
-        /// 验证用户凭据（用户名和密码）
+        /// Validate user credentials (username and password)
         /// </summary>
-        /// <param name="username">用户名</param>
-        /// <param name="password">密码</param>
-        /// <returns>验证成功返回用户信息，失败返回 null</returns>
+        /// <param name="username">Username</param>
+        /// <param name="password">Password</param>
+        /// <returns>Returns user information on success, null on failure</returns>
         Task<UserAuthenticationDto?> ValidateCredentialsAsync(string username, string password);
 
         /// <summary>
-        /// 根据用户ID获取用户信息
+        /// Get user information by user ID
         /// </summary>
-        /// <param name="userId">用户ID</param>
-        /// <returns>用户信息</returns>
+        /// <param name="userId">User ID</param>
+        /// <returns>User information</returns>
         Task<UserAuthenticationDto?> GetUserByIdAsync(string userId);
     }
 }

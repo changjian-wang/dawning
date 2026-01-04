@@ -10,47 +10,47 @@ namespace Dawning.Identity.Domain.Aggregates.Administration
     public class SystemConfigAggregate : IAggregateRoot
     {
         /// <summary>
-        /// 唯一Id
+        /// Unique ID
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 类型：Client，IdentityResource，ApiResource，ApiScope，也可以存储上级key来形成上下级联动查询
+        /// Type: Client, IdentityResource, ApiResource, ApiScope. Can also store parent key to form hierarchical linked queries
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 键
+        /// Key
         /// </summary>
         public string? Key { get; set; }
 
         /// <summary>
-        /// 值
+        /// Value
         /// </summary>
         public string? Value { get; set; }
 
         /// <summary>
-        /// 描述说明
+        /// Description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 用户是否可编辑
+        /// Whether non-editable by user
         /// </summary>
         public bool NonEditable { get; set; } = true;
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime Created { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? Updated { get; set; }
     }

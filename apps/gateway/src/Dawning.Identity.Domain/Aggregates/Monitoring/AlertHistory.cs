@@ -1,87 +1,87 @@
 namespace Dawning.Identity.Domain.Aggregates.Monitoring;
 
 /// <summary>
-/// 告警历史实体
+/// Alert History Entity
 /// </summary>
 public class AlertHistory
 {
     /// <summary>
-    /// 告警历史ID
+    /// Alert history ID
     /// </summary>
     public long Id { get; set; }
 
     /// <summary>
-    /// 告警规则ID
+    /// Alert rule ID
     /// </summary>
     public long RuleId { get; set; }
 
     /// <summary>
-    /// 规则名称(冗余)
+    /// Rule name (denormalized)
     /// </summary>
     public string RuleName { get; set; } = string.Empty;
 
     /// <summary>
-    /// 指标类型
+    /// Metric type
     /// </summary>
     public string MetricType { get; set; } = string.Empty;
 
     /// <summary>
-    /// 触发时的指标值
+    /// Metric value when triggered
     /// </summary>
     public decimal MetricValue { get; set; }
 
     /// <summary>
-    /// 阈值
+    /// Threshold
     /// </summary>
     public decimal Threshold { get; set; }
 
     /// <summary>
-    /// 严重程度
+    /// Severity
     /// </summary>
     public string Severity { get; set; } = "warning";
 
     /// <summary>
-    /// 告警消息
+    /// Alert message
     /// </summary>
     public string? Message { get; set; }
 
     /// <summary>
-    /// 状态: triggered, acknowledged, resolved
+    /// Status: triggered, acknowledged, resolved
     /// </summary>
     public string Status { get; set; } = "triggered";
 
     /// <summary>
-    /// 触发时间
+    /// Triggered time
     /// </summary>
     public DateTime TriggeredAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// 确认时间
+    /// Acknowledged time
     /// </summary>
     public DateTime? AcknowledgedAt { get; set; }
 
     /// <summary>
-    /// 确认人
+    /// Acknowledged by
     /// </summary>
     public string? AcknowledgedBy { get; set; }
 
     /// <summary>
-    /// 解决时间
+    /// Resolved time
     /// </summary>
     public DateTime? ResolvedAt { get; set; }
 
     /// <summary>
-    /// 解决人
+    /// Resolved by
     /// </summary>
     public string? ResolvedBy { get; set; }
 
     /// <summary>
-    /// 是否已发送通知
+    /// Whether notification was sent
     /// </summary>
     public bool NotifySent { get; set; }
 
     /// <summary>
-    /// 通知结果
+    /// Notification result
     /// </summary>
     public string? NotifyResult { get; set; }
 }

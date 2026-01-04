@@ -1,32 +1,32 @@
 namespace Dawning.Identity.Domain.Models.Gateway
 {
     /// <summary>
-    /// 网关集群查询模型
+    /// Gateway cluster query model
     /// </summary>
     public class GatewayClusterQueryModel
     {
         /// <summary>
-        /// 集群ID（模糊搜索）
+        /// Cluster ID (fuzzy search)
         /// </summary>
         public string? ClusterId { get; set; }
 
         /// <summary>
-        /// 集群名称（模糊搜索）
+        /// Cluster name (fuzzy search)
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 负载均衡策略
+        /// Load balancing policy
         /// </summary>
         public string? LoadBalancingPolicy { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Is enabled
         /// </summary>
         public bool? IsEnabled { get; set; }
 
         /// <summary>
-        /// 关键词（搜索集群ID、名称、描述）
+        /// Keyword (search cluster ID, name, description)
         /// </summary>
         public string? Keyword { get; set; }
     }

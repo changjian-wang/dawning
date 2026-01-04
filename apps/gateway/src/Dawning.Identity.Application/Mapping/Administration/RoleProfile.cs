@@ -8,7 +8,7 @@ using Dawning.Identity.Domain.Aggregates.Administration;
 namespace Dawning.Identity.Application.Mapping.Administration
 {
     /// <summary>
-    /// 角色映射Profile
+    /// Role mapping profile
     /// </summary>
     public class RoleProfile : Profile
     {
@@ -27,7 +27,7 @@ namespace Dawning.Identity.Application.Mapping.Administration
                     dest => dest.Permissions,
                     opt => opt.MapFrom(src => SerializePermissions(src.Permissions))
                 )
-                .ForMember(dest => dest.IsSystem, opt => opt.MapFrom(src => false)); // 新创建的角色不是系统角色
+                .ForMember(dest => dest.IsSystem, opt => opt.MapFrom(src => false)); // Newly created roles are not system roles
 
             // UpdateRoleDto -> Role
             CreateMap<UpdateRoleDto, Role>()

@@ -4,52 +4,52 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Gateway
 {
     /// <summary>
-    /// IP 访问规则聚合根
+    /// IP Access Rule Aggregate Root
     /// </summary>
     public class IpAccessRule : IAggregateRoot
     {
         /// <summary>
-        /// 唯一标识
+        /// Unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// IP 地址或 CIDR 范围 (如 192.168.1.0/24)
+        /// IP address or CIDR range (e.g., 192.168.1.0/24)
         /// </summary>
         public string IpAddress { get; set; } = string.Empty;
 
         /// <summary>
-        /// 规则类型: whitelist, blacklist
+        /// Rule type: whitelist, blacklist
         /// </summary>
         public string RuleType { get; set; } = "blacklist";
 
         /// <summary>
-        /// 描述
+        /// Description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 过期时间（可选，用于临时封禁）
+        /// Expiration time (optional, used for temporary bans)
         /// </summary>
         public DateTime? ExpiresAt { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者
+        /// Created by
         /// </summary>
         public string? CreatedBy { get; set; }
     }

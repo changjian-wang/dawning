@@ -14,7 +14,7 @@ using Yarp.ReverseProxy.LoadBalancing;
 namespace Dawning.Identity.Application.Services.Gateway
 {
     /// <summary>
-    /// 网关配置服务 - 从数据库读取 YARP 配置
+    /// Gateway configuration service - reads YARP configuration from database
     /// </summary>
     public class GatewayConfigService : IGatewayConfigService
     {
@@ -83,7 +83,7 @@ namespace Dawning.Identity.Application.Services.Gateway
             Dawning.Identity.Domain.Aggregates.Gateway.GatewayRoute dbRoute
         )
         {
-            // 解析 Match
+            // Parse Match
             var match = new RouteMatch
             {
                 Path = dbRoute.MatchPath,
@@ -93,10 +93,10 @@ namespace Dawning.Identity.Application.Services.Gateway
                 QueryParameters = ParseQueryParameters(dbRoute.MatchQueryParameters),
             };
 
-            // 解析 Transforms
+            // Parse Transforms
             var transforms = BuildTransforms(dbRoute);
 
-            // 解析 Metadata
+            // Parse Metadata
             var metadata = ParseMetadata(dbRoute.Metadata);
 
             return new RouteConfig
@@ -124,10 +124,10 @@ namespace Dawning.Identity.Application.Services.Gateway
             Dawning.Identity.Domain.Aggregates.Gateway.GatewayCluster dbCluster
         )
         {
-            // 解析目标地址
+            // Parse destination addresses
             var destinations = ParseDestinations(dbCluster.Destinations);
 
-            // 健康检查配置
+            // Health check configuration
             HealthCheckConfig? healthCheck = null;
             if (dbCluster.HealthCheckEnabled)
             {
@@ -147,7 +147,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 };
             }
 
-            // Session 亲和性配置
+            // Session affinity configuration
             SessionAffinityConfig? sessionAffinity = null;
             if (dbCluster.SessionAffinityEnabled)
             {
@@ -159,7 +159,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 };
             }
 
-            // HTTP 客户端配置
+            // HTTP client configuration
             HttpClientConfig? httpClient = null;
             if (dbCluster.MaxConnectionsPerServer.HasValue)
             {
@@ -169,7 +169,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 };
             }
 
-            // HTTP 请求配置
+            // HTTP request configuration
             ForwarderRequestConfig? httpRequest = null;
             if (dbCluster.RequestTimeoutSeconds.HasValue)
             {
@@ -179,7 +179,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 };
             }
 
-            // 解析 Metadata
+            // Parse Metadata
             var metadata = ParseMetadata(dbCluster.Metadata);
 
             return new ClusterConfig
@@ -278,7 +278,7 @@ namespace Dawning.Identity.Application.Services.Gateway
         {
             var transforms = new List<Dictionary<string, string>>();
 
-            // 移除路径前缀
+            // Remove path prefix
             if (!string.IsNullOrEmpty(dbRoute.TransformPathRemovePrefix))
             {
                 transforms.Add(
@@ -289,7 +289,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 );
             }
 
-            // 添加路径前缀
+            // Add path prefix
             if (!string.IsNullOrEmpty(dbRoute.TransformPathPrefix))
             {
                 transforms.Add(
@@ -297,7 +297,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 );
             }
 
-            // 请求头转换
+            // Request header transforms
             if (!string.IsNullOrEmpty(dbRoute.TransformRequestHeaders))
             {
                 try
@@ -322,7 +322,7 @@ namespace Dawning.Identity.Application.Services.Gateway
                 catch { }
             }
 
-            // 响应头转换
+            // Response header transforms
             if (!string.IsNullOrEmpty(dbRoute.TransformResponseHeaders))
             {
                 try
@@ -361,9 +361,9 @@ namespace Dawning.Identity.Application.Services.Gateway
 
             try
             {
-                // 支持两种格式：
-                // 1. 简单数组格式: [{"destinationId": "dest1", "address": "http://..."}]
-                // 2. 对象格式: {"dest1": {"Address": "http://..."}}
+                // Support two formats:
+                // 1. Simple array format: [{"destinationId": "dest1", "address": "http://..."}]
+                // 2. Object format: {"dest1": {"Address": "http://..."}}
 
                 var destinations = new Dictionary<string, DestinationConfig>();
 

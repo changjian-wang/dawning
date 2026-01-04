@@ -5,22 +5,22 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Application.Interfaces.Logging
 {
     /// <summary>
-    /// 请求日志服务接口
+    /// Request logging service interface
     /// </summary>
     public interface IRequestLoggingService
     {
         /// <summary>
-        /// 记录请求日志
+        /// Log a request
         /// </summary>
         Task LogRequestAsync(RequestLogEntry entry);
 
         /// <summary>
-        /// 获取请求日志（分页）
+        /// Get request logs (paginated)
         /// </summary>
         Task<PagedRequestLogs> GetLogsAsync(RequestLogQuery query);
 
         /// <summary>
-        /// 获取请求统计信息
+        /// Get request statistics
         /// </summary>
         Task<RequestStatistics> GetStatisticsAsync(
             DateTime? startTime = null,
@@ -28,297 +28,297 @@ namespace Dawning.Identity.Application.Interfaces.Logging
         );
 
         /// <summary>
-        /// 清理过期日志
+        /// Clean up expired logs
         /// </summary>
         Task<int> CleanupOldLogsAsync(int retentionDays);
     }
 
     /// <summary>
-    /// 请求日志条目
+    /// Request log entry
     /// </summary>
     public class RequestLogEntry
     {
         /// <summary>
-        /// 日志ID
+        /// Log ID
         /// </summary>
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// 请求ID（用于关联）
+        /// Request ID (for correlation)
         /// </summary>
         public string? RequestId { get; set; }
 
         /// <summary>
-        /// HTTP 方法
+        /// HTTP method
         /// </summary>
         public string Method { get; set; } = string.Empty;
 
         /// <summary>
-        /// 请求路径
+        /// Request path
         /// </summary>
         public string Path { get; set; } = string.Empty;
 
         /// <summary>
-        /// 查询字符串
+        /// Query string
         /// </summary>
         public string? QueryString { get; set; }
 
         /// <summary>
-        /// 状态码
+        /// Status code
         /// </summary>
         public int StatusCode { get; set; }
 
         /// <summary>
-        /// 响应时间（毫秒）
+        /// Response time (milliseconds)
         /// </summary>
         public long ResponseTimeMs { get; set; }
 
         /// <summary>
-        /// 客户端IP
+        /// Client IP
         /// </summary>
         public string? ClientIp { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User agent
         /// </summary>
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 用户ID（如果已认证）
+        /// User ID (if authenticated)
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 用户名
+        /// Username
         /// </summary>
         public string? UserName { get; set; }
 
         /// <summary>
-        /// 请求时间
+        /// Request time
         /// </summary>
         public DateTime RequestTime { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 请求体大小（字节）
+        /// Request body size (bytes)
         /// </summary>
         public long? RequestBodySize { get; set; }
 
         /// <summary>
-        /// 响应体大小（字节）
+        /// Response body size (bytes)
         /// </summary>
         public long? ResponseBodySize { get; set; }
 
         /// <summary>
-        /// 异常信息（如果有）
+        /// Exception information (if any)
         /// </summary>
         public string? Exception { get; set; }
 
         /// <summary>
-        /// 额外信息（JSON）
+        /// Additional information (JSON)
         /// </summary>
         public string? AdditionalInfo { get; set; }
     }
 
     /// <summary>
-    /// 请求日志查询参数
+    /// Request log query parameters
     /// </summary>
     public class RequestLogQuery
     {
         /// <summary>
-        /// 起始时间
+        /// Start time
         /// </summary>
         public DateTime? StartTime { get; set; }
 
         /// <summary>
-        /// 结束时间
+        /// End time
         /// </summary>
         public DateTime? EndTime { get; set; }
 
         /// <summary>
-        /// HTTP 方法过滤
+        /// HTTP method filter
         /// </summary>
         public string? Method { get; set; }
 
         /// <summary>
-        /// 路径过滤（支持模糊匹配）
+        /// Path filter (supports fuzzy matching)
         /// </summary>
         public string? Path { get; set; }
 
         /// <summary>
-        /// 状态码过滤
+        /// Status code filter
         /// </summary>
         public int? StatusCode { get; set; }
 
         /// <summary>
-        /// 最小状态码
+        /// Minimum status code
         /// </summary>
         public int? MinStatusCode { get; set; }
 
         /// <summary>
-        /// 最大状态码
+        /// Maximum status code
         /// </summary>
         public int? MaxStatusCode { get; set; }
 
         /// <summary>
-        /// 用户ID过滤
+        /// User ID filter
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 客户端IP过滤
+        /// Client IP filter
         /// </summary>
         public string? ClientIp { get; set; }
 
         /// <summary>
-        /// 只显示错误请求
+        /// Show only error requests
         /// </summary>
         public bool? OnlyErrors { get; set; }
 
         /// <summary>
-        /// 只显示慢请求（大于指定毫秒数）
+        /// Show only slow requests (greater than specified milliseconds)
         /// </summary>
         public long? SlowRequestThresholdMs { get; set; }
 
         /// <summary>
-        /// 页码
+        /// Page number
         /// </summary>
         public int Page { get; set; } = 1;
 
         /// <summary>
-        /// 每页数量
+        /// Page size
         /// </summary>
         public int PageSize { get; set; } = 20;
     }
 
     /// <summary>
-    /// 分页请求日志结果
+    /// Paginated request logs result
     /// </summary>
     public class PagedRequestLogs
     {
         /// <summary>
-        /// 日志列表
+        /// Log list
         /// </summary>
         public List<RequestLogEntry> Items { get; set; } = new();
 
         /// <summary>
-        /// 总数量
+        /// Total count
         /// </summary>
         public long TotalCount { get; set; }
 
         /// <summary>
-        /// 当前页码
+        /// Current page number
         /// </summary>
         public int Page { get; set; }
 
         /// <summary>
-        /// 每页数量
+        /// Page size
         /// </summary>
         public int PageSize { get; set; }
 
         /// <summary>
-        /// 总页数
+        /// Total pages
         /// </summary>
         public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
     }
 
     /// <summary>
-    /// 请求统计信息
+    /// Request statistics
     /// </summary>
     public class RequestStatistics
     {
         /// <summary>
-        /// 总请求数
+        /// Total requests
         /// </summary>
         public long TotalRequests { get; set; }
 
         /// <summary>
-        /// 成功请求数（2xx）
+        /// Successful requests (2xx)
         /// </summary>
         public long SuccessRequests { get; set; }
 
         /// <summary>
-        /// 客户端错误数（4xx）
+        /// Client errors (4xx)
         /// </summary>
         public long ClientErrors { get; set; }
 
         /// <summary>
-        /// 服务器错误数（5xx）
+        /// Server errors (5xx)
         /// </summary>
         public long ServerErrors { get; set; }
 
         /// <summary>
-        /// 平均响应时间（毫秒）
+        /// Average response time (milliseconds)
         /// </summary>
         public double AverageResponseTimeMs { get; set; }
 
         /// <summary>
-        /// 最大响应时间（毫秒）
+        /// Maximum response time (milliseconds)
         /// </summary>
         public long MaxResponseTimeMs { get; set; }
 
         /// <summary>
-        /// 最小响应时间（毫秒）
+        /// Minimum response time (milliseconds)
         /// </summary>
         public long MinResponseTimeMs { get; set; }
 
         /// <summary>
-        /// P95 响应时间（毫秒）
+        /// P95 response time (milliseconds)
         /// </summary>
         public long P95ResponseTimeMs { get; set; }
 
         /// <summary>
-        /// P99 响应时间（毫秒）
+        /// P99 response time (milliseconds)
         /// </summary>
         public long P99ResponseTimeMs { get; set; }
 
         /// <summary>
-        /// 按状态码分组统计
+        /// Statistics grouped by status code
         /// </summary>
         public Dictionary<int, long> StatusCodeDistribution { get; set; } = new();
 
         /// <summary>
-        /// 按路径分组统计（Top 10）
+        /// Statistics grouped by path (Top 10)
         /// </summary>
         public List<PathStatistic> TopPaths { get; set; } = new();
 
         /// <summary>
-        /// 按小时分组请求量
+        /// Requests grouped by hour
         /// </summary>
         public Dictionary<string, long> HourlyRequests { get; set; } = new();
 
         /// <summary>
-        /// 统计时间范围
+        /// Statistics time range start
         /// </summary>
         public DateTime StartTime { get; set; }
 
         /// <summary>
-        /// 统计时间范围
+        /// Statistics time range end
         /// </summary>
         public DateTime EndTime { get; set; }
     }
 
     /// <summary>
-    /// 路径统计
+    /// Path statistics
     /// </summary>
     public class PathStatistic
     {
         /// <summary>
-        /// 路径
+        /// Path
         /// </summary>
         public string Path { get; set; } = string.Empty;
 
         /// <summary>
-        /// 请求次数
+        /// Request count
         /// </summary>
         public long RequestCount { get; set; }
 
         /// <summary>
-        /// 平均响应时间
+        /// Average response time
         /// </summary>
         public double AverageResponseTimeMs { get; set; }
 
         /// <summary>
-        /// 错误次数
+        /// Error count
         /// </summary>
         public long ErrorCount { get; set; }
     }

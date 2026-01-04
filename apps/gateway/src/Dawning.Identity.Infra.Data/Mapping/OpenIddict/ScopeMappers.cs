@@ -10,7 +10,7 @@ using Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict;
 namespace Dawning.Identity.Infra.Data.Mapping.OpenIddict
 {
     /// <summary>
-    /// Scope 映射器
+    /// Scope mapper
     /// </summary>
     public static class ScopeMappers
     {

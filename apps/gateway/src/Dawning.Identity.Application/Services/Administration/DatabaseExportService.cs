@@ -6,27 +6,27 @@ using Dapper;
 namespace Dawning.Identity.Application.Services.Administration;
 
 /// <summary>
-/// 数据库导出服务接口
+/// Database export service interface
 /// </summary>
 public interface IDatabaseExportService
 {
     /// <summary>
-    /// 导出数据库到 SQL 格式
+    /// Export database to SQL format
     /// </summary>
-    /// <param name="connection">数据库连接</param>
-    /// <param name="excludeTables">要排除的表名集合</param>
-    /// <returns>SQL 格式的数据库备份内容</returns>
+    /// <param name="connection">Database connection</param>
+    /// <param name="excludeTables">Set of table names to exclude</param>
+    /// <returns>Database backup content in SQL format</returns>
     Task<string> ExportToSqlAsync(IDbConnection connection, HashSet<string>? excludeTables = null);
 }
 
 /// <summary>
-/// 数据库导出服务实现
-/// 使用 ADO.NET GetSchema() 实现跨数据库兼容
+/// Database export service implementation
+/// Uses ADO.NET GetSchema() for cross-database compatibility
 /// </summary>
 public class DatabaseExportService : IDatabaseExportService
 {
     /// <summary>
-    /// 导出数据库到 SQL 格式
+    /// Export database to SQL format
     /// </summary>
     public async Task<string> ExportToSqlAsync(
         IDbConnection connection,
@@ -49,12 +49,12 @@ public class DatabaseExportService : IDatabaseExportService
 
         try
         {
-            // 使用 ADO.NET GetSchema 获取表列表（跨数据库兼容）
+            // Use ADO.NET GetSchema to get table list (cross-database compatible)
             var tables = GetTableNames(connection, excludeTables);
 
             foreach (var table in tables)
             {
-                // 导出表数据
+                // Export table data
                 await ExportTableDataAsync(connection, table, sb);
             }
         }
@@ -70,7 +70,7 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 获取所有表名（使用 ADO.NET GetSchema，跨数据库兼容）
+    /// Get all table names (using ADO.NET GetSchema, cross-database compatible)
     /// </summary>
     private List<string> GetTableNames(IDbConnection connection, HashSet<string> excludeTables)
     {
@@ -78,12 +78,12 @@ public class DatabaseExportService : IDatabaseExportService
 
         if (connection is DbConnection dbConnection)
         {
-            // 使用 ADO.NET 标准方式获取表信息
+            // Use ADO.NET standard way to get table information
             var schema = dbConnection.GetSchema("Tables");
 
             foreach (DataRow row in schema.Rows)
             {
-                // 不同数据库的列名可能不同，尝试常见的列名
+                // Different databases may have different column names, try common column names
                 var tableName = GetTableNameFromRow(row);
 
                 if (
@@ -101,11 +101,11 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 从 DataRow 获取表名
+    /// Get table name from DataRow
     /// </summary>
     private string? GetTableNameFromRow(DataRow row)
     {
-        // 不同数据库使用不同的列名
+        // Different databases use different column names
         string[] possibleColumns = { "TABLE_NAME", "table_name", "TableName", "Name" };
 
         foreach (var col in possibleColumns)
@@ -120,11 +120,11 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 判断是否为系统表
+    /// Check if it is a system table
     /// </summary>
     private bool IsSystemTable(string tableName)
     {
-        // 排除常见的系统表前缀
+        // Exclude common system table prefixes
         var systemPrefixes = new[] { "sys", "pg_", "sqlite_", "mysql.", "information_schema." };
         var lowerName = tableName.ToLowerInvariant();
 
@@ -132,7 +132,7 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 导出表数据（使用 Dapper，跨数据库兼容）
+    /// Export table data (using Dapper, cross-database compatible)
     /// </summary>
     private async Task ExportTableDataAsync(
         IDbConnection connection,
@@ -140,7 +140,7 @@ public class DatabaseExportService : IDatabaseExportService
         StringBuilder sb
     )
     {
-        // 使用参数化的表名（注意：表名无法参数化，但这里的表名来自 GetSchema，是安全的）
+        // Use parameterized table name (Note: table names cannot be parameterized, but here the table name comes from GetSchema, which is safe)
         var quotedTable = QuoteIdentifier(tableName, connection);
         var rows = await connection.QueryAsync($"SELECT * FROM {quotedTable}");
         var rowList = rows.ToList();
@@ -164,7 +164,7 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 引用标识符（根据数据库类型使用不同的引号）
+    /// Quote identifier (use different quotes based on database type)
     /// </summary>
     private string QuoteIdentifier(string identifier, IDbConnection connection)
     {
@@ -175,12 +175,12 @@ public class DatabaseExportService : IDatabaseExportService
             var t when t.Contains("mysql") => $"`{identifier}`",
             var t when t.Contains("sqlserver") || t.Contains("sqlconnection") => $"[{identifier}]",
             var t when t.Contains("npgsql") || t.Contains("postgres") => $"\"{identifier}\"",
-            _ => $"`{identifier}`" // 默认使用反引号
+            _ => $"`{identifier}`" // Default to backticks
         };
     }
 
     /// <summary>
-    /// 格式化 SQL 值
+    /// Format SQL value
     /// </summary>
     private static string FormatSqlValue(object? value)
     {
@@ -200,10 +200,10 @@ public class DatabaseExportService : IDatabaseExportService
     }
 
     /// <summary>
-    /// 转义 SQL 字符串
+    /// Escape SQL string
     /// </summary>
     private static string EscapeSqlString(string value)
     {
-        return value.Replace("\\", "\\\\").Replace("'", "''"); // SQL 标准转义
+        return value.Replace("\\", "\\\\").Replace("'", "''"); // SQL standard escape
     }
 }

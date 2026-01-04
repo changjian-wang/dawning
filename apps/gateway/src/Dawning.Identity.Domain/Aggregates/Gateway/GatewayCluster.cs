@@ -4,129 +4,129 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Gateway
 {
     /// <summary>
-    /// 网关集群聚合根
-    /// 用于管理 YARP 反向代理的后端集群配置
+    /// Gateway Cluster Aggregate Root
+    /// Used for managing YARP reverse proxy backend cluster configuration
     /// </summary>
     public class GatewayCluster : IAggregateRoot
     {
         /// <summary>
-        /// 集群唯一标识
+        /// Cluster unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 集群ID（YARP配置中使用的标识符）
+        /// Cluster ID (identifier used in YARP configuration)
         /// </summary>
         public string ClusterId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 集群名称
+        /// Cluster name
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 集群描述
+        /// Cluster description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 负载均衡策略 (RoundRobin, Random, LeastRequests, PowerOfTwoChoices, First)
+        /// Load balancing policy (RoundRobin, Random, LeastRequests, PowerOfTwoChoices, First)
         /// </summary>
         public string LoadBalancingPolicy { get; set; } = "RoundRobin";
 
         /// <summary>
-        /// 目标地址列表（JSON格式）
-        /// 格式: [{"destinationId": "dest1", "address": "http://localhost:5001", "health": "http://localhost:5001/health"}]
+        /// Destination address list (JSON format)
+        /// Format: [{"destinationId": "dest1", "address": "http://localhost:5001", "health": "http://localhost:5001/health"}]
         /// </summary>
         public string Destinations { get; set; } = "[]";
 
         /// <summary>
-        /// 健康检查配置 - 是否启用主动健康检查
+        /// Health check configuration - Enable active health check
         /// </summary>
         public bool HealthCheckEnabled { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 检查间隔（秒）
+        /// Health check configuration - Check interval (seconds)
         /// </summary>
         public int? HealthCheckInterval { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 超时时间（秒）
+        /// Health check configuration - Timeout (seconds)
         /// </summary>
         public int? HealthCheckTimeout { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 健康检查路径
+        /// Health check configuration - Health check path
         /// </summary>
         public string? HealthCheckPath { get; set; }
 
         /// <summary>
-        /// 健康检查配置 - 被动健康检查策略
+        /// Health check configuration - Passive health check policy
         /// </summary>
         public string? PassiveHealthPolicy { get; set; }
 
         /// <summary>
-        /// 会话亲和性配置 - 是否启用
+        /// Session affinity configuration - Enable
         /// </summary>
         public bool SessionAffinityEnabled { get; set; }
 
         /// <summary>
-        /// 会话亲和性配置 - 策略 (Cookie, CustomHeader)
+        /// Session affinity configuration - Policy (Cookie, CustomHeader)
         /// </summary>
         public string? SessionAffinityPolicy { get; set; }
 
         /// <summary>
-        /// 会话亲和性配置 - 亲和键名
+        /// Session affinity configuration - Affinity key name
         /// </summary>
         public string? SessionAffinityKeyName { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 最大连接数
+        /// HTTP client configuration - Maximum connections per server
         /// </summary>
         public int? MaxConnectionsPerServer { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 请求超时（秒）
+        /// HTTP client configuration - Request timeout (seconds)
         /// </summary>
         public int? RequestTimeoutSeconds { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 允许的HTTP版本（逗号分隔，如 "1.1,2"）
+        /// HTTP client configuration - Allowed HTTP versions (comma-separated, e.g., "1.1,2")
         /// </summary>
         public string? AllowedHttpVersions { get; set; }
 
         /// <summary>
-        /// HTTP客户端配置 - 是否验证SSL证书
+        /// HTTP client configuration - Whether to validate SSL certificate
         /// </summary>
         public bool DangerousAcceptAnyServerCertificate { get; set; }
 
         /// <summary>
-        /// 元数据（JSON格式）
+        /// Metadata (JSON format)
         /// </summary>
         public string? Metadata { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者
+        /// Created by
         /// </summary>
         public string? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者
+        /// Updated by
         /// </summary>
         public string? UpdatedBy { get; set; }
     }

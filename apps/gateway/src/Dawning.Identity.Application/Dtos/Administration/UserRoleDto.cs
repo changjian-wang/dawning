@@ -5,69 +5,69 @@ using Dawning.Identity.Application.Dtos.User;
 namespace Dawning.Identity.Application.Dtos.Administration
 {
     /// <summary>
-    /// 用户角色关联DTO
+    /// User Role Association DTO
     /// </summary>
     public class UserRoleDto
     {
         /// <summary>
-        /// 关联ID
+        /// Association ID
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 用户ID
+        /// User ID
         /// </summary>
         public Guid UserId { get; set; }
 
         /// <summary>
-        /// 角色ID
+        /// Role ID
         /// </summary>
         public Guid RoleId { get; set; }
 
         /// <summary>
-        /// 角色名称
+        /// Role Name
         /// </summary>
         public string? RoleName { get; set; }
 
         /// <summary>
-        /// 角色显示名称
+        /// Role Display Name
         /// </summary>
         public string? RoleDisplayName { get; set; }
 
         /// <summary>
-        /// 分配时间
+        /// Assignment Time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 分配者ID
+        /// Assigner ID
         /// </summary>
         public Guid? CreatedBy { get; set; }
     }
 
     /// <summary>
-    /// 分配角色请求DTO
+    /// Assign Roles Request DTO
     /// </summary>
     public class AssignRolesDto
     {
         /// <summary>
-        /// 用户ID
+        /// User ID
         /// </summary>
         public Guid UserId { get; set; }
 
         /// <summary>
-        /// 角色ID列表
+        /// Role ID List
         /// </summary>
         public List<Guid> RoleIds { get; set; } = new();
     }
 
     /// <summary>
-    /// 用户详情（含角色）DTO
+    /// User Details (with Roles) DTO
     /// </summary>
     public class UserWithRolesDto : UserDto
     {
         /// <summary>
-        /// 用户的角色列表
+        /// User's Role List
         /// </summary>
         public List<RoleDto> Roles { get; set; } = new();
     }

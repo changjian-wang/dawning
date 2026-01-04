@@ -3,29 +3,29 @@ using System.Collections.Generic;
 namespace Dawning.Identity.Domain.Models
 {
     /// <summary>
-    /// Cursor 分页数据
+    /// Cursor paged data
     /// </summary>
-    /// <typeparam name="T">数据类型</typeparam>
+    /// <typeparam name="T">Data type</typeparam>
     public class CursorPagedData<T>
         where T : class, new()
     {
         /// <summary>
-        /// 每页数量
+        /// Number of items per page
         /// </summary>
         public int PageSize { get; init; }
 
         /// <summary>
-        /// 是否有下一页
+        /// Whether there is a next page
         /// </summary>
         public bool HasNextPage { get; init; }
 
         /// <summary>
-        /// 下一页游标（最后一条记录的 Timestamp）
+        /// Next page cursor (Timestamp of the last record)
         /// </summary>
         public long? NextCursor { get; init; }
 
         /// <summary>
-        /// 数据列表
+        /// Data list
         /// </summary>
         public List<T> Items { get; init; } = new List<T>();
     }

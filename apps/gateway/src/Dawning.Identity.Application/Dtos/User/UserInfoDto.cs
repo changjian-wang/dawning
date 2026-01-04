@@ -1,47 +1,47 @@
 namespace Dawning.Identity.Application.Dtos.User
 {
     /// <summary>
-    /// 用户信息响应 DTO
+    /// User Info Response DTO
     /// </summary>
     public class UserInfoDto
     {
         /// <summary>
-        /// 用户ID
+        /// User ID
         /// </summary>
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
-        /// 用户名
+        /// Username
         /// </summary>
         public string Username { get; set; } = string.Empty;
 
         /// <summary>
-        /// 邮箱
+        /// Email
         /// </summary>
         public string Email { get; set; } = string.Empty;
 
         /// <summary>
-        /// 角色列表
+        /// Role List
         /// </summary>
         public List<string> Roles { get; set; } = new();
 
         /// <summary>
-        /// 显示名称
+        /// Display Name
         /// </summary>
         public string? Name { get; set; }
 
         /// <summary>
-        /// 头像 URL
+        /// Avatar URL
         /// </summary>
         public string? Avatar { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime? CreatedAt { get; set; }
 
         /// <summary>
-        /// 是否激活
+        /// Is Active
         /// </summary>
         public bool IsActive { get; set; }
     }

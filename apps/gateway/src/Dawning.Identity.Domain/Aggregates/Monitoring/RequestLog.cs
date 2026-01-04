@@ -3,7 +3,7 @@ using System;
 namespace Dawning.Identity.Domain.Aggregates.Monitoring;
 
 /// <summary>
-/// 请求日志聚合根
+/// Request Log Aggregate Root
 /// </summary>
 public class RequestLog
 {

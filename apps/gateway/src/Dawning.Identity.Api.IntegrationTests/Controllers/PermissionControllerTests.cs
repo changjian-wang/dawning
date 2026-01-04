@@ -5,14 +5,14 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 权限控制器集成测试
+/// Permission controller integration tests
 /// </summary>
 public class PermissionControllerTests : IntegrationTestBase
 {
     public PermissionControllerTests(CustomWebApplicationFactory factory)
         : base(factory) { }
 
-    #region 未认证测试
+    #region Unauthenticated tests
 
     [Fact]
     public async Task GetPermissionById_WithoutAuth_ReturnsUnauthorized()
@@ -149,7 +149,7 @@ public class PermissionControllerTests : IntegrationTestBase
 
     #endregion
 
-    #region 端点可达性测试
+    #region Endpoint reachability tests
 
     [Fact]
     public async Task GetPermissionList_WithPagination_ReturnsUnauthorized()

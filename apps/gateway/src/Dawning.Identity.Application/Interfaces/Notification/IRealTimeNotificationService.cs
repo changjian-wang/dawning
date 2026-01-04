@@ -1,39 +1,39 @@
 namespace Dawning.Identity.Application.Interfaces.Notification;
 
 /// <summary>
-/// 实时推送服务接口
-/// 用于将告警、系统消息等实时推送给用户
+/// Real-time push service interface
+/// Used for pushing alerts, system messages, etc. to users in real-time
 /// </summary>
 public interface IRealTimeNotificationService
 {
     /// <summary>
-    /// 推送告警通知
+    /// Push alert notification
     /// </summary>
     Task SendAlertNotificationAsync(RealTimeAlertNotification alert);
 
     /// <summary>
-    /// 推送系统消息
+    /// Push system message
     /// </summary>
     Task SendSystemMessageAsync(RealTimeSystemMessage message);
 
     /// <summary>
-    /// 推送日志条目（实时日志流）
+    /// Push log entry (real-time log stream)
     /// </summary>
     Task SendLogEntryAsync(RealTimeLogEntry logEntry);
 
     /// <summary>
-    /// 推送通知给指定用户
+    /// Push notification to specific user
     /// </summary>
     Task SendToUserAsync(Guid userId, RealTimeNotification notification);
 
     /// <summary>
-    /// 推送通知给指定角色
+    /// Push notification to specific role
     /// </summary>
     Task SendToRoleAsync(string role, RealTimeNotification notification);
 }
 
 /// <summary>
-/// 实时通知基类
+/// Real-time notification base class
 /// </summary>
 public class RealTimeNotification
 {
@@ -46,7 +46,7 @@ public class RealTimeNotification
 }
 
 /// <summary>
-/// 实时告警通知
+/// Real-time alert notification
 /// </summary>
 public class RealTimeAlertNotification : RealTimeNotification
 {
@@ -59,7 +59,7 @@ public class RealTimeAlertNotification : RealTimeNotification
 }
 
 /// <summary>
-/// 实时系统消息
+/// Real-time system message
 /// </summary>
 public class RealTimeSystemMessage : RealTimeNotification
 {
@@ -69,7 +69,7 @@ public class RealTimeSystemMessage : RealTimeNotification
 }
 
 /// <summary>
-/// 实时日志条目
+/// Real-time log entry
 /// </summary>
 public class RealTimeLogEntry
 {

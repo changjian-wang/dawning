@@ -1,18 +1,18 @@
 namespace Dawning.Identity.Application.Interfaces.Messaging;
 
 /// <summary>
-/// 消息总线接口 - 发布/订阅抽象
+/// Message bus interface - Publish/Subscribe abstraction
 /// </summary>
 public interface IMessageBus
 {
     /// <summary>
-    /// 发布消息到指定主题
+    /// Publish message to specified topic
     /// </summary>
-    /// <typeparam name="T">消息类型</typeparam>
-    /// <param name="topic">主题名称</param>
-    /// <param name="message">消息内容</param>
-    /// <param name="key">消息键（用于分区）</param>
-    /// <param name="cancellationToken">取消令牌</param>
+    /// <typeparam name="T">Message type</typeparam>
+    /// <param name="topic">Topic name</param>
+    /// <param name="message">Message content</param>
+    /// <param name="key">Message key (for partitioning)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
     Task PublishAsync<T>(
         string topic,
         T message,
@@ -22,7 +22,7 @@ public interface IMessageBus
         where T : class;
 
     /// <summary>
-    /// 发布消息（使用消息类型名作为主题）
+    /// Publish message (using message type name as topic)
     /// </summary>
     Task PublishAsync<T>(
         T message,
@@ -33,30 +33,30 @@ public interface IMessageBus
 }
 
 /// <summary>
-/// 消息处理器接口
+/// Message handler interface
 /// </summary>
-/// <typeparam name="T">消息类型</typeparam>
+/// <typeparam name="T">Message type</typeparam>
 public interface IMessageHandler<in T>
     where T : class
 {
     /// <summary>
-    /// 处理消息
+    /// Handle message
     /// </summary>
     Task HandleAsync(T message, CancellationToken cancellationToken = default);
 }
 
 /// <summary>
-/// 消息消费者接口
+/// Message consumer interface
 /// </summary>
 public interface IMessageConsumer
 {
     /// <summary>
-    /// 开始消费消息
+    /// Start consuming messages
     /// </summary>
     Task StartAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// 停止消费消息
+    /// Stop consuming messages
     /// </summary>
     Task StopAsync(CancellationToken cancellationToken);
 }

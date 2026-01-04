@@ -12,7 +12,7 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Application.Services.Administration
 {
     /// <summary>
-    /// 审计日志应用服务实现
+    /// Audit log application service implementation
     /// </summary>
     public class AuditLogService : IAuditLogService
     {
@@ -26,7 +26,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 根据ID获取审计日志
+        /// Get audit log by ID
         /// </summary>
         public async Task<AuditLogDto?> GetAsync(Guid id)
         {
@@ -35,7 +35,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取分页审计日志列表
+        /// Get paged audit log list
         /// </summary>
         public async Task<PagedData<AuditLogDto>> GetPagedListAsync(
             AuditLogModel model,
@@ -55,7 +55,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 创建审计日志
+        /// Create audit log
         /// </summary>
         public async Task<AuditLogDto> CreateAsync(CreateAuditLogDto dto)
         {
@@ -69,7 +69,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 删除过期的审计日志
+        /// Delete expired audit logs
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime date)
         {

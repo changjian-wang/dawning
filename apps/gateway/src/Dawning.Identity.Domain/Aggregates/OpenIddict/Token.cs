@@ -4,54 +4,54 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.OpenIddict
 {
     /// <summary>
-    /// OpenIddict 令牌聚合根
+    /// OpenIddict Token Aggregate Root
     /// </summary>
     public class Token : IAggregateRoot
     {
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 关联的应用程序 ID
+        /// Associated application ID
         /// </summary>
         public Guid? ApplicationId { get; set; }
 
         /// <summary>
-        /// 关联的授权 ID
+        /// Associated authorization ID
         /// </summary>
         public Guid? AuthorizationId { get; set; }
 
         /// <summary>
-        /// 用户标识
+        /// User subject identifier
         /// </summary>
         public string? Subject { get; set; }
 
         /// <summary>
-        /// 令牌类型（access_token, refresh_token, id_token）
+        /// Token type (access_token, refresh_token, id_token)
         /// </summary>
         public string? Type { get; set; }
 
         /// <summary>
-        /// 令牌状态（valid, revoked, redeemed）
+        /// Token status (valid, revoked, redeemed)
         /// </summary>
         public string? Status { get; set; }
 
         /// <summary>
-        /// 令牌负载（JWT）
+        /// Token payload (JWT)
         /// </summary>
         public string? Payload { get; set; }
 
         /// <summary>
-        /// 引用 ID（用于令牌内省）
+        /// Reference ID (used for token introspection)
         /// </summary>
         public string? ReferenceId { get; set; }
 
         /// <summary>
-        /// 过期时间
+        /// Expiration time
         /// </summary>
         public DateTime? ExpiresAt { get; set; }
 
         /// <summary>
-        /// 过期时间（OpenIddict 命名）
+        /// Expiration time (OpenIddict naming convention)
         /// </summary>
         public DateTime? ExpirationDate
         {
@@ -60,22 +60,22 @@ namespace Dawning.Identity.Domain.Aggregates.OpenIddict
         }
 
         /// <summary>
-        /// 使用时间（令牌被使用的时间）
+        /// Redemption time (when the token was used)
         /// </summary>
         public DateTime? RedemptionDate { get; set; }
 
         /// <summary>
-        /// 扩展属性
+        /// Extension properties
         /// </summary>
         public Dictionary<string, string> Properties { get; set; } = new();
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 业务方法：检查令牌是否过期
+        /// Business method: Check if token is expired
         /// </summary>
         public bool IsExpired()
         {

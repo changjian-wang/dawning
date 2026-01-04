@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 namespace Dawning.Identity.Domain.Models.OpenIddict
 {
     /// <summary>
-    /// Application 查询模型
+    /// Application query model
     /// </summary>
     public class ApplicationModel
     {
         /// <summary>
-        /// 客户端 ID
+        /// Client ID
         /// </summary>
         public string? ClientId { get; set; }
 
         /// <summary>
-        /// 显示名称
+        /// Display name
         /// </summary>
         public string? DisplayName { get; set; }
 
         /// <summary>
-        /// 客户端类型（confidential, public）
+        /// Client type (confidential, public)
         /// </summary>
         public string? Type { get; set; }
     }

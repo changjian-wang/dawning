@@ -1,28 +1,28 @@
 namespace Dawning.Identity.Application.Interfaces.Monitoring;
 
 /// <summary>
-/// 告警通知服务接口
+/// Alert notification service interface
 /// </summary>
 public interface IAlertNotificationService
 {
     /// <summary>
-    /// 发送邮件通知
+    /// Send email notification
     /// </summary>
     Task<NotificationResult> SendEmailNotificationAsync(AlertNotificationContext context);
 
     /// <summary>
-    /// 发送 Webhook 通知
+    /// Send webhook notification
     /// </summary>
     Task<NotificationResult> SendWebhookNotificationAsync(AlertNotificationContext context);
 
     /// <summary>
-    /// 发送所有配置的通知
+    /// Send all configured notifications
     /// </summary>
     Task<NotificationResult> SendNotificationsAsync(AlertNotificationContext context);
 }
 
 /// <summary>
-/// 告警通知上下文
+/// Alert notification context
 /// </summary>
 public class AlertNotificationContext
 {
@@ -41,7 +41,7 @@ public class AlertNotificationContext
 }
 
 /// <summary>
-/// 通知发送结果
+/// Notification send result
 /// </summary>
 public class NotificationResult
 {

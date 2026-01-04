@@ -7,32 +7,32 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     /// <summary>
-    /// 用户仓储接口
+    /// User repository interface
     /// </summary>
     public interface IUserRepository
     {
         /// <summary>
-        /// 根据ID异步获取用户
+        /// Asynchronously get user by ID
         /// </summary>
         Task<User?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据用户名获取用户
+        /// Get user by username
         /// </summary>
         Task<User?> GetByUsernameAsync(string username);
 
         /// <summary>
-        /// 根据邮箱获取用户
+        /// Get user by email
         /// </summary>
         Task<User?> GetByEmailAsync(string email);
 
         /// <summary>
-        /// 获取分页用户列表
+        /// Get paginated user list
         /// </summary>
         Task<PagedData<User>> GetPagedListAsync(UserModel model, int page, int itemsPerPage);
 
         /// <summary>
-        /// 获取用户列表（Cursor 分页）
+        /// Get user list (cursor pagination)
         /// </summary>
         Task<CursorPagedData<User>> GetPagedListByCursorAsync(
             UserModel model,
@@ -41,37 +41,37 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         );
 
         /// <summary>
-        /// 异步插入用户
+        /// Asynchronously insert user
         /// </summary>
         ValueTask<int> InsertAsync(User model);
 
         /// <summary>
-        /// 异步更新用户
+        /// Asynchronously update user
         /// </summary>
         ValueTask<bool> UpdateAsync(User model);
 
         /// <summary>
-        /// 异步删除用户（软删除）
+        /// Asynchronously delete user (soft delete)
         /// </summary>
         ValueTask<bool> DeleteAsync(User model);
 
         /// <summary>
-        /// 检查用户名是否存在
+        /// Check if username exists
         /// </summary>
         Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null);
 
         /// <summary>
-        /// 检查邮箱是否存在
+        /// Check if email exists
         /// </summary>
         Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null);
 
         /// <summary>
-        /// 获取用户锁定结束时间（如果处于锁定状态）
+        /// Get user lockout end time (if in locked state)
         /// </summary>
         Task<DateTime?> GetLockoutEndAsync(string username);
 
         /// <summary>
-        /// 记录登录失败并返回更新后的状态
+        /// Record failed login attempt and return updated status
         /// </summary>
         Task<(int FailedCount, bool IsLockedOut, DateTime? LockoutEnd)> RecordFailedLoginAsync(
             string username,
@@ -80,12 +80,12 @@ namespace Dawning.Identity.Domain.Interfaces.Administration
         );
 
         /// <summary>
-        /// 重置登录失败计数
+        /// Reset failed login count
         /// </summary>
         Task ResetFailedLoginCountAsync(string username);
 
         /// <summary>
-        /// 解锁用户账户
+        /// Unlock user account
         /// </summary>
         Task UnlockUserAsync(Guid userId);
     }

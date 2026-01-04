@@ -1,38 +1,38 @@
 namespace Dawning.Identity.Application.Interfaces.Messaging;
 
 /// <summary>
-/// 消息基类
+/// Message base class
 /// </summary>
 public abstract class MessageBase
 {
     /// <summary>
-    /// 消息 ID
+    /// Message ID
     /// </summary>
     public string MessageId { get; set; } = Guid.NewGuid().ToString();
 
     /// <summary>
-    /// 消息创建时间
+    /// Message creation time
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// 消息来源服务
+    /// Source service
     /// </summary>
     public string? SourceService { get; set; }
 
     /// <summary>
-    /// 租户 ID
+    /// Tenant ID
     /// </summary>
     public Guid? TenantId { get; set; }
 
     /// <summary>
-    /// 关联 ID（用于分布式追踪）
+    /// Correlation ID (for distributed tracing)
     /// </summary>
     public string? CorrelationId { get; set; }
 }
 
 /// <summary>
-/// 审计日志消息
+/// Audit log message
 /// </summary>
 public class AuditLogMessage : MessageBase
 {
@@ -49,7 +49,7 @@ public class AuditLogMessage : MessageBase
 }
 
 /// <summary>
-/// 告警通知消息
+/// Alert notification message
 /// </summary>
 public class AlertNotificationMessage : MessageBase
 {
@@ -64,7 +64,7 @@ public class AlertNotificationMessage : MessageBase
 }
 
 /// <summary>
-/// 邮件发送消息
+/// Email message
 /// </summary>
 public class EmailMessage : MessageBase
 {
@@ -79,7 +79,7 @@ public class EmailMessage : MessageBase
 }
 
 /// <summary>
-/// 用户事件消息
+/// User event message
 /// </summary>
 public class UserEventMessage : MessageBase
 {
@@ -91,7 +91,7 @@ public class UserEventMessage : MessageBase
 }
 
 /// <summary>
-/// 系统事件消息
+/// System event message
 /// </summary>
 public class SystemEventMessage : MessageBase
 {
@@ -102,7 +102,7 @@ public class SystemEventMessage : MessageBase
 }
 
 /// <summary>
-/// 配置变更消息（用于分布式配置同步）
+/// Config changed message (for distributed config synchronization)
 /// </summary>
 public class ConfigChangedMessage : MessageBase
 {
@@ -114,7 +114,7 @@ public class ConfigChangedMessage : MessageBase
 }
 
 /// <summary>
-/// 缓存失效消息（分布式缓存同步）
+/// Cache invalidation message (distributed cache sync)
 /// </summary>
 public class CacheInvalidationMessage : MessageBase
 {

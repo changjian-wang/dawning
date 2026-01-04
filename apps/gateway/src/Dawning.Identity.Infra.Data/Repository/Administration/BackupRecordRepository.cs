@@ -12,7 +12,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Administration;
 
 /// <summary>
-/// 备份记录仓储实现
+/// Backup record repository implementation
 /// </summary>
 public class BackupRecordRepository : IBackupRecordRepository
 {
@@ -24,7 +24,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 获取备份历史列表
+    /// Get backup history list
     /// </summary>
     public async Task<List<BackupRecord>> GetHistoryAsync(int count = 20)
     {
@@ -38,7 +38,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 根据ID获取备份记录
+    /// Get backup record by ID
     /// </summary>
     public async Task<BackupRecord?> GetByIdAsync(Guid id)
     {
@@ -50,7 +50,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 创建备份记录
+    /// Create backup record
     /// </summary>
     public async Task<bool> CreateAsync(BackupRecord record)
     {
@@ -60,7 +60,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 更新备份记录
+    /// Update backup record
     /// </summary>
     public async Task<bool> UpdateAsync(BackupRecord record)
     {
@@ -69,7 +69,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 删除备份记录
+    /// Delete backup record
     /// </summary>
     public async Task<bool> DeleteAsync(Guid id)
     {
@@ -78,7 +78,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 获取过期备份记录
+    /// Get expired backup records
     /// </summary>
     public async Task<List<BackupRecord>> GetExpiredAsync(DateTime cutoffDate)
     {
@@ -91,7 +91,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     }
 
     /// <summary>
-    /// 批量删除过期备份记录
+    /// Batch delete expired backup records
     /// </summary>
     public async Task<int> DeleteExpiredAsync(DateTime cutoffDate)
     {

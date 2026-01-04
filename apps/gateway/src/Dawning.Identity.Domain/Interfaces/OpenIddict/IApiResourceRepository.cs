@@ -8,7 +8,7 @@ using Dawning.Identity.Domain.Models.OpenIddict;
 namespace Dawning.Identity.Domain.Interfaces.OpenIddict
 {
     /// <summary>
-    /// API资源仓储接口
+    /// API resource repository interface
     /// </summary>
     public interface IApiResourceRepository
     {

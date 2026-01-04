@@ -7,37 +7,37 @@ using Dawning.Identity.Domain.Models;
 namespace Dawning.Identity.Application.Interfaces.MultiTenancy
 {
     /// <summary>
-    /// 租户服务接口
+    /// Tenant service interface
     /// </summary>
     public interface ITenantService
     {
         /// <summary>
-        /// 根据ID获取租户
+        /// Get tenant by ID
         /// </summary>
         Task<Tenant?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据租户代码获取租户
+        /// Get tenant by tenant code
         /// </summary>
         Task<Tenant?> GetByCodeAsync(string code);
 
         /// <summary>
-        /// 根据域名获取租户
+        /// Get tenant by domain
         /// </summary>
         Task<Tenant?> GetByDomainAsync(string domain);
 
         /// <summary>
-        /// 获取所有租户
+        /// Get all tenants
         /// </summary>
         Task<IEnumerable<Tenant>> GetAllAsync();
 
         /// <summary>
-        /// 获取所有启用的租户
+        /// Get all active tenants
         /// </summary>
         Task<IEnumerable<Tenant>> GetActiveTenantsAsync();
 
         /// <summary>
-        /// 分页获取租户列表
+        /// Get paged tenant list
         /// </summary>
         Task<PagedData<Tenant>> GetPagedAsync(
             string? keyword,
@@ -47,37 +47,37 @@ namespace Dawning.Identity.Application.Interfaces.MultiTenancy
         );
 
         /// <summary>
-        /// 创建租户
+        /// Create tenant
         /// </summary>
         Task<Tenant> CreateAsync(Tenant tenant);
 
         /// <summary>
-        /// 更新租户
+        /// Update tenant
         /// </summary>
         Task<Tenant> UpdateAsync(Tenant tenant);
 
         /// <summary>
-        /// 删除租户
+        /// Delete tenant
         /// </summary>
         Task<bool> DeleteAsync(Guid id);
 
         /// <summary>
-        /// 切换租户启用状态
+        /// Toggle tenant active status
         /// </summary>
         Task<bool> SetActiveAsync(Guid id, bool isActive);
 
         /// <summary>
-        /// 检查租户代码是否可用
+        /// Check if tenant code is available
         /// </summary>
         Task<bool> IsCodeAvailableAsync(string code, Guid? excludeId = null);
 
         /// <summary>
-        /// 检查域名是否可用
+        /// Check if domain is available
         /// </summary>
         Task<bool> IsDomainAvailableAsync(string domain, Guid? excludeId = null);
 
         /// <summary>
-        /// 解析租户（从请求头、域名、查询参数等）
+        /// Resolve tenant (from request header, domain, query params, etc.)
         /// </summary>
         Task<Tenant?> ResolveTenantAsync(string? tenantCode, string? host);
     }

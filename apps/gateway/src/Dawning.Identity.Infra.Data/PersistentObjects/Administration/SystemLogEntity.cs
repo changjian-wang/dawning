@@ -4,98 +4,98 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Administration
 {
     /// <summary>
-    /// 系统日志数据库实体
+    /// System log database entity
     /// </summary>
     [Table("system_logs")]
     public class SystemLogEntity
     {
         /// <summary>
-        /// 日志ID
+        /// Log ID
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 日志级别
+        /// Log level
         /// </summary>
         [Column("level")]
         public string Level { get; set; } = string.Empty;
 
         /// <summary>
-        /// 日志消息
+        /// Log message
         /// </summary>
         [Column("message")]
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// 异常信息
+        /// Exception information
         /// </summary>
         [Column("exception")]
         public string? Exception { get; set; }
 
         /// <summary>
-        /// 异常堆栈跟踪
+        /// Exception stack trace
         /// </summary>
         [Column("stack_trace")]
         public string? StackTrace { get; set; }
 
         /// <summary>
-        /// 异常来源
+        /// Exception source
         /// </summary>
         [Column("source")]
         public string? Source { get; set; }
 
         /// <summary>
-        /// 操作用户ID
+        /// Operator user ID
         /// </summary>
         [Column("user_id")]
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 操作用户名
+        /// Operator username
         /// </summary>
         [Column("username")]
         public string? Username { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP address
         /// </summary>
         [Column("ip_address")]
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User agent
         /// </summary>
         [Column("user_agent")]
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// Request path
         /// </summary>
         [Column("request_path")]
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 请求方法
+        /// Request method
         /// </summary>
         [Column("request_method")]
         public string? RequestMethod { get; set; }
 
         /// <summary>
-        /// HTTP状态码
+        /// HTTP status code
         /// </summary>
         [Column("status_code")]
         public int? StatusCode { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         [Column("timestamp")]
         public long Timestamp { get; set; }

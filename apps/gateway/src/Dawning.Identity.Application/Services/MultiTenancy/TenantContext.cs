@@ -4,8 +4,8 @@ using Dawning.Identity.Domain.Interfaces.MultiTenancy;
 namespace Dawning.Identity.Application.Services.MultiTenancy
 {
     /// <summary>
-    /// 租户上下文实现
-    /// 基于 AsyncLocal 存储当前租户信息，支持异步上下文传递
+    /// Tenant context implementation.
+    /// Uses AsyncLocal to store current tenant information, supporting async context propagation.
     /// </summary>
     public class TenantContext : ITenantContext
     {
@@ -32,7 +32,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         }
 
         /// <summary>
-        /// 租户信息内部类
+        /// Tenant information inner class
         /// </summary>
         private class TenantInfo
         {

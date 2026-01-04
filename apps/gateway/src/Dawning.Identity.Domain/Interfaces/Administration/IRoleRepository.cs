@@ -8,47 +8,47 @@ using Dawning.Identity.Domain.Models.Administration;
 namespace Dawning.Identity.Domain.Interfaces.Administration
 {
     /// <summary>
-    /// 角色仓储接口
+    /// Role repository interface
     /// </summary>
     public interface IRoleRepository
     {
         /// <summary>
-        /// 根据ID异步获取角色
+        /// Asynchronously get role by ID
         /// </summary>
         Task<Role?> GetAsync(Guid id);
 
         /// <summary>
-        /// 根据角色名称获取角色
+        /// Get role by name
         /// </summary>
         Task<Role?> GetByNameAsync(string name);
 
         /// <summary>
-        /// 获取分页角色列表
+        /// Get paginated role list
         /// </summary>
         Task<PagedData<Role>> GetPagedListAsync(RoleModel model, int page, int itemsPerPage);
 
         /// <summary>
-        /// 获取所有角色
+        /// Get all roles
         /// </summary>
         Task<IEnumerable<Role>> GetAllAsync();
 
         /// <summary>
-        /// 异步插入角色
+        /// Asynchronously insert role
         /// </summary>
         ValueTask<int> InsertAsync(Role model);
 
         /// <summary>
-        /// 异步更新角色
+        /// Asynchronously update role
         /// </summary>
         ValueTask<bool> UpdateAsync(Role model);
 
         /// <summary>
-        /// 异步删除角色（软删除）
+        /// Asynchronously delete role (soft delete)
         /// </summary>
         ValueTask<bool> DeleteAsync(Role model);
 
         /// <summary>
-        /// 检查角色名称是否存在
+        /// Check if role name exists
         /// </summary>
         Task<bool> NameExistsAsync(string name, Guid? excludeRoleId = null);
     }

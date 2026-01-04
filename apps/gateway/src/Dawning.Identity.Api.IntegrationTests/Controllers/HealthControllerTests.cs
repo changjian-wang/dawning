@@ -4,7 +4,7 @@ using FluentAssertions;
 namespace Dawning.Identity.Api.IntegrationTests.Controllers;
 
 /// <summary>
-/// 健康检查控制器集成测试
+/// Health check controller integration tests
 /// </summary>
 public class HealthControllerTests : IntegrationTestBase
 {
@@ -33,7 +33,7 @@ public class HealthControllerTests : IntegrationTestBase
         var response = await Client.GetAsync("/api/health/detailed");
 
         // Assert
-        // 可能是 200 (Healthy) 或 503 (Unhealthy，如果数据库不可用)
+        // May be 200 (Healthy) or 503 (Unhealthy, if database is unavailable)
         response
             .StatusCode.Should()
             .BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
@@ -49,7 +49,7 @@ public class HealthControllerTests : IntegrationTestBase
         var response = await Client.GetAsync("/api/health/ready");
 
         // Assert
-        // 取决于数据库是否可用
+        // Depends on whether database is available
         response
             .StatusCode.Should()
             .BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
@@ -71,7 +71,7 @@ public class HealthControllerTests : IntegrationTestBase
     [Fact]
     public async Task Get_HealthChecksEndpoint_ReturnsOk()
     {
-        // Act - 内置 ASP.NET Core 健康检查端点
+        // Act - Built-in ASP.NET Core health check endpoint
         var response = await Client.GetAsync("/health");
 
         // Assert

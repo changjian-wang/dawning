@@ -11,8 +11,8 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
     /// <summary>
-    /// ClaimTypeRepository 类实现了 IClaimTypeRepository 接口，提供了一系列用于操作 ClaimType 实体的方法。
-    /// 该类通过依赖注入接收一个 DbContext 对象，使用它来执行数据库操作。
+    /// ClaimTypeRepository class implements the IClaimTypeRepository interface, providing a set of methods for operating on ClaimType entities.
+    /// This class receives a DbContext object through dependency injection and uses it to execute database operations.
     /// </summary>
     public class ClaimTypeRepository : IClaimTypeRepository
     {
@@ -25,8 +25,8 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         private readonly DbContext _context;
 
         /// <summary>
-        /// ClaimTypeRepository 类实现了 IClaimTypeRepository 接口，提供了一系列用于操作 ClaimType 实体的方法。
-        /// 该类通过依赖注入接收一个 DbContext 对象，使用它来执行数据库操作。
+        /// ClaimTypeRepository class implements the IClaimTypeRepository interface, providing a set of methods for operating on ClaimType entities.
+        /// This class receives a DbContext object through dependency injection and uses it to execute database operations.
         /// </summary>
         public ClaimTypeRepository(DbContext context)
         {
@@ -34,10 +34,10 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步获取指定ID的ClaimType实体。
+        /// Asynchronously get a ClaimType entity by the specified ID.
         /// </summary>
-        /// <param name="id">要检索的ClaimType实体的唯一标识符。</param>
-        /// <returns>返回与给定ID匹配的ClaimType实体，如果没有找到则返回一个新的ClaimType实例。</returns>
+        /// <param name="id">The unique identifier of the ClaimType entity to retrieve.</param>
+        /// <returns>Returns the ClaimType entity matching the given ID, or a new ClaimType instance if not found.</returns>
         public async Task<ClaimType> GetAsync(Guid id)
         {
             ClaimTypeEntity entity = await _context.Connection.GetAsync<ClaimTypeEntity>(
@@ -48,12 +48,12 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步获取指定模型、页码和每页项数的ClaimType实体分页列表。
+        /// Asynchronously get a paged list of ClaimType entities based on the specified model, page number, and items per page.
         /// </summary>
-        /// <param name="model">用于过滤查询结果的ClaimTypeModel。</param>
-        /// <param name="page">要检索的结果页码。</param>
-        /// <param name="itemsPerPage">每页显示的项数。</param>
-        /// <returns>返回符合条件的ClaimType实体分页列表，如果没有找到匹配项则返回null。</returns>
+        /// <param name="model">The ClaimTypeModel used to filter query results.</param>
+        /// <param name="page">The page number of results to retrieve.</param>
+        /// <param name="itemsPerPage">The number of items to display per page.</param>
+        /// <returns>Returns a paged list of ClaimType entities matching the criteria, or null if no matches are found.</returns>
         public async Task<PagedData<ClaimType>> GetPagedListAsync(
             ClaimTypeModel model,
             int page,
@@ -80,9 +80,9 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步获取所有ClaimType实体。
+        /// Asynchronously get all ClaimType entities.
         /// </summary>
-        /// <returns>返回包含所有ClaimType实体的集合，如果未找到任何实体，则返回null。</returns>
+        /// <returns>Returns a collection containing all ClaimType entities, or null if no entities are found.</returns>
         public async Task<IEnumerable<ClaimType>> GetAllAsync()
         {
             var list = await _context.Connection.GetAllAsync<ClaimTypeEntity>();
@@ -90,11 +90,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步插入一个新的ClaimType实体。
+        /// Asynchronously insert a new ClaimType entity.
         /// </summary>
-        /// <param name="model">要插入的ClaimType实体。</param>
-        /// <returns>返回一个整数，表示受影响的行数。如果插入成功，则通常为1；如果插入失败，则可能返回0或抛出异常。</returns>
-        /// <exception cref="ArgumentNullException">当提供的model为null时抛出。</exception>
+        /// <param name="model">The ClaimType entity to insert.</param>
+        /// <returns>Returns an integer representing the number of affected rows. Typically 1 if insertion succeeds; may return 0 or throw an exception if insertion fails.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the provided model is null.</exception>
         public async ValueTask<int> InsertAsync(ClaimType model)
         {
             if (model == null)
@@ -107,11 +107,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步更新指定的ClaimType实体。
+        /// Asynchronously update the specified ClaimType entity.
         /// </summary>
-        /// <param name="model">要更新的ClaimType实体。</param>
-        /// <returns>如果更新成功，则返回true；否则返回false。</returns>
-        /// <exception cref="ArgumentNullException">当提供的model为null时抛出。</exception>
+        /// <param name="model">The ClaimType entity to update.</param>
+        /// <returns>Returns true if update succeeds; otherwise returns false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the provided model is null.</exception>
         public async ValueTask<bool> UpdateAsync(ClaimType model)
         {
             if (model == null)
@@ -125,11 +125,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据提供的ClaimType实体异步删除指定的ClaimType记录。
+        /// Asynchronously delete the specified ClaimType record based on the provided ClaimType entity.
         /// </summary>
-        /// <param name="model">要删除的ClaimType实体。</param>
-        /// <returns>如果删除成功，则返回true；否则返回false。</returns>
-        /// <exception cref="ArgumentNullException">当提供的ClaimType实体为null时抛出。</exception>
+        /// <param name="model">The ClaimType entity to delete.</param>
+        /// <returns>Returns true if deletion succeeds; otherwise returns false.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when the provided ClaimType entity is null.</exception>
         public async ValueTask<bool> DeleteAsync(ClaimType model)
         {
             if (model == null)

@@ -5,7 +5,7 @@ using Dawning.Identity.Domain.Aggregates.Gateway;
 namespace Dawning.Identity.Application.Mapping.Gateway
 {
     /// <summary>
-    /// 网关集群 AutoMapper 配置
+    /// Gateway cluster AutoMapper configuration
     /// </summary>
     public class GatewayClusterProfile : Profile
     {

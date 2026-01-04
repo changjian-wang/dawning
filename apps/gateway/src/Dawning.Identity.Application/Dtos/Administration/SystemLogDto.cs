@@ -3,143 +3,143 @@ using System;
 namespace Dawning.Identity.Application.Dtos.Administration
 {
     /// <summary>
-    /// 系统日志DTO
+    /// System Log DTO
     /// </summary>
     public class SystemLogDto
     {
         /// <summary>
-        /// 日志ID
+        /// Log ID
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 日志级别
+        /// Log Level
         /// </summary>
         public string Level { get; set; } = string.Empty;
 
         /// <summary>
-        /// 日志消息
+        /// Log Message
         /// </summary>
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// 异常信息
+        /// Exception Information
         /// </summary>
         public string? Exception { get; set; }
 
         /// <summary>
-        /// 异常堆栈跟踪
+        /// Exception Stack Trace
         /// </summary>
         public string? StackTrace { get; set; }
 
         /// <summary>
-        /// 异常来源
+        /// Exception Source
         /// </summary>
         public string? Source { get; set; }
 
         /// <summary>
-        /// 操作用户ID
+        /// User ID
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 操作用户名
+        /// Username
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP Address
         /// </summary>
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User Agent
         /// </summary>
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// Request Path
         /// </summary>
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 请求方法
+        /// Request Method
         /// </summary>
         public string? RequestMethod { get; set; }
 
         /// <summary>
-        /// HTTP状态码
+        /// HTTP Status Code
         /// </summary>
         public int? StatusCode { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created Time
         /// </summary>
         public DateTime CreatedAt { get; set; }
     }
 
     /// <summary>
-    /// 创建系统日志DTO
+    /// Create System Log DTO
     /// </summary>
     public class CreateSystemLogDto
     {
         /// <summary>
-        /// 日志级别
+        /// Log Level
         /// </summary>
         public string Level { get; set; } = string.Empty;
 
         /// <summary>
-        /// 日志消息
+        /// Log Message
         /// </summary>
         public string Message { get; set; } = string.Empty;
 
         /// <summary>
-        /// 异常信息
+        /// Exception Information
         /// </summary>
         public string? Exception { get; set; }
 
         /// <summary>
-        /// 异常堆栈跟踪
+        /// Exception Stack Trace
         /// </summary>
         public string? StackTrace { get; set; }
 
         /// <summary>
-        /// 异常来源
+        /// Exception Source
         /// </summary>
         public string? Source { get; set; }
 
         /// <summary>
-        /// 操作用户ID
+        /// User ID
         /// </summary>
         public Guid? UserId { get; set; }
 
         /// <summary>
-        /// 操作用户名
+        /// Username
         /// </summary>
         public string? Username { get; set; }
 
         /// <summary>
-        /// IP地址
+        /// IP Address
         /// </summary>
         public string? IpAddress { get; set; }
 
         /// <summary>
-        /// 用户代理
+        /// User Agent
         /// </summary>
         public string? UserAgent { get; set; }
 
         /// <summary>
-        /// 请求路径
+        /// Request Path
         /// </summary>
         public string? RequestPath { get; set; }
 
         /// <summary>
-        /// 请求方法
+        /// Request Method
         /// </summary>
         public string? RequestMethod { get; set; }
 
         /// <summary>
-        /// HTTP状态码
+        /// HTTP Status Code
         /// </summary>
         public int? StatusCode { get; set; }
     }

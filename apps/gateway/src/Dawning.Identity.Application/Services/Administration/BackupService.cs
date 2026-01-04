@@ -5,7 +5,7 @@ using Dawning.Identity.Domain.Interfaces.UoW;
 namespace Dawning.Identity.Application.Services.Administration;
 
 /// <summary>
-/// 数据库备份服务实现 - 使用Repository模式
+/// Database backup service implementation - using Repository pattern
 /// </summary>
 public class BackupService : IBackupService
 {
@@ -25,7 +25,7 @@ public class BackupService : IBackupService
         _exportService = exportService;
         _backupPath = Path.Combine(AppContext.BaseDirectory, "Backups");
 
-        // 确保备份目录存在
+        // Ensure backup directory exists
         if (!Directory.Exists(_backupPath))
         {
             Directory.CreateDirectory(_backupPath);
@@ -33,7 +33,7 @@ public class BackupService : IBackupService
     }
 
     /// <summary>
-    /// 获取备份历史记录
+    /// Get backup history records
     /// </summary>
     public async Task<List<BackupRecord>> GetBackupHistoryAsync(int count = 20)
     {
@@ -41,7 +41,7 @@ public class BackupService : IBackupService
     }
 
     /// <summary>
-    /// 创建数据库备份
+    /// Create database backup
     /// </summary>
     public async Task<BackupResult> CreateBackupAsync(BackupOptions? options = null)
     {
@@ -54,10 +54,10 @@ public class BackupService : IBackupService
             var fileName = $"backup_{timestamp}.sql";
             var filePath = Path.Combine(_backupPath, fileName);
 
-            // 构建排除表集合
+            // Build excluded table set
             var excludeTables = BuildExcludeTableSet(options);
 
-            // 使用导出服务导出数据库
+            // Use export service to export database
             var sqlContent = await _exportService.ExportToSqlAsync(
                 _unitOfWork.Connection,
                 excludeTables
@@ -100,7 +100,7 @@ public class BackupService : IBackupService
     }
 
     /// <summary>
-    /// 删除备份记录
+    /// Delete backup record
     /// </summary>
     public async Task<bool> DeleteBackupAsync(Guid backupId)
     {
@@ -110,19 +110,19 @@ public class BackupService : IBackupService
             return false;
         }
 
-        // 删除物理文件
+        // Delete physical file
         if (File.Exists(record.FilePath))
         {
             File.Delete(record.FilePath);
         }
 
-        // 删除数据库记录
+        // Delete database record
         await _unitOfWork.BackupRecord.DeleteAsync(backupId);
         return true;
     }
 
     /// <summary>
-    /// 清理过期备份
+    /// Clean up expired backups
     /// </summary>
     public async Task<int> CleanupOldBackupsAsync(int retentionDays)
     {
@@ -131,7 +131,7 @@ public class BackupService : IBackupService
 
         foreach (var record in expiredRecords)
         {
-            // 删除物理文件
+            // Delete physical file
             if (File.Exists(record.FilePath))
             {
                 try
@@ -140,17 +140,17 @@ public class BackupService : IBackupService
                 }
                 catch
                 {
-                    // 忽略文件删除错误，继续删除数据库记录
+                    // Ignore file deletion errors, continue with database record deletion
                 }
             }
         }
 
-        // 批量删除过期记录
+        // Batch delete expired records
         return await _unitOfWork.BackupRecord.DeleteExpiredAsync(cutoffDate);
     }
 
     /// <summary>
-    /// 获取备份配置
+    /// Get backup configuration
     /// </summary>
     public async Task<BackupConfiguration> GetConfigurationAsync()
     {
@@ -162,12 +162,12 @@ public class BackupService : IBackupService
         {
             RetentionDays = int.TryParse(retentionDays, out var days) ? days : 30,
             AutoBackupEnabled = autoBackupEnabled?.ToLower() == "true",
-            AutoBackupCron = autoBackupCron ?? "0 2 * * *", // 默认每天凌晨2点
+            AutoBackupCron = autoBackupCron ?? "0 2 * * *", // Default: every day at 2 AM
         };
     }
 
     /// <summary>
-    /// 更新备份配置
+    /// Update backup configuration
     /// </summary>
     public async Task UpdateConfigurationAsync(BackupConfiguration config)
     {
@@ -192,7 +192,7 @@ public class BackupService : IBackupService
     }
 
     /// <summary>
-    /// 构建排除表集合
+    /// Build excluded table set
     /// </summary>
     private static HashSet<string> BuildExcludeTableSet(BackupOptions options)
     {

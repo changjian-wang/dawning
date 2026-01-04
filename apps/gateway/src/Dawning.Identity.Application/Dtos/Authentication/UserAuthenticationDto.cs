@@ -1,47 +1,47 @@
 namespace Dawning.Identity.Application.Dtos.Authentication
 {
     /// <summary>
-    /// 用户认证模型
+    /// User Authentication Model
     /// </summary>
     public class UserAuthenticationDto
     {
         /// <summary>
-        /// 用户ID
+        /// User ID
         /// </summary>
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
-        /// 用户名
+        /// Username
         /// </summary>
         public string Username { get; set; } = string.Empty;
 
         /// <summary>
-        /// 邮箱
+        /// Email
         /// </summary>
         public string? Email { get; set; }
 
         /// <summary>
-        /// 角色列表（从user_roles表加载）
+        /// Role List (loaded from user_roles table)
         /// </summary>
         public List<string> Roles { get; set; } = new();
 
         /// <summary>
-        /// 是否启用
+        /// Is Enabled
         /// </summary>
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 账户是否被锁定
+        /// Is Account Locked Out
         /// </summary>
         public bool IsLockedOut { get; set; } = false;
 
         /// <summary>
-        /// 锁定结束时间
+        /// Lockout End Time
         /// </summary>
         public DateTime? LockoutEnd { get; set; }
 
         /// <summary>
-        /// 锁定提示消息
+        /// Lockout Message
         /// </summary>
         public string? LockoutMessage { get; set; }
     }

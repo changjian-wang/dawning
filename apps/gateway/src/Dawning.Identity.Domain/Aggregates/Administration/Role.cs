@@ -5,74 +5,74 @@ using Dawning.Identity.Domain.Core.Interfaces;
 namespace Dawning.Identity.Domain.Aggregates.Administration
 {
     /// <summary>
-    /// 角色聚合根
+    /// Role Aggregate Root
     /// </summary>
     public class Role : IAggregateRoot
     {
         /// <summary>
-        /// 角色唯一标识
+        /// Role unique identifier
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 角色名称（唯一标识，如admin、user、manager）
+        /// Role name (unique identifier, e.g., admin, user, manager)
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 角色显示名称
+        /// Role display name
         /// </summary>
         public string DisplayName { get; set; } = string.Empty;
 
         /// <summary>
-        /// 角色描述
+        /// Role description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 是否为系统角色（系统角色不可删除）
+        /// Whether it is a system role (system roles cannot be deleted)
         /// </summary>
         public bool IsSystem { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 角色权限列表（JSON数组字符串）
-        /// 格式: ["resource:action:scope", ...]
-        /// 例如: ["user:create:*", "user:read:own"]
+        /// Role permissions list (JSON array string)
+        /// Format: ["resource:action:scope", ...]
+        /// Examples: ["user:create:*", "user:read:own"]
         /// </summary>
         public string? Permissions { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Created by ID
         /// </summary>
         public Guid? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 更新者ID
+        /// Updated by ID
         /// </summary>
         public Guid? UpdatedBy { get; set; }
 
         /// <summary>
-        /// 软删除时间
+        /// Soft delete time
         /// </summary>
         public DateTime? DeletedAt { get; set; }
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         public long Timestamp { get; set; }
     }
