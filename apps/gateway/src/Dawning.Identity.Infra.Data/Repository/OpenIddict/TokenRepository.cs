@@ -17,7 +17,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
     /// <summary>
-    /// Token Repository 实现
+    /// Token Repository implementation
     /// </summary>
     public class TokenRepository : ITokenRepository
     {
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID异步获取Token
+        /// Get Token by ID asynchronously
         /// </summary>
         public async Task<Token> GetAsync(Guid id)
         {
@@ -41,7 +41,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ReferenceId获取Token
+        /// Get Token by ReferenceId
         /// </summary>
         public async Task<Token?> GetByReferenceIdAsync(string referenceId)
         {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据Subject获取Token列表
+        /// Get Token list by Subject
         /// </summary>
         public async Task<IEnumerable<Token>> GetBySubjectAsync(string subject)
         {
@@ -67,7 +67,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ApplicationId获取Token列表
+        /// Get Token list by ApplicationId
         /// </summary>
         public async Task<IEnumerable<Token>> GetByApplicationIdAsync(Guid applicationId)
         {
@@ -80,7 +80,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据AuthorizationId获取Token列表
+        /// Get Token list by AuthorizationId
         /// </summary>
         public async Task<IEnumerable<Token>> GetByAuthorizationIdAsync(Guid authorizationId)
         {
@@ -93,7 +93,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paged list
         /// </summary>
         public async Task<PagedData<Token>> GetPagedListAsync(
             TokenModel model,
@@ -128,7 +128,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有Token
+        /// Get all Tokens
         /// </summary>
         public async Task<IEnumerable<Token>> GetAllAsync()
         {
@@ -137,7 +137,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步插入Token
+        /// Insert Token asynchronously
         /// </summary>
         public async ValueTask<int> InsertAsync(Token model)
         {
@@ -151,7 +151,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步更新Token
+        /// Update Token asynchronously
         /// </summary>
         public async ValueTask<bool> UpdateAsync(Token model)
         {
@@ -165,7 +165,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步删除Token
+        /// Delete Token asynchronously
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Token model)
         {
@@ -179,7 +179,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 清理过期的令牌
+        /// Prune expired tokens
         /// </summary>
         public async Task<int> PruneExpiredTokensAsync()
         {
@@ -202,7 +202,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取用户的有效令牌列表
+        /// Get valid tokens list for a user
         /// </summary>
         public async Task<IEnumerable<Token>> GetValidTokensBySubjectAsync(string subject)
         {
@@ -216,7 +216,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 撤销用户的所有有效令牌
+        /// Revoke all valid tokens for a user
         /// </summary>
         public async Task<int> RevokeAllBySubjectAsync(string subject)
         {
@@ -242,7 +242,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 撤销指定令牌
+        /// Revoke a specific token
         /// </summary>
         public async Task<bool> RevokeByIdAsync(Guid tokenId)
         {

@@ -256,7 +256,7 @@ namespace Dawning.Identity.Api.Controllers.Gateway
 
                 if (!success)
                 {
-                    if (errorMessage?.Contains("not found") == true || errorMessage?.Contains("不存在") == true)
+                    if (errorMessage?.Contains("not found") == true || errorMessage?.Contains("does not exist") == true)
                     {
                         return NotFound(new { code = 40400, message = errorMessage });
                     }

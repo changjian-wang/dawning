@@ -3,102 +3,102 @@ using System;
 namespace Dawning.Identity.Domain.Aggregates.MultiTenancy
 {
     /// <summary>
-    /// 租户聚合根
+    /// Tenant aggregate root
     /// </summary>
     public class Tenant
     {
         /// <summary>
-        /// 租户ID
+        /// Tenant ID
         /// </summary>
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 租户代码（唯一标识，用于URL、Header等）
+        /// Tenant code (unique identifier, used for URL, Header, etc.)
         /// </summary>
         public string Code { get; set; } = string.Empty;
 
         /// <summary>
-        /// 租户名称
+        /// Tenant name
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 租户描述
+        /// Tenant description
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// 绑定域名（可选，用于子域名识别租户）
+        /// Bound domain (optional, used for subdomain tenant identification)
         /// </summary>
         public string? Domain { get; set; }
 
         /// <summary>
-        /// 联系邮箱
+        /// Contact email
         /// </summary>
         public string? Email { get; set; }
 
         /// <summary>
-        /// 联系电话
+        /// Contact phone
         /// </summary>
         public string? Phone { get; set; }
 
         /// <summary>
-        /// 租户Logo URL
+        /// Tenant logo URL
         /// </summary>
         public string? LogoUrl { get; set; }
 
         /// <summary>
-        /// 租户配置（JSON格式，存储自定义配置）
+        /// Tenant settings (JSON format, stores custom configuration)
         /// </summary>
         public string? Settings { get; set; }
 
         /// <summary>
-        /// 数据库连接字符串（可选，用于独立数据库隔离）
+        /// Database connection string (optional, for isolated database separation)
         /// </summary>
         public string? ConnectionString { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 订阅计划（如 free, basic, pro, enterprise）
+        /// Subscription plan (e.g., free, basic, pro, enterprise)
         /// </summary>
         public string Plan { get; set; } = "free";
 
         /// <summary>
-        /// 订阅到期时间
+        /// Subscription expiration time
         /// </summary>
         public DateTime? SubscriptionExpiresAt { get; set; }
 
         /// <summary>
-        /// 最大用户数限制
+        /// Maximum user count limit
         /// </summary>
         public int? MaxUsers { get; set; }
 
         /// <summary>
-        /// 最大存储空间（MB）
+        /// Maximum storage space (MB)
         /// </summary>
         public int? MaxStorageMB { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created at
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated at
         /// </summary>
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Created by user ID
         /// </summary>
         public Guid? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者ID
+        /// Updated by user ID
         /// </summary>
         public Guid? UpdatedBy { get; set; }
     }

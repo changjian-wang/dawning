@@ -178,7 +178,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 手动记录日志（测试用）
+        /// Manual log entry (for testing)
         /// </summary>
         [HttpPost("test")]
         [Authorize(Roles = "admin")]

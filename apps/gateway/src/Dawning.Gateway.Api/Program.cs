@@ -32,7 +32,7 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMemoryCache();
 
-// ===== MediatR (进程内领域事件) =====
+// ===== MediatR (In-process Domain Events) =====
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(
         typeof(Dawning.Identity.Application.EventHandlers.UserCreatedEventHandler).Assembly

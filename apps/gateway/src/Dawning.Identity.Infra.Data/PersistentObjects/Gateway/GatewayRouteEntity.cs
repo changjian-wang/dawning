@@ -4,158 +4,158 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Gateway
 {
     /// <summary>
-    /// 网关路由数据库实体
+    /// Gateway route database entity
     /// </summary>
     [Table("gateway_routes")]
     public class GatewayRouteEntity
     {
         /// <summary>
-        /// 路由唯一标识
+        /// Route unique identifier
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 路由ID（YARP配置中使用的标识符）
+        /// Route ID (identifier used in YARP configuration)
         /// </summary>
         [Column("route_id")]
         public string RouteId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 路由名称
+        /// Route name
         /// </summary>
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 路由描述
+        /// Route description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 关联的集群ID
+        /// Associated cluster ID
         /// </summary>
         [Column("cluster_id")]
         public string ClusterId { get; set; } = string.Empty;
 
         /// <summary>
-        /// 匹配路径模式
+        /// Match path pattern
         /// </summary>
         [Column("match_path")]
         public string MatchPath { get; set; } = string.Empty;
 
         /// <summary>
-        /// 匹配的HTTP方法
+        /// Match HTTP methods
         /// </summary>
         [Column("match_methods")]
         public string? MatchMethods { get; set; }
 
         /// <summary>
-        /// 匹配的主机头
+        /// Match host headers
         /// </summary>
         [Column("match_hosts")]
         public string? MatchHosts { get; set; }
 
         /// <summary>
-        /// 匹配的请求头（JSON格式）
+        /// Match request headers (JSON format)
         /// </summary>
         [Column("match_headers")]
         public string? MatchHeaders { get; set; }
 
         /// <summary>
-        /// 匹配的查询参数（JSON格式）
+        /// Match query parameters (JSON format)
         /// </summary>
         [Column("match_query_parameters")]
         public string? MatchQueryParameters { get; set; }
 
         /// <summary>
-        /// 转换配置 - 路径前缀
+        /// Transform configuration - path prefix
         /// </summary>
         [Column("transform_path_prefix")]
         public string? TransformPathPrefix { get; set; }
 
         /// <summary>
-        /// 转换配置 - 路径移除前缀
+        /// Transform configuration - path remove prefix
         /// </summary>
         [Column("transform_path_remove_prefix")]
         public string? TransformPathRemovePrefix { get; set; }
 
         /// <summary>
-        /// 转换配置 - 请求头（JSON格式）
+        /// Transform configuration - request headers (JSON format)
         /// </summary>
         [Column("transform_request_headers")]
         public string? TransformRequestHeaders { get; set; }
 
         /// <summary>
-        /// 转换配置 - 响应头（JSON格式）
+        /// Transform configuration - response headers (JSON format)
         /// </summary>
         [Column("transform_response_headers")]
         public string? TransformResponseHeaders { get; set; }
 
         /// <summary>
-        /// 授权策略
+        /// Authorization policy
         /// </summary>
         [Column("authorization_policy")]
         public string? AuthorizationPolicy { get; set; }
 
         /// <summary>
-        /// 限流策略
+        /// Rate limiter policy
         /// </summary>
         [Column("rate_limiter_policy")]
         public string? RateLimiterPolicy { get; set; }
 
         /// <summary>
-        /// CORS策略
+        /// CORS policy
         /// </summary>
         [Column("cors_policy")]
         public string? CorsPolicy { get; set; }
 
         /// <summary>
-        /// 超时时间（秒）
+        /// Timeout in seconds
         /// </summary>
         [Column("timeout_seconds")]
         public int? TimeoutSeconds { get; set; }
 
         /// <summary>
-        /// 路由顺序
+        /// Route order
         /// </summary>
         [Column("sort_order")]
         public int SortOrder { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_enabled")]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 元数据（JSON格式）
+        /// Metadata (JSON format)
         /// </summary>
         [Column("metadata")]
         public string? Metadata { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created at
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated at
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者
+        /// Created by
         /// </summary>
         [Column("created_by")]
         public string? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者
+        /// Updated by
         /// </summary>
         [Column("updated_by")]
         public string? UpdatedBy { get; set; }

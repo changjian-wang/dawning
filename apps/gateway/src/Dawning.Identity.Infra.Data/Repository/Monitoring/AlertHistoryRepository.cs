@@ -14,7 +14,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Monitoring;
 
 /// <summary>
-/// 告警历史仓储实现
+/// Alert history repository implementation
 /// </summary>
 public class AlertHistoryRepository : IAlertHistoryRepository
 {
@@ -26,7 +26,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 分页查询告警历史
+    /// Paged query for alert history
     /// </summary>
     public async Task<PagedData<AlertHistory>> GetPagedListAsync(
         AlertHistoryQueryModel model,
@@ -36,7 +36,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     {
         var builder = _context.Connection.Builder<AlertHistoryEntity>(_context.Transaction);
 
-        // 应用过滤条件
+        // Apply filter conditions
         builder = builder
             .WhereIf(model.RuleId.HasValue, x => x.RuleId == model.RuleId!.Value)
             .WhereIf(!string.IsNullOrEmpty(model.MetricType), x => x.MetricType == model.MetricType)
@@ -45,7 +45,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
             .WhereIf(model.StartTime.HasValue, x => x.TriggeredAt >= model.StartTime!.Value)
             .WhereIf(model.EndTime.HasValue, x => x.TriggeredAt <= model.EndTime!.Value);
 
-        // 按触发时间降序排序
+        // Sort by trigger time descending
         var result = await builder
             .OrderByDescending(x => x.TriggeredAt)
             .AsPagedListAsync(page, pageSize);
@@ -60,7 +60,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 根据ID获取告警历史
+    /// Get alert history by ID
     /// </summary>
     public async Task<AlertHistory?> GetByIdAsync(long id)
     {
@@ -72,7 +72,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 创建告警历史
+    /// Create alert history
     /// </summary>
     public async Task<long> CreateAsync(AlertHistory history)
     {
@@ -84,7 +84,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 更新告警状态为已确认
+    /// Update alert status to acknowledged
     /// </summary>
     public async Task<bool> AcknowledgeAsync(long id, string acknowledgedBy)
     {
@@ -103,7 +103,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 更新告警状态为已解决
+    /// Update alert status to resolved
     /// </summary>
     public async Task<bool> ResolveAsync(long id, string resolvedBy)
     {
@@ -122,7 +122,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 更新告警状态
+    /// Update alert status
     /// </summary>
     public async Task<bool> UpdateStatusAsync(long id, string status)
     {
@@ -139,11 +139,11 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 获取未解决的告警
+    /// Get unresolved alerts
     /// </summary>
     public async Task<IEnumerable<AlertHistory>> GetUnresolvedAsync()
     {
-        // 使用两次查询合并结果，因为 Builder 模式不支持 OR 条件
+        // Use two queries and merge results, because Builder pattern does not support OR conditions
         var triggeredEntities = await _context
             .Connection.Builder<AlertHistoryEntity>(_context.Transaction)
             .Where(x => x.Status == "triggered")
@@ -164,7 +164,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 更新通知发送状态
+    /// Update notification send status
     /// </summary>
     public async Task<bool> UpdateNotifyResultAsync(long id, bool sent, string? result)
     {
@@ -182,21 +182,21 @@ public class AlertHistoryRepository : IAlertHistoryRepository
     }
 
     /// <summary>
-    /// 获取告警统计
+    /// Get alert statistics
     /// </summary>
     public async Task<AlertStatistics> GetStatisticsAsync()
     {
         var stats = new AlertStatistics();
         var today = DateTime.UtcNow.Date;
 
-        // 获取所有规则统计
+        // Get all rules statistics
         var allRules = await _context
             .Connection.Builder<AlertRuleEntity>(_context.Transaction)
             .AsListAsync();
         stats.TotalRules = allRules.Count();
         stats.EnabledRules = allRules.Count(r => r.IsEnabled);
 
-        // 获取今日告警
+        // Get today's alerts
         var todayAlerts = await _context
             .Connection.Builder<AlertHistoryEntity>(_context.Transaction)
             .Where(x => x.TriggeredAt >= today)
@@ -204,17 +204,17 @@ public class AlertHistoryRepository : IAlertHistoryRepository
         var todayList = todayAlerts.ToList();
         stats.TotalAlertsToday = todayList.Count;
 
-        // 按指标类型统计
+        // Group by metric type
         stats.AlertsByMetricType = todayList
             .GroupBy(x => x.MetricType)
             .ToDictionary(g => g.Key, g => g.Count());
 
-        // 按严重程度统计
+        // Group by severity
         stats.AlertsBySeverity = todayList
             .GroupBy(x => x.Severity)
             .ToDictionary(g => g.Key, g => g.Count());
 
-        // 未解决告警统计 - 分两次查询
+        // Unresolved alerts statistics - two separate queries
         var triggeredAlerts = await _context
             .Connection.Builder<AlertHistoryEntity>(_context.Transaction)
             .Where(x => x.Status == "triggered")

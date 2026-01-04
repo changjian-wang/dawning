@@ -102,7 +102,7 @@ namespace Dawning.Identity.Api.Middleware
                         CacheEntryOptions.FromMinutes(cacheAttribute.DurationSeconds / 60)
                     );
 
-                    // 添加缓存头
+                    // Add cache headers
                     if (!context.Response.HasStarted)
                     {
                         context.Response.Headers.Append("X-Cache", "MISS");
@@ -113,7 +113,7 @@ namespace Dawning.Identity.Api.Middleware
                     }
                 }
 
-                // 将响应写回原始流
+                // Write response back to original stream
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 await memoryStream.CopyToAsync(originalBodyStream);
             }
@@ -127,17 +127,17 @@ namespace Dawning.Identity.Api.Middleware
         {
             var keyBuilder = new StringBuilder(CacheKeyPrefix);
 
-            // 添加前缀
+            // Add prefix
             if (!string.IsNullOrEmpty(cacheAttribute.CacheKeyPrefix))
             {
                 keyBuilder.Append(cacheAttribute.CacheKeyPrefix);
                 keyBuilder.Append(':');
             }
 
-            // 添加路径
+            // Add path
             keyBuilder.Append(context.Request.Path.Value?.ToLowerInvariant());
 
-            // 按用户区分
+            // Vary by user
             if (cacheAttribute.VaryByUser && context.User.Identity?.IsAuthenticated == true)
             {
                 var userId =
@@ -147,7 +147,7 @@ namespace Dawning.Identity.Api.Middleware
                 keyBuilder.Append(userId);
             }
 
-            // 按查询参数区分
+            // Vary by query parameters
             if (!string.IsNullOrEmpty(cacheAttribute.VaryByQueryKeys))
             {
                 var queryKeys = cacheAttribute.VaryByQueryKeys.Split(
@@ -167,7 +167,7 @@ namespace Dawning.Identity.Api.Middleware
                 }
             }
 
-            // 对完整查询字符串进行哈希（如果没有指定特定查询键）
+            // Hash the full query string if no specific query keys are specified
             if (
                 string.IsNullOrEmpty(cacheAttribute.VaryByQueryKeys)
                 && context.Request.QueryString.HasValue
@@ -185,7 +185,7 @@ namespace Dawning.Identity.Api.Middleware
         }
 
         /// <summary>
-        /// 缓存的响应对象
+        /// Cached response object
         /// </summary>
         private class CachedResponse
         {

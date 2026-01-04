@@ -9,7 +9,7 @@ using OpenIddict.Abstractions;
 namespace Dawning.Identity.Infra.Data.Stores
 {
     /// <summary>
-    /// OpenIddict Authorization Store - 桥接到 Dapper Repository
+    /// OpenIddict Authorization Store - Bridge to Dapper Repository
     /// </summary>
     public class OpenIddictAuthorizationStore : IOpenIddictAuthorizationStore<Authorization>
     {

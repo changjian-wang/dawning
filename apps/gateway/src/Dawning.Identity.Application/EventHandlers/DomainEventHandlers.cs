@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.EventHandlers;
 
 /// <summary>
-/// 用户创建事件处理器
-/// 进程内处理：记录审计日志、发送欢迎邮件等
+/// User created event handler
+/// In-process handling: record audit log, send welcome email, etc.
 /// </summary>
 public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 {
@@ -32,7 +32,7 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
             notification.UserName
         );
 
-        // 1. 发布审计日志到 Kafka
+        // 1. Publish audit log to Kafka
         await _integrationEventBus.PublishAsync(
             new AuditLogIntegrationEvent
             {
@@ -46,7 +46,7 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
             cancellationToken: cancellationToken
         );
 
-        // 2. 如果有邮箱，发送欢迎邮件
+        // 2. If email exists, send welcome email
         if (!string.IsNullOrEmpty(notification.Email))
         {
             await _integrationEventBus.PublishAsync(
@@ -62,7 +62,7 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
             );
         }
 
-        // 3. 发布用户事件供其他服务订阅
+        // 3. Publish user event for other services to subscribe
         await _integrationEventBus.PublishAsync(
             new UserEventIntegrationEvent
             {
@@ -77,7 +77,7 @@ public class UserCreatedEventHandler : INotificationHandler<UserCreatedEvent>
 }
 
 /// <summary>
-/// 用户登录事件处理器
+/// User login event handler
 /// </summary>
 public class UserLoggedInEventHandler : INotificationHandler<UserLoggedInEvent>
 {
@@ -103,7 +103,7 @@ public class UserLoggedInEventHandler : INotificationHandler<UserLoggedInEvent>
             notification.Success
         );
 
-        // 发布审计日志
+        // Publish audit log
         await _integrationEventBus.PublishAsync(
             new AuditLogIntegrationEvent
             {
@@ -124,7 +124,7 @@ public class UserLoggedInEventHandler : INotificationHandler<UserLoggedInEvent>
 }
 
 /// <summary>
-/// 密码变更事件处理器
+/// Password change event handler
 /// </summary>
 public class UserPasswordChangedEventHandler : INotificationHandler<UserPasswordChangedEvent>
 {
@@ -150,7 +150,7 @@ public class UserPasswordChangedEventHandler : INotificationHandler<UserPassword
             notification.UserId
         );
 
-        // 发布审计日志
+        // Publish audit log
         await _integrationEventBus.PublishAsync(
             new AuditLogIntegrationEvent
             {
@@ -165,7 +165,7 @@ public class UserPasswordChangedEventHandler : INotificationHandler<UserPassword
             cancellationToken: cancellationToken
         );
 
-        // 失效用户会话缓存
+        // Invalidate user session cache
         await _integrationEventBus.PublishAsync(
             new CacheInvalidationIntegrationEvent
             {
@@ -178,7 +178,7 @@ public class UserPasswordChangedEventHandler : INotificationHandler<UserPassword
 }
 
 /// <summary>
-/// 角色分配事件处理器
+/// Role assignment event handler
 /// </summary>
 public class RoleAssignedEventHandler : INotificationHandler<RoleAssignedEvent>
 {
@@ -202,7 +202,7 @@ public class RoleAssignedEventHandler : INotificationHandler<RoleAssignedEvent>
             notification.RoleName
         );
 
-        // 发布审计日志
+        // Publish audit log
         await _integrationEventBus.PublishAsync(
             new AuditLogIntegrationEvent
             {
@@ -217,7 +217,7 @@ public class RoleAssignedEventHandler : INotificationHandler<RoleAssignedEvent>
             cancellationToken: cancellationToken
         );
 
-        // 失效权限缓存
+        // Invalidate permissions cache
         await _integrationEventBus.PublishAsync(
             new CacheInvalidationIntegrationEvent
             {
@@ -230,7 +230,7 @@ public class RoleAssignedEventHandler : INotificationHandler<RoleAssignedEvent>
 }
 
 /// <summary>
-/// 配置变更事件处理器
+/// Configuration change event handler
 /// </summary>
 public class ConfigurationChangedEventHandler : INotificationHandler<ConfigurationChangedEvent>
 {
@@ -257,7 +257,7 @@ public class ConfigurationChangedEventHandler : INotificationHandler<Configurati
             notification.ConfigKey
         );
 
-        // 通知所有实例配置变更
+        // Notify all instances of configuration change
         await _integrationEventBus.PublishAsync(
             new ConfigChangedIntegrationEvent
             {
@@ -273,7 +273,7 @@ public class ConfigurationChangedEventHandler : INotificationHandler<Configurati
 }
 
 /// <summary>
-/// 告警触发事件处理器
+/// Alert triggered event handler
 /// </summary>
 public class AlertTriggeredEventHandler : INotificationHandler<AlertTriggeredEvent>
 {
@@ -299,7 +299,7 @@ public class AlertTriggeredEventHandler : INotificationHandler<AlertTriggeredEve
             notification.Threshold
         );
 
-        // 发布告警通知
+        // Publish alert notification
         await _integrationEventBus.PublishAsync(
             new AlertNotificationIntegrationEvent
             {
@@ -318,7 +318,7 @@ public class AlertTriggeredEventHandler : INotificationHandler<AlertTriggeredEve
 }
 
 /// <summary>
-/// 实体变更事件处理器（通用审计）
+/// Entity change event handler (general audit)
 /// </summary>
 public class EntityChangedEventHandler : INotificationHandler<EntityChangedEvent>
 {
@@ -343,7 +343,7 @@ public class EntityChangedEventHandler : INotificationHandler<EntityChangedEvent
             notification.Action
         );
 
-        // 发布审计日志
+        // Publish audit log
         await _integrationEventBus.PublishAsync(
             new AuditLogIntegrationEvent
             {

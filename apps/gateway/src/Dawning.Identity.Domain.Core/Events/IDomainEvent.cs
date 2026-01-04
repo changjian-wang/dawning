@@ -3,30 +3,30 @@ using MediatR;
 namespace Dawning.Identity.Domain.Core.Events;
 
 /// <summary>
-/// 领域事件标记接口
-/// 所有领域事件都应实现此接口
-/// 继承 INotification 以支持 MediatR 发布/订阅
+/// Domain event marker interface
+/// All domain events should implement this interface
+/// Inherits INotification to support MediatR publish/subscribe
 /// </summary>
 public interface IDomainEvent : INotification
 {
     /// <summary>
-    /// 事件唯一标识
+    /// Event unique identifier
     /// </summary>
     Guid EventId { get; }
 
     /// <summary>
-    /// 事件发生时间
+    /// Event occurrence time
     /// </summary>
     DateTime OccurredOn { get; }
 
     /// <summary>
-    /// 事件类型名称
+    /// Event type name
     /// </summary>
     string EventType { get; }
 }
 
 /// <summary>
-/// 领域事件基类
+/// Domain event base class
 /// </summary>
 public abstract class DomainEvent : IDomainEvent
 {
@@ -36,29 +36,29 @@ public abstract class DomainEvent : IDomainEvent
 }
 
 /// <summary>
-/// 集成事件标记接口
-/// 用于跨服务/进程的事件（通过消息队列发布）
+/// Integration event marker interface
+/// Used for cross-service/process events (published via message queue)
 /// </summary>
 public interface IIntegrationEvent
 {
     /// <summary>
-    /// 事件唯一标识
+    /// Event unique identifier
     /// </summary>
     Guid EventId { get; }
 
     /// <summary>
-    /// 事件发生时间
+    /// Event occurrence time
     /// </summary>
     DateTime OccurredOn { get; }
 
     /// <summary>
-    /// 关联 ID（用于分布式追踪）
+    /// Correlation ID (for distributed tracing)
     /// </summary>
     string? CorrelationId { get; set; }
 }
 
 /// <summary>
-/// 集成事件基类
+/// Integration event base class
 /// </summary>
 public abstract class IntegrationEvent : IIntegrationEvent
 {
@@ -66,3 +66,4 @@ public abstract class IntegrationEvent : IIntegrationEvent
     public DateTime OccurredOn { get; } = DateTime.UtcNow;
     public string? CorrelationId { get; set; }
 }
+

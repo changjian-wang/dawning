@@ -5,17 +5,17 @@ using Xunit.Abstractions;
 namespace Dawning.Identity.Api.IntegrationTests;
 
 /// <summary>
-/// API 性能基准测试
-/// 验证关键 API 端点的响应时间是否符合要求
+/// API performance benchmark tests
+/// Verify that key API endpoint response times meet requirements
 /// </summary>
 public class PerformanceBenchmarkTests : IntegrationTestBase
 {
     private readonly ITestOutputHelper _output;
 
-    // 响应时间阈值（毫秒）
-    private const int StandardThreshold = 500; // 标准 API 响应时间
-    private const int FastThreshold = 200; // 快速 API 响应时间
-    private const int SlowThreshold = 1000; // 允许较慢的操作
+    // Response time thresholds (milliseconds)
+    private const int StandardThreshold = 500; // Standard API response time
+    private const int FastThreshold = 200; // Fast API response time
+    private const int SlowThreshold = 1000; // Allowed for slower operations
 
     public PerformanceBenchmarkTests(CustomWebApplicationFactory factory, ITestOutputHelper output)
         : base(factory)
@@ -32,7 +32,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         // Assert
         _output.WriteLine($"GET /api/health - {elapsed}ms");
         response.IsSuccessStatusCode.Should().BeTrue();
-        elapsed.Should().BeLessThan(FastThreshold, "健康检查应在 200ms 内响应");
+        elapsed.Should().BeLessThan(FastThreshold, "Health check should respond within 200ms");
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         // Assert
         _output.WriteLine($"GET /api/health/live - {elapsed}ms");
         response.IsSuccessStatusCode.Should().BeTrue();
-        elapsed.Should().BeLessThan(FastThreshold, "存活检查应在 200ms 内响应");
+        elapsed.Should().BeLessThan(FastThreshold, "Liveness check should respond within 200ms");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
 
         // Assert
         _output.WriteLine($"GET /api/user - {elapsed}ms (401 Unauthorized)");
-        elapsed.Should().BeLessThan(StandardThreshold, "用户列表 API 应在 500ms 内响应");
+        elapsed.Should().BeLessThan(StandardThreshold, "User list API should respond within 500ms");
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
 
         // Assert
         _output.WriteLine($"GET /api/role - {elapsed}ms");
-        elapsed.Should().BeLessThan(StandardThreshold, "角色列表 API 应在 500ms 内响应");
+        elapsed.Should().BeLessThan(StandardThreshold, "Role list API should respond within 500ms");
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
 
         // Assert
         _output.WriteLine($"GET /api/permission - {elapsed}ms");
-        elapsed.Should().BeLessThan(StandardThreshold, "权限列表 API 应在 500ms 内响应");
+        elapsed.Should().BeLessThan(StandardThreshold, "Permission list API should respond within 500ms");
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
 
         // Assert
         _output.WriteLine($"GET /api/audit-log - {elapsed}ms");
-        elapsed.Should().BeLessThan(StandardThreshold, "审计日志 API 应在 500ms 内响应");
+        elapsed.Should().BeLessThan(StandardThreshold, "Audit log API should respond within 500ms");
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
 
         // Assert
         _output.WriteLine($"GET /api/monitoring/logs - {elapsed}ms");
-        elapsed.Should().BeLessThan(StandardThreshold, "监控日志 API 应在 500ms 内响应");
+        elapsed.Should().BeLessThan(StandardThreshold, "Monitoring log API should respond within 500ms");
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
 
         // Assert
         _output.WriteLine($"POST /connect/token - {elapsed}ms");
-        elapsed.Should().BeLessThan(SlowThreshold, "Token 请求应在 1000ms 内响应");
+        elapsed.Should().BeLessThan(SlowThreshold, "Token request should respond within 1000ms");
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         const int concurrentRequests = 10;
         var tasks = new List<Task<(HttpResponseMessage, long)>>();
 
-        // Act - 并发请求
+        // Act - Concurrent requests
         for (int i = 0; i < concurrentRequests; i++)
         {
             tasks.Add(MeasureRequestAsync(() => Client.GetAsync("/api/health")));
@@ -157,13 +157,13 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         var avgTime = times.Average();
         var maxTime = times.Max();
 
-        _output.WriteLine($"并发 {concurrentRequests} 个请求:");
-        _output.WriteLine($"  平均响应时间: {avgTime:F1}ms");
-        _output.WriteLine($"  最大响应时间: {maxTime}ms");
-        _output.WriteLine($"  各请求时间: [{string.Join(", ", times)}]ms");
+        _output.WriteLine($"Concurrent {concurrentRequests} requests:");
+        _output.WriteLine($"  Average response time: {avgTime:F1}ms");
+        _output.WriteLine($"  Maximum response time: {maxTime}ms");
+        _output.WriteLine($"  Individual request times: [{string.Join(", ", times)}]ms");
 
-        avgTime.Should().BeLessThan(StandardThreshold, "并发请求平均响应时间应在 500ms 内");
-        maxTime.Should().BeLessThan(SlowThreshold, "并发请求最大响应时间应在 1000ms 内");
+        avgTime.Should().BeLessThan(StandardThreshold, "Concurrent requests average response time should be within 500ms");
+        maxTime.Should().BeLessThan(SlowThreshold, "Concurrent requests maximum response time should be within 1000ms");
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         const int requestCount = 5;
         var times = new List<long>();
 
-        // Act - 连续请求
+        // Act - Sequential requests
         for (int i = 0; i < requestCount; i++)
         {
             var (_, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/health"));
@@ -184,17 +184,17 @@ public class PerformanceBenchmarkTests : IntegrationTestBase
         var avgTime = times.Average();
         var stdDev = Math.Sqrt(times.Select(t => Math.Pow(t - avgTime, 2)).Average());
 
-        _output.WriteLine($"连续 {requestCount} 个请求:");
-        _output.WriteLine($"  平均响应时间: {avgTime:F1}ms");
-        _output.WriteLine($"  标准差: {stdDev:F1}ms");
-        _output.WriteLine($"  各请求时间: [{string.Join(", ", times)}]ms");
+        _output.WriteLine($"Sequential {requestCount} requests:");
+        _output.WriteLine($"  Average response time: {avgTime:F1}ms");
+        _output.WriteLine($"  Standard deviation: {stdDev:F1}ms");
+        _output.WriteLine($"  Individual request times: [{string.Join(", ", times)}]ms");
 
-        avgTime.Should().BeLessThan(FastThreshold, "连续请求平均响应时间应在 200ms 内");
-        stdDev.Should().BeLessThan(100, "响应时间波动不应太大");
+        avgTime.Should().BeLessThan(FastThreshold, "Sequential requests average response time should be within 200ms");
+        stdDev.Should().BeLessThan(100, "Response time variance should not be too large");
     }
 
     /// <summary>
-    /// 测量请求响应时间
+    /// Measure request response time
     /// </summary>
     private async Task<(HttpResponseMessage Response, long ElapsedMs)> MeasureRequestAsync(
         Func<Task<HttpResponseMessage>> requestFunc

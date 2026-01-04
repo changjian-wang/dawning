@@ -165,11 +165,11 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 创建审计日志（内部使用）
+        /// Create audit log (internal use)
         /// </summary>
         [HttpPost]
         [ProducesResponseType(typeof(AuditLogDto), StatusCodes.Status201Created)]
-        [Authorize(Roles = "super_admin")] // 只有超级管理员可以手动创建
+        [Authorize(Roles = "super_admin")] // Only super admin can create manually
         public async Task<IActionResult> Create([FromBody] CreateAuditLogDto dto)
         {
             try
@@ -189,7 +189,7 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 删除过期的审计日志（数据清理）
+        /// Delete expired audit logs (data cleanup)
         /// </summary>
         [HttpDelete("cleanup")]
         [ProducesResponseType(StatusCodes.Status200OK)]

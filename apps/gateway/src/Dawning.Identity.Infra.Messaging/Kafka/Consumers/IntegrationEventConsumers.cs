@@ -11,8 +11,8 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Identity.Infra.Messaging.Kafka.Consumers;
 
 /// <summary>
-/// 审计日志集成事件消费者
-/// 从 Kafka 消费审计日志事件并持久化到数据库
+/// Audit log integration event consumer
+/// Consumes audit log events from Kafka and persists them to the database
 /// </summary>
 public class AuditLogIntegrationEventConsumer
     : KafkaIntegrationEventConsumer<AuditLogIntegrationEvent>
@@ -61,7 +61,7 @@ public class AuditLogIntegrationEventConsumer
 }
 
 /// <summary>
-/// 告警通知集成事件消费者
+/// Alert notification integration event consumer
 /// </summary>
 public class AlertNotificationIntegrationEventConsumer
     : KafkaIntegrationEventConsumer<AlertNotificationIntegrationEvent>
@@ -114,7 +114,7 @@ public class AlertNotificationIntegrationEventConsumer
 }
 
 /// <summary>
-/// 邮件集成事件消费者
+/// Email integration event consumer
 /// </summary>
 public class EmailIntegrationEventConsumer : KafkaIntegrationEventConsumer<EmailIntegrationEvent>
 {
@@ -136,7 +136,7 @@ public class EmailIntegrationEventConsumer : KafkaIntegrationEventConsumer<Email
         CancellationToken cancellationToken
     )
     {
-        // TODO: 当 IEmailService 实现后启用
+        // TODO: Enable when IEmailService is implemented
         _logger.LogInformation(
             "Email queued for {To}. Subject: {Subject} (Email service not implemented yet)",
             @event.To,
@@ -148,7 +148,7 @@ public class EmailIntegrationEventConsumer : KafkaIntegrationEventConsumer<Email
 }
 
 /// <summary>
-/// 配置变更集成事件消费者
+/// Configuration change integration event consumer
 /// </summary>
 public class ConfigChangedIntegrationEventConsumer
     : KafkaIntegrationEventConsumer<ConfigChangedIntegrationEvent>
@@ -189,7 +189,7 @@ public class ConfigChangedIntegrationEventConsumer
 }
 
 /// <summary>
-/// 缓存失效集成事件消费者
+/// Cache invalidation integration event consumer
 /// </summary>
 public class CacheInvalidationIntegrationEventConsumer
     : KafkaIntegrationEventConsumer<CacheInvalidationIntegrationEvent>
@@ -231,7 +231,7 @@ public class CacheInvalidationIntegrationEventConsumer
 }
 
 /// <summary>
-/// 用户事件集成事件消费者
+/// User event integration event consumer
 /// </summary>
 public class UserEventIntegrationEventConsumer
     : KafkaIntegrationEventConsumer<UserEventIntegrationEvent>
@@ -261,12 +261,12 @@ public class UserEventIntegrationEventConsumer
             @event.UserName
         );
 
-        // 根据事件类型处理
+        // Handle based on event type
         switch (@event.EventType)
         {
             case "RoleAssigned":
             case "RoleRevoked":
-                // 失效权限缓存
+                // Invalidate permissions cache
                 var cacheService = serviceProvider.GetService<ICacheService>();
                 if (cacheService != null)
                 {

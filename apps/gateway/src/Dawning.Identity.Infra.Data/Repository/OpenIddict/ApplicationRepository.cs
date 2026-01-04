@@ -13,7 +13,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
     /// <summary>
-    /// Application Repository 实现
+    /// Application Repository implementation
     /// </summary>
     public class ApplicationRepository : IApplicationRepository
     {
@@ -25,7 +25,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID异步获取Application
+        /// Get Application by ID asynchronously
         /// </summary>
         public async Task<Application> GetAsync(Guid id)
         {
@@ -37,7 +37,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ClientId获取Application
+        /// Get Application by ClientId
         /// </summary>
         public async Task<Application?> GetByClientIdAsync(string clientId)
         {
@@ -50,7 +50,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paged list
         /// </summary>
         public async Task<PagedData<Application>> GetPagedListAsync(
             ApplicationModel model,
@@ -83,7 +83,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有Application
+        /// Get all Applications
         /// </summary>
         public async Task<IEnumerable<Application>> GetAllAsync()
         {
@@ -94,7 +94,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步插入Application
+        /// Insert Application asynchronously
         /// </summary>
         public async ValueTask<int> InsertAsync(Application model)
         {
@@ -108,7 +108,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步更新Application
+        /// Update Application asynchronously
         /// </summary>
         public async ValueTask<bool> UpdateAsync(Application model)
         {
@@ -123,7 +123,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步删除Application
+        /// Delete Application asynchronously
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Application model)
         {

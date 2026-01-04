@@ -53,7 +53,7 @@ namespace Dawning.Identity.Application.Services.Authentication
                 }
             }
 
-            // 使用ValidateCredentialsAndUpdateLoginAsync方法，它会同时验证密码和更新登录时间
+            // Use ValidateCredentialsAndUpdateLoginAsync method, which validates password and updates login time simultaneously
             var user = await _userService.ValidateCredentialsAndUpdateLoginAsync(
                 username,
                 password

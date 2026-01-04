@@ -3,28 +3,28 @@
 namespace Dawning.Identity.Api.Models
 {
     /// <summary>
-    /// 统一API响应格式
+    /// Unified API response format
     /// </summary>
-    /// <typeparam name="T">响应数据类型</typeparam>
+    /// <typeparam name="T">Response data type</typeparam>
     public class ApiResponse<T>
     {
         /// <summary>
-        /// 业务状态码（20000表示成功）
+        /// Business status code (20000 indicates success)
         /// </summary>
         public int Code { get; set; } = 20000;
 
         /// <summary>
-        /// 响应消息
+        /// Response message
         /// </summary>
         public string Message { get; set; } = "Success";
 
         /// <summary>
-        /// 响应数据
+        /// Response data
         /// </summary>
         public T? Data { get; set; }
 
         /// <summary>
-        /// 成功响应
+        /// Success response
         /// </summary>
         public static ApiResponse<T> Success(T data, string message = "Success")
         {

@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Identity.Infra.Messaging.Kafka;
 
 /// <summary>
-/// Kafka 集成事件消费者基类
+/// Kafka integration event consumer base class
 /// </summary>
-/// <typeparam name="TEvent">事件类型</typeparam>
+/// <typeparam name="TEvent">Event type</typeparam>
 public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
     where TEvent : class, IIntegrationEvent
 {
@@ -49,7 +49,7 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
             return;
         }
 
-        await Task.Yield(); // 让启动继续
+        await Task.Yield(); // Allow startup to continue
 
         var config = new ConsumerConfig
         {
@@ -112,7 +112,7 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
         }
         catch (OperationCanceledException)
         {
-            // 正常关闭
+            // Normal shutdown
         }
         finally
         {
@@ -154,7 +154,7 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
             using var scope = _scopeFactory.CreateScope();
             await HandleEventAsync(scope.ServiceProvider, @event, cancellationToken);
 
-            // 手动提交 offset
+            // Manually commit offset
             _consumer?.Commit(consumeResult);
 
             _logger.LogDebug(
@@ -170,12 +170,12 @@ public abstract class KafkaIntegrationEventConsumer<TEvent> : BackgroundService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing message from {Topic}", _topic);
-            // 不提交 offset，消息会被重新消费
+            // Don't commit offset, message will be reconsumed
         }
     }
 
     /// <summary>
-    /// 处理事件的抽象方法，由具体消费者实现
+    /// Abstract method for handling events, implemented by concrete consumers
     /// </summary>
     protected abstract Task HandleEventAsync(
         IServiceProvider serviceProvider,

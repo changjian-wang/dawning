@@ -9,7 +9,7 @@ using OpenIddict.Abstractions;
 namespace Dawning.Identity.Infra.Data.Stores
 {
     /// <summary>
-    /// OpenIddict Token Store - 桥接到 Dapper Repository
+    /// OpenIddict Token Store - bridges to Dapper Repository
     /// </summary>
     public class OpenIddictTokenStore : IOpenIddictTokenStore<Token>
     {
@@ -394,7 +394,7 @@ namespace Dawning.Identity.Infra.Data.Stores
         }
 
         /// <summary>
-        /// 根据 Authorization ID 撤销令牌
+        /// Revoke tokens by Authorization ID
         /// </summary>
         public async ValueTask<long> RevokeByAuthorizationIdAsync(
             string identifier,

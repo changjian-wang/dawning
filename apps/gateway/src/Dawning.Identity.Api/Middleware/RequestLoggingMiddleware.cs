@@ -102,8 +102,8 @@ namespace Dawning.Identity.Api.Middleware
             }
             finally
             {
-                // 使用 Fire-and-forget 模式记录到数据库，不阻塞响应
-                // 捕获必要的值避免闭包问题
+                // Fire-and-forget pattern for database logging, don't block the response
+                // Capture necessary values to avoid closure issues
                 var logContext = new LogContext
                 {
                     RequestId = requestId,
@@ -120,7 +120,7 @@ namespace Dawning.Identity.Api.Middleware
                     Exception = exception,
                 };
 
-                // Fire-and-forget，使用应用级别的 IServiceScopeFactory 不阻塞响应
+                // Fire-and-forget using application-level IServiceScopeFactory, don't block the response
                 _ = Task.Run(async () =>
                 {
                     try

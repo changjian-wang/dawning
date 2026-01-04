@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace Dawning.Identity.Api.IntegrationTests;
 
 /// <summary>
-/// 集成测试基类，提供公共功能
+/// Integration test base class, provides common functionality
 /// </summary>
 public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFactory>, IDisposable
 {
@@ -25,7 +25,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
     }
 
     /// <summary>
-    /// 设置 Bearer Token
+    /// Set Bearer Token
     /// </summary>
     protected void SetBearerToken(string token)
     {
@@ -33,7 +33,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
     }
 
     /// <summary>
-    /// 清除 Authorization Header
+    /// Clear Authorization Header
     /// </summary>
     protected void ClearBearerToken()
     {
@@ -41,7 +41,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
     }
 
     /// <summary>
-    /// POST 请求并返回反序列化的响应
+    /// POST request and return deserialized response
     /// </summary>
     protected async Task<T?> PostAsync<T>(string url, object content)
     {
@@ -51,7 +51,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
     }
 
     /// <summary>
-    /// GET 请求并返回反序列化的响应
+    /// GET request and return deserialized response
     /// </summary>
     protected async Task<T?> GetAsync<T>(string url)
     {
@@ -61,7 +61,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
     }
 
     /// <summary>
-    /// PUT 请求并返回反序列化的响应
+    /// PUT request and return deserialized response
     /// </summary>
     protected async Task<T?> PutAsync<T>(string url, object content)
     {
@@ -71,7 +71,7 @@ public abstract class IntegrationTestBase : IClassFixture<CustomWebApplicationFa
     }
 
     /// <summary>
-    /// DELETE 请求
+    /// DELETE request
     /// </summary>
     protected async Task<HttpResponseMessage> DeleteAsync(string url)
     {

@@ -8,7 +8,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
 {
     /// <summary>
-    /// OpenIddict 授权持久化对象
+    /// OpenIddict Authorization persistent object
     /// </summary>
     [Table("openiddict_authorizations")]
     public class AuthorizationEntity
@@ -30,19 +30,19 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
         public string? Status { get; set; }
 
         /// <summary>
-        /// 作用域列表（JSON 格式存储）
+        /// Scopes list (stored in JSON format)
         /// </summary>
         [Column("scopes")]
         public string? ScopesJson { get; set; }
 
         /// <summary>
-        /// 扩展属性（JSON 格式存储）
+        /// Extended properties (stored in JSON format)
         /// </summary>
         [Column("properties")]
         public string? PropertiesJson { get; set; }
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         [Column("timestamp")]
         [IgnoreUpdate]

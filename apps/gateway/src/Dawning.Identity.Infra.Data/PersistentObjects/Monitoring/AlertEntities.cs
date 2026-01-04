@@ -3,74 +3,74 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Monitoring
 {
     /// <summary>
-    /// 告警规则实体
+    /// Alert rule entity
     /// </summary>
     [Table("alert_rules")]
     public class AlertRuleEntity
     {
         /// <summary>
-        /// 规则ID
+        /// Rule ID
         /// </summary>
         [Key]
         [Column("id")]
         public long Id { get; set; }
 
         /// <summary>
-        /// 规则名称
+        /// Rule name
         /// </summary>
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 规则描述
+        /// Rule description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 指标类型: cpu, memory, response_time, error_rate, request_count
+        /// Metric type: cpu, memory, response_time, error_rate, request_count
         /// </summary>
         [Column("metric_type")]
         public string MetricType { get; set; } = string.Empty;
 
         /// <summary>
-        /// 比较操作符: gt, gte, lt, lte, eq
+        /// Comparison operator: gt, gte, lt, lte, eq
         /// </summary>
         [Column("operator")]
         public string Operator { get; set; } = "gt";
 
         /// <summary>
-        /// 阈值
+        /// Threshold
         /// </summary>
         [Column("threshold")]
         public decimal Threshold { get; set; }
 
         /// <summary>
-        /// 持续时间(秒)，超过此时间才触发告警
+        /// Duration in seconds, alert triggers only after exceeding this time
         /// </summary>
         [Column("duration_seconds")]
         public int DurationSeconds { get; set; } = 60;
 
         /// <summary>
-        /// 严重程度: info, warning, error, critical
+        /// Severity: info, warning, error, critical
         /// </summary>
         [Column("severity")]
         public string Severity { get; set; } = "warning";
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_enabled")]
         public bool IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// 通知渠道，JSON数组: ["email", "webhook"]
+        /// Notification channels, JSON array: ["email", "webhook"]
         /// </summary>
         [Column("notify_channels")]
         public string? NotifyChannels { get; set; }
 
         /// <summary>
-        /// 通知邮箱，逗号分隔
+        /// Notification emails, comma separated
         /// </summary>
         [Column("notify_emails")]
         public string? NotifyEmails { get; set; }
@@ -82,129 +82,129 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.Monitoring
         public string? WebhookUrl { get; set; }
 
         /// <summary>
-        /// 冷却时间(分钟)，避免重复告警
+        /// Cooldown time in minutes, to avoid repeated alerts
         /// </summary>
         [Column("cooldown_minutes")]
         public int CooldownMinutes { get; set; } = 5;
 
         /// <summary>
-        /// 上次触发时间
+        /// Last triggered time
         /// </summary>
         [Column("last_triggered_at")]
         public DateTime? LastTriggeredAt { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
-    /// 告警历史实体
+    /// Alert history entity
     /// </summary>
     [Table("alert_history")]
     public class AlertHistoryEntity
     {
         /// <summary>
-        /// 告警历史ID
+        /// Alert history ID
         /// </summary>
         [Key]
         [Column("id")]
         public long Id { get; set; }
 
         /// <summary>
-        /// 告警规则ID
+        /// Alert rule ID
         /// </summary>
         [Column("rule_id")]
         public long RuleId { get; set; }
 
         /// <summary>
-        /// 规则名称(冗余)
+        /// Rule name (redundant)
         /// </summary>
         [Column("rule_name")]
         public string RuleName { get; set; } = string.Empty;
 
         /// <summary>
-        /// 指标类型
+        /// Metric type
         /// </summary>
         [Column("metric_type")]
         public string MetricType { get; set; } = string.Empty;
 
         /// <summary>
-        /// 触发时的指标值
+        /// Metric value at trigger time
         /// </summary>
         [Column("metric_value")]
         public decimal MetricValue { get; set; }
 
         /// <summary>
-        /// 阈值
+        /// Threshold
         /// </summary>
         [Column("threshold")]
         public decimal Threshold { get; set; }
 
         /// <summary>
-        /// 严重程度
+        /// Severity
         /// </summary>
         [Column("severity")]
         public string Severity { get; set; } = "warning";
 
         /// <summary>
-        /// 告警消息
+        /// Alert message
         /// </summary>
         [Column("message")]
         public string? Message { get; set; }
 
         /// <summary>
-        /// 状态: triggered, acknowledged, resolved
+        /// Status: triggered, acknowledged, resolved
         /// </summary>
         [Column("status")]
         public string Status { get; set; } = "triggered";
 
         /// <summary>
-        /// 触发时间
+        /// Triggered time
         /// </summary>
         [Column("triggered_at")]
         public DateTime TriggeredAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// 确认时间
+        /// Acknowledged time
         /// </summary>
         [Column("acknowledged_at")]
         public DateTime? AcknowledgedAt { get; set; }
 
         /// <summary>
-        /// 确认人
+        /// Acknowledged by
         /// </summary>
         [Column("acknowledged_by")]
         public string? AcknowledgedBy { get; set; }
 
         /// <summary>
-        /// 解决时间
+        /// Resolved time
         /// </summary>
         [Column("resolved_at")]
         public DateTime? ResolvedAt { get; set; }
 
         /// <summary>
-        /// 解决人
+        /// Resolved by
         /// </summary>
         [Column("resolved_by")]
         public string? ResolvedBy { get; set; }
 
         /// <summary>
-        /// 是否已发送通知
+        /// Whether notification has been sent
         /// </summary>
         [Column("notify_sent")]
         public bool NotifySent { get; set; }
 
         /// <summary>
-        /// 通知结果
+        /// Notification result
         /// </summary>
         [Column("notify_result")]
         public string? NotifyResult { get; set; }

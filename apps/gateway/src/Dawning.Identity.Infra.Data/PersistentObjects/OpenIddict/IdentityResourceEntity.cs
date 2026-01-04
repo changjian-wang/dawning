@@ -4,7 +4,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
 {
     /// <summary>
-    /// 身份资源持久化对象
+    /// Identity resource persistent object
     /// </summary>
     [Table("identity_resources")]
     public class IdentityResourceEntity
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
     }
 
     /// <summary>
-    /// 身份资源声明持久化对象
+    /// Identity resource claim persistent object
     /// </summary>
     [Table("identity_resource_claims")]
     public class IdentityResourceClaimEntity

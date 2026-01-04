@@ -4,7 +4,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
 {
     /// <summary>
-    /// OpenIddict 应用程序持久化对象
+    /// OpenIddict Application persistent object
     /// </summary>
     [Table("openiddict_applications")]
     public class ApplicationEntity
@@ -29,19 +29,19 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
         public string? ConsentType { get; set; }
 
         /// <summary>
-        /// 权限列表（JSON 格式存储）
+        /// Permissions list (stored in JSON format)
         /// </summary>
         [Column("permissions")]
         public string? PermissionsJson { get; set; }
 
         /// <summary>
-        /// 重定向 URI（JSON 格式存储）
+        /// Redirect URIs (stored in JSON format)
         /// </summary>
         [Column("redirect_uris")]
         public string? RedirectUrisJson { get; set; }
 
         /// <summary>
-        /// 登出重定向 URI（JSON 格式存储）
+        /// Post-logout redirect URIs (stored in JSON format)
         /// </summary>
         [Column("post_logout_redirect_uris")]
         public string? PostLogoutRedirectUrisJson { get; set; }
@@ -53,7 +53,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
         public string? PropertiesJson { get; set; }
 
         /// <summary>
-        /// 时间戳
+        /// Timestamp
         /// </summary>
         [Column("timestamp")]
         [IgnoreUpdate]

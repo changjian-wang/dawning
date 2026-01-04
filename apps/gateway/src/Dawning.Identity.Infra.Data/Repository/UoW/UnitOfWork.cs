@@ -28,7 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         {
             _context = context ?? throw new ArgumentException(nameof(context));
 
-            // 所有Repository共享一个DbContext
+            // All Repositories share one DbContext
             // Administration
             User = new UserRepository(_context);
             ClaimType = new ClaimTypeRepository(_context);
@@ -65,7 +65,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
         }
 
         /// <summary>
-        /// 获取数据库连接（用于直接执行 SQL）
+        /// Get database connection (for executing SQL directly)
         /// </summary>
         public IDbConnection Connection => _context.Connection;
 
@@ -127,7 +127,7 @@ namespace Dawning.Identity.Infra.Data.Repository.UoW
 
         public Task CommitAsync()
         {
-            // 当前 DbContext 只有同步方法，简单包装为 Task
+            // Current DbContext only has synchronous methods, wrap as Task simply
             Commit();
             return Task.CompletedTask;
         }

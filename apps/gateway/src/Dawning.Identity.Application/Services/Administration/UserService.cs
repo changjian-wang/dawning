@@ -134,7 +134,7 @@ namespace Dawning.Identity.Application.Services.Administration
             // Validate password complexity (prefer password policy service)
             await ValidatePasswordAsync(dto.Password);
 
-            // 创建用户实体
+            // Create user entity
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -286,7 +286,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 修改密码
+        /// Change password
         /// </summary>
         public async Task<bool> ChangePasswordAsync(ChangePasswordDto dto)
         {
@@ -296,22 +296,22 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"User with ID '{dto.UserId}' not found.");
             }
 
-            // 验证旧密码
+            // Verify old password
             if (!VerifyPassword(dto.OldPassword, user.PasswordHash))
             {
                 throw new InvalidOperationException("Old password is incorrect.");
             }
 
-            // 验证新密码与旧密码不同
+            // Verify new password differs from old password
             if (dto.NewPassword == dto.OldPassword)
             {
-                throw new InvalidOperationException("新密码不能与旧密码相同。");
+                throw new InvalidOperationException("New password cannot be the same as the old password.");
             }
 
-            // 验证密码复杂度
+            // Validate password complexity
             await ValidatePasswordAsync(dto.NewPassword);
 
-            // 更新密码
+            // Update password
             user.PasswordHash = HashPassword(dto.NewPassword);
             user.UpdatedAt = DateTime.UtcNow;
 
@@ -321,7 +321,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 重置密码（管理员功能）
+        /// Reset password (admin function)
         /// </summary>
         public async Task<bool> ResetPasswordAsync(Guid userId, string newPassword)
         {
@@ -331,10 +331,10 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"User with ID '{userId}' not found.");
             }
 
-            // 验证密码复杂度
+            // Validate password complexity
             await ValidatePasswordAsync(newPassword);
 
-            // 直接更新密码，不需要验证旧密码
+            // Update password directly without verifying old password
             user.PasswordHash = HashPassword(newPassword);
             user.UpdatedAt = DateTime.UtcNow;
 
@@ -344,7 +344,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 检查用户名是否存在
+        /// Check if username exists
         /// </summary>
         public async Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null)
         {
@@ -352,17 +352,17 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 检查邮箱是否存在
+        /// Check if email exists
         /// </summary>
         public async Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null)
         {
             return await _userRepository.EmailExistsAsync(email, excludeUserId);
         }
 
-        #region 密码哈希和验证辅助方法
+        #region Password Hashing and Verification Helper Methods
 
         /// <summary>
-        /// 哈希密码（使用PBKDF2）
+        /// Hash password (using PBKDF2)
         /// </summary>
         private static string HashPassword(string password)
         {
@@ -370,7 +370,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 验证密码
+        /// Verify password
         /// </summary>
         private static bool VerifyPassword(string password, string passwordHash)
         {
@@ -378,58 +378,58 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 验证密码复杂度
+        /// Validate password complexity
         /// </summary>
-        /// <param name="password">待验证的密码</param>
-        /// <returns>验证结果和错误消息</returns>
+        /// <param name="password">Password to validate</param>
+        /// <returns>Validation result and error message</returns>
         private static (bool IsValid, string ErrorMessage) ValidatePasswordComplexity(
             string password
         )
         {
             if (string.IsNullOrWhiteSpace(password))
             {
-                return (false, "密码不能为空");
+                return (false, "Password cannot be empty");
             }
 
             if (password.Length < 8)
             {
-                return (false, "密码长度至少为8个字符");
+                return (false, "Password must be at least 8 characters long");
             }
 
             if (password.Length > 128)
             {
-                return (false, "密码长度不能超过128个字符");
+                return (false, "Password cannot exceed 128 characters");
             }
 
-            // 至少包含一个大写字母
+            // Must contain at least one uppercase letter
             if (!Regex.IsMatch(password, @"[A-Z]"))
             {
-                return (false, "密码必须包含至少一个大写字母");
+                return (false, "Password must contain at least one uppercase letter");
             }
 
-            // 至少包含一个小写字母
+            // Must contain at least one lowercase letter
             if (!Regex.IsMatch(password, @"[a-z]"))
             {
-                return (false, "密码必须包含至少一个小写字母");
+                return (false, "Password must contain at least one lowercase letter");
             }
 
-            // 至少包含一个数字
+            // Must contain at least one digit
             if (!Regex.IsMatch(password, @"[0-9]"))
             {
-                return (false, "密码必须包含至少一个数字");
+                return (false, "Password must contain at least one digit");
             }
 
-            // 至少包含一个特殊字符
+            // Must contain at least one special character
             if (!Regex.IsMatch(password, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>/?]"))
             {
-                return (false, "密码必须包含至少一个特殊字符 (!@#$%^&*等)");
+                return (false, "Password must contain at least one special character (!@#$%^&* etc.)");
             }
 
             return (true, string.Empty);
         }
 
         /// <summary>
-        /// 异步验证密码（优先使用密码策略服务，回退到本地验证）
+        /// Validate password asynchronously (prefer password policy service, fallback to local validation)
         /// </summary>
         private async Task ValidatePasswordAsync(string password)
         {
@@ -441,13 +441,13 @@ namespace Dawning.Identity.Application.Services.Administration
                     var errorMessage =
                         result.Errors.Count > 0
                             ? string.Join("; ", result.Errors)
-                            : "密码不符合策略要求";
+                            : "Password does not meet policy requirements";
                     throw new InvalidOperationException(errorMessage);
                 }
             }
             else
             {
-                // 回退到静态验证方法
+                // Fallback to static validation method
                 var (isValid, errorMessage) = ValidatePasswordComplexity(password);
                 if (!isValid)
                 {
@@ -459,12 +459,12 @@ namespace Dawning.Identity.Application.Services.Administration
         #endregion
 
         /// <summary>
-        /// 更新最后登录时间
+        /// Update last login time
         /// </summary>
         public async Task UpdateLastLoginAsync(Guid userId)
         {
-            // 直接通过Repository更新，不使用UnitOfWork事务
-            // 这是一个独立的操作，不需要与其他操作在同一事务中
+            // Update directly through Repository without UnitOfWork transaction
+            // This is an independent operation that doesn't need to be in the same transaction
             var user = await _userRepository.GetAsync(userId);
             if (user == null)
             {
@@ -476,7 +476,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 验证用户密码
+        /// Validate user password
         /// </summary>
         public async Task<UserDto?> ValidatePasswordAsync(string username, string password)
         {
@@ -485,25 +485,25 @@ namespace Dawning.Identity.Application.Services.Administration
                 return null;
             }
 
-            // 从数据库获取用户（包含PasswordHash）
+            // Get user from database (including PasswordHash)
             var user = await _userRepository.GetByUsernameAsync(username);
             if (user == null || !user.IsActive)
             {
                 return null;
             }
 
-            // 验证密码 - 使用 PasswordHasher.Verify
+            // Verify password - using PasswordHasher.Verify
             if (!PasswordHasher.Verify(password, user.PasswordHash))
             {
                 return null;
             }
 
-            // 返回DTO（不包含密码）
+            // Return DTO (without password)
             return _mapper.Map<UserDto>(user);
         }
 
         /// <summary>
-        /// 验证用户凭据并更新登录时间
+        /// Validate user credentials and update login time
         /// </summary>
         public async Task<UserDto?> ValidateCredentialsAndUpdateLoginAsync(
             string username,
@@ -513,22 +513,22 @@ namespace Dawning.Identity.Application.Services.Administration
             var user = await ValidatePasswordAsync(username, password);
             if (user != null)
             {
-                // 在独立事务中更新最后登录时间，避免影响主事务
+                // Update last login time in separate transaction to avoid affecting main transaction
                 try
                 {
                     await UpdateLastLoginAsync(user.Id);
                 }
                 catch
                 {
-                    // 记录错误但不影响登录流程
-                    // 可以使用日志记录: _logger.LogWarning(ex, "Failed to update last login time for user {UserId}", user.Id);
+                    // Log error but don't affect login flow
+                    // Can use logger: _logger.LogWarning(ex, "Failed to update last login time for user {UserId}", user.Id);
                 }
             }
             return user;
         }
 
         /// <summary>
-        /// 获取用户的所有角色
+        /// Get all roles for a user
         /// </summary>
         public async Task<IEnumerable<RoleDto>> GetUserRolesAsync(Guid userId)
         {
@@ -537,7 +537,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取用户详情（含角色）
+        /// Get user details with roles
         /// </summary>
         public async Task<UserWithRolesDto?> GetUserWithRolesAsync(Guid userId)
         {
@@ -554,7 +554,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 为用户分配角色
+        /// Assign roles to user
         /// </summary>
         public async Task<bool> AssignRolesAsync(
             Guid userId,
@@ -572,7 +572,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 移除用户的角色
+        /// Remove role from user
         /// </summary>
         public async Task<bool> RemoveRoleAsync(Guid userId, Guid roleId)
         {
@@ -580,11 +580,11 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取用户统计信息
+        /// Get user statistics
         /// </summary>
         public async Task<UserStatisticsDto> GetUserStatisticsAsync()
         {
-            // 获取所有用户用于统计（使用空模型获取全部）
+            // Get all users for statistics (use empty model to get all)
             var allUsers = await _userRepository.GetPagedListAsync(
                 new UserModel(),
                 1,
@@ -614,7 +614,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 GeneratedAt = now,
             };
 
-            // 按角色统计
+            // Statistics by role
             var roleGroups = users
                 .GroupBy(u => u.Role ?? "unknown")
                 .ToDictionary(g => g.Key, g => g.Count());
@@ -624,13 +624,13 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 获取最近活跃用户（基于最后登录时间）
+        /// Get recent active users (based on last login time)
         /// </summary>
         public async Task<IEnumerable<RecentActiveUserDto>> GetRecentActiveUsersAsync(
             int count = 10
         )
         {
-            // 获取有登录记录的用户，按最后登录时间降序
+            // Get users with login records, ordered by last login time descending
             var model = new UserModel { IsActive = true };
             var allUsers = await _userRepository.GetPagedListAsync(model, 1, int.MaxValue);
 

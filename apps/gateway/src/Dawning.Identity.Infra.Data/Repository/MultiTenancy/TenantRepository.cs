@@ -15,7 +15,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.MultiTenancy
 {
     /// <summary>
-    /// 租户仓储实现
+    /// Tenant repository implementation
     /// </summary>
     public class TenantRepository : ITenantRepository
     {
@@ -84,7 +84,7 @@ namespace Dawning.Identity.Infra.Data.Repository.MultiTenancy
         {
             var builder = _context.Connection.Builder<TenantEntity>(_context.Transaction);
 
-            // 关键字搜索
+            // Keyword search
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 builder.Where(t =>
@@ -94,7 +94,7 @@ namespace Dawning.Identity.Infra.Data.Repository.MultiTenancy
                 );
             }
 
-            // 启用状态过滤
+            // Enabled status filter
             if (isActive.HasValue)
             {
                 builder.Where(t => t.IsActive == isActive.Value);

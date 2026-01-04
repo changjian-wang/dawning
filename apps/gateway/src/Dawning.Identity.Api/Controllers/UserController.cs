@@ -257,7 +257,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("User created: {Username}", user.Username);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "Create",
                     entityType: "User",
@@ -324,7 +324,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("User updated: {UserId}", id);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "Update",
                     entityType: "User",
@@ -376,7 +376,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("User deleted: {UserId}", id);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "Delete",
                     entityType: "User",
@@ -438,7 +438,7 @@ namespace Dawning.Identity.Api.Controllers
                     failedIds.Count
                 );
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "BatchDelete",
                     entityType: "User",
@@ -525,7 +525,7 @@ namespace Dawning.Identity.Api.Controllers
                     failedIds.Count
                 );
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: request.IsActive ? "BatchEnable" : "BatchDisable",
                     entityType: "User",
@@ -566,7 +566,7 @@ namespace Dawning.Identity.Api.Controllers
 
                 _logger.LogInformation("Password changed for user: {UserId}", dto.UserId);
 
-                // 记录审计日志
+                // Record audit log
                 await _auditLogHelper.LogAsync(
                     action: "ChangePassword",
                     entityType: "User",
@@ -698,7 +698,7 @@ namespace Dawning.Identity.Api.Controllers
 #endif
                 _logger.LogWarning("DEV MODE: Force resetting all users and creating new admin");
 
-                // 直接使用SQL硬删除所有用户（包括软删除的）
+                // Use SQL to hard delete all users (including soft-deleted ones)
                 var connectionString = _configuration.GetConnectionString("MySQL");
                 using (var connection = new MySqlConnection(connectionString))
                 {
@@ -710,7 +710,7 @@ namespace Dawning.Identity.Api.Controllers
                     );
                 }
 
-                // 创建新的管理员账号
+                // Create new admin account
                 var createUserDto = new CreateUserDto
                 {
                     Username = "admin",
@@ -851,21 +851,21 @@ namespace Dawning.Identity.Api.Controllers
         {
             try
             {
-                // 查找 admin 用户
+                // Find admin user
                 var admin = await _userService.GetByUsernameAsync("admin");
                 if (admin == null)
                 {
                     return NotFound(ApiResponse.Error(40400, "Admin user not found"));
                 }
 
-                // 查找 super_admin 角色
+                // Find super_admin role
                 var superAdminRole = await _roleService.GetByNameAsync("super_admin");
                 if (superAdminRole?.Id == null)
                 {
                     return NotFound(ApiResponse.Error(40400, "super_admin role not found"));
                 }
 
-                // 检查是否已分配
+                // Check if already assigned
                 var existingRoles = await _userService.GetUserRolesAsync(admin.Id);
                 if (existingRoles.Any(r => r.Name == "super_admin"))
                 {
@@ -880,7 +880,7 @@ namespace Dawning.Identity.Api.Controllers
                     );
                 }
 
-                // 分配角色
+                // Assign role
                 await _userService.AssignRolesAsync(
                     admin.Id,
                     new List<Guid> { superAdminRole.Id.Value },

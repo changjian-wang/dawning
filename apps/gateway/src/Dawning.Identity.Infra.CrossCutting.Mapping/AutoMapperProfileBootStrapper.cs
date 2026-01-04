@@ -10,7 +10,7 @@ namespace Dawning.Identity.Infra.CrossCutting.Mapping
         const string INFRA_DATA_ASSEMBLY_NAME = $"{NAME_SPACE}.Infra.Data";
 
         /// <summary>
-        /// 注册 AutoMapper 服务
+        /// Register AutoMapper services
         /// </summary>
         public static IServiceCollection RegisterServices(IServiceCollection services)
         {
@@ -20,7 +20,7 @@ namespace Dawning.Identity.Infra.CrossCutting.Mapping
         }
 
         /// <summary>
-        /// 加载包含 Profile 的程序集
+        /// Load assemblies containing AutoMapper Profiles
         /// </summary>
         private static IEnumerable<Assembly> LoadAssemblies()
         {

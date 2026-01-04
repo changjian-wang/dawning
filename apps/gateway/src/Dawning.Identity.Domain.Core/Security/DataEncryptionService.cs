@@ -8,37 +8,37 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Domain.Core.Security
 {
     /// <summary>
-    /// 数据加密服务接口
+    /// Data encryption service interface
     /// </summary>
     public interface IDataEncryptionService
     {
         /// <summary>
-        /// 加密字符串
+        /// Encrypt a string
         /// </summary>
-        /// <param name="plainText">明文</param>
-        /// <returns>加密后的 Base64 字符串</returns>
+        /// <param name="plainText">Plain text</param>
+        /// <returns>Encrypted Base64 string</returns>
         string Encrypt(string plainText);
 
         /// <summary>
-        /// 解密字符串
+        /// Decrypt a string
         /// </summary>
-        /// <param name="cipherText">加密的 Base64 字符串</param>
-        /// <returns>解密后的明文</returns>
+        /// <param name="cipherText">Encrypted Base64 string</param>
+        /// <returns>Decrypted plain text</returns>
         string Decrypt(string cipherText);
 
         /// <summary>
-        /// 尝试解密（如果失败返回原文）
+        /// Try to decrypt (returns original text if decryption fails)
         /// </summary>
         string TryDecrypt(string text);
 
         /// <summary>
-        /// 检查字符串是否已加密
+        /// Check if a string is encrypted
         /// </summary>
         bool IsEncrypted(string text);
     }
 
     /// <summary>
-    /// 基于 AES-256 的数据加密服务实现
+    /// AES-256 based data encryption service implementation
     /// </summary>
     public class AesDataEncryptionService : IDataEncryptionService
     {
@@ -53,12 +53,12 @@ namespace Dawning.Identity.Domain.Core.Security
         {
             _logger = logger;
 
-            // 从配置读取加密密钥
+            // Read encryption key from configuration
             var keyBase64 = configuration["Security:EncryptionKey"];
 
             if (string.IsNullOrEmpty(keyBase64))
             {
-                // 如果未配置，生成一个警告并使用默认密钥（仅用于开发）
+                // If not configured, log a warning and use a default key (for development only)
                 _logger?.LogWarning(
                     "Security:EncryptionKey not configured. Using a default key. THIS IS NOT SECURE FOR PRODUCTION!"
                 );
@@ -84,14 +84,14 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 加密字符串
+        /// Encrypt a string
         /// </summary>
         public string Encrypt(string plainText)
         {
             if (string.IsNullOrEmpty(plainText))
                 return plainText;
 
-            // 如果已经加密，直接返回
+            // If already encrypted, return as-is
             if (IsEncrypted(plainText))
                 return plainText;
 
@@ -104,7 +104,7 @@ namespace Dawning.Identity.Domain.Core.Security
                 using var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
                 using var msEncrypt = new MemoryStream();
 
-                // 先写入 IV
+                // Write IV first
                 msEncrypt.Write(aes.IV, 0, aes.IV.Length);
 
                 using (
@@ -125,32 +125,32 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 解密字符串
+        /// Decrypt a string
         /// </summary>
         public string Decrypt(string cipherText)
         {
             if (string.IsNullOrEmpty(cipherText))
                 return cipherText;
 
-            // 如果没有加密前缀，直接返回
+            // If no encryption prefix, return as-is
             if (!IsEncrypted(cipherText))
                 return cipherText;
 
             try
             {
-                // 移除前缀
+                // Remove prefix
                 var actualCipherText = cipherText.Substring(EncryptionPrefix.Length);
                 var cipherBytes = Convert.FromBase64String(actualCipherText);
 
                 using var aes = Aes.Create();
                 aes.Key = _key;
 
-                // 从密文中提取 IV（前16字节）
+                // Extract IV from ciphertext (first 16 bytes)
                 var iv = new byte[16];
                 Array.Copy(cipherBytes, 0, iv, 0, 16);
                 aes.IV = iv;
 
-                // 实际密文从第17字节开始
+                // Actual ciphertext starts from byte 17
                 var actualCipherBytes = new byte[cipherBytes.Length - 16];
                 Array.Copy(cipherBytes, 16, actualCipherBytes, 0, actualCipherBytes.Length);
 
@@ -169,7 +169,7 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 尝试解密（如果失败返回原文）
+        /// Try to decrypt (returns original text if decryption fails)
         /// </summary>
         public string TryDecrypt(string text)
         {
@@ -187,7 +187,7 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 检查字符串是否已加密
+        /// Check if a string is encrypted
         /// </summary>
         public bool IsEncrypted(string text)
         {
@@ -195,7 +195,7 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 生成一个新的随机加密密钥
+        /// Generate a new random encryption key
         /// </summary>
         public static string GenerateNewKey()
         {
@@ -206,11 +206,11 @@ namespace Dawning.Identity.Domain.Core.Security
         }
 
         /// <summary>
-        /// 生成默认密钥（仅用于开发环境）
+        /// Generate default key (for development environment only)
         /// </summary>
         private static byte[] GenerateDefaultKey()
         {
-            // 使用固定种子生成可重复的密钥（仅用于开发）
+            // Use fixed seed to generate repeatable key (for development only)
             using var sha256 = SHA256.Create();
             return sha256.ComputeHash(Encoding.UTF8.GetBytes("DawningDevKey2025!@#"));
         }

@@ -153,166 +153,166 @@ namespace Dawning.Identity.Api.Controllers.Administration
         }
 
         /// <summary>
-        /// 初始化默认配置
+        /// Initialize default configuration
         /// </summary>
         [HttpPost("init-defaults")]
         [Authorize(Policy = "SystemAdmin")]
         public async Task<IActionResult> InitDefaults()
         {
-            // 系统配置
+            // System configuration
             await _systemConfigService.SetValueAsync(
                 "System",
                 "AppName",
                 "Dawning Gateway",
-                "应用名称"
+                "Application name"
             );
-            await _systemConfigService.SetValueAsync("System", "AppVersion", "1.0.0", "应用版本");
+            await _systemConfigService.SetValueAsync("System", "AppVersion", "1.0.0", "Application version");
             await _systemConfigService.SetValueAsync(
                 "System",
                 "DefaultLanguage",
                 "zh-CN",
-                "默认语言"
+                "Default language"
             );
             await _systemConfigService.SetValueAsync(
                 "System",
                 "TimeZone",
                 "Asia/Shanghai",
-                "默认时区"
+                "Default timezone"
             );
 
-            // 安全配置
+            // Security configuration
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "PasswordMinLength",
                 "8",
-                "密码最小长度"
+                "Minimum password length"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "PasswordRequireDigit",
                 "true",
-                "密码需要数字"
+                "Password requires digit"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "PasswordRequireLowercase",
                 "true",
-                "密码需要小写字母"
+                "Password requires lowercase letter"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "PasswordRequireUppercase",
                 "true",
-                "密码需要大写字母"
+                "Password requires uppercase letter"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "PasswordRequireNonAlphanumeric",
                 "false",
-                "密码需要特殊字符"
+                "Password requires special character"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "LockoutMaxAttempts",
                 "5",
-                "锁定前最大尝试次数"
+                "Maximum attempts before lockout"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "LockoutDurationMinutes",
                 "15",
-                "锁定持续时间（分钟）"
+                "Lockout duration (minutes)"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "AccessTokenLifetimeMinutes",
                 "60",
-                "访问令牌有效期（分钟）"
+                "Access token lifetime (minutes)"
             );
             await _systemConfigService.SetValueAsync(
                 "Security",
                 "RefreshTokenLifetimeDays",
                 "7",
-                "刷新令牌有效期（天）"
+                "Refresh token lifetime (days)"
             );
 
-            // 邮件配置
+            // Email configuration
             await _systemConfigService.SetValueAsync(
                 "Email",
                 "SmtpHost",
                 "smtp.example.com",
-                "SMTP服务器地址"
+                "SMTP server address"
             );
-            await _systemConfigService.SetValueAsync("Email", "SmtpPort", "587", "SMTP端口");
-            await _systemConfigService.SetValueAsync("Email", "SmtpUsername", "", "SMTP用户名");
-            await _systemConfigService.SetValueAsync("Email", "SmtpPassword", "", "SMTP密码");
-            await _systemConfigService.SetValueAsync("Email", "EnableSsl", "true", "启用SSL");
+            await _systemConfigService.SetValueAsync("Email", "SmtpPort", "587", "SMTP port");
+            await _systemConfigService.SetValueAsync("Email", "SmtpUsername", "", "SMTP username");
+            await _systemConfigService.SetValueAsync("Email", "SmtpPassword", "", "SMTP password");
+            await _systemConfigService.SetValueAsync("Email", "EnableSsl", "true", "Enable SSL");
             await _systemConfigService.SetValueAsync(
                 "Email",
                 "FromAddress",
                 "noreply@example.com",
-                "发件人地址"
+                "From address"
             );
             await _systemConfigService.SetValueAsync(
                 "Email",
                 "FromName",
                 "Dawning Gateway",
-                "发件人名称"
+                "From name"
             );
 
-            // 日志配置
+            // Logging configuration
             await _systemConfigService.SetValueAsync(
                 "Logging",
                 "LogLevel",
                 "Information",
-                "日志级别"
+                "Log level"
             );
             await _systemConfigService.SetValueAsync(
                 "Logging",
                 "RetentionDays",
                 "30",
-                "日志保留天数"
+                "Log retention days"
             );
             await _systemConfigService.SetValueAsync(
                 "Logging",
                 "EnableRequestLogging",
                 "true",
-                "启用请求日志"
+                "Enable request logging"
             );
             await _systemConfigService.SetValueAsync(
                 "Logging",
                 "EnableAuditLogging",
                 "true",
-                "启用审计日志"
+                "Enable audit logging"
             );
 
-            // 网关配置
+            // Gateway configuration
             await _systemConfigService.SetValueAsync(
                 "Gateway",
                 "EnableRateLimiting",
                 "true",
-                "启用限流"
+                "Enable rate limiting"
             );
             await _systemConfigService.SetValueAsync(
                 "Gateway",
                 "DefaultRateLimit",
                 "100",
-                "默认限流次数/分钟"
+                "Default rate limit per minute"
             );
             await _systemConfigService.SetValueAsync(
                 "Gateway",
                 "EnableCaching",
                 "false",
-                "启用缓存"
+                "Enable caching"
             );
             await _systemConfigService.SetValueAsync(
                 "Gateway",
                 "CacheExpirationMinutes",
                 "5",
-                "缓存过期时间（分钟）"
+                "Cache expiration time (minutes)"
             );
 
-            return Ok(new { success = true, message = "默认配置已初始化" });
+            return Ok(new { success = true, message = "Default configuration initialized" });
         }
     }
 

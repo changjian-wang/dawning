@@ -5,7 +5,7 @@ using StackExchange.Redis;
 namespace Dawning.Identity.Infra.Messaging.Distributed;
 
 /// <summary>
-/// 基于 Redis 的分布式锁实现
+/// Redis-based distributed lock implementation
 /// </summary>
 public class RedisDistributedLock : IDistributedLock
 {
@@ -89,7 +89,7 @@ public class RedisDistributedLock : IDistributedLock
     }
 
     /// <summary>
-    /// Redis 锁句柄实现
+    /// Redis lock handle implementation
     /// </summary>
     private class RedisLockHandle : IDistributedLockHandle
     {
@@ -127,7 +127,7 @@ public class RedisDistributedLock : IDistributedLock
 
             try
             {
-                // 只有持有锁的实例才能延长锁
+                // Only the instance holding the lock can extend it
                 var script =
                     @"
                     if redis.call('get', KEYS[1]) == ARGV[1] then
@@ -164,7 +164,7 @@ public class RedisDistributedLock : IDistributedLock
 
             try
             {
-                // 只有持有锁的实例才能释放锁
+                // Only the instance holding the lock can release it
                 var script =
                     @"
                     if redis.call('get', KEYS[1]) == ARGV[1] then

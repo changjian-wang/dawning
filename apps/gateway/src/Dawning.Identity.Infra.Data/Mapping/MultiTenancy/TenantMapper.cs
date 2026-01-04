@@ -4,7 +4,7 @@ using Dawning.Identity.Infra.Data.PersistentObjects.MultiTenancy;
 namespace Dawning.Identity.Infra.Data.Mapping.MultiTenancy
 {
     /// <summary>
-    /// 租户实体映射扩展
+    /// Tenant entity mapping extensions
     /// </summary>
     public static class TenantMapper
     {

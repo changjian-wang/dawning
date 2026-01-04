@@ -4,7 +4,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
 {
     /// <summary>
-    /// API资源持久化对象
+    /// API resource persistent object
     /// </summary>
     [Table("api_resources")]
     public class ApiResourceEntity
@@ -46,7 +46,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
     }
 
     /// <summary>
-    /// API资源作用域关联持久化对象
+    /// API resource scope association persistent object
     /// </summary>
     [Table("api_resource_scopes")]
     public class ApiResourceScopeEntity
@@ -66,7 +66,7 @@ namespace Dawning.Identity.Infra.Data.PersistentObjects.OpenIddict
     }
 
     /// <summary>
-    /// API资源声明持久化对象
+    /// API resource claim persistent object
     /// </summary>
     [Table("api_resource_claims")]
     public class ApiResourceClaimEntity

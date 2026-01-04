@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Token
 {
     /// <summary>
-    /// Token 黑名单服务实现（基于 Redis）
+    /// Token blacklist service implementation (Redis-based)
     /// </summary>
     public class TokenBlacklistService : ITokenBlacklistService
     {
@@ -24,7 +24,7 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 将令牌加入黑名单
+        /// Add token to blacklist
         /// </summary>
         public async Task AddToBlacklistAsync(string jti, DateTime expiration)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Application.Services.Token
                 var key = $"{TokenBlacklistPrefix}{jti}";
                 var ttl = expiration - DateTime.UtcNow;
 
-                // 只有在未过期的情况下才添加
+                // Only add if not expired
                 if (ttl > TimeSpan.Zero)
                 {
                     await _cache.SetStringAsync(
@@ -59,7 +59,7 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 检查令牌是否在黑名单中
+        /// Check if token is in blacklist
         /// </summary>
         public async Task<bool> IsBlacklistedAsync(string jti)
         {
@@ -75,12 +75,12 @@ namespace Dawning.Identity.Application.Services.Token
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Failed to check blacklist for token {Jti}", jti);
-                return false; // 失败时默认不阻止
+                return false; // Default to not blocking on failure
             }
         }
 
         /// <summary>
-        /// 将用户的所有令牌加入黑名单
+        /// Blacklist all tokens for a user
         /// </summary>
         public async Task BlacklistUserTokensAsync(Guid userId, DateTime expiration)
         {
@@ -91,7 +91,7 @@ namespace Dawning.Identity.Application.Services.Token
 
                 if (ttl > TimeSpan.Zero)
                 {
-                    // 存储黑名单时间戳，之前的所有令牌都无效
+                    // Store blacklist timestamp - all previous tokens become invalid
                     await _cache.SetStringAsync(
                         key,
                         DateTime.UtcNow.Ticks.ToString(),
@@ -112,7 +112,7 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 检查用户是否在全局黑名单中
+        /// Check if user is in global blacklist
         /// </summary>
         public async Task<bool> IsUserBlacklistedAsync(Guid userId)
         {
@@ -130,18 +130,18 @@ namespace Dawning.Identity.Application.Services.Token
         }
 
         /// <summary>
-        /// 清理过期的黑名单条目（Redis 自动处理过期，此方法可用于手动清理）
+        /// Clean up expired blacklist entries (Redis handles expiration automatically, this method can be used for manual cleanup)
         /// </summary>
         public Task CleanupExpiredEntriesAsync()
         {
-            // Redis 自动处理过期条目，无需手动清理
+            // Redis automatically handles expired entries, no manual cleanup needed
             _logger.LogDebug("Cleanup not needed - Redis handles expiration automatically");
             return Task.CompletedTask;
         }
     }
 
     /// <summary>
-    /// 内存缓存版本的 Token 黑名单服务（用于不使用 Redis 的场景）
+    /// In-memory cache version of Token blacklist service (for scenarios without Redis)
     /// </summary>
     public class InMemoryTokenBlacklistService : ITokenBlacklistService
     {
@@ -203,7 +203,7 @@ namespace Dawning.Identity.Application.Services.Token
 
         public Task CleanupExpiredEntriesAsync()
         {
-            // MemoryCache 自动处理过期
+            // MemoryCache automatically handles expiration
             return Task.CompletedTask;
         }
     }

@@ -10,8 +10,8 @@ using Microsoft.Extensions.Options;
 namespace Dawning.Identity.Infra.Messaging.Kafka;
 
 /// <summary>
-/// 基于 Kafka 的集成事件总线实现
-/// 用于跨进程/服务发布事件
+/// Kafka-based integration event bus implementation
+/// Used for cross-process/service event publishing
 /// </summary>
 public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
 {
@@ -63,7 +63,7 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
     }
 
     /// <summary>
-    /// 发布集成事件到 Kafka
+    /// Publish integration event to Kafka
     /// </summary>
     public async Task PublishAsync<TEvent>(
         TEvent @event,
@@ -121,7 +121,7 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
     }
 
     /// <summary>
-    /// 批量发布集成事件
+    /// Batch publish integration events
     /// </summary>
     public async Task PublishManyAsync<TEvent>(
         IEnumerable<TEvent> events,
@@ -135,12 +135,12 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
             await PublishAsync(@event, topic, cancellationToken);
         }
 
-        // 确保所有消息都已发送
+        // Ensure all messages are sent
         _producer.Flush(cancellationToken);
     }
 
     /// <summary>
-    /// 根据事件类型获取 Topic 名称
+    /// Get Topic name based on event type
     /// </summary>
     private string GetTopicForEvent<TEvent>()
         where TEvent : IIntegrationEvent
@@ -194,7 +194,7 @@ public class KafkaIntegrationEventBus : IIntegrationEventBus, IDisposable
 }
 
 /// <summary>
-/// 空实现的集成事件总线（当 Kafka 禁用时使用）
+/// Null implementation of integration event bus (used when Kafka is disabled)
 /// </summary>
 public class NullIntegrationEventBus : IIntegrationEventBus
 {

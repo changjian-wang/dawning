@@ -16,7 +16,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Gateway
 {
     /// <summary>
-    /// 网关集群仓储实现
+    /// Gateway cluster repository implementation
     /// </summary>
     public class GatewayClusterRepository : IGatewayClusterRepository
     {
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据ID获取集群
+        /// Get cluster by ID
         /// </summary>
         public async Task<GatewayCluster?> GetAsync(Guid id)
         {
@@ -40,7 +40,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据ClusterId获取集群
+        /// Get cluster by ClusterId
         /// </summary>
         public async Task<GatewayCluster?> GetByClusterIdAsync(string clusterId)
         {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取所有启用的集群
+        /// Get all enabled clusters
         /// </summary>
         public async Task<IEnumerable<GatewayCluster>> GetAllEnabledAsync()
         {
@@ -67,7 +67,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取所有集群（用于下拉选择）
+        /// Get all clusters (for dropdown selection)
         /// </summary>
         public async Task<IEnumerable<GatewayCluster>> GetAllAsync()
         {
@@ -80,7 +80,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取分页集群列表
+        /// Get paged cluster list
         /// </summary>
         public async Task<PagedData<GatewayCluster>> GetPagedListAsync(
             GatewayClusterQueryModel model,
@@ -90,7 +90,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         {
             var builder = _context.Connection.Builder<GatewayClusterEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(
                     !string.IsNullOrWhiteSpace(model.ClusterId),
@@ -106,7 +106,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
                 )
                 .WhereIf(model.IsEnabled.HasValue, c => c.IsEnabled == model.IsEnabled!.Value);
 
-            // 关键词搜索
+            // Keyword search
             if (!string.IsNullOrWhiteSpace(model.Keyword))
             {
                 builder = builder.Where(c =>
@@ -116,7 +116,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
                 );
             }
 
-            // 按ID排序
+            // Sort by ID
             var result = await builder
                 .OrderBy(c => c.ClusterId)
                 .AsPagedListAsync(page, itemsPerPage);
@@ -131,7 +131,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 插入集群
+        /// Insert cluster
         /// </summary>
         public async ValueTask<int> InsertAsync(GatewayCluster model)
         {
@@ -141,7 +141,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 更新集群
+        /// Update cluster
         /// </summary>
         public async ValueTask<int> UpdateAsync(GatewayCluster model)
         {
@@ -152,7 +152,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 删除集群
+        /// Delete cluster
         /// </summary>
         public async ValueTask<int> DeleteAsync(Guid id)
         {
@@ -168,7 +168,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 检查ClusterId是否已存在
+        /// Check if ClusterId already exists
         /// </summary>
         public async Task<bool> ExistsByClusterIdAsync(string clusterId, Guid? excludeId = null)
         {
@@ -185,7 +185,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 检查集群是否被路由引用
+        /// Check if cluster is referenced by routes
         /// </summary>
         public async Task<bool> IsReferencedByRoutesAsync(string clusterId)
         {

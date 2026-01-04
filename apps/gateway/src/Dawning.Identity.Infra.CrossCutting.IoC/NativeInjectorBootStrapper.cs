@@ -17,23 +17,23 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         const string REPOSITORY_SUFFIX_NAME = "Repository";
 
         /// <summary>
-        /// 注册应用服务
+        /// Register application services
         /// </summary>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            // 注册 UnitOfWork
+            // Register UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-            // 注册 HttpClientFactory（用于 Webhook 通知）
+            // Register HttpClientFactory (for Webhook notifications)
             services.AddHttpClient();
 
-            // 注册告警检查后台服务
+            // Register alert check background service
             services.AddHostedService<AlertCheckBackgroundService>();
 
-            // 注册多租户上下文（Scoped，每个请求一个实例）
+            // Register multi-tenant context (Scoped, one instance per request)
             services.AddScoped<ITenantContext, TenantContext>();
 
-            // 扫描并注册程序集中的服务和仓储
+            // Scan and register services and repositories from assemblies
             foreach (var assembly in LoadAssemblies())
             {
                 RegisterServices(services, assembly);
@@ -43,7 +43,7 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         }
 
         /// <summary>
-        /// 注册服务
+        /// Register services
         /// </summary>
         private static void RegisterServices(IServiceCollection services, Assembly assembly)
         {
@@ -61,19 +61,19 @@ namespace Dawning.Identity.Infra.CrossCutting.IoC
         }
 
         /// <summary>
-        /// 判断是否为 Service 或 Repository
+        /// Check if type is a Service or Repository
         /// </summary>
         private static bool IsServiceOrRepository(Type type) =>
             type.Name.EndsWith(SERVICE_SUFFIX_NAME) || type.Name.EndsWith(REPOSITORY_SUFFIX_NAME);
 
         /// <summary>
-        /// 获取相关接口（只返回项目内部的接口）
+        /// Get relevant interfaces (only return project internal interfaces)
         /// </summary>
         private static IEnumerable<Type> GetRelevantInterfaces(this Type type) =>
             type.GetInterfaces().Where(i => i.Namespace?.StartsWith(NAME_SPACE) ?? false);
 
         /// <summary>
-        /// 加载程序集
+        /// Load assemblies
         /// </summary>
         private static IEnumerable<Assembly> LoadAssemblies()
         {

@@ -16,7 +16,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
     /// <summary>
-    /// 身份资源仓储实现
+    /// Identity resource repository implementation
     /// </summary>
     public class IdentityResourceRepository : IIdentityResourceRepository
     {
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID获取身份资源
+        /// Get identity resource by ID
         /// </summary>
         public async Task<IdentityResource?> GetAsync(Guid id)
         {
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称获取身份资源
+        /// Get identity resource by name
         /// </summary>
         public async Task<IdentityResource?> GetByNameAsync(string name)
         {
@@ -72,7 +72,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paged list
         /// </summary>
         public async Task<PagedData<IdentityResource>> GetPagedListAsync(
             IdentityResourceModel model,
@@ -116,7 +116,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有身份资源
+        /// Get all identity resources
         /// </summary>
         public async Task<IEnumerable<IdentityResource>> GetAllAsync()
         {
@@ -140,7 +140,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称列表获取身份资源
+        /// Get identity resources by name list
         /// </summary>
         public async Task<IEnumerable<IdentityResource>> GetByNamesAsync(IEnumerable<string> names)
         {
@@ -171,7 +171,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 插入身份资源
+        /// Insert identity resource
         /// </summary>
         public async ValueTask<int> InsertAsync(IdentityResource model)
         {
@@ -198,7 +198,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 更新身份资源
+        /// Update identity resource
         /// </summary>
         public async ValueTask<bool> UpdateAsync(IdentityResource model)
         {
@@ -233,7 +233,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 删除身份资源
+        /// Delete identity resource
         /// </summary>
         public async ValueTask<bool> DeleteAsync(IdentityResource model)
         {

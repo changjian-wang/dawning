@@ -10,7 +10,7 @@ using OpenIddict.Abstractions;
 namespace Dawning.Identity.Infra.Data.Stores
 {
     /// <summary>
-    /// OpenIddict Scope Store - 桥接到 Dapper Repository
+    /// OpenIddict Scope Store - Bridge to Dapper Repository
     /// </summary>
     public class OpenIddictScopeStore : IOpenIddictScopeStore<Scope>
     {
@@ -371,7 +371,7 @@ namespace Dawning.Identity.Infra.Data.Stores
         }
 
         /// <summary>
-        /// GetAsync - 用于查询
+        /// GetAsync - For query
         /// </summary>
         public ValueTask<TResult?> GetAsync<TState, TResult>(
             Func<IQueryable<Scope>, TState, IQueryable<TResult>> query,
@@ -379,7 +379,7 @@ namespace Dawning.Identity.Infra.Data.Stores
             CancellationToken cancellationToken
         )
         {
-            // Dapper 不支持 IQueryable
+            // Dapper does not support IQueryable
             return new ValueTask<TResult?>(default(TResult));
         }
     }

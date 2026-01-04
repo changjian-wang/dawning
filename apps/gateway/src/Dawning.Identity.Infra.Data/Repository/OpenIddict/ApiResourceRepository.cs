@@ -16,7 +16,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
     /// <summary>
-    /// API资源仓储实现
+    /// API resource repository implementation
     /// </summary>
     public class ApiResourceRepository : IApiResourceRepository
     {
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID获取API资源
+        /// Get API resource by ID
         /// </summary>
         public async Task<ApiResource?> GetAsync(Guid id)
         {
@@ -55,7 +55,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称获取API资源
+        /// Get API resource by name
         /// </summary>
         public async Task<ApiResource?> GetByNameAsync(string name)
         {
@@ -84,7 +84,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paged list
         /// </summary>
         public async Task<PagedData<ApiResource>> GetPagedListAsync(
             ApiResourceModel model,
@@ -133,7 +133,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有API资源
+        /// Get all API resources
         /// </summary>
         public async Task<IEnumerable<ApiResource>> GetAllAsync()
         {
@@ -163,7 +163,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称列表获取API资源
+        /// Get API resources by name list
         /// </summary>
         public async Task<IEnumerable<ApiResource>> GetByNamesAsync(IEnumerable<string> names)
         {
@@ -200,7 +200,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 插入API资源
+        /// Insert API resource
         /// </summary>
         public async ValueTask<int> InsertAsync(ApiResource model)
         {
@@ -243,7 +243,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 更新API资源
+        /// Update API resource
         /// </summary>
         public async ValueTask<bool> UpdateAsync(ApiResource model)
         {
@@ -300,7 +300,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 删除API资源
+        /// Delete API resource
         /// </summary>
         public async ValueTask<bool> DeleteAsync(ApiResource model)
         {

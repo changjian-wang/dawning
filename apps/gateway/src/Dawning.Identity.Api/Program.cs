@@ -198,7 +198,7 @@ namespace Dawning.Identity.Api
             // ===== OpenTelemetry =====
             builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
 
-            // ===== MediatR (进程内领域事件) =====
+            // ===== MediatR (In-process Domain Events) =====
             builder.Services.AddMediatR(cfg =>
                 cfg.RegisterServicesFromAssembly(
                     typeof(Application.EventHandlers.UserCreatedEventHandler).Assembly
@@ -206,15 +206,15 @@ namespace Dawning.Identity.Api
             );
 
             // ===== Messaging Services (DDD Event-Driven Architecture) =====
-            // MediatR 用于进程内领域事件
-            // Kafka 用于进程间集成事件
+            // MediatR for in-process domain events
+            // Kafka for inter-process integration events
             builder.Services.AddMessagingServices(builder.Configuration);
 
-            // 启动 Kafka 集成事件消费者（后台服务）
+            // Start Kafka integration event consumers (background services)
             builder.Services.AddKafkaIntegrationEventConsumers();
 
-            // ===== Distributed Lock (分布式锁) =====
-            // 使用 Infra.Messaging 层的扩展方法（支持 Redis 不可用时的优雅降级）
+            // ===== Distributed Lock =====
+            // Use Infra.Messaging layer extension method (supports graceful fallback when Redis is unavailable)
             builder.Services.AddDistributedLock();
 
             // ===== Database Seeder =====
@@ -243,7 +243,7 @@ namespace Dawning.Identity.Api
             app.UseCsrfToken();
 
             // ===== Middleware Configuration =====
-            // 所有中间件已测试
+            // All middleware has been tested
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseMiddleware<PerformanceMonitoringMiddleware>();
@@ -253,7 +253,7 @@ namespace Dawning.Identity.Api
             app.UseRouting();
             app.UseCors("AllowAll");
 
-            // 启用认证和授权
+            // Enable authentication and authorization
             app.UseAuthentication();
 
             // ===== Tenant Resolution Middleware =====
@@ -282,7 +282,7 @@ namespace Dawning.Identity.Api
             );
 
             // ===== Database Seeding =====
-            // 在测试环境下跳过数据库种子
+            // Skip database seeding in test environment
             if (!app.Environment.IsEnvironment("Testing"))
             {
                 using (var scope = app.Services.CreateScope())

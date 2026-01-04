@@ -12,7 +12,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.Repository.Monitoring;
 
 /// <summary>
-/// 告警规则仓储实现
+/// Alert rule repository implementation
 /// </summary>
 public class AlertRuleRepository : IAlertRuleRepository
 {
@@ -24,7 +24,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 获取所有告警规则
+    /// Get all alert rules
     /// </summary>
     public async Task<IEnumerable<AlertRule>> GetAllAsync()
     {
@@ -37,7 +37,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 获取启用的告警规则
+    /// Get enabled alert rules
     /// </summary>
     public async Task<IEnumerable<AlertRule>> GetEnabledAsync()
     {
@@ -52,7 +52,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 根据ID获取告警规则
+    /// Get alert rule by ID
     /// </summary>
     public async Task<AlertRule?> GetByIdAsync(long id)
     {
@@ -61,7 +61,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 创建告警规则
+    /// Create alert rule
     /// </summary>
     public async Task<long> CreateAsync(AlertRule rule)
     {
@@ -74,7 +74,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 更新告警规则
+    /// Update alert rule
     /// </summary>
     public async Task<bool> UpdateAsync(AlertRule rule)
     {
@@ -85,7 +85,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 删除告警规则
+    /// Delete alert rule
     /// </summary>
     public async Task<bool> DeleteAsync(long id)
     {
@@ -97,7 +97,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 更新启用状态
+    /// Update enabled status
     /// </summary>
     public async Task<bool> SetEnabledAsync(long id, bool isEnabled)
     {
@@ -112,7 +112,7 @@ public class AlertRuleRepository : IAlertRuleRepository
     }
 
     /// <summary>
-    /// 更新最后触发时间
+    /// Update last triggered time
     /// </summary>
     public async Task<bool> UpdateLastTriggeredAsync(long id, DateTime triggeredAt)
     {

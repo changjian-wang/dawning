@@ -10,22 +10,22 @@ namespace Dawning.Identity.Domain.Models
         where T : class, new()
     {
         /// <summary>
-        /// 当前页码
+        /// Current page index
         /// </summary>
         public int PageIndex { get; init; }
 
         /// <summary>
-        /// 每页数量
+        /// Number of items per page
         /// </summary>
         public int PageSize { get; init; }
 
         /// <summary>
-        /// 总记录数
+        /// Total number of records
         /// </summary>
         public long TotalCount { get; init; }
 
         /// <summary>
-        /// 数据列表
+        /// Data list
         /// </summary>
         public IEnumerable<T> Items { get; init; } = new List<T>();
     }

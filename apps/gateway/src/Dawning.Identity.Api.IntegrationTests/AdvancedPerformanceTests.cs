@@ -8,14 +8,14 @@ using Xunit.Abstractions;
 namespace Dawning.Identity.Api.IntegrationTests;
 
 /// <summary>
-/// 高级性能和压力测试
-/// 测试系统在高负载下的表现
+/// Advanced performance and stress tests
+/// Tests system behavior under high load
 /// </summary>
 public class AdvancedPerformanceTests : IntegrationTestBase
 {
     private readonly ITestOutputHelper _output;
 
-    // 性能阈值（毫秒）
+    // Performance thresholds (milliseconds)
     private const int FastApiThreshold = 200;
     private const int StandardApiThreshold = 500;
     private const int HighLoadThreshold = 2000;
@@ -33,7 +33,7 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         const int concurrentRequests = 50;
         var tasks = new List<Task<(HttpResponseMessage, long)>>();
 
-        // Act - 高并发请求
+        // Act - High concurrency requests
         var stopwatch = Stopwatch.StartNew();
         for (int i = 0; i < concurrentRequests; i++)
         {
@@ -50,29 +50,29 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var p95Time = times.OrderBy(t => t).ElementAt((int)(times.Count * 0.95));
         var p99Time = times.OrderBy(t => t).ElementAt((int)(times.Count * 0.99));
 
-        _output.WriteLine($"高并发测试 ({concurrentRequests} 请求):");
+        _output.WriteLine($"High concurrency test ({concurrentRequests} requests):");
         _output.WriteLine(
-            $"  成功率: {successCount}/{concurrentRequests} ({successCount * 100.0 / concurrentRequests:F1}%)"
+            $"  Success rate: {successCount}/{concurrentRequests} ({successCount * 100.0 / concurrentRequests:F1}%)"
         );
-        _output.WriteLine($"  总耗时: {stopwatch.ElapsedMilliseconds}ms");
-        _output.WriteLine($"  平均响应时间: {avgTime:F1}ms");
-        _output.WriteLine($"  P95 响应时间: {p95Time}ms");
-        _output.WriteLine($"  P99 响应时间: {p99Time}ms");
-        _output.WriteLine($"  最小/最大: {times.Min()}ms / {times.Max()}ms");
+        _output.WriteLine($"  Total time: {stopwatch.ElapsedMilliseconds}ms");
+        _output.WriteLine($"  Average response time: {avgTime:F1}ms");
+        _output.WriteLine($"  P95 response time: {p95Time}ms");
+        _output.WriteLine($"  P99 response time: {p99Time}ms");
+        _output.WriteLine($"  Min/Max: {times.Min()}ms / {times.Max()}ms");
 
-        successCount.Should().Be(concurrentRequests, "所有请求应该成功");
-        p95Time.Should().BeLessThan(HighLoadThreshold, "P95 响应时间应在 2000ms 内");
+        successCount.Should().Be(concurrentRequests, "All requests should succeed");
+        p95Time.Should().BeLessThan(HighLoadThreshold, "P95 response time should be within 2000ms");
     }
 
     [Fact]
     public async Task BurstTraffic_ShouldHandleSpikes()
     {
-        // Arrange - 模拟流量突增
+        // Arrange - Simulate traffic spikes
         const int burstSize = 20;
         const int burstCount = 3;
         var allResults = new List<(HttpResponseMessage, long)>();
 
-        // Act - 多次突发请求
+        // Act - Multiple burst requests
         for (int burst = 0; burst < burstCount; burst++)
         {
             var tasks = Enumerable
@@ -83,7 +83,7 @@ public class AdvancedPerformanceTests : IntegrationTestBase
             var results = await Task.WhenAll(tasks);
             allResults.AddRange(results);
 
-            // 短暂间隔后再次突发
+            // Short delay before next burst
             await Task.Delay(100);
         }
 
@@ -92,19 +92,19 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var successCount = allResults.Count(r => r.Item1.IsSuccessStatusCode);
         var avgTime = times.Average();
 
-        _output.WriteLine($"突发流量测试 ({burstCount} 次突发, 每次 {burstSize} 请求):");
-        _output.WriteLine($"  总请求数: {allResults.Count}");
-        _output.WriteLine($"  成功率: {successCount * 100.0 / allResults.Count:F1}%");
-        _output.WriteLine($"  平均响应时间: {avgTime:F1}ms");
+        _output.WriteLine($"Burst traffic test ({burstCount} bursts, {burstSize} requests each):");
+        _output.WriteLine($"  Total requests: {allResults.Count}");
+        _output.WriteLine($"  Success rate: {successCount * 100.0 / allResults.Count:F1}%");
+        _output.WriteLine($"  Average response time: {avgTime:F1}ms");
 
-        successCount.Should().Be(allResults.Count, "所有突发请求应该成功");
-        avgTime.Should().BeLessThan(StandardApiThreshold, "平均响应时间应在 500ms 内");
+        successCount.Should().Be(allResults.Count, "All burst requests should succeed");
+        avgTime.Should().BeLessThan(StandardApiThreshold, "Average response time should be within 500ms");
     }
 
     [Fact]
     public async Task MixedEndpoints_ConcurrentRequests_ShouldAllSucceed()
     {
-        // Arrange - 混合请求不同的端点（排除需要数据库的 /api/health/ready）
+        // Arrange - Mixed requests to different endpoints (excluding /api/health/ready that requires database)
         var endpoints = new[]
         {
             "/api/health",
@@ -116,7 +116,7 @@ public class AdvancedPerformanceTests : IntegrationTestBase
 
         var tasks = new List<Task<(HttpResponseMessage, long)>>();
 
-        // Act - 并发请求多个不同端点
+        // Act - Concurrent requests to multiple different endpoints
         var stopwatch = Stopwatch.StartNew();
         foreach (var endpoint in endpoints)
         {
@@ -132,19 +132,19 @@ public class AdvancedPerformanceTests : IntegrationTestBase
 
         // Assert
         var times = results.Select(r => r.Item2).ToList();
-        // 统计有效响应（成功或需要认证都是正常的）
+        // Count valid responses (success or requires authentication are normal)
         var validResponses = results.Count(r =>
             r.Item1.IsSuccessStatusCode || r.Item1.StatusCode == HttpStatusCode.Unauthorized
         );
 
-        _output.WriteLine($"混合端点并发测试:");
-        _output.WriteLine($"  端点数量: {endpoints.Length}");
-        _output.WriteLine($"  总请求数: {tasks.Count}");
-        _output.WriteLine($"  有效响应: {validResponses}");
-        _output.WriteLine($"  总耗时: {stopwatch.ElapsedMilliseconds}ms");
-        _output.WriteLine($"  平均响应时间: {times.Average():F1}ms");
+        _output.WriteLine($"Mixed endpoints concurrency test:");
+        _output.WriteLine($"  Endpoint count: {endpoints.Length}");
+        _output.WriteLine($"  Total requests: {tasks.Count}");
+        _output.WriteLine($"  Valid responses: {validResponses}");
+        _output.WriteLine($"  Total time: {stopwatch.ElapsedMilliseconds}ms");
+        _output.WriteLine($"  Average response time: {times.Average():F1}ms");
 
-        validResponses.Should().Be(tasks.Count, "所有请求应该返回有效响应");
+        validResponses.Should().Be(tasks.Count, "All requests should return valid responses");
     }
 
     [Fact]
@@ -154,7 +154,7 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         const int requestCount = 10;
         var times = new List<long>();
 
-        // Act - 连续请求并记录时间
+        // Act - Continuous requests and record time
         for (int i = 0; i < requestCount; i++)
         {
             var (response, elapsed) = await MeasureRequestAsync(() =>
@@ -164,19 +164,19 @@ public class AdvancedPerformanceTests : IntegrationTestBase
             response.EnsureSuccessStatusCode();
         }
 
-        // Assert - 计算统计指标
+        // Assert - Calculate statistics
         var avgTime = times.Average();
         var stdDev = Math.Sqrt(times.Select(t => Math.Pow(t - avgTime, 2)).Average());
         var coefficientOfVariation = stdDev / avgTime * 100;
 
-        _output.WriteLine($"响应时间稳定性测试 ({requestCount} 请求):");
-        _output.WriteLine($"  响应时间: [{string.Join(", ", times)}]ms");
-        _output.WriteLine($"  平均值: {avgTime:F1}ms");
-        _output.WriteLine($"  标准差: {stdDev:F1}ms");
-        _output.WriteLine($"  变异系数: {coefficientOfVariation:F1}%");
+        _output.WriteLine($"Response time stability test ({requestCount} requests):");
+        _output.WriteLine($"  Response times: [{string.Join(", ", times)}]ms");
+        _output.WriteLine($"  Average: {avgTime:F1}ms");
+        _output.WriteLine($"  Standard deviation: {stdDev:F1}ms");
+        _output.WriteLine($"  Coefficient of variation: {coefficientOfVariation:F1}%");
 
-        // 变异系数应小于 100%（表示相对稳定）
-        coefficientOfVariation.Should().BeLessThan(100, "响应时间变异系数应小于 100%");
+        // Coefficient of variation should be less than 100% (indicates relative stability)
+        coefficientOfVariation.Should().BeLessThan(100, "Response time coefficient of variation should be less than 100%");
     }
 
     [Fact]
@@ -188,17 +188,17 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var warmupTimes = new List<long>();
         var measuredTimes = new List<long>();
 
-        // Act - 预热请求
+        // Act - Warmup requests
         for (int i = 0; i < warmupRequests; i++)
         {
             var (_, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/health"));
             warmupTimes.Add(elapsed);
         }
 
-        // 等待一下让系统稳定
+        // Wait a moment for system to stabilize
         await Task.Delay(100);
 
-        // Act - 测量请求
+        // Act - Measurement requests
         for (int i = 0; i < measuredRequests; i++)
         {
             var (_, elapsed) = await MeasureRequestAsync(() => Client.GetAsync("/api/health"));
@@ -209,22 +209,22 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var warmupAvg = warmupTimes.Average();
         var measuredAvg = measuredTimes.Average();
 
-        _output.WriteLine($"预热效应测试:");
+        _output.WriteLine($"Warmup effect test:");
         _output.WriteLine(
-            $"  预热请求 ({warmupRequests}): [{string.Join(", ", warmupTimes)}]ms, 平均 {warmupAvg:F1}ms"
+            $"  Warmup requests ({warmupRequests}): [{string.Join(", ", warmupTimes)}]ms, average {warmupAvg:F1}ms"
         );
         _output.WriteLine(
-            $"  测量请求 ({measuredRequests}): [{string.Join(", ", measuredTimes)}]ms, 平均 {measuredAvg:F1}ms"
+            $"  Measurement requests ({measuredRequests}): [{string.Join(", ", measuredTimes)}]ms, average {measuredAvg:F1}ms"
         );
 
-        // 测量阶段的平均时间应该稳定
-        measuredAvg.Should().BeLessThan(FastApiThreshold, "预热后请求应在 200ms 内响应");
+        // Average time during measurement phase should be stable
+        measuredAvg.Should().BeLessThan(FastApiThreshold, "Requests after warmup should respond within 200ms");
     }
 
     [Fact]
     public async Task LargePayload_TokenRequest_ShouldHandle()
     {
-        // Arrange - 发送较大的请求
+        // Arrange - Send a larger request
         var content = new FormUrlEncodedContent(
             new Dictionary<string, string>
             {
@@ -242,13 +242,13 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         stopwatch.Stop();
 
         // Assert
-        _output.WriteLine($"Token 请求测试:");
-        _output.WriteLine($"  响应时间: {stopwatch.ElapsedMilliseconds}ms");
-        _output.WriteLine($"  状态码: {response.StatusCode}");
+        _output.WriteLine($"Token request test:");
+        _output.WriteLine($"  Response time: {stopwatch.ElapsedMilliseconds}ms");
+        _output.WriteLine($"  Status code: {response.StatusCode}");
 
         stopwatch
             .ElapsedMilliseconds.Should()
-            .BeLessThan(HighLoadThreshold, "Token 请求应在 2000ms 内响应");
+            .BeLessThan(HighLoadThreshold, "Token request should respond within 2000ms");
     }
 
     [Fact]
@@ -258,7 +258,7 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         var pageSizes = new[] { 10, 20, 50, 100 };
         var results = new Dictionary<int, long>();
 
-        // Act - 测试不同分页大小的性能
+        // Act - Test performance of different pagination sizes
         foreach (var pageSize in pageSizes)
         {
             var (_, elapsed) = await MeasureRequestAsync(() =>
@@ -268,18 +268,18 @@ public class AdvancedPerformanceTests : IntegrationTestBase
         }
 
         // Assert
-        _output.WriteLine($"分页性能测试:");
+        _output.WriteLine($"Pagination performance test:");
         foreach (var (pageSize, time) in results)
         {
             _output.WriteLine($"  pageSize={pageSize}: {time}ms");
         }
 
-        // 所有分页请求应该在合理时间内响应
+        // All pagination requests should respond within reasonable time
         results.Values.Should().AllSatisfy(t => t.Should().BeLessThan(StandardApiThreshold));
     }
 
     /// <summary>
-    /// 测量请求响应时间
+    /// Measure request response time
     /// </summary>
     private async Task<(HttpResponseMessage Response, long ElapsedMs)> MeasureRequestAsync(
         Func<Task<HttpResponseMessage>> requestFunc

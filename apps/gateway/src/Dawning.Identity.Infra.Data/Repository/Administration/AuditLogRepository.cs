@@ -14,7 +14,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Administration
 {
     /// <summary>
-    /// 审计日志仓储实现
+    /// Audit log repository implementation
     /// </summary>
     public class AuditLogRepository : IAuditLogRepository
     {
@@ -26,7 +26,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 根据ID异步获取审计日志
+        /// Get audit log by ID asynchronously
         /// </summary>
         public async Task<AuditLog?> GetAsync(Guid id)
         {
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 获取分页审计日志列表
+        /// Get paged audit log list
         /// </summary>
         public async Task<PagedData<AuditLog>> GetPagedListAsync(
             AuditLogModel model,
@@ -48,7 +48,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         {
             var builder = _context.Connection.Builder<AuditLogEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(model.UserId.HasValue, a => a.UserId == model.UserId!.Value)
                 .WhereIf(
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
                 .WhereIf(model.StartDate.HasValue, a => a.CreatedAt >= model.StartDate!.Value)
                 .WhereIf(model.EndDate.HasValue, a => a.CreatedAt <= model.EndDate!.Value);
 
-            // 按创建时间降序排序（最新的在前）
+            // Sort by creation time descending (newest first)
             var result = await builder
                 .OrderByDescending(a => a.CreatedAt)
                 .AsPagedListAsync(page, itemsPerPage);
@@ -83,7 +83,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 异步插入审计日志
+        /// Insert audit log asynchronously
         /// </summary>
         public async ValueTask<int> InsertAsync(AuditLog model)
         {
@@ -95,7 +95,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         }
 
         /// <summary>
-        /// 批量删除过期的审计日志（数据清理）
+        /// Batch delete expired audit logs (data cleanup)
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime date)
         {

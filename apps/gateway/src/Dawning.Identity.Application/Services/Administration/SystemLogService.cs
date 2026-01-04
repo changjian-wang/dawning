@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 namespace Dawning.Identity.Application.Services.Administration
 {
     /// <summary>
-    /// 系统日志服务实现
+    /// System log service implementation
     /// </summary>
     public class SystemLogService : ISystemLogService
     {
@@ -39,7 +39,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 记录错误日志
+        /// Log an error
         /// </summary>
         public async Task LogErrorAsync(
             Exception exception,
@@ -51,12 +51,12 @@ namespace Dawning.Identity.Application.Services.Administration
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
 
-            // 实时推送错误日志
+            // Push error log in real-time
             await PushLogToClientsAsync(log);
         }
 
         /// <summary>
-        /// 记录警告日志
+        /// Log a warning
         /// </summary>
         public async Task LogWarningAsync(string message, HttpContext? httpContext = null)
         {
@@ -64,12 +64,12 @@ namespace Dawning.Identity.Application.Services.Administration
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
 
-            // 实时推送警告日志
+            // Push warning log in real-time
             await PushLogToClientsAsync(log);
         }
 
         /// <summary>
-        /// 记录信息日志
+        /// Log an information message
         /// </summary>
         public async Task LogInfoAsync(string message, HttpContext? httpContext = null)
         {
@@ -77,12 +77,12 @@ namespace Dawning.Identity.Application.Services.Administration
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
 
-            // 仅推送重要的信息日志（避免日志洪水）
-            // 信息日志暂不推送，可通过配置开启
+            // Only push important info logs (avoid log flooding)
+            // Info logs are not pushed for now, can be enabled via configuration
         }
 
         /// <summary>
-        /// 创建系统日志
+        /// Create a system log
         /// </summary>
         public async Task<SystemLogDto> CreateAsync(CreateSystemLogDto dto)
         {
@@ -93,7 +93,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 根据ID获取系统日志
+        /// Get system log by ID
         /// </summary>
         public async Task<SystemLogDto?> GetAsync(Guid id)
         {
@@ -102,7 +102,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 分页获取系统日志列表
+        /// Get paged list of system logs
         /// </summary>
         public async Task<PagedData<SystemLogDto>> GetPagedListAsync(
             SystemLogQueryModel queryModel,
@@ -122,7 +122,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 删除指定日期之前的日志
+        /// Delete logs older than the specified date
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime beforeDate)
         {
@@ -132,7 +132,7 @@ namespace Dawning.Identity.Application.Services.Administration
         #region Private Methods
 
         /// <summary>
-        /// 从异常创建日志对象
+        /// Create log object from exception
         /// </summary>
         private SystemLog CreateLogFromException(
             Exception exception,
@@ -161,7 +161,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 从消息创建日志对象
+        /// Create log object from message
         /// </summary>
         private SystemLog CreateLogFromMessage(
             string message,
@@ -186,7 +186,7 @@ namespace Dawning.Identity.Application.Services.Administration
         }
 
         /// <summary>
-        /// 从HTTP上下文补充日志信息
+        /// Enrich log information from HTTP context
         /// </summary>
         private void EnrichLogFromHttpContext(
             SystemLog log,
@@ -194,7 +194,7 @@ namespace Dawning.Identity.Application.Services.Administration
             int? statusCode
         )
         {
-            // 用户信息
+            // User information
             if (httpContext.User?.Identity?.IsAuthenticated == true)
             {
                 var userIdClaim = httpContext.User.Claims.FirstOrDefault(c =>
@@ -211,7 +211,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 log.Username = usernameClaim?.Value;
             }
 
-            // IP地址
+            // IP address
             log.IpAddress = httpContext.Connection.RemoteIpAddress?.ToString();
 
             // User-Agent
@@ -220,16 +220,16 @@ namespace Dawning.Identity.Application.Services.Administration
                 log.UserAgent = httpContext.Request.Headers["User-Agent"].ToString();
             }
 
-            // 请求路径和方法
+            // Request path and method
             log.RequestPath = httpContext.Request.Path.Value;
             log.RequestMethod = httpContext.Request.Method;
 
-            // HTTP状态码
+            // HTTP status code
             log.StatusCode = statusCode ?? httpContext.Response.StatusCode;
         }
 
         /// <summary>
-        /// 推送日志到实时订阅的客户端
+        /// Push log to real-time subscribed clients
         /// </summary>
         private async Task PushLogToClientsAsync(SystemLog log)
         {
@@ -254,8 +254,8 @@ namespace Dawning.Identity.Application.Services.Administration
             }
             catch (Exception ex)
             {
-                // 推送失败不应影响日志记录
-                _logger.LogDebug(ex, "实时推送日志失败");
+                // Push failure should not affect log recording
+                _logger.LogDebug(ex, "Failed to push log in real-time");
             }
         }
 

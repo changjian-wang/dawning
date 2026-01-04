@@ -23,7 +23,7 @@ public class LoginLockoutServiceTests
 
         _uowMock.Setup(x => x.User).Returns(_userRepositoryMock.Object);
 
-        // 使用真实配置而非 Mock（extension methods 不能被 mock）
+        // Use real configuration instead of Mock (extension methods cannot be mocked)
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddInMemoryCollection(
             new Dictionary<string, string?>
@@ -153,7 +153,7 @@ public class LoginLockoutServiceTests
     [Fact]
     public async Task IsLockedOutAsync_Should_Return_Null_When_Lockout_Disabled()
     {
-        // Arrange - 创建禁用锁定的配置
+        // Arrange - Create configuration with lockout disabled
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddInMemoryCollection(
             new Dictionary<string, string?>
@@ -178,7 +178,7 @@ public class LoginLockoutServiceTests
     [Fact]
     public async Task RecordFailedLoginAsync_Should_Not_Record_When_Disabled()
     {
-        // Arrange - 创建禁用锁定的配置
+        // Arrange - Create configuration with lockout disabled
         var configBuilder = new ConfigurationBuilder();
         configBuilder.AddInMemoryCollection(
             new Dictionary<string, string?>

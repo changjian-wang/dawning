@@ -4,7 +4,7 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.Monitoring;
 
 /// <summary>
-/// 请求日志实体
+/// Request log entity
 /// </summary>
 [Table("request_logs")]
 public class RequestLogEntity

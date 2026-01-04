@@ -16,7 +16,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.Gateway
 {
     /// <summary>
-    /// 网关路由仓储实现
+    /// Gateway route repository implementation
     /// </summary>
     public class GatewayRouteRepository : IGatewayRouteRepository
     {
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据ID获取路由
+        /// Get route by ID
         /// </summary>
         public async Task<GatewayRoute?> GetAsync(Guid id)
         {
@@ -40,7 +40,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 根据RouteId获取路由
+        /// Get route by RouteId
         /// </summary>
         public async Task<GatewayRoute?> GetByRouteIdAsync(string routeId)
         {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取所有启用的路由
+        /// Get all enabled routes
         /// </summary>
         public async Task<IEnumerable<GatewayRoute>> GetAllEnabledAsync()
         {
@@ -68,7 +68,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 获取分页路由列表
+        /// Get paged route list
         /// </summary>
         public async Task<PagedData<GatewayRoute>> GetPagedListAsync(
             GatewayRouteQueryModel model,
@@ -78,7 +78,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         {
             var builder = _context.Connection.Builder<GatewayRouteEntity>(_context.Transaction);
 
-            // 应用过滤条件
+            // Apply filter conditions
             builder = builder
                 .WhereIf(
                     !string.IsNullOrWhiteSpace(model.RouteId),
@@ -98,7 +98,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
                 )
                 .WhereIf(model.IsEnabled.HasValue, r => r.IsEnabled == model.IsEnabled!.Value);
 
-            // 关键词搜索
+            // Keyword search
             if (!string.IsNullOrWhiteSpace(model.Keyword))
             {
                 builder = builder.Where(r =>
@@ -109,7 +109,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
                 );
             }
 
-            // 按顺序和ID排序
+            // Sort by order and ID
             var result = await builder
                 .OrderBy(r => r.SortOrder)
                 .ThenBy(r => r.RouteId)
@@ -125,7 +125,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 插入路由
+        /// Insert route
         /// </summary>
         public async ValueTask<int> InsertAsync(GatewayRoute model)
         {
@@ -135,7 +135,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 更新路由
+        /// Update route
         /// </summary>
         public async ValueTask<int> UpdateAsync(GatewayRoute model)
         {
@@ -146,7 +146,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 删除路由
+        /// Delete route
         /// </summary>
         public async ValueTask<int> DeleteAsync(Guid id)
         {
@@ -162,7 +162,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
         }
 
         /// <summary>
-        /// 检查RouteId是否已存在
+        /// Check if RouteId already exists
         /// </summary>
         public async Task<bool> ExistsByRouteIdAsync(string routeId, Guid? excludeId = null)
         {

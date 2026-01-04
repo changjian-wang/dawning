@@ -40,7 +40,7 @@ public class AlertServiceTests
         );
     }
 
-    #region 告警规则测试
+    #region Alert Rule Tests
 
     [Fact]
     public async Task GetAllRulesAsync_Should_Return_All_Rules()
@@ -255,7 +255,7 @@ public class AlertServiceTests
 
     #endregion
 
-    #region 告警历史测试
+    #region Alert History Tests
 
     [Fact]
     public async Task GetAlertHistoryAsync_Should_Return_Paged_Results()
@@ -399,7 +399,7 @@ public class AlertServiceTests
 
     #endregion
 
-    #region 统计测试
+    #region Statistics Tests
 
     [Fact]
     public async Task GetAlertStatisticsAsync_Should_Return_Statistics()

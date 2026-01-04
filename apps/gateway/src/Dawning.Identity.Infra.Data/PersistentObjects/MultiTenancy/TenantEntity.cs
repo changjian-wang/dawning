@@ -4,122 +4,122 @@ using Dawning.ORM.Dapper;
 namespace Dawning.Identity.Infra.Data.PersistentObjects.MultiTenancy
 {
     /// <summary>
-    /// 租户数据库实体
+    /// Tenant database entity
     /// </summary>
     [Table("tenants")]
     public class TenantEntity
     {
         /// <summary>
-        /// 租户ID
+        /// Tenant ID
         /// </summary>
         [ExplicitKey]
         [Column("id")]
         public Guid Id { get; set; }
 
         /// <summary>
-        /// 租户代码（唯一标识）
+        /// Tenant code (unique identifier)
         /// </summary>
         [Column("code")]
         public string Code { get; set; } = string.Empty;
 
         /// <summary>
-        /// 租户名称
+        /// Tenant name
         /// </summary>
         [Column("name")]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// 租户描述
+        /// Tenant description
         /// </summary>
         [Column("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// 绑定域名
+        /// Bound domain
         /// </summary>
         [Column("domain")]
         public string? Domain { get; set; }
 
         /// <summary>
-        /// 联系邮箱
+        /// Contact email
         /// </summary>
         [Column("email")]
         public string? Email { get; set; }
 
         /// <summary>
-        /// 联系电话
+        /// Contact phone
         /// </summary>
         [Column("phone")]
         public string? Phone { get; set; }
 
         /// <summary>
-        /// 租户Logo URL
+        /// Tenant Logo URL
         /// </summary>
         [Column("logo_url")]
         public string? LogoUrl { get; set; }
 
         /// <summary>
-        /// 租户配置（JSON）
+        /// Tenant settings (JSON)
         /// </summary>
         [Column("settings")]
         public string? Settings { get; set; }
 
         /// <summary>
-        /// 数据库连接字符串
+        /// Database connection string
         /// </summary>
         [Column("connection_string")]
         public string? ConnectionString { get; set; }
 
         /// <summary>
-        /// 是否启用
+        /// Whether enabled
         /// </summary>
         [Column("is_active")]
         public bool IsActive { get; set; } = true;
 
         /// <summary>
-        /// 订阅计划
+        /// Subscription plan
         /// </summary>
         [Column("plan")]
         public string Plan { get; set; } = "free";
 
         /// <summary>
-        /// 订阅到期时间
+        /// Subscription expiration time
         /// </summary>
         [Column("subscription_expires_at")]
         public DateTime? SubscriptionExpiresAt { get; set; }
 
         /// <summary>
-        /// 最大用户数限制
+        /// Maximum user limit
         /// </summary>
         [Column("max_users")]
         public int? MaxUsers { get; set; }
 
         /// <summary>
-        /// 最大存储空间（MB）
+        /// Maximum storage space (MB)
         /// </summary>
         [Column("max_storage_mb")]
         public int? MaxStorageMB { get; set; }
 
         /// <summary>
-        /// 创建时间
+        /// Created time
         /// </summary>
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
-        /// 更新时间
+        /// Updated time
         /// </summary>
         [Column("updated_at")]
         public DateTime? UpdatedAt { get; set; }
 
         /// <summary>
-        /// 创建者ID
+        /// Creator ID
         /// </summary>
         [Column("created_by")]
         public Guid? CreatedBy { get; set; }
 
         /// <summary>
-        /// 更新者ID
+        /// Updater ID
         /// </summary>
         [Column("updated_by")]
         public Guid? UpdatedBy { get; set; }

@@ -17,7 +17,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
     /// <summary>
-    /// Authorization Repository 实现
+    /// Authorization Repository implementation
     /// </summary>
     public class AuthorizationRepository : IAuthorizationRepository
     {
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID异步获取Authorization
+        /// Get Authorization by ID asynchronously
         /// </summary>
         public async Task<Authorization> GetAsync(Guid id)
         {
@@ -41,7 +41,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据Subject获取Authorization列表
+        /// Get Authorization list by Subject
         /// </summary>
         public async Task<IEnumerable<Authorization>> GetBySubjectAsync(string subject)
         {
@@ -54,7 +54,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ApplicationId获取Authorization列表
+        /// Get Authorization list by ApplicationId
         /// </summary>
         public async Task<IEnumerable<Authorization>> GetByApplicationIdAsync(Guid applicationId)
         {
@@ -67,7 +67,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paged list
         /// </summary>
         public async Task<PagedData<Authorization>> GetPagedListAsync(
             AuthorizationModel model,
@@ -98,7 +98,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有Authorization
+        /// Get all Authorizations
         /// </summary>
         public async Task<IEnumerable<Authorization>> GetAllAsync()
         {
@@ -109,7 +109,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步插入Authorization
+        /// Insert Authorization asynchronously
         /// </summary>
         public async ValueTask<int> InsertAsync(Authorization model)
         {
@@ -123,7 +123,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步更新Authorization
+        /// Update Authorization asynchronously
         /// </summary>
         public async ValueTask<bool> UpdateAsync(Authorization model)
         {
@@ -137,7 +137,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步删除Authorization
+        /// Delete Authorization asynchronously
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Authorization model)
         {

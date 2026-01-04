@@ -12,7 +12,7 @@ using static Dawning.ORM.Dapper.SqlMapperExtensions;
 namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
 {
     /// <summary>
-    /// Scope Repository 实现
+    /// Scope Repository implementation
     /// </summary>
     public class ScopeRepository : IScopeRepository
     {
@@ -24,7 +24,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据ID异步获取Scope
+        /// Get Scope by ID asynchronously
         /// </summary>
         public async Task<Scope> GetAsync(Guid id)
         {
@@ -36,7 +36,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称异步获取Scope
+        /// Get Scope by name asynchronously
         /// </summary>
         public async Task<Scope?> GetByNameAsync(string name)
         {
@@ -49,7 +49,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取分页列表
+        /// Get paged list
         /// </summary>
         public async Task<PagedData<Scope>> GetPagedListAsync(
             ScopeModel model,
@@ -81,7 +81,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 获取所有Scope
+        /// Get all Scopes
         /// </summary>
         public async Task<IEnumerable<Scope>> GetAllAsync()
         {
@@ -90,14 +90,14 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 根据名称列表获取Scope
+        /// Get Scopes by name list
         /// </summary>
         public async Task<IEnumerable<Scope>> GetByNamesAsync(IEnumerable<string> names)
         {
             if (names == null || !names.Any())
                 return Enumerable.Empty<Scope>();
 
-            // 使用 QueryBuilder 支持的 IN 操作：集合.Contains(字段)
+            // Use QueryBuilder's supported IN operation: collection.Contains(field)
             var result = await _context
                 .Connection.Builder<ScopeEntity>(_context.Transaction)
                 .WhereIf(true, s => names.Contains(s.Name!))
@@ -107,7 +107,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步插入Scope
+        /// Insert Scope asynchronously
         /// </summary>
         public async ValueTask<int> InsertAsync(Scope model)
         {
@@ -121,7 +121,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步更新Scope
+        /// Update Scope asynchronously
         /// </summary>
         public async ValueTask<bool> UpdateAsync(Scope model)
         {
@@ -135,7 +135,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         }
 
         /// <summary>
-        /// 异步删除Scope
+        /// Delete Scope asynchronously
         /// </summary>
         public async ValueTask<bool> DeleteAsync(Scope model)
         {
