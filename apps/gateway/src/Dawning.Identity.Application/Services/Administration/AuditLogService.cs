@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
@@ -17,12 +17,10 @@ namespace Dawning.Identity.Application.Services.Administration
     public class AuditLogService : IAuditLogService
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
 
-        public AuditLogService(IUnitOfWork uow, IMapper mapper)
+        public AuditLogService(IUnitOfWork uow)
         {
             _uow = uow;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -31,7 +29,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<AuditLogDto?> GetAsync(Guid id)
         {
             var auditLog = await _uow.AuditLog.GetAsync(id);
-            return auditLog != null ? _mapper.Map<AuditLogDto>(auditLog) : null;
+            return auditLog?.ToDto();
         }
 
         /// <summary>
@@ -50,7 +48,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,
                 TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(a => _mapper.Map<AuditLogDto>(a)),
+                Items = pagedData.Items.ToDtos(),
             };
         }
 
@@ -59,13 +57,11 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<AuditLogDto> CreateAsync(CreateAuditLogDto dto)
         {
-            var auditLog = _mapper.Map<AuditLog>(dto);
-            auditLog.Id = Guid.NewGuid();
-            auditLog.CreatedAt = DateTime.UtcNow;
+            var auditLog = dto.ToEntity();
 
             await _uow.AuditLog.InsertAsync(auditLog);
 
-            return _mapper.Map<AuditLogDto>(auditLog);
+            return auditLog.ToDto();
         }
 
         /// <summary>

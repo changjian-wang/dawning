@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
@@ -18,12 +18,10 @@ namespace Dawning.Identity.Application.Services.Administration
     public class RoleService : IRoleService
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
 
-        public RoleService(IUnitOfWork uow, IMapper mapper)
+        public RoleService(IUnitOfWork uow)
         {
             _uow = uow;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -32,7 +30,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<RoleDto?> GetAsync(Guid id)
         {
             var role = await _uow.Role.GetAsync(id);
-            return role != null ? _mapper.Map<RoleDto>(role) : null;
+            return role?.ToDto();
         }
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<RoleDto?> GetByNameAsync(string name)
         {
             var role = await _uow.Role.GetByNameAsync(name);
-            return role != null ? _mapper.Map<RoleDto>(role) : null;
+            return role?.ToDto();
         }
 
         /// <summary>
@@ -60,7 +58,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,
                 TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(r => _mapper.Map<RoleDto>(r)),
+                Items = pagedData.Items.ToDtos(),
             };
         }
 
@@ -70,7 +68,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<IEnumerable<RoleDto>> GetAllAsync()
         {
             var roles = await _uow.Role.GetAllAsync();
-            return roles.Select(r => _mapper.Map<RoleDto>(r));
+            return roles.ToDtos();
         }
 
         /// <summary>
@@ -85,14 +83,12 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // Create role entity
-            var role = _mapper.Map<Role>(dto);
-            role.Id = Guid.NewGuid();
-            role.CreatedAt = DateTime.UtcNow;
+            var role = dto.ToEntity();
             role.CreatedBy = operatorId;
 
             await _uow.Role.InsertAsync(role);
 
-            return _mapper.Map<RoleDto>(role);
+            return role.ToDto();
         }
 
         /// <summary>
@@ -113,25 +109,13 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // Update fields
-            if (dto.DisplayName != null)
-                role.DisplayName = dto.DisplayName;
-            if (dto.Description != null)
-                role.Description = dto.Description;
-            if (dto.IsActive.HasValue)
-                role.IsActive = dto.IsActive.Value;
-            if (dto.Permissions != null)
-            {
-                role.Permissions = dto.Permissions.Any()
-                    ? System.Text.Json.JsonSerializer.Serialize(dto.Permissions)
-                    : null;
-            }
-
+            role.ApplyUpdate(dto);
             role.UpdatedAt = DateTime.UtcNow;
             role.UpdatedBy = operatorId;
 
             await _uow.Role.UpdateAsync(role);
 
-            return _mapper.Map<RoleDto>(role);
+            return role.ToDto();
         }
 
         /// <summary>

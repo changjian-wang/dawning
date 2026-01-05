@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
+using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Application.Mapping.OpenIddict;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Aggregates.OpenIddict;
@@ -40,16 +41,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             string description
         )
         {
-            var auditLog = new AuditLog
-            {
-                Id = Guid.NewGuid(),
-                UserId = userId,
-                Action = action,
-                EntityType = entityType,
-                EntityId = entityId,
-                Description = description,
-                CreatedAt = DateTime.UtcNow,
-            };
+            var auditLog = AuditLogMappers.CustomAudit(
+                action,
+                entityType,
+                entityId,
+                description,
+                userId
+            );
             await _unitOfWork.AuditLog.InsertAsync(auditLog);
         }
 

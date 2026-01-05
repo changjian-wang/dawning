@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Dtos.IntegrationEvents;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Events;
 using Dawning.Identity.Application.Interfaces.Security;
+using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Core.Security;
 using Dawning.Identity.Domain.Interfaces.Administration;
@@ -27,7 +27,6 @@ namespace Dawning.Identity.Application.Services.Administration
     {
         private readonly IUserRepository _userRepository;
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
         private readonly IPasswordPolicyService? _passwordPolicyService;
         private readonly IIntegrationEventBus _integrationEventBus;
         private readonly ILogger<UserService> _logger;
@@ -35,7 +34,6 @@ namespace Dawning.Identity.Application.Services.Administration
         public UserService(
             IUserRepository userRepository,
             IUnitOfWork uow,
-            IMapper mapper,
             IIntegrationEventBus integrationEventBus,
             ILogger<UserService> logger,
             IPasswordPolicyService? passwordPolicyService = null
@@ -43,7 +41,6 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             _userRepository = userRepository;
             _uow = uow;
-            _mapper = mapper;
             _integrationEventBus = integrationEventBus;
             _logger = logger;
             _passwordPolicyService = passwordPolicyService;
@@ -55,7 +52,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<UserDto?> GetByIdAsync(Guid id)
         {
             var user = await _userRepository.GetAsync(id);
-            return user != null ? _mapper.Map<UserDto>(user) : null;
+            return user.ToDtoOrNull();
         }
 
         /// <summary>
@@ -64,7 +61,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<UserDto?> GetByUsernameAsync(string username)
         {
             var user = await _userRepository.GetByUsernameAsync(username);
-            return user != null ? _mapper.Map<UserDto>(user) : null;
+            return user.ToDtoOrNull();
         }
 
         /// <summary>
@@ -83,7 +80,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,
                 TotalCount = pagedData.TotalCount,
-                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u)),
+                Items = pagedData.Items.ToDtos(),
             };
         }
 
@@ -107,7 +104,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 PageSize = pagedData.PageSize,
                 HasNextPage = pagedData.HasNextPage,
                 NextCursor = pagedData.NextCursor,
-                Items = pagedData.Items.Select(u => _mapper.Map<UserDto>(u)).ToList(),
+                Items = pagedData.Items.ToDtos().ToList(),
             };
         }
 
@@ -134,23 +131,13 @@ namespace Dawning.Identity.Application.Services.Administration
             // Validate password complexity (prefer password policy service)
             await ValidatePasswordAsync(dto.Password);
 
-            // Create user entity
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = dto.Username,
-                PasswordHash = HashPassword(dto.Password),
-                Email = dto.Email,
-                PhoneNumber = dto.PhoneNumber,
-                DisplayName = dto.DisplayName ?? dto.Username,
-                Avatar = dto.Avatar,
-                Role = dto.Role,
-                IsActive = dto.IsActive,
-                IsSystem = dto.IsSystem,
-                Remark = dto.Remark,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = operatorId,
-            };
+            // Create user entity using AutoMapper
+            var user = dto.ToEntity();
+            user.Id = Guid.NewGuid();
+            user.PasswordHash = HashPassword(dto.Password);
+            user.DisplayName = dto.DisplayName ?? dto.Username;
+            user.CreatedAt = DateTime.UtcNow;
+            user.CreatedBy = operatorId;
 
             await _userRepository.InsertAsync(user);
 
@@ -186,7 +173,7 @@ namespace Dawning.Identity.Application.Services.Administration
                 );
             }
 
-            return _mapper.Map<UserDto>(user);
+            return user.ToDto();
         }
 
         /// <summary>
@@ -210,27 +197,13 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // Update fields
-            if (dto.Email != null)
-                user.Email = dto.Email;
-            if (dto.PhoneNumber != null)
-                user.PhoneNumber = dto.PhoneNumber;
-            if (dto.DisplayName != null)
-                user.DisplayName = dto.DisplayName;
-            if (dto.Avatar != null)
-                user.Avatar = dto.Avatar;
-            if (dto.Role != null)
-                user.Role = dto.Role;
-            if (dto.IsActive.HasValue)
-                user.IsActive = dto.IsActive.Value;
-            if (dto.Remark != null)
-                user.Remark = dto.Remark;
-
+            user.ApplyUpdate(dto);
             user.UpdatedAt = DateTime.UtcNow;
             user.UpdatedBy = operatorId;
 
             await _userRepository.UpdateAsync(user);
 
-            return _mapper.Map<UserDto>(user);
+            return user.ToDto();
         }
 
         /// <summary>
@@ -305,7 +278,9 @@ namespace Dawning.Identity.Application.Services.Administration
             // Verify new password differs from old password
             if (dto.NewPassword == dto.OldPassword)
             {
-                throw new InvalidOperationException("New password cannot be the same as the old password.");
+                throw new InvalidOperationException(
+                    "New password cannot be the same as the old password."
+                );
             }
 
             // Validate password complexity
@@ -422,7 +397,10 @@ namespace Dawning.Identity.Application.Services.Administration
             // Must contain at least one special character
             if (!Regex.IsMatch(password, @"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>/?]"))
             {
-                return (false, "Password must contain at least one special character (!@#$%^&* etc.)");
+                return (
+                    false,
+                    "Password must contain at least one special character (!@#$%^&* etc.)"
+                );
             }
 
             return (true, string.Empty);
@@ -499,7 +477,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // Return DTO (without password)
-            return _mapper.Map<UserDto>(user);
+            return user.ToDto();
         }
 
         /// <summary>
@@ -533,7 +511,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<IEnumerable<RoleDto>> GetUserRolesAsync(Guid userId)
         {
             var roles = await _uow.UserRole.GetUserRolesAsync(userId);
-            return roles.Select(r => _mapper.Map<RoleDto>(r));
+            return roles.ToDtos();
         }
 
         /// <summary>
@@ -547,7 +525,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
             var roles = await GetUserRolesAsync(userId);
 
-            var userWithRoles = _mapper.Map<UserWithRolesDto>(user);
+            var userWithRoles = user.ToUserWithRolesDto();
             userWithRoles.Roles = roles.ToList();
 
             return userWithRoles;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -59,6 +60,60 @@ namespace Dawning.Identity.Application.Mapping.Administration
                 return null;
 
             return JsonSerializer.Serialize(permissions);
+        }
+    }
+
+    /// <summary>
+    /// Role static mappers using AutoMapper
+    /// </summary>
+    public static class RoleMappers
+    {
+        private static IMapper Mapper { get; }
+
+        static RoleMappers()
+        {
+            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<RoleProfile>()).CreateMapper();
+        }
+
+        /// <summary>
+        /// Convert Role to RoleDto
+        /// </summary>
+        public static RoleDto ToDto(this Role role) => Mapper.Map<RoleDto>(role);
+
+        /// <summary>
+        /// Convert Role collection to RoleDto collection
+        /// </summary>
+        public static IEnumerable<RoleDto> ToDtos(this IEnumerable<Role> roles) =>
+            roles.Select(r => r.ToDto());
+
+        /// <summary>
+        /// Convert CreateRoleDto to Role entity
+        /// </summary>
+        public static Role ToEntity(this CreateRoleDto dto)
+        {
+            var entity = Mapper.Map<Role>(dto);
+            entity.Id = Guid.NewGuid();
+            entity.CreatedAt = DateTime.UtcNow;
+            return entity;
+        }
+
+        /// <summary>
+        /// Apply UpdateRoleDto to existing Role entity
+        /// </summary>
+        public static void ApplyUpdate(this Role role, UpdateRoleDto dto)
+        {
+            if (dto.DisplayName != null)
+                role.DisplayName = dto.DisplayName;
+            if (dto.Description != null)
+                role.Description = dto.Description;
+            if (dto.IsActive.HasValue)
+                role.IsActive = dto.IsActive.Value;
+            if (dto.Permissions != null)
+            {
+                role.Permissions = dto.Permissions.Any()
+                    ? JsonSerializer.Serialize(dto.Permissions)
+                    : null;
+            }
         }
     }
 }

@@ -1,4 +1,3 @@
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Services.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
@@ -16,18 +15,16 @@ public class RoleServiceTests
 {
     private readonly Mock<IRoleRepository> _roleRepositoryMock;
     private readonly Mock<IUnitOfWork> _uowMock;
-    private readonly Mock<IMapper> _mapperMock;
     private readonly RoleService _roleService;
 
     public RoleServiceTests()
     {
         _roleRepositoryMock = new Mock<IRoleRepository>();
         _uowMock = new Mock<IUnitOfWork>();
-        _mapperMock = new Mock<IMapper>();
 
         _uowMock.Setup(x => x.Role).Returns(_roleRepositoryMock.Object);
 
-        _roleService = new RoleService(_uowMock.Object, _mapperMock.Object);
+        _roleService = new RoleService(_uowMock.Object);
     }
 
     [Fact]
@@ -56,7 +53,6 @@ public class RoleServiceTests
         };
 
         _roleRepositoryMock.Setup(x => x.GetAsync(roleId)).ReturnsAsync(role);
-        _mapperMock.Setup(x => x.Map<RoleDto>(role)).Returns(roleDto);
 
         // Act
         var result = await _roleService.GetAsync(roleId);
@@ -102,7 +98,6 @@ public class RoleServiceTests
         };
 
         _roleRepositoryMock.Setup(x => x.GetByNameAsync(roleName)).ReturnsAsync(role);
-        _mapperMock.Setup(x => x.Map<RoleDto>(role)).Returns(roleDto);
 
         // Act
         var result = await _roleService.GetByNameAsync(roleName);
@@ -135,8 +130,6 @@ public class RoleServiceTests
 
         _roleRepositoryMock.Setup(x => x.NameExistsAsync(createDto.Name, null)).ReturnsAsync(false);
         _roleRepositoryMock.Setup(x => x.InsertAsync(It.IsAny<Role>())).ReturnsAsync(1);
-        _mapperMock.Setup(x => x.Map<Role>(createDto)).Returns(new Role { Name = createDto.Name });
-        _mapperMock.Setup(x => x.Map<RoleDto>(It.IsAny<Role>())).Returns(roleDto);
 
         // Act
         var result = await _roleService.CreateAsync(createDto, null);
@@ -197,7 +190,6 @@ public class RoleServiceTests
 
         _roleRepositoryMock.Setup(x => x.GetAsync(roleId)).ReturnsAsync(existingRole);
         _roleRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<Role>())).ReturnsAsync(true);
-        _mapperMock.Setup(x => x.Map<RoleDto>(It.IsAny<Role>())).Returns(updatedRoleDto);
 
         // Act
         var result = await _roleService.UpdateAsync(updateDto, null);
@@ -275,8 +267,6 @@ public class RoleServiceTests
         };
 
         _roleRepositoryMock.Setup(x => x.GetAllAsync()).ReturnsAsync(roles);
-        _mapperMock.Setup(x => x.Map<RoleDto>(roles[0])).Returns(roleDtos[0]);
-        _mapperMock.Setup(x => x.Map<RoleDto>(roles[1])).Returns(roleDtos[1]);
 
         // Act
         var result = await _roleService.GetAllAsync();
@@ -305,7 +295,6 @@ public class RoleServiceTests
         };
 
         _roleRepositoryMock.Setup(x => x.GetPagedListAsync(model, 1, 10)).ReturnsAsync(pagedData);
-        _mapperMock.Setup(x => x.Map<RoleDto>(It.IsAny<Role>())).Returns(new RoleDto());
 
         // Act
         var result = await _roleService.GetPagedListAsync(model, 1, 10);

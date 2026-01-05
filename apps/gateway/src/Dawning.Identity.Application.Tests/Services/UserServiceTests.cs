@@ -1,4 +1,3 @@
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.User;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Events;
@@ -19,7 +18,6 @@ public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _userRepositoryMock;
     private readonly Mock<IUnitOfWork> _uowMock;
-    private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IIntegrationEventBus> _integrationEventBusMock;
     private readonly Mock<ILogger<UserService>> _loggerMock;
     private readonly IUserService _userService;
@@ -28,14 +26,12 @@ public class UserServiceTests
     {
         _userRepositoryMock = new Mock<IUserRepository>();
         _uowMock = new Mock<IUnitOfWork>();
-        _mapperMock = new Mock<IMapper>();
         _integrationEventBusMock = new Mock<IIntegrationEventBus>();
         _loggerMock = new Mock<ILogger<UserService>>();
 
         _userService = new UserService(
             _userRepositoryMock.Object,
             _uowMock.Object,
-            _mapperMock.Object,
             _integrationEventBusMock.Object,
             _loggerMock.Object
         );
@@ -67,8 +63,6 @@ public class UserServiceTests
         };
 
         _userRepositoryMock.Setup(x => x.GetAsync(userId)).ReturnsAsync(user);
-
-        _mapperMock.Setup(x => x.Map<UserDto>(user)).Returns(userDto);
 
         // Act
         var result = await _userService.GetByIdAsync(userId);
@@ -115,8 +109,6 @@ public class UserServiceTests
 
         _userRepositoryMock.Setup(x => x.GetByUsernameAsync(username)).ReturnsAsync(user);
 
-        _mapperMock.Setup(x => x.Map<UserDto>(user)).Returns(userDto);
-
         // Act
         var result = await _userService.GetByUsernameAsync(username);
 
@@ -159,8 +151,6 @@ public class UserServiceTests
             .ReturnsAsync(false);
 
         _userRepositoryMock.Setup(x => x.InsertAsync(It.IsAny<User>())).ReturnsAsync(1);
-
-        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>())).Returns(userDto);
 
         // Act
         var result = await _userService.CreateAsync(createDto, null);
@@ -213,8 +203,6 @@ public class UserServiceTests
             .ReturnsAsync(false);
 
         _userRepositoryMock.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(true);
-
-        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>())).Returns(updatedUserDto);
 
         // Act
         var result = await _userService.UpdateAsync(updateDto, null);
@@ -297,10 +285,6 @@ public class UserServiceTests
         };
 
         _userRepositoryMock.Setup(x => x.GetPagedListAsync(model, 1, 10)).ReturnsAsync(pagedData);
-
-        _mapperMock.Setup(x => x.Map<UserDto>(users[0])).Returns(userDtos[0]);
-
-        _mapperMock.Setup(x => x.Map<UserDto>(users[1])).Returns(userDtos[1]);
 
         // Act
         var result = await _userService.GetPagedListAsync(model, 1, 10);

@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
 using Dawning.Identity.Application.Interfaces.Notification;
+using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
@@ -21,19 +21,16 @@ namespace Dawning.Identity.Application.Services.Administration
     public class SystemLogService : ISystemLogService
     {
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
         private readonly IRealTimeNotificationService _realTimeNotification;
         private readonly ILogger<SystemLogService> _logger;
 
         public SystemLogService(
             IUnitOfWork uow,
-            IMapper mapper,
             IRealTimeNotificationService realTimeNotification,
             ILogger<SystemLogService> logger
         )
         {
             _uow = uow;
-            _mapper = mapper;
             _realTimeNotification = realTimeNotification;
             _logger = logger;
         }
@@ -86,10 +83,10 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<SystemLogDto> CreateAsync(CreateSystemLogDto dto)
         {
-            var log = _mapper.Map<SystemLog>(dto);
+            var log = dto.ToEntity();
             await _uow.SystemLog.InsertAsync(log);
             await _uow.CommitAsync();
-            return _mapper.Map<SystemLogDto>(log);
+            return log.ToDto();
         }
 
         /// <summary>
@@ -98,7 +95,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<SystemLogDto?> GetAsync(Guid id)
         {
             var log = await _uow.SystemLog.GetAsync(id);
-            return _mapper.Map<SystemLogDto>(log);
+            return log.ToDtoOrNull();
         }
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
             return new PagedData<SystemLogDto>
             {
-                Items = _mapper.Map<SystemLogDto[]>(pagedData.Items),
+                Items = pagedData.Items.ToDtoArray(),
                 TotalCount = pagedData.TotalCount,
                 PageIndex = pagedData.PageIndex,
                 PageSize = pagedData.PageSize,

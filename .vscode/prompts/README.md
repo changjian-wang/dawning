@@ -19,7 +19,8 @@
     ├── performance-analysis.prompt.md
     ├── debug-issue.prompt.md
     ├── git-commit.prompt.md
-    └── create-docker-config.prompt.md
+    ├── create-docker-config.prompt.md
+    └── automapper-style.prompt.md   # AutoMapper 静态映射器风格规范
 ```
 
 ## 🚀 快速开始
@@ -96,6 +97,7 @@ Copilot: (自动遵循项目规范生成代码)
 | `debug-issue.prompt.md` | 调试问题 | `#debug-issue 帮我排查这个空引用异常` |
 | `git-commit.prompt.md` | Git 提交 | `#git-commit 生成这次修改的提交信息` |
 | `create-docker-config.prompt.md` | Docker 配置 | `#create-docker-config 创建部署配置` |
+| `automapper-style.prompt.md` | AutoMapper 代码风格 | `#automapper-style 将 Service 改为静态 Mapper 风格` |
 
 ## 💡 使用技巧
 

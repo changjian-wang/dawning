@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dawning.Identity.Application.Dtos.Administration;
 using Dawning.Identity.Application.Interfaces.Administration;
+using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
+using Dawning.Identity.Domain.Constants;
 using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
@@ -116,21 +118,8 @@ namespace Dawning.Identity.Application.Services.Administration
                 throw new InvalidOperationException($"Permission code '{dto.Code}' already exists");
             }
 
-            var permission = new Permission
-            {
-                Id = Guid.NewGuid(),
-                Code = dto.Code,
-                Name = dto.Name,
-                Description = dto.Description,
-                Resource = dto.Resource,
-                Action = dto.Action,
-                Category = dto.Category,
-                IsSystem = false,
-                IsActive = dto.IsActive,
-                DisplayOrder = dto.DisplayOrder,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = operatorId,
-            };
+            var permission = dto.ToEntity();
+            permission.CreatedBy = operatorId;
 
             _unitOfWork.BeginTransaction();
             try
@@ -139,20 +128,12 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
-                    new Domain.Aggregates.Administration.AuditLog
-                    {
-                        Id = Guid.NewGuid(),
-                        Action = "Create",
-                        EntityType = "Permission",
-                        EntityId = permission.Id,
-                        Description = $"Created permission: {permission.Name} ({permission.Code})",
-                        IpAddress = null,
-                        UserAgent = null,
-                        StatusCode = 200,
-                        UserId = operatorId,
-                        Username = null,
-                        CreatedAt = DateTime.UtcNow,
-                    }
+                    AuditLogMappers.CreateAudit(
+                        AuditEntityType.Permission,
+                        permission.Id,
+                        $"Created permission: {permission.Name} ({permission.Code})",
+                        operatorId
+                    )
                 );
 
                 _unitOfWork.Commit();
@@ -184,11 +165,7 @@ namespace Dawning.Identity.Application.Services.Administration
 
             var oldValues = $"{permission.Name}|{permission.Description}";
 
-            permission.Name = dto.Name;
-            permission.Description = dto.Description;
-            permission.IsActive = dto.IsActive;
-            permission.DisplayOrder = dto.DisplayOrder;
-            permission.UpdatedAt = DateTime.UtcNow;
+            permission.ApplyUpdate(dto);
             permission.UpdatedBy = operatorId;
 
             _unitOfWork.BeginTransaction();
@@ -198,21 +175,12 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
-                    new Domain.Aggregates.Administration.AuditLog
-                    {
-                        Id = Guid.NewGuid(),
-                        Action = "Update",
-                        EntityType = "Permission",
-                        EntityId = permission.Id,
-                        Description =
-                            $"Updated permission: {oldValues} -> {permission.Name}|{permission.Description}",
-                        IpAddress = null,
-                        UserAgent = null,
-                        StatusCode = 200,
-                        UserId = operatorId,
-                        Username = null,
-                        CreatedAt = DateTime.UtcNow,
-                    }
+                    AuditLogMappers.UpdateAudit(
+                        AuditEntityType.Permission,
+                        permission.Id,
+                        $"Updated permission: {oldValues} -> {permission.Name}|{permission.Description}",
+                        operatorId
+                    )
                 );
 
                 _unitOfWork.Commit();
@@ -255,20 +223,11 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
-                    new Domain.Aggregates.Administration.AuditLog
-                    {
-                        Id = Guid.NewGuid(),
-                        Action = "Delete",
-                        EntityType = "Permission",
-                        EntityId = id,
-                        Description = $"Deleted permission: {permission.Name} ({permission.Code})",
-                        IpAddress = null,
-                        UserAgent = null,
-                        StatusCode = 200,
-                        UserId = null,
-                        Username = null,
-                        CreatedAt = DateTime.UtcNow,
-                    }
+                    AuditLogMappers.DeleteAudit(
+                        AuditEntityType.Permission,
+                        id,
+                        $"Deleted permission: {permission.Name} ({permission.Code})"
+                    )
                 );
 
                 _unitOfWork.Commit();
@@ -315,20 +274,13 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
-                    new Domain.Aggregates.Administration.AuditLog
-                    {
-                        Id = Guid.NewGuid(),
-                        Action = "AssignPermissions",
-                        EntityType = "Role",
-                        EntityId = roleId,
-                        Description = $"Assigned {permissionIds.Count()} permission(s) to role '{role.Name}'",
-                        IpAddress = null,
-                        UserAgent = null,
-                        StatusCode = 200,
-                        UserId = operatorId,
-                        Username = null,
-                        CreatedAt = DateTime.UtcNow,
-                    }
+                    AuditLogMappers.CustomAudit(
+                        AuditAction.AssignPermissions,
+                        AuditEntityType.Role,
+                        roleId,
+                        $"Assigned {permissionIds.Count()} permission(s) to role '{role.Name}'",
+                        operatorId
+                    )
                 );
 
                 _unitOfWork.Commit();
@@ -359,20 +311,12 @@ namespace Dawning.Identity.Application.Services.Administration
 
                 // Record audit log
                 await _unitOfWork.AuditLog.InsertAsync(
-                    new Domain.Aggregates.Administration.AuditLog
-                    {
-                        Id = Guid.NewGuid(),
-                        Action = "RemovePermissions",
-                        EntityType = "Role",
-                        EntityId = roleId,
-                        Description = $"Removed {permissionIds.Count()} permission(s) from role '{role.Name}'",
-                        IpAddress = null,
-                        UserAgent = null,
-                        StatusCode = 200,
-                        UserId = null,
-                        Username = null,
-                        CreatedAt = DateTime.UtcNow,
-                    }
+                    AuditLogMappers.CustomAudit(
+                        AuditAction.RemovePermissions,
+                        AuditEntityType.Role,
+                        roleId,
+                        $"Removed {permissionIds.Count()} permission(s) from role '{role.Name}'"
+                    )
                 );
 
                 _unitOfWork.Commit();
@@ -410,29 +354,6 @@ namespace Dawning.Identity.Application.Services.Administration
 
             // Deduplicate and return permission codes
             return allPermissions.Where(p => p.IsActive).Select(p => p.Code).Distinct().ToList();
-        }
-    }
-
-    // Extension methods
-    public static class PermissionExtensions
-    {
-        public static PermissionDto ToDto(this Permission permission)
-        {
-            return new PermissionDto
-            {
-                Id = permission.Id,
-                Code = permission.Code,
-                Name = permission.Name,
-                Description = permission.Description,
-                Resource = permission.Resource,
-                Action = permission.Action,
-                Category = permission.Category,
-                IsSystem = permission.IsSystem,
-                IsActive = permission.IsActive,
-                DisplayOrder = permission.DisplayOrder,
-                CreatedAt = permission.CreatedAt,
-                UpdatedAt = permission.UpdatedAt,
-            };
         }
     }
 }
