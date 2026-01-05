@@ -15,12 +15,16 @@
     ├── create-database-table.prompt.md
     ├── create-sdk-feature.prompt.md
     ├── create-unit-tests.prompt.md
+    ├── create-domain-event.prompt.md    # 领域事件创建规范
+    ├── create-docker-config.prompt.md
     ├── code-review.prompt.md
     ├── performance-analysis.prompt.md
     ├── debug-issue.prompt.md
     ├── git-commit.prompt.md
-    ├── create-docker-config.prompt.md
-    └── automapper-style.prompt.md   # AutoMapper 静态映射器风格规范
+    ├── automapper-style.prompt.md       # AutoMapper 静态映射器风格规范
+    ├── error-handling.prompt.md         # 异常处理规范
+    ├── constants-definition.prompt.md   # 常量定义规范
+    └── refactor-service.prompt.md       # Service 层重构指南
 ```
 
 ## 🚀 快速开始
@@ -92,12 +96,16 @@ Copilot: (自动遵循项目规范生成代码)
 | `create-database-table.prompt.md` | 设计数据库表 | `#create-database-table 设计权限表` |
 | `create-sdk-feature.prompt.md` | 开发 SDK 功能 | `#create-sdk-feature 添加 HTTP 重试扩展` |
 | `create-unit-tests.prompt.md` | 生成单元测试 | `#create-unit-tests 为 UserService 写测试` |
+| `create-domain-event.prompt.md` | 创建领域事件 | `#create-domain-event 创建用户事件和审计处理器` |
 | `code-review.prompt.md` | 代码审查 | `#code-review 审查这个 PR 的代码` |
 | `performance-analysis.prompt.md` | 性能分析 | `#performance-analysis 分析这个查询性能` |
 | `debug-issue.prompt.md` | 调试问题 | `#debug-issue 帮我排查这个空引用异常` |
 | `git-commit.prompt.md` | Git 提交 | `#git-commit 生成这次修改的提交信息` |
 | `create-docker-config.prompt.md` | Docker 配置 | `#create-docker-config 创建部署配置` |
 | `automapper-style.prompt.md` | AutoMapper 代码风格 | `#automapper-style 将 Service 改为静态 Mapper 风格` |
+| `error-handling.prompt.md` | 异常处理规范 | `#error-handling 添加异常处理` |
+| `constants-definition.prompt.md` | 常量定义规范 | `#constants-definition 定义审计常量` |
+| `refactor-service.prompt.md` | Service 重构 | `#refactor-service 重构 UserService` |
 
 ## 💡 使用技巧
 

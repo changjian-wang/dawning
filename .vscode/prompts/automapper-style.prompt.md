@@ -145,23 +145,23 @@ using YourProject.Application.Mapping;
 
 public class UserService : IUserService
 {
-    private readonly IUnitOfWork _uow;
+    private readonly IUnitOfWork _unitOfWork;
     // ✅ 无需注入 IMapper
 
-    public UserService(IUnitOfWork uow)
+    public UserService(IUnitOfWork unitOfWork)
     {
-        _uow = uow;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<UserDto?> GetAsync(Guid id)
     {
-        var user = await _uow.User.GetAsync(id);
+        var user = await _unitOfWork.User.GetAsync(id);
         return user?.ToDto();  // ✅ 扩展方法，简洁
     }
 
     public async Task<IEnumerable<UserDto>> GetAllAsync()
     {
-        var users = await _uow.User.GetAllAsync();
+        var users = await _unitOfWork.User.GetAllAsync();
         return users.ToDtos();  // ✅ 批量转换
     }
 
@@ -172,20 +172,20 @@ public class UserService : IUserService
         user.CreatedAt = DateTime.UtcNow;
         user.CreatedBy = operatorId;
         
-        await _uow.User.InsertAsync(user);
+        await _unitOfWork.User.InsertAsync(user);
         return user.ToDto();  // ✅ 扩展方法
     }
 
     public async Task<UserDto> UpdateAsync(UpdateUserDto dto, Guid? operatorId)
     {
-        var user = await _uow.User.GetAsync(dto.Id);
+        var user = await _unitOfWork.User.GetAsync(dto.Id);
         if (user == null) throw new NotFoundException("User not found");
         
         user.ApplyUpdate(dto);  // ✅ 应用更新
         user.UpdatedAt = DateTime.UtcNow;
         user.UpdatedBy = operatorId;
         
-        await _uow.User.UpdateAsync(user);
+        await _unitOfWork.User.UpdateAsync(user);
         return user.ToDto();
     }
 }

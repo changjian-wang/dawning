@@ -32,15 +32,96 @@ public class {Resource}Dto
 }
 ```
 
-### 3. 创建 Service 接口和实现
+### 3. 创建 Mapper 文件
+在 `Mapping/{Module}/` 目录创建静态 Mapper：
+
+```csharp
+namespace YourProject.Application.Mapping;
+
+public class {Resource}Profile : Profile
+{
+    public {Resource}Profile()
+    {
+        CreateMap<{Resource}, {Resource}Dto>();
+        CreateMap<Create{Resource}Dto, {Resource}>();
+    }
+}
+
+public static class {Resource}Mappers
+{
+    private static IMapper Mapper { get; }
+    
+    static {Resource}Mappers()
+    {
+        var config = new MapperConfiguration(cfg => cfg.AddProfile<{Resource}Profile>());
+        Mapper = config.CreateMapper();
+    }
+
+    public static {Resource}Dto ToDto(this {Resource} entity) => Mapper.Map<{Resource}Dto>(entity);
+    public static {Resource}Dto? ToDtoOrNull(this {Resource}? entity) => entity?.ToDto();
+    public static IEnumerable<{Resource}Dto> ToDtos(this IEnumerable<{Resource}> entities) => 
+        entities.Select(e => e.ToDto());
+    public static {Resource} ToEntity(this Create{Resource}Dto dto) => Mapper.Map<{Resource}>(dto);
+    public static void ApplyUpdate(this {Resource} entity, Update{Resource}Dto dto) => Mapper.Map(dto, entity);
+}
+```
+
+### 4. 创建 Service 接口和实现
 ```csharp
 public interface I{Resource}Service
 {
     Task<{Resource}Dto?> GetByIdAsync(Guid id);
-    Task<PagedResult<{Resource}Dto>> GetPagedAsync({Resource}QueryDto query);
-    Task<Guid> CreateAsync(Create{Resource}Dto dto);
-    Task UpdateAsync(Guid id, Update{Resource}Dto dto);
-    Task DeleteAsync(Guid id);
+    Task<PagedData<{Resource}Dto>> GetPagedAsync({Resource}QueryModel query, int page, int pageSize);
+    Task<{Resource}Dto> CreateAsync(Create{Resource}Dto dto, string? username = null);
+    Task<{Resource}Dto?> UpdateAsync(Update{Resource}Dto dto, string? username = null);
+    Task<bool> DeleteAsync(Guid id);
+}
+
+// ✅ 使用 UnitOfWork + 静态 Mapper
+public class {Resource}Service(IUnitOfWork unitOfWork) : I{Resource}Service
+{
+    public async Task<{Resource}Dto?> GetByIdAsync(Guid id)
+    {
+        var entity = await unitOfWork.{Resource}.GetByIdAsync(id);
+        return entity?.ToDto();  // 使用静态 Mapper
+    }
+
+    public async Task<PagedData<{Resource}Dto>> GetPagedAsync({Resource}QueryModel query, int page, int pageSize)
+    {
+        var pagedData = await unitOfWork.{Resource}.GetPagedListAsync(query, page, pageSize);
+        return new PagedData<{Resource}Dto>
+        {
+            Items = pagedData.Items.ToDtos(),
+            TotalCount = pagedData.TotalCount,
+            PageIndex = pagedData.PageIndex,
+            PageSize = pagedData.PageSize
+        };
+    }
+
+    public async Task<{Resource}Dto> CreateAsync(Create{Resource}Dto dto, string? username = null)
+    {
+        var entity = dto.ToEntity();
+        entity.CreatedBy = username;
+        await unitOfWork.{Resource}.InsertAsync(entity);
+        return entity.ToDto();
+    }
+
+    public async Task<{Resource}Dto?> UpdateAsync(Update{Resource}Dto dto, string? username = null)
+    {
+        var entity = await unitOfWork.{Resource}.GetByIdAsync(dto.Id);
+        if (entity == null) return null;
+        
+        entity.ApplyUpdate(dto);
+        entity.UpdatedBy = username;
+        await unitOfWork.{Resource}.UpdateAsync(entity);
+        return entity.ToDto();
+    }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var result = await unitOfWork.{Resource}.DeleteAsync(id);
+        return result > 0;
+    }
 }
 ```
 

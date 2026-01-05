@@ -43,14 +43,18 @@ Dawning is a microservices gateway system built with .NET 8 and Vue 3. It provid
 namespace Dawning.Gateway.Controllers;
 
 // ✅ Use primary constructors (C# 12)
-public class UserService(IUserRepository repo, ILogger<UserService> logger) : IUserService
+public class UserService(IUnitOfWork unitOfWork, ILogger<UserService> logger) : IUserService
 {
-    // ✅ Use expression body for simple methods
-    public async Task<UserDto?> GetByIdAsync(Guid id) =>
-        await repo.GetByIdAsync(id);
+    // ✅ Access repositories through UnitOfWork
+    public async Task<UserDto?> GetByIdAsync(Guid id)
+    {
+        var user = await unitOfWork.User.GetByIdAsync(id);
+        return user?.ToDto();  // Use static Mapper extension
+    }
 }
 
-// ✅ Private fields with underscore prefix
+// ✅ Private fields with underscore prefix (use _unitOfWork, not _uow)
+private readonly IUnitOfWork _unitOfWork;
 private readonly ILogger<UserController> _logger;
 
 // ✅ XML documentation for public APIs
@@ -220,6 +224,38 @@ onMounted(fetchData);
 | Database Tables | snake_case | `user_roles` |
 | API URLs | kebab-case | `/api/request-logs` |
 
+## Service Layer Patterns
+
+### UnitOfWork Pattern (Required)
+```csharp
+// ✅ Correct - Access repositories through UnitOfWork
+public class RoleService(IUnitOfWork unitOfWork) : IRoleService
+{
+    public async Task<RoleDto?> GetByIdAsync(Guid id)
+    {
+        var role = await unitOfWork.Role.GetByIdAsync(id);
+        return role?.ToDto();
+    }
+}
+
+// ❌ Wrong - Don't inject both Repository and UnitOfWork
+public class RoleService(IRoleRepository repo, IUnitOfWork unitOfWork)  // Redundant!
+```
+
+### Static Mapper Pattern (Required)
+```csharp
+// ✅ Correct - Use static Mapper extension methods
+var dto = entity.ToDto();        // Entity -> DTO
+var entity = dto.ToEntity();     // CreateDto -> Entity
+entity.ApplyUpdate(updateDto);   // Apply UpdateDto to Entity
+
+// ❌ Wrong - Don't inject IMapper
+public class UserService(IMapper mapper)  // Don't do this!
+{
+    return _mapper.Map<UserDto>(user);    // Don't do this!
+}
+```
+
 ## Important Notes
 
 1. **Never hardcode secrets** - Use environment variables or configuration
@@ -230,6 +266,8 @@ onMounted(fetchData);
 6. **Document public APIs** - Use XML comments for all public members
 7. **Use dependency injection** - Constructor injection preferred
 8. **Follow RESTful conventions** - Proper HTTP methods and status codes
+9. **Use UnitOfWork** - Access repositories via `_unitOfWork.{Repository}`
+10. **Use static Mappers** - Use `entity.ToDto()` not `_mapper.Map<>()`
 
 ## Reference Documentation
 

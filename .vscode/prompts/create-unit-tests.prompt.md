@@ -100,18 +100,25 @@ public async Task CreateAsync_NullInput_ThrowsArgumentNullException()
 ```
 
 ### Service 测试（带 Mock）
+
+> ⚠️ **重要**: Service 通过 UnitOfWork 访问 Repository，测试时需要通过 UnitOfWork Mock 设置 Repository Mock
+
 ```csharp
 public class UserServiceTests
 {
-    private readonly Mock<IUserRepository> _mockRepo;
-    private readonly Mock<ILogger<UserService>> _mockLogger;
+    private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly UserService _service;
 
     public UserServiceTests()
     {
-        _mockRepo = new Mock<IUserRepository>();
-        _mockLogger = new Mock<ILogger<UserService>>();
-        _service = new UserService(_mockRepo.Object, _mockLogger.Object);
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        
+        // ✅ 正确：通过 UnitOfWork 设置 Repository Mock
+        _unitOfWorkMock.Setup(x => x.User).Returns(_userRepositoryMock.Object);
+        
+        _service = new UserService(_unitOfWorkMock.Object);
     }
 
     [Fact]
@@ -120,8 +127,8 @@ public class UserServiceTests
         // Arrange
         var userId = Guid.NewGuid();
         var expectedUser = new User { Id = userId, Username = "test" };
-        _mockRepo.Setup(r => r.GetByIdAsync(userId))
-                 .ReturnsAsync(expectedUser);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(userId))
+                           .ReturnsAsync(expectedUser);
 
         // Act
         var result = await _service.GetByIdAsync(userId);
@@ -137,8 +144,8 @@ public class UserServiceTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        _mockRepo.Setup(r => r.GetByIdAsync(userId))
-                 .ReturnsAsync((User?)null);
+        _userRepositoryMock.Setup(r => r.GetByIdAsync(userId))
+                           .ReturnsAsync((User?)null);
 
         // Act
         var result = await _service.GetByIdAsync(userId);
@@ -153,17 +160,31 @@ public class UserServiceTests
         // Arrange
         var dto = new CreateUserDto { Username = "newuser" };
         var expectedId = Guid.NewGuid();
-        _mockRepo.Setup(r => r.CreateAsync(It.IsAny<User>()))
-                 .ReturnsAsync(expectedId);
+        _userRepositoryMock.Setup(r => r.InsertAsync(It.IsAny<User>()))
+                           .ReturnsAsync(1);
 
         // Act
         var result = await _service.CreateAsync(dto);
 
         // Assert
-        Assert.Equal(expectedId, result);
-        _mockRepo.Verify(r => r.CreateAsync(It.Is<User>(u => u.Username == "newuser")), Times.Once);
+        Assert.NotNull(result);
+        _userRepositoryMock.Verify(r => r.InsertAsync(It.Is<User>(u => u.Username == "newuser")), Times.Once);
     }
 }
+```
+
+### ❌ 错误示例（不要这样做）
+```csharp
+// ❌ 错误：直接注入 Repository Mock 到 Service
+public UserServiceTests()
+{
+    _userRepositoryMock = new Mock<IUserRepository>();
+    _service = new UserService(_userRepositoryMock.Object);  // 错误！
+}
+
+// ❌ 错误：Mock IMapper（应使用静态 Mapper）
+_mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>()))
+           .Returns(new UserDto { ... });  // 不需要 Mock，直接用 ToDto()
 ```
 
 ### Controller 测试
