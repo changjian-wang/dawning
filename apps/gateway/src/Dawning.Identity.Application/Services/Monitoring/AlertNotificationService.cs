@@ -64,7 +64,10 @@ public class AlertNotificationService : IAlertNotificationService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Real-time alert push failed, continuing with other notification channels");
+            _logger.LogWarning(
+                ex,
+                "Real-time alert push failed, continuing with other notification channels"
+            );
         }
 
         foreach (var channel in context.NotifyChannels)

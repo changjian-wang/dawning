@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.OpenIddict;
@@ -20,12 +19,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     public class TokenService : ITokenService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public TokenService(IUnitOfWork unitOfWork, IMapper mapper)
+        public TokenService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<TokenDto> GetAsync(Guid id)
@@ -89,13 +86,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<int> InsertAsync(TokenDto dto)
         {
-            TokenEntity model = _mapper.Map<TokenEntity>(dto);
+            TokenEntity model = dto.ToModel() ?? new TokenEntity();
             return await _unitOfWork.Token.InsertAsync(model);
         }
 
         public async ValueTask<bool> UpdateAsync(TokenDto dto)
         {
-            TokenEntity model = _mapper.Map<TokenEntity>(dto);
+            TokenEntity model = dto.ToModel() ?? new TokenEntity();
             return await _unitOfWork.Token.UpdateAsync(model);
         }
 

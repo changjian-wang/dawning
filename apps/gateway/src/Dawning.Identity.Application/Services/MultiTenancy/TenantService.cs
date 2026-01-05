@@ -17,19 +17,19 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
     /// </summary>
     public class TenantService : ITenantService
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IDistributedCache _cache;
         private readonly ILogger<TenantService> _logger;
         private const string CachePrefix = "tenant:";
         private static readonly TimeSpan CacheExpiration = TimeSpan.FromMinutes(30);
 
         public TenantService(
-            IUnitOfWork uow,
+            IUnitOfWork unitOfWork,
             IDistributedCache cache,
             ILogger<TenantService> logger
         )
         {
-            _uow = uow;
+            _unitOfWork = unitOfWork;
             _cache = cache;
             _logger = logger;
         }
@@ -44,7 +44,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
                 return JsonSerializer.Deserialize<Tenant>(cached);
             }
 
-            var tenant = await _uow.Tenant.GetAsync(id);
+            var tenant = await _unitOfWork.Tenant.GetAsync(id);
             if (tenant != null)
             {
                 await CacheTenantAsync(tenant);
@@ -62,7 +62,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
                 return JsonSerializer.Deserialize<Tenant>(cached);
             }
 
-            var tenant = await _uow.Tenant.GetByCodeAsync(code);
+            var tenant = await _unitOfWork.Tenant.GetByCodeAsync(code);
             if (tenant != null)
             {
                 await CacheTenantAsync(tenant);
@@ -80,7 +80,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
                 return JsonSerializer.Deserialize<Tenant>(cached);
             }
 
-            var tenant = await _uow.Tenant.GetByDomainAsync(domain);
+            var tenant = await _unitOfWork.Tenant.GetByDomainAsync(domain);
             if (tenant != null)
             {
                 await CacheTenantAsync(tenant);
@@ -91,13 +91,13 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<IEnumerable<Tenant>> GetAllAsync()
         {
-            return await _uow.Tenant.GetAllAsync();
+            return await _unitOfWork.Tenant.GetAllAsync();
         }
 
         /// <inheritdoc/>
         public async Task<IEnumerable<Tenant>> GetActiveTenantsAsync()
         {
-            return await _uow.Tenant.GetActiveTenantsAsync();
+            return await _unitOfWork.Tenant.GetActiveTenantsAsync();
         }
 
         /// <inheritdoc/>
@@ -108,14 +108,14 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             int pageSize
         )
         {
-            return await _uow.Tenant.GetPagedAsync(keyword, isActive, page, pageSize);
+            return await _unitOfWork.Tenant.GetPagedAsync(keyword, isActive, page, pageSize);
         }
 
         /// <inheritdoc/>
         public async Task<Tenant> CreateAsync(Tenant tenant)
         {
             // Validate code uniqueness
-            if (await _uow.Tenant.ExistsCodeAsync(tenant.Code))
+            if (await _unitOfWork.Tenant.ExistsCodeAsync(tenant.Code))
             {
                 throw new InvalidOperationException($"Tenant code '{tenant.Code}' already exists");
             }
@@ -123,7 +123,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             // Validate domain uniqueness
             if (
                 !string.IsNullOrWhiteSpace(tenant.Domain)
-                && await _uow.Tenant.ExistsDomainAsync(tenant.Domain)
+                && await _unitOfWork.Tenant.ExistsDomainAsync(tenant.Domain)
             )
             {
                 throw new InvalidOperationException($"Domain '{tenant.Domain}' is already in use");
@@ -132,7 +132,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             tenant.Id = Guid.NewGuid();
             tenant.CreatedAt = DateTime.UtcNow;
 
-            await _uow.Tenant.InsertAsync(tenant);
+            await _unitOfWork.Tenant.InsertAsync(tenant);
             _logger.LogInformation("Created tenant: {TenantCode} ({TenantId})", tenant.Code, tenant.Id);
 
             return tenant;
@@ -141,14 +141,14 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<Tenant> UpdateAsync(Tenant tenant)
         {
-            var existing = await _uow.Tenant.GetAsync(tenant.Id);
+            var existing = await _unitOfWork.Tenant.GetAsync(tenant.Id);
             if (existing == null)
             {
                 throw new InvalidOperationException($"Tenant not found: {tenant.Id}");
             }
 
             // Validate code uniqueness
-            if (await _uow.Tenant.ExistsCodeAsync(tenant.Code, tenant.Id))
+            if (await _unitOfWork.Tenant.ExistsCodeAsync(tenant.Code, tenant.Id))
             {
                 throw new InvalidOperationException($"Tenant code '{tenant.Code}' already exists");
             }
@@ -156,14 +156,14 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
             // Validate domain uniqueness
             if (
                 !string.IsNullOrWhiteSpace(tenant.Domain)
-                && await _uow.Tenant.ExistsDomainAsync(tenant.Domain, tenant.Id)
+                && await _unitOfWork.Tenant.ExistsDomainAsync(tenant.Domain, tenant.Id)
             )
             {
                 throw new InvalidOperationException($"Domain '{tenant.Domain}' is already in use");
             }
 
             tenant.UpdatedAt = DateTime.UtcNow;
-            await _uow.Tenant.UpdateAsync(tenant);
+            await _unitOfWork.Tenant.UpdateAsync(tenant);
 
             // Clear cache
             await InvalidateCacheAsync(existing);
@@ -175,13 +175,13 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var tenant = await _uow.Tenant.GetAsync(id);
+            var tenant = await _unitOfWork.Tenant.GetAsync(id);
             if (tenant == null)
             {
                 return false;
             }
 
-            var result = await _uow.Tenant.DeleteAsync(id);
+            var result = await _unitOfWork.Tenant.DeleteAsync(id);
             if (result > 0)
             {
                 await InvalidateCacheAsync(tenant);
@@ -197,7 +197,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<bool> SetActiveAsync(Guid id, bool isActive)
         {
-            var tenant = await _uow.Tenant.GetAsync(id);
+            var tenant = await _unitOfWork.Tenant.GetAsync(id);
             if (tenant == null)
             {
                 return false;
@@ -205,7 +205,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
 
             tenant.IsActive = isActive;
             tenant.UpdatedAt = DateTime.UtcNow;
-            await _uow.Tenant.UpdateAsync(tenant);
+            await _unitOfWork.Tenant.UpdateAsync(tenant);
             await InvalidateCacheAsync(tenant);
 
             _logger.LogInformation(
@@ -220,7 +220,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         /// <inheritdoc/>
         public async Task<bool> IsCodeAvailableAsync(string code, Guid? excludeId = null)
         {
-            return !await _uow.Tenant.ExistsCodeAsync(code, excludeId);
+            return !await _unitOfWork.Tenant.ExistsCodeAsync(code, excludeId);
         }
 
         /// <inheritdoc/>
@@ -228,7 +228,7 @@ namespace Dawning.Identity.Application.Services.MultiTenancy
         {
             if (string.IsNullOrWhiteSpace(domain))
                 return true;
-            return !await _uow.Tenant.ExistsDomainAsync(domain, excludeId);
+            return !await _unitOfWork.Tenant.ExistsDomainAsync(domain, excludeId);
         }
 
         /// <inheritdoc/>

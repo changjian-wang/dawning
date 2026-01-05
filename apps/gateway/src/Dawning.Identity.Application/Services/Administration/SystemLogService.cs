@@ -20,17 +20,17 @@ namespace Dawning.Identity.Application.Services.Administration
     /// </summary>
     public class SystemLogService : ISystemLogService
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IRealTimeNotificationService _realTimeNotification;
         private readonly ILogger<SystemLogService> _logger;
 
         public SystemLogService(
-            IUnitOfWork uow,
+            IUnitOfWork unitOfWork,
             IRealTimeNotificationService realTimeNotification,
             ILogger<SystemLogService> logger
         )
         {
-            _uow = uow;
+            _unitOfWork = unitOfWork;
             _realTimeNotification = realTimeNotification;
             _logger = logger;
         }
@@ -45,8 +45,8 @@ namespace Dawning.Identity.Application.Services.Administration
         )
         {
             var log = CreateLogFromException(exception, httpContext, statusCode, "Error");
-            await _uow.SystemLog.InsertAsync(log);
-            await _uow.CommitAsync();
+            await _unitOfWork.SystemLog.InsertAsync(log);
+            await _unitOfWork.CommitAsync();
 
             // Push error log in real-time
             await PushLogToClientsAsync(log);
@@ -58,8 +58,8 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task LogWarningAsync(string message, HttpContext? httpContext = null)
         {
             var log = CreateLogFromMessage(message, httpContext, "Warning");
-            await _uow.SystemLog.InsertAsync(log);
-            await _uow.CommitAsync();
+            await _unitOfWork.SystemLog.InsertAsync(log);
+            await _unitOfWork.CommitAsync();
 
             // Push warning log in real-time
             await PushLogToClientsAsync(log);
@@ -71,8 +71,8 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task LogInfoAsync(string message, HttpContext? httpContext = null)
         {
             var log = CreateLogFromMessage(message, httpContext, "Information");
-            await _uow.SystemLog.InsertAsync(log);
-            await _uow.CommitAsync();
+            await _unitOfWork.SystemLog.InsertAsync(log);
+            await _unitOfWork.CommitAsync();
 
             // Only push important info logs (avoid log flooding)
             // Info logs are not pushed for now, can be enabled via configuration
@@ -84,8 +84,8 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<SystemLogDto> CreateAsync(CreateSystemLogDto dto)
         {
             var log = dto.ToEntity();
-            await _uow.SystemLog.InsertAsync(log);
-            await _uow.CommitAsync();
+            await _unitOfWork.SystemLog.InsertAsync(log);
+            await _unitOfWork.CommitAsync();
             return log.ToDto();
         }
 
@@ -94,7 +94,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<SystemLogDto?> GetAsync(Guid id)
         {
-            var log = await _uow.SystemLog.GetAsync(id);
+            var log = await _unitOfWork.SystemLog.GetAsync(id);
             return log.ToDtoOrNull();
         }
 
@@ -107,7 +107,7 @@ namespace Dawning.Identity.Application.Services.Administration
             int itemsPerPage
         )
         {
-            var pagedData = await _uow.SystemLog.GetPagedListAsync(queryModel, page, itemsPerPage);
+            var pagedData = await _unitOfWork.SystemLog.GetPagedListAsync(queryModel, page, itemsPerPage);
 
             return new PagedData<SystemLogDto>
             {
@@ -123,7 +123,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime beforeDate)
         {
-            return await _uow.SystemLog.DeleteOlderThanAsync(beforeDate);
+            return await _unitOfWork.SystemLog.DeleteOlderThanAsync(beforeDate);
         }
 
         #region Private Methods

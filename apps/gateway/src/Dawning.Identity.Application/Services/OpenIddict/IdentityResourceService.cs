@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.Administration;
@@ -21,12 +20,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     public class IdentityResourceService : IIdentityResourceService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public IdentityResourceService(IUnitOfWork unitOfWork, IMapper mapper)
+        public IdentityResourceService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -120,7 +117,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             // Map and prepare model
-            var model = _mapper.Map<IdentityResource>(dto);
+            var model = dto.ToModel() ?? new IdentityResource();
             model.Id = Guid.NewGuid();
             model.CreatedAt = DateTime.UtcNow;
 
@@ -177,7 +174,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             // Map and update
-            var model = _mapper.Map<IdentityResource>(dto);
+            var model = dto.ToModel() ?? new IdentityResource();
 
             // Deduplicate Claims
             if (model.UserClaims != null && model.UserClaims.Any())

@@ -12,7 +12,6 @@ using Dawning.Identity.Application.Interfaces.Security;
 using Dawning.Identity.Application.Mapping.Administration;
 using Dawning.Identity.Domain.Aggregates.Administration;
 using Dawning.Identity.Domain.Core.Security;
-using Dawning.Identity.Domain.Interfaces.Administration;
 using Dawning.Identity.Domain.Interfaces.UoW;
 using Dawning.Identity.Domain.Models;
 using Dawning.Identity.Domain.Models.Administration;
@@ -25,22 +24,19 @@ namespace Dawning.Identity.Application.Services.Administration
     /// </summary>
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordPolicyService? _passwordPolicyService;
         private readonly IIntegrationEventBus _integrationEventBus;
         private readonly ILogger<UserService> _logger;
 
         public UserService(
-            IUserRepository userRepository,
-            IUnitOfWork uow,
+            IUnitOfWork unitOfWork,
             IIntegrationEventBus integrationEventBus,
             ILogger<UserService> logger,
             IPasswordPolicyService? passwordPolicyService = null
         )
         {
-            _userRepository = userRepository;
-            _uow = uow;
+            _unitOfWork = unitOfWork;
             _integrationEventBus = integrationEventBus;
             _logger = logger;
             _passwordPolicyService = passwordPolicyService;
@@ -51,7 +47,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<UserDto?> GetByIdAsync(Guid id)
         {
-            var user = await _userRepository.GetAsync(id);
+            var user = await _unitOfWork.User.GetAsync(id);
             return user.ToDtoOrNull();
         }
 
@@ -60,7 +56,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<UserDto?> GetByUsernameAsync(string username)
         {
-            var user = await _userRepository.GetByUsernameAsync(username);
+            var user = await _unitOfWork.User.GetByUsernameAsync(username);
             return user.ToDtoOrNull();
         }
 
@@ -73,7 +69,7 @@ namespace Dawning.Identity.Application.Services.Administration
             int itemsPerPage
         )
         {
-            var pagedData = await _userRepository.GetPagedListAsync(model, page, itemsPerPage);
+            var pagedData = await _unitOfWork.User.GetPagedListAsync(model, page, itemsPerPage);
 
             return new PagedData<UserDto>
             {
@@ -93,7 +89,7 @@ namespace Dawning.Identity.Application.Services.Administration
             int pageSize
         )
         {
-            var pagedData = await _userRepository.GetPagedListByCursorAsync(
+            var pagedData = await _unitOfWork.User.GetPagedListByCursorAsync(
                 model,
                 cursor,
                 pageSize
@@ -114,7 +110,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<UserDto> CreateAsync(CreateUserDto dto, Guid? operatorId = null)
         {
             // Validate if username already exists
-            if (await _userRepository.UsernameExistsAsync(dto.Username))
+            if (await _unitOfWork.User.UsernameExistsAsync(dto.Username))
             {
                 throw new InvalidOperationException($"Username '{dto.Username}' already exists.");
             }
@@ -122,7 +118,7 @@ namespace Dawning.Identity.Application.Services.Administration
             // Validate if email already exists
             if (
                 !string.IsNullOrWhiteSpace(dto.Email)
-                && await _userRepository.EmailExistsAsync(dto.Email)
+                && await _unitOfWork.User.EmailExistsAsync(dto.Email)
             )
             {
                 throw new InvalidOperationException($"Email '{dto.Email}' already exists.");
@@ -139,7 +135,7 @@ namespace Dawning.Identity.Application.Services.Administration
             user.CreatedAt = DateTime.UtcNow;
             user.CreatedBy = operatorId;
 
-            await _userRepository.InsertAsync(user);
+            await _unitOfWork.User.InsertAsync(user);
 
             // Publish user creation integration event
             try
@@ -181,7 +177,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<UserDto> UpdateAsync(UpdateUserDto dto, Guid? operatorId = null)
         {
-            var user = await _userRepository.GetAsync(dto.Id);
+            var user = await _unitOfWork.User.GetAsync(dto.Id);
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{dto.Id}' not found.");
@@ -190,7 +186,7 @@ namespace Dawning.Identity.Application.Services.Administration
             // Validate if email already exists (exclude current user)
             if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != user.Email)
             {
-                if (await _userRepository.EmailExistsAsync(dto.Email, user.Id))
+                if (await _unitOfWork.User.EmailExistsAsync(dto.Email, user.Id))
                 {
                     throw new InvalidOperationException($"Email '{dto.Email}' already exists.");
                 }
@@ -201,7 +197,7 @@ namespace Dawning.Identity.Application.Services.Administration
             user.UpdatedAt = DateTime.UtcNow;
             user.UpdatedBy = operatorId;
 
-            await _userRepository.UpdateAsync(user);
+            await _unitOfWork.User.UpdateAsync(user);
 
             return user.ToDto();
         }
@@ -211,7 +207,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> DeleteAsync(Guid id, Guid? operatorId = null)
         {
-            var user = await _userRepository.GetAsync(id);
+            var user = await _unitOfWork.User.GetAsync(id);
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{id}' not found.");
@@ -224,7 +220,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             user.UpdatedBy = operatorId;
-            var result = await _userRepository.DeleteAsync(user);
+            var result = await _unitOfWork.User.DeleteAsync(user);
 
             // Publish user deletion integration event
             if (result)
@@ -263,7 +259,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> ChangePasswordAsync(ChangePasswordDto dto)
         {
-            var user = await _userRepository.GetAsync(dto.UserId);
+            var user = await _unitOfWork.User.GetAsync(dto.UserId);
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{dto.UserId}' not found.");
@@ -290,7 +286,7 @@ namespace Dawning.Identity.Application.Services.Administration
             user.PasswordHash = HashPassword(dto.NewPassword);
             user.UpdatedAt = DateTime.UtcNow;
 
-            var result = await _userRepository.UpdateAsync(user);
+            var result = await _unitOfWork.User.UpdateAsync(user);
 
             return result;
         }
@@ -300,7 +296,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> ResetPasswordAsync(Guid userId, string newPassword)
         {
-            var user = await _userRepository.GetAsync(userId);
+            var user = await _unitOfWork.User.GetAsync(userId);
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{userId}' not found.");
@@ -313,7 +309,7 @@ namespace Dawning.Identity.Application.Services.Administration
             user.PasswordHash = HashPassword(newPassword);
             user.UpdatedAt = DateTime.UtcNow;
 
-            var result = await _userRepository.UpdateAsync(user);
+            var result = await _unitOfWork.User.UpdateAsync(user);
 
             return result;
         }
@@ -323,7 +319,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> UsernameExistsAsync(string username, Guid? excludeUserId = null)
         {
-            return await _userRepository.UsernameExistsAsync(username, excludeUserId);
+            return await _unitOfWork.User.UsernameExistsAsync(username, excludeUserId);
         }
 
         /// <summary>
@@ -331,7 +327,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> EmailExistsAsync(string email, Guid? excludeUserId = null)
         {
-            return await _userRepository.EmailExistsAsync(email, excludeUserId);
+            return await _unitOfWork.User.EmailExistsAsync(email, excludeUserId);
         }
 
         #region Password Hashing and Verification Helper Methods
@@ -441,16 +437,16 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task UpdateLastLoginAsync(Guid userId)
         {
-            // Update directly through Repository without UnitOfWork transaction
+            // Update directly through UnitOfWork
             // This is an independent operation that doesn't need to be in the same transaction
-            var user = await _userRepository.GetAsync(userId);
+            var user = await _unitOfWork.User.GetAsync(userId);
             if (user == null)
             {
                 return;
             }
 
             user.LastLoginAt = DateTime.UtcNow;
-            await _userRepository.UpdateAsync(user);
+            await _unitOfWork.User.UpdateAsync(user);
         }
 
         /// <summary>
@@ -464,7 +460,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             // Get user from database (including PasswordHash)
-            var user = await _userRepository.GetByUsernameAsync(username);
+            var user = await _unitOfWork.User.GetByUsernameAsync(username);
             if (user == null || !user.IsActive)
             {
                 return null;
@@ -510,7 +506,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<IEnumerable<RoleDto>> GetUserRolesAsync(Guid userId)
         {
-            var roles = await _uow.UserRole.GetUserRolesAsync(userId);
+            var roles = await _unitOfWork.UserRole.GetUserRolesAsync(userId);
             return roles.ToDtos();
         }
 
@@ -540,13 +536,13 @@ namespace Dawning.Identity.Application.Services.Administration
             Guid? operatorId = null
         )
         {
-            var user = await _userRepository.GetAsync(userId);
+            var user = await _unitOfWork.User.GetAsync(userId);
             if (user == null)
             {
                 throw new InvalidOperationException($"User with ID '{userId}' not found.");
             }
 
-            return await _uow.UserRole.AssignRolesAsync(userId, roleIds, operatorId);
+            return await _unitOfWork.UserRole.AssignRolesAsync(userId, roleIds, operatorId);
         }
 
         /// <summary>
@@ -554,7 +550,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> RemoveRoleAsync(Guid userId, Guid roleId)
         {
-            return await _uow.UserRole.RemoveRoleAsync(userId, roleId);
+            return await _unitOfWork.UserRole.RemoveRoleAsync(userId, roleId);
         }
 
         /// <summary>
@@ -563,7 +559,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<UserStatisticsDto> GetUserStatisticsAsync()
         {
             // Get all users for statistics (use empty model to get all)
-            var allUsers = await _userRepository.GetPagedListAsync(
+            var allUsers = await _unitOfWork.User.GetPagedListAsync(
                 new UserModel(),
                 1,
                 int.MaxValue
@@ -610,7 +606,7 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             // Get users with login records, ordered by last login time descending
             var model = new UserModel { IsActive = true };
-            var allUsers = await _userRepository.GetPagedListAsync(model, 1, int.MaxValue);
+            var allUsers = await _unitOfWork.User.GetPagedListAsync(model, 1, int.MaxValue);
 
             var recentUsers = allUsers
                 .Items.Where(u => u.LastLoginAt.HasValue)

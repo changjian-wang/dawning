@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.Administration;
@@ -22,12 +21,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     public class ScopeService : IScopeService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public ScopeService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ScopeService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -119,7 +116,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             // Map and prepare model
-            Scope model = _mapper.Map<Scope>(dto);
+            Scope model = dto.ToModel() ?? new Scope();
             model.Id = Guid.NewGuid();
             model.CreatedAt = DateTime.UtcNow;
 
@@ -174,7 +171,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             // Map and update
-            Scope model = _mapper.Map<Scope>(dto);
+            Scope model = dto.ToModel() ?? new Scope();
 
             // Remove duplicate resources
             if (model.Resources != null && model.Resources.Any())

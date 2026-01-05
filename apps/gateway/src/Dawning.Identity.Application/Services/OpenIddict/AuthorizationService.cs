@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.OpenIddict;
@@ -20,12 +19,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     public class AuthorizationService : IAuthorizationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public AuthorizationService(IUnitOfWork unitOfWork, IMapper mapper)
+        public AuthorizationService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         public async Task<AuthorizationDto> GetAsync(Guid id)
@@ -79,13 +76,13 @@ namespace Dawning.Identity.Application.Services.OpenIddict
 
         public async ValueTask<int> InsertAsync(AuthorizationDto dto)
         {
-            Authorization model = _mapper.Map<Authorization>(dto);
+            Authorization model = dto.ToModel() ?? new Authorization();
             return await _unitOfWork.Authorization.InsertAsync(model);
         }
 
         public async ValueTask<bool> UpdateAsync(AuthorizationDto dto)
         {
-            Authorization model = _mapper.Map<Authorization>(dto);
+            Authorization model = dto.ToModel() ?? new Authorization();
             return await _unitOfWork.Authorization.UpdateAsync(model);
         }
 

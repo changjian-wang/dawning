@@ -29,8 +29,10 @@ public class UserServiceTests
         _integrationEventBusMock = new Mock<IIntegrationEventBus>();
         _loggerMock = new Mock<ILogger<UserService>>();
 
+        // Setup UnitOfWork to return the mocked UserRepository
+        _uowMock.Setup(x => x.User).Returns(_userRepositoryMock.Object);
+
         _userService = new UserService(
-            _userRepositoryMock.Object,
             _uowMock.Object,
             _integrationEventBusMock.Object,
             _loggerMock.Object

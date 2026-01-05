@@ -17,11 +17,11 @@ namespace Dawning.Identity.Application.Services.Administration
     /// </summary>
     public class RoleService : IRoleService
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RoleService(IUnitOfWork uow)
+        public RoleService(IUnitOfWork unitOfWork)
         {
-            _uow = uow;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<RoleDto?> GetAsync(Guid id)
         {
-            var role = await _uow.Role.GetAsync(id);
+            var role = await _unitOfWork.Role.GetAsync(id);
             return role?.ToDto();
         }
 
@@ -38,7 +38,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<RoleDto?> GetByNameAsync(string name)
         {
-            var role = await _uow.Role.GetByNameAsync(name);
+            var role = await _unitOfWork.Role.GetByNameAsync(name);
             return role?.ToDto();
         }
 
@@ -51,7 +51,7 @@ namespace Dawning.Identity.Application.Services.Administration
             int itemsPerPage
         )
         {
-            var pagedData = await _uow.Role.GetPagedListAsync(model, page, itemsPerPage);
+            var pagedData = await _unitOfWork.Role.GetPagedListAsync(model, page, itemsPerPage);
 
             return new PagedData<RoleDto>
             {
@@ -67,7 +67,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<IEnumerable<RoleDto>> GetAllAsync()
         {
-            var roles = await _uow.Role.GetAllAsync();
+            var roles = await _unitOfWork.Role.GetAllAsync();
             return roles.ToDtos();
         }
 
@@ -77,7 +77,7 @@ namespace Dawning.Identity.Application.Services.Administration
         public async Task<RoleDto> CreateAsync(CreateRoleDto dto, Guid? operatorId = null)
         {
             // Validate if role name already exists
-            if (await _uow.Role.NameExistsAsync(dto.Name))
+            if (await _unitOfWork.Role.NameExistsAsync(dto.Name))
             {
                 throw new InvalidOperationException($"Role name '{dto.Name}' already exists.");
             }
@@ -86,7 +86,7 @@ namespace Dawning.Identity.Application.Services.Administration
             var role = dto.ToEntity();
             role.CreatedBy = operatorId;
 
-            await _uow.Role.InsertAsync(role);
+            await _unitOfWork.Role.InsertAsync(role);
 
             return role.ToDto();
         }
@@ -96,7 +96,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<RoleDto> UpdateAsync(UpdateRoleDto dto, Guid? operatorId = null)
         {
-            var role = await _uow.Role.GetAsync(dto.Id);
+            var role = await _unitOfWork.Role.GetAsync(dto.Id);
             if (role == null)
             {
                 throw new InvalidOperationException($"Role with ID '{dto.Id}' not found.");
@@ -113,7 +113,7 @@ namespace Dawning.Identity.Application.Services.Administration
             role.UpdatedAt = DateTime.UtcNow;
             role.UpdatedBy = operatorId;
 
-            await _uow.Role.UpdateAsync(role);
+            await _unitOfWork.Role.UpdateAsync(role);
 
             return role.ToDto();
         }
@@ -123,7 +123,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> DeleteAsync(Guid id, Guid? operatorId = null)
         {
-            var role = await _uow.Role.GetAsync(id);
+            var role = await _unitOfWork.Role.GetAsync(id);
             if (role == null)
             {
                 throw new InvalidOperationException($"Role with ID '{id}' not found.");
@@ -136,7 +136,7 @@ namespace Dawning.Identity.Application.Services.Administration
             }
 
             role.UpdatedBy = operatorId;
-            var result = await _uow.Role.DeleteAsync(role);
+            var result = await _unitOfWork.Role.DeleteAsync(role);
 
             return result;
         }
@@ -146,7 +146,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<bool> NameExistsAsync(string name, Guid? excludeRoleId = null)
         {
-            return await _uow.Role.NameExistsAsync(name, excludeRoleId);
+            return await _unitOfWork.Role.NameExistsAsync(name, excludeRoleId);
         }
     }
 }

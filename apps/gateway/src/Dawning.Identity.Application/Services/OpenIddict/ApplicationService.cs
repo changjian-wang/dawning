@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
@@ -21,7 +20,6 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     public class ApplicationService : IApplicationService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
 
         /// <summary>
@@ -29,12 +27,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
         /// </summary>
         public ApplicationService(
             IUnitOfWork unitOfWork,
-            IMapper mapper,
             ICurrentUserService currentUserService
         )
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _currentUserService = currentUserService;
         }
 
@@ -162,7 +158,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             Domain.Aggregates.OpenIddict.Application model =
-                _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
+                dto.ToModel() ?? new Domain.Aggregates.OpenIddict.Application();
 
             // If confidential type and has ClientSecret, use PBKDF2 hash
             if (!string.IsNullOrEmpty(dto.ClientSecret) && dto.Type == "confidential")
@@ -218,7 +214,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             ValidateRedirectUris(dto.PostLogoutRedirectUris, "PostLogoutRedirectUri");
 
             Domain.Aggregates.OpenIddict.Application model =
-                _mapper.Map<Domain.Aggregates.OpenIddict.Application>(dto);
+                dto.ToModel() ?? new Domain.Aggregates.OpenIddict.Application();
 
             // If new secret is provided, use PBKDF2 hash
             if (!string.IsNullOrEmpty(dto.ClientSecret) && dto.Type == "confidential")

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using Dawning.Identity.Application.Dtos.OpenIddict;
 using Dawning.Identity.Application.Interfaces.OpenIddict;
 using Dawning.Identity.Application.Mapping.Administration;
@@ -21,12 +20,10 @@ namespace Dawning.Identity.Application.Services.OpenIddict
     public class ApiResourceService : IApiResourceService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
 
-        public ApiResourceService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ApiResourceService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             // Map and prepare model
-            var model = _mapper.Map<ApiResource>(dto);
+            var model = dto.ToModel() ?? new ApiResource();
             model.Id = Guid.NewGuid();
             model.CreatedAt = DateTime.UtcNow;
 
@@ -174,7 +171,7 @@ namespace Dawning.Identity.Application.Services.OpenIddict
             }
 
             // Map and update
-            var model = _mapper.Map<ApiResource>(dto);
+            var model = dto.ToModel() ?? new ApiResource();
 
             // Deduplicate Scopes and Claims
             if (model.Scopes != null && model.Scopes.Any())

@@ -16,11 +16,11 @@ namespace Dawning.Identity.Application.Services.Administration
     /// </summary>
     public class AuditLogService : IAuditLogService
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuditLogService(IUnitOfWork uow)
+        public AuditLogService(IUnitOfWork unitOfWork)
         {
-            _uow = uow;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<AuditLogDto?> GetAsync(Guid id)
         {
-            var auditLog = await _uow.AuditLog.GetAsync(id);
+            var auditLog = await _unitOfWork.AuditLog.GetAsync(id);
             return auditLog?.ToDto();
         }
 
@@ -41,7 +41,7 @@ namespace Dawning.Identity.Application.Services.Administration
             int itemsPerPage
         )
         {
-            var pagedData = await _uow.AuditLog.GetPagedListAsync(model, page, itemsPerPage);
+            var pagedData = await _unitOfWork.AuditLog.GetPagedListAsync(model, page, itemsPerPage);
 
             return new PagedData<AuditLogDto>
             {
@@ -59,7 +59,7 @@ namespace Dawning.Identity.Application.Services.Administration
         {
             var auditLog = dto.ToEntity();
 
-            await _uow.AuditLog.InsertAsync(auditLog);
+            await _unitOfWork.AuditLog.InsertAsync(auditLog);
 
             return auditLog.ToDto();
         }
@@ -69,7 +69,7 @@ namespace Dawning.Identity.Application.Services.Administration
         /// </summary>
         public async Task<int> DeleteOlderThanAsync(DateTime date)
         {
-            return await _uow.AuditLog.DeleteOlderThanAsync(date);
+            return await _unitOfWork.AuditLog.DeleteOlderThanAsync(date);
         }
     }
 }
