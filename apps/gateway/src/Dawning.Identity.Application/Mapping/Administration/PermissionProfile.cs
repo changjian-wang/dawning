@@ -40,7 +40,9 @@ namespace Dawning.Identity.Application.Mapping.Administration
 
         static PermissionMappers()
         {
-            Mapper = new MapperConfiguration(cfg => cfg.AddProfile<PermissionProfile>()).CreateMapper();
+            Mapper = new MapperConfiguration(cfg =>
+                cfg.AddProfile<PermissionProfile>()
+            ).CreateMapper();
         }
 
         /// <summary>

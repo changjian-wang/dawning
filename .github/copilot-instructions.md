@@ -268,9 +268,3 @@ public class UserService(IMapper mapper)  // Don't do this!
 8. **Follow RESTful conventions** - Proper HTTP methods and status codes
 9. **Use UnitOfWork** - Access repositories via `_unitOfWork.{Repository}`
 10. **Use static Mappers** - Use `entity.ToDto()` not `_mapper.Map<>()`
-
-## Reference Documentation
-
-- [DEVELOPMENT_STANDARDS.md](docs/DEVELOPMENT_STANDARDS.md) - Full development standards
-- [DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) - Developer guide
-- [AUTHENTICATION_INTEGRATION.md](docs/AUTHENTICATION_INTEGRATION.md) - Auth integration

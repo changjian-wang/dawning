@@ -18,13 +18,19 @@ public class NullRealTimeNotificationService : IRealTimeNotificationService
 
     public Task SendAlertNotificationAsync(RealTimeAlertNotification alert)
     {
-        _logger.LogDebug("Real-time notification service not configured, skipping alert push: {Title}", alert.Title);
+        _logger.LogDebug(
+            "Real-time notification service not configured, skipping alert push: {Title}",
+            alert.Title
+        );
         return Task.CompletedTask;
     }
 
     public Task SendSystemMessageAsync(RealTimeSystemMessage message)
     {
-        _logger.LogDebug("Real-time notification service not configured, skipping system message push: {Title}", message.Title);
+        _logger.LogDebug(
+            "Real-time notification service not configured, skipping system message push: {Title}",
+            message.Title
+        );
         return Task.CompletedTask;
     }
 

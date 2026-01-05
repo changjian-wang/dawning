@@ -107,7 +107,11 @@ namespace Dawning.Identity.Application.Services.Administration
             int itemsPerPage
         )
         {
-            var pagedData = await _unitOfWork.SystemLog.GetPagedListAsync(queryModel, page, itemsPerPage);
+            var pagedData = await _unitOfWork.SystemLog.GetPagedListAsync(
+                queryModel,
+                page,
+                itemsPerPage
+            );
 
             return new PagedData<SystemLogDto>
             {
