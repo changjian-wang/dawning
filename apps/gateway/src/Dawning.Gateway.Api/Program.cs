@@ -159,6 +159,23 @@ builder.Services.AddRateLimiter(options =>
         }
     );
 
+    // Agents API rate limiting: 30 requests per minute (LLM calls are expensive)
+    options.AddSlidingWindowLimiter(
+        "agents-rate-limit",
+        config =>
+        {
+            config.PermitLimit = 30;
+            config.Window = TimeSpan.FromMinutes(1);
+            config.SegmentsPerWindow = 6;
+            config.QueueProcessingOrder = System
+                .Threading
+                .RateLimiting
+                .QueueProcessingOrder
+                .OldestFirst;
+            config.QueueLimit = 10;
+        }
+    );
+
     // Rate limit response
     options.OnRejected = async (context, cancellationToken) =>
     {
