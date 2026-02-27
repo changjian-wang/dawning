@@ -1,19 +1,32 @@
 ---
-description: 创建新的 Vue 3 页面组件
+description: "Create Vue 3 admin page with Arco Design: list, form, i18n, CRUD operations. Trigger: 创建页面, create page, Vue页面, 新建页面, 前端页面, vue page, 管理页面"
 ---
 
-# 创建 Vue 3 页面组件
+# Create Vue Page Skill
 
-根据需求创建完整的 Vue 3 管理后台页面。
+## 目标
 
-## 创建流程
+创建完整的 Vue 3 管理后台页面（列表 + CRUD + 国际化）。
 
-### 1. 分析需求
-- 确定页面功能（列表/详情/表单）
-- 识别需要的 API 接口
-- 确定使用的 Arco Design 组件
+## 触发条件
 
-### 2. 创建目录结构
+- **关键词**：创建页面, create page, Vue页面, 新建页面, 前端页面, vue page, 管理页面, 列表页
+- **文件模式**：`*.vue`, `src/views/**`, `src/api/*.ts`
+- **用户意图**：创建新的管理后台页面
+
+## 编排
+
+- **前置**：`create-api`（先有后端接口）
+- **后续**：无
+
+## Skill 使用日志
+
+使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-vue-page — {触发原因}`
+
+---
+
+## 目录结构
+
 ```
 views/{module}/{feature}/
 ├── index.vue              # 主页面
@@ -25,8 +38,9 @@ views/{module}/{feature}/
     └── en-US.ts
 ```
 
-### 3. 创建 API 接口
-在 `src/api/` 目录创建接口文件：
+## 创建流程
+
+### 1. 创建 API 接口
 
 ```typescript
 // src/api/{feature}.ts
@@ -35,13 +49,7 @@ import type { IPagedData } from './paged-data';
 
 export interface {Feature}Info {
   id: string;
-  // 其他字段
-}
-
-export interface {Feature}QueryParams {
-  keyword?: string;
-  page?: number;
-  pageSize?: number;
+  // 业务字段
 }
 
 export function get{Feature}List(params: {Feature}QueryParams) {
@@ -65,7 +73,8 @@ export function delete{Feature}(id: string) {
 }
 ```
 
-### 4. 创建主页面
+### 2. 创建主页面
+
 ```vue
 <template>
   <div class="container">
@@ -92,11 +101,6 @@ export function delete{Feature}(id: string) {
 
     <!-- 表格区域 -->
     <a-card class="table-card">
-      <template #title>
-        <a-space>
-          <span>{{ t('menu.{module}.{feature}') }}</span>
-        </a-space>
-      </template>
       <template #extra>
         <a-button type="primary" @click="handleAdd">
           <template #icon><icon-plus /></template>
@@ -126,7 +130,6 @@ export function delete{Feature}(id: string) {
       </a-table>
     </a-card>
 
-    <!-- 编辑弹窗 -->
     <EditModal v-model:visible="editModalVisible" :id="editingId" @success="fetchData" />
   </div>
 </template>
@@ -141,34 +144,19 @@ import EditModal from './components/EditModal.vue';
 
 const { t } = useI18n();
 
-// 搜索表单
-const searchForm = reactive({
-  keyword: '',
-});
-
-// 分页
-const pagination = reactive({
-  current: 1,
-  pageSize: 20,
-  total: 0,
-});
-
-// 表格数据
+const searchForm = reactive({ keyword: '' });
+const pagination = reactive({ current: 1, pageSize: 20, total: 0 });
 const loading = ref(false);
 const tableData = ref<{Feature}Info[]>([]);
-
-// 编辑弹窗
 const editModalVisible = ref(false);
 const editingId = ref<string | undefined>();
 
-// 表格列定义
 const columns = computed(() => [
   { title: 'ID', dataIndex: 'id', width: 200 },
   // 其他列...
   { title: t('common.operations'), slotName: 'operations', width: 150 },
 ]);
 
-// 获取数据
 const fetchData = async () => {
   loading.value = true;
   try {
@@ -184,36 +172,11 @@ const fetchData = async () => {
   }
 };
 
-// 搜索
-const handleSearch = () => {
-  pagination.current = 1;
-  fetchData();
-};
-
-const resetSearch = () => {
-  searchForm.keyword = '';
-  handleSearch();
-};
-
-// 分页
-const handlePageChange = (page: number) => {
-  pagination.current = page;
-  fetchData();
-};
-
-// 新增
-const handleAdd = () => {
-  editingId.value = undefined;
-  editModalVisible.value = true;
-};
-
-// 编辑
-const handleEdit = (record: {Feature}Info) => {
-  editingId.value = record.id;
-  editModalVisible.value = true;
-};
-
-// 删除
+const handleSearch = () => { pagination.current = 1; fetchData(); };
+const resetSearch = () => { searchForm.keyword = ''; handleSearch(); };
+const handlePageChange = (page: number) => { pagination.current = page; fetchData(); };
+const handleAdd = () => { editingId.value = undefined; editModalVisible.value = true; };
+const handleEdit = (record: {Feature}Info) => { editingId.value = record.id; editModalVisible.value = true; };
 const handleDelete = async (id: string) => {
   await delete{Feature}(id);
   Message.success(t('common.deleteSuccess'));
@@ -224,33 +187,29 @@ onMounted(fetchData);
 </script>
 
 <style lang="less" scoped>
-.container {
-  padding: 20px;
-}
-.search-card {
-  margin-bottom: 16px;
-}
+.container { padding: 20px; }
+.search-card { margin-bottom: 16px; }
 </style>
 ```
 
-### 5. 创建国际化文件
+### 3. 创建国际化文件
+
 ```typescript
 // locale/zh-CN.ts
 export default {
   'menu.{module}.{feature}': '{Feature}管理',
   '{feature}.keyword': '关键词',
-  '{feature}.createSuccess': '创建成功',
 };
 
 // locale/en-US.ts
 export default {
   'menu.{module}.{feature}': '{Feature} Management',
   '{feature}.keyword': 'Keyword',
-  '{feature}.createSuccess': 'Created successfully',
 };
 ```
 
-### 6. 添加路由
+### 4. 添加路由
+
 在路由配置中添加新页面路由。
 
 ## 规范要求
@@ -261,3 +220,9 @@ export default {
 - 添加国际化支持（zh-CN, en-US）
 - 操作后显示成功/失败消息
 - 删除前显示确认提示
+
+## 验收场景
+
+- **输入**："创建一个产品管理页面"
+- **预期**：agent 生成 API 接口、列表页、编辑弹窗、国际化文件
+- **上次验证**：2026-02-27 ✅
