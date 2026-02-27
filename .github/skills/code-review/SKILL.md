@@ -19,10 +19,6 @@ description: "Code review checklist for Dawning project: code style, DI, mappers
 - **前置**：无
 - **后续**：`build-project`（修复后构建验证）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} code-review — {触发原因}`
-
 ---
 
 ## 审查维度（9 个）

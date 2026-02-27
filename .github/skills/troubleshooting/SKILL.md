@@ -19,10 +19,6 @@ description: "Debug and troubleshoot issues in Dawning: NullReference, DI errors
 - **前置**：无
 - **后续**：`build-project`（修复后验证构建）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} troubleshooting — {触发原因}`
-
 ---
 
 ## 调试流程

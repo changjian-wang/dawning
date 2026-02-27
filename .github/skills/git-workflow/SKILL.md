@@ -19,10 +19,6 @@ description: "Git operations for Dawning project with conventional commit messag
 - **前置**：格式化完成后提交
 - **后续**：无
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} git-workflow — {触发原因}`
-
 ---
 
 ## Standard Flow

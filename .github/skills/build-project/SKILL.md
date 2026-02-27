@@ -19,10 +19,6 @@ description: "Build Dawning Gateway backend (.NET 8) and Admin frontend (Vue 3).
 - **前置**：代码变更后
 - **后续**：运行测试
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} build-project — {触发原因}`
-
 ---
 
 ## Backend (Gateway)

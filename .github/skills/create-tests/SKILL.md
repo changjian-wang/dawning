@@ -19,10 +19,6 @@ description: "Create unit tests for Dawning with xUnit, Moq, UnitOfWork mock pat
 - **前置**：`create-api`（实现代码后写测试）
 - **后续**：`build-project`（确保测试编译通过）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-tests — {触发原因}`
-
 ---
 
 ## 测试框架

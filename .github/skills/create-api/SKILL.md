@@ -19,10 +19,6 @@ description: "Create RESTful API endpoint for Dawning: DTO, Mapper, Service, Con
 - **前置**：`create-database`（先有表结构）
 - **后续**：`create-tests`（创建后写测试）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-api — {触发原因}`
-
 ---
 
 ## 创建流程

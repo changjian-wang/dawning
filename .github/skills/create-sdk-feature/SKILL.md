@@ -19,10 +19,6 @@ description: "Create SDK package features for Dawning: extension methods, servic
 - **前置**：无
 - **后续**：`create-tests`（SDK 包必须 >80% 覆盖率）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-sdk-feature — {触发原因}`
-
 ---
 
 ## SDK 包结构

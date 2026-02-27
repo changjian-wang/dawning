@@ -19,10 +19,6 @@ description: "Create MySQL database table with GUID primary key, timestamp field
 - **前置**：无
 - **后续**：`create-api`（表结构就绪后创建 API）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-database — {触发原因}`
-
 ---
 
 ## 重要规范

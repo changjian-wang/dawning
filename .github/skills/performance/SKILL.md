@@ -19,10 +19,6 @@ description: "Performance analysis for Dawning: N+1 queries, memory allocation, 
 - **前置**：无
 - **后续**：`create-tests`（优化后验证功能不破坏）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} performance — {触发原因}`
-
 ---
 
 ## 常见性能问题

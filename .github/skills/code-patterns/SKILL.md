@@ -19,10 +19,6 @@ description: "Dawning coding patterns: static AutoMapper, UnitOfWork, error hand
 - **前置**：无
 - **后续**：`code-review`（编码后审查）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} code-patterns — {触发原因}`
-
 ---
 
 ## 1. 静态 Mapper 模式

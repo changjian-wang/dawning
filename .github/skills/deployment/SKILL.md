@@ -19,10 +19,6 @@ description: "Docker and deployment configuration for Dawning: Dockerfile, docke
 - **前置**：`build-project`（构建通过后部署）
 - **后续**：无
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} deployment — {触发原因}`
-
 ---
 
 ## .NET 8 Dockerfile

@@ -19,10 +19,6 @@ description: "Create Vue 3 admin page with Arco Design: list, form, i18n, CRUD o
 - **前置**：`create-api`（先有后端接口）
 - **后续**：无
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-vue-page — {触发原因}`
-
 ---
 
 ## 目录结构

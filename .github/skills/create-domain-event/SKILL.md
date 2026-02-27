@@ -19,10 +19,6 @@ description: "Create domain events and event handlers for Dawning: event definit
 - **前置**：`create-api`（Service 层就绪）
 - **后续**：`create-tests`（事件处理器需要测试）
 
-## Skill 使用日志
-
-使用本 skill 后，在 `/memories/repo/skill-usage.md` 追加一行：`- {日期} create-domain-event — {触发原因}`
-
 ---
 
 ## 文件结构
