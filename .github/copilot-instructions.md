@@ -256,6 +256,15 @@ public class UserService(IMapper mapper)  // Don't do this!
 }
 ```
 
+## Skill 索引
+
+| Skill | 覆盖范围 | 触发关键词 |
+|-------|---------|-----------|
+| build-project | 构建后端 (.NET 8) 和前端 (Vue 3) | 构建, build, compile, dotnet build, pnpm build |
+| git-workflow | 提交规范、pre-commit 检查 | git, commit, push, branch, tag |
+| markdown | Markdown/XML 文档规范 | markdown, 写文档, README, API docs |
+| changelog | CHANGELOG 格式、release notes | changelog, 变更日志, release notes |
+
 ## Important Notes
 
 1. **Never hardcode secrets** - Use environment variables or configuration
