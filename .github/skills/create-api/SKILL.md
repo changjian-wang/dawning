@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Scaffolding a new RESTful API endpoint: CreateDto/UpdateDto/ResponseDto, Mapper profile, Service interface+implementation, Controller, DI registration
-  Don't use when: Creating database tables (use create-database), creating tests (use create-tests), reviewing existing APIs (use code-review)
+  Don't use when: Creating database tables (use create-database); creating tests (use create-tests); reviewing existing APIs (use code-review); creating Vue frontend pages (use create-vue-page); implementing shared patterns like Mapper/UnitOfWork (use code-patterns)
   Inputs: Entity name and CRUD operations needed
   Outputs: Complete API scaffolding: DTOs, Mapper, Service, Controller, DI registration
   Success criteria: API endpoint compiles, follows UnitOfWork pattern, returns ApiResult<T>, has proper route attributes

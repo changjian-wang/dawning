@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Creating domain event records, event handler classes, audit log event handlers, and integrating events into services
-  Don't use when: Creating API endpoints (use create-api), creating database tables (use create-database)
+  Don't use when: Creating API endpoints (use create-api); creating database tables (use create-database); creating tests (use create-tests); implementing service patterns without events (use code-patterns)
   Inputs: Event name and trigger scenario
   Outputs: Event record, EventHandler class, service integration code
   Success criteria: Event follows record pattern, handler implements IDomainEventHandler<T>, service dispatches event correctly

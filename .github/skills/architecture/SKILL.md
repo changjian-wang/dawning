@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Understanding DDD layers, gateway project structure, SDK package layout, generating Mermaid architecture diagrams, or reviewing module boundaries
-  Don't use when: Writing code (use code-patterns or create-api), building (use build-project)
+  Don't use when: Writing code (use code-patterns or create-api); building the project (use build-project); reviewing code quality (use code-review); creating database tables (use create-database)
   Inputs: Architecture question or diagram request
   Outputs: Project structure reference, Mermaid diagram, or module boundary analysis
   Success criteria: User understands project architecture and can make informed structural decisions

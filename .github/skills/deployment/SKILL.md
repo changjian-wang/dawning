@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Creating or modifying Dockerfiles (.NET 8 multi-stage, Vue 3 + Nginx), docker-compose configs, or Nginx configuration
-  Don't use when: Building the project (use build-project), configuring K8s (not used in dawning)
+  Don't use when: Building the project (use build-project); writing application code (use code-patterns or create-api); running tests (use create-tests); writing documentation (use markdown); diagnosing runtime errors (use troubleshooting)
   Inputs: Deployment requirement or Docker config change
   Outputs: Dockerfile, docker-compose.yml, or nginx.conf
   Success criteria: Docker images build, containers start, services communicate correctly

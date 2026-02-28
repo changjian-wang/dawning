@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Building Gateway backend (.NET 8), Admin frontend (Vue 3), or SDK packages; fixing compilation errors
-  Don't use when: Running tests (use create-tests), deploying (use deployment), formatting (use git-workflow)
+  Don't use when: Running tests (use create-tests); deploying containers (use deployment); writing code (use code-patterns); diagnosing runtime errors (use troubleshooting); creating API endpoints (use create-api)
   Inputs: Build command or compilation error
   Outputs: Successful build or resolved compilation error
   Success criteria: `dotnet build` and/or `pnpm build` succeed with 0 errors

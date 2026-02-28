@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Creating xUnit unit tests with Moq, UnitOfWork mock pattern for Service tests, Controller tests with mocked services
-  Don't use when: Writing production code (use code-patterns or create-api), running existing tests
+  Don't use when: Writing production code (use code-patterns or create-api); running existing tests (use build-project); reviewing code (use code-review); creating Vue pages (use create-vue-page); diagnosing test failures (use troubleshooting)
   Inputs: Class or method to test
   Outputs: Test class with arrange/act/assert pattern, proper mocking of UnitOfWork and repositories
   Success criteria: Tests follow naming convention, mock UnitOfWork correctly, cover happy path and edge cases

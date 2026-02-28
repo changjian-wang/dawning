@@ -1,7 +1,7 @@
 ---
 description: |
   Use when: Implementing static AutoMapper profiles, UnitOfWork service patterns, exception handling (BusinessException/NotFoundException), or defining constants (AuditConstants/CacheKeyConstants)
-  Don't use when: Creating new API endpoints (use create-api), creating database tables (use create-database), reviewing code (use code-review)
+  Don't use when: Creating new API endpoints (use create-api); creating database tables (use create-database); reviewing code (use code-review); creating Vue pages (use create-vue-page); creating tests (use create-tests)
   Inputs: Entity/Service name or pattern to implement
   Outputs: Mapper profile, service class, exception types, or constants following project conventions
   Success criteria: Code follows static Mapper pattern, uses UnitOfWork correctly, exceptions have proper HTTP status codes
