@@ -1,25 +1,8 @@
 ---
-description: "Create unit tests for Dawning with xUnit, Moq, UnitOfWork mock pattern. Trigger: 单元测试, unit test, 写测试, create test, 测试, test, xunit, mock"
+description: "Use when: Creating xUnit unit tests with Moq, UnitOfWork mock pattern for Service tests, Controller tests with mocked services\nDon't use when: Writing production code (use code-patterns or create-api), running existing tests\nInputs: Class or method to test\nOutputs: Test class with arrange/act/assert pattern, proper mocking of UnitOfWork and repositories\nSuccess criteria: Tests follow naming convention, mock UnitOfWork correctly, cover happy path and edge cases"
 ---
 
 # Create Tests Skill
-
-## 目标
-
-为 Dawning 项目编写符合规范的单元测试。
-
-## 触发条件
-
-- **关键词**：单元测试, unit test, 写测试, create test, 测试, test, xunit, mock, 覆盖率, coverage
-- **文件模式**：`*Tests.cs`, `tests/**/*.cs`
-- **用户意图**：创建单元测试、提高测试覆盖率
-
-## 编排
-
-- **前置**：`create-api`（实现代码后写测试）
-- **后续**：`build-project`（确保测试编译通过）
-
----
 
 ## 测试框架
 
@@ -175,8 +158,3 @@ dotnet test tests/Dawning.Core.Tests             # 特定项目
 dotnet test --collect:"XPlat Code Coverage"      # 带覆盖率
 ```
 
-## 验收场景
-
-- **输入**："帮 RoleService 写单元测试"
-- **预期**：agent 生成通过 UnitOfWork Mock 设置的测试类，覆盖 CRUD 操作
-- **上次验证**：2026-02-27 ✅

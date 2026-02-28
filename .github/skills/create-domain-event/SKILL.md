@@ -1,25 +1,8 @@
 ---
-description: "Create domain events and event handlers for Dawning: event definition, audit log handler, service integration. Trigger: 领域事件, domain event, 事件处理, event handler, 事件发布, publish event"
+description: "Use when: Creating domain event records, event handler classes, audit log event handlers, and integrating events into services\nDon't use when: Creating API endpoints (use create-api), creating database tables (use create-database)\nInputs: Event name and trigger scenario\nOutputs: Event record, EventHandler class, service integration code\nSuccess criteria: Event follows record pattern, handler implements IDomainEventHandler<T>, service dispatches event correctly"
 ---
 
 # Create Domain Event Skill
-
-## 目标
-
-创建领域事件和事件处理器，解耦核心业务逻辑与副作用操作。
-
-## 触发条件
-
-- **关键词**：领域事件, domain event, 事件处理, event handler, 事件发布, publish event, 解耦
-- **文件模式**：`*Event.cs`, `*EventHandler.cs`, `Domain/Events/**`
-- **用户意图**：创建领域事件、实现事件驱动
-
-## 编排
-
-- **前置**：`create-api`（Service 层就绪）
-- **后续**：`create-tests`（事件处理器需要测试）
-
----
 
 ## 文件结构
 
@@ -105,8 +88,3 @@ public class UserService(
 }
 ```
 
-## 验收场景
-
-- **输入**："创建 Order 的领域事件"
-- **预期**：agent 生成 OrderCreatedEvent/UpdatedEvent/DeletedEvent + 审计日志处理器
-- **上次验证**：2026-02-27 ✅

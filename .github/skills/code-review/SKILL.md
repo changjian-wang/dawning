@@ -1,25 +1,8 @@
 ---
-description: "Code review checklist for Dawning project: code style, DI, mappers, API design, database, security, performance, error handling. Trigger: 审查, review, check code, 代码审查, code review, 检查代码"
+description: "Use when: Reviewing code across 9 dimensions: code style, DI, mappers, API design, database, security, performance, error handling, tests\nDon't use when: Writing or fixing code (use code-patterns or create-api), building (use build-project)\nInputs: Code files or changes to review\nOutputs: Structured review with findings per dimension, severity ratings\nSuccess criteria: All 9 dimensions checked, findings documented with severity and fix suggestions"
 ---
 
 # Code Review Skill
-
-## 目标
-
-对 Dawning 项目代码进行全面审查，检查是否符合项目规范和最佳实践。
-
-## 触发条件
-
-- **关键词**：审查, review, check code, 代码审查, code review, 检查代码, 质量检查
-- **文件模式**：`*.cs`, `*.vue`, `*.ts`
-- **用户意图**：审查代码质量、检查规范合规性
-
-## 编排
-
-- **前置**：无
-- **后续**：`build-project`（修复后构建验证）
-
----
 
 ## 审查维度（9 个）
 
@@ -112,8 +95,3 @@ description: "Code review checklist for Dawning project: code style, DI, mappers
 - 改进优先级: ...
 ```
 
-## 验收场景
-
-- **输入**："审查一下 UserService 的代码"
-- **预期**：agent 按 9 个维度逐项检查，输出结构化审查报告
-- **上次验证**：2026-02-27 ✅

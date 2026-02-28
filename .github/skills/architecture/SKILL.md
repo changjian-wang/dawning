@@ -1,25 +1,8 @@
 ---
-description: "Generate architecture diagrams and documentation for Dawning: Mermaid, system architecture, DDD layers, deployment diagrams. Trigger: 架构, architecture, 架构图, diagram, 系统设计, system design, 模块关系, 依赖关系"
+description: "Use when: Understanding DDD layers, gateway project structure, SDK package layout, generating Mermaid architecture diagrams, or reviewing module boundaries\nDon't use when: Writing code (use code-patterns or create-api), building (use build-project)\nInputs: Architecture question or diagram request\nOutputs: Project structure reference, Mermaid diagram, or module boundary analysis\nSuccess criteria: User understands project architecture and can make informed structural decisions"
 ---
 
 # Architecture Skill
-
-## 目标
-
-生成 Dawning 项目的架构图、架构文档和模块依赖分析。
-
-## 触发条件
-
-- **关键词**：架构, architecture, 架构图, diagram, 系统设计, system design, 模块关系, 依赖关系, DDD, 分层
-- **文件模式**：`*.sln`, `*.csproj`, `docs/**`
-- **用户意图**：生成架构图、分析模块依赖、编写架构文档
-
-## 编排
-
-- **前置**：无
-- **后续**：`markdown`（架构文档格式化）
-
----
 
 ## 项目架构
 
@@ -103,8 +86,3 @@ sequenceDiagram
     Identity-->>Client: Access Token
 ```
 
-## 验收场景
-
-- **输入**："画一下系统的架构图"
-- **预期**：agent 生成 Mermaid 架构图，标注主要组件和数据流
-- **上次验证**：2026-02-27 ✅

@@ -1,25 +1,8 @@
 ---
-description: "Debug and troubleshoot issues in Dawning: NullReference, DI errors, database connection, auth failures, API errors. Trigger: 调试, debug, 排错, troubleshoot, 报错, error, 问题, issue, 异常, exception"
+description: "Use when: Diagnosing NullReference errors, DI registration failures, database connection issues, auth failures, or API errors\nDon't use when: Performing code audits (use code-review), writing new features (use create-api)\nInputs: Error message, stack trace, or problem description\nOutputs: Root cause diagnosis and resolution steps\nSuccess criteria: Problem identified and resolved with a clear explanation"
 ---
 
 # Troubleshooting Skill
-
-## 目标
-
-帮助定位和解决 Dawning 项目中的代码问题。
-
-## 触发条件
-
-- **关键词**：调试, debug, 排错, troubleshoot, 报错, error, 问题, issue, 异常, exception, 修复, fix bug
-- **文件模式**：`*.cs`, `*.vue`, `*.ts`
-- **用户意图**：调试问题、修复错误、排查异常
-
-## 编排
-
-- **前置**：无
-- **后续**：`build-project`（修复后验证构建）
-
----
 
 ## 调试流程
 
@@ -79,8 +62,3 @@ pnpm dev
 # 浏览器 F12 → Network 面板检查请求
 ```
 
-## 验收场景
-
-- **输入**："启动报错 Unable to resolve service for type 'IUserService'"
-- **预期**：agent 检查 DI 注册、Service 构造函数、生命周期配置
-- **上次验证**：2026-02-27 ✅

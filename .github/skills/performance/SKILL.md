@@ -1,25 +1,8 @@
 ---
-description: "Performance analysis for Dawning: N+1 queries, memory allocation, async patterns, database optimization. Trigger: 性能, performance, 优化, optimize, 慢查询, slow, N+1, 内存, memory"
+description: "Use when: Analyzing N+1 queries, memory allocation issues, async anti-patterns, database optimization, or caching strategy\nDon't use when: Fixing bugs (use code-patterns), auditing code (use code-review)\nInputs: Performance concern or slow operation to analyze\nOutputs: Root cause analysis with specific optimization recommendations\nSuccess criteria: Performance issue identified, optimization applied, measurable improvement"
 ---
 
 # Performance Skill
-
-## 目标
-
-分析和优化 Dawning 项目的性能问题。
-
-## 触发条件
-
-- **关键词**：性能, performance, 优化, optimize, 慢查询, slow query, N+1, 内存, memory, 缓存, cache
-- **文件模式**：`*.cs`, `*.sql`
-- **用户意图**：性能分析、优化查询、减少内存分配
-
-## 编排
-
-- **前置**：无
-- **后续**：`create-tests`（优化后验证功能不破坏）
-
----
 
 ## 常见性能问题
 
@@ -90,8 +73,3 @@ public int Calculate(int a, int b) => a + b;
 await _cache.SetAsync(CacheKeyConstants.User.ById(id), user, TimeSpan.FromMinutes(30));
 ```
 
-## 验收场景
-
-- **输入**："用户列表接口很慢"
-- **预期**：agent 检查 SQL 查询（N+1、缺少索引）、缓存策略、异步模式
-- **上次验证**：2026-02-27 ✅

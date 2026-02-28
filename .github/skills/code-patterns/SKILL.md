@@ -1,25 +1,8 @@
 ---
-description: "Dawning coding patterns: static AutoMapper, UnitOfWork, error handling, constants, service refactoring. Trigger: 编码规范, code pattern, mapper, 映射, UnitOfWork, 异常处理, error handling, 常量, constants, 重构, refactor"
+description: "Use when: Implementing static AutoMapper profiles, UnitOfWork service patterns, exception handling (BusinessException/NotFoundException), or defining constants (AuditConstants/CacheKeyConstants)\nDon't use when: Creating new API endpoints (use create-api), creating database tables (use create-database), reviewing code (use code-review)\nInputs: Entity/Service name or pattern to implement\nOutputs: Mapper profile, service class, exception types, or constants following project conventions\nSuccess criteria: Code follows static Mapper pattern, uses UnitOfWork correctly, exceptions have proper HTTP status codes"
 ---
 
 # Code Patterns Skill
-
-## 目标
-
-定义 Dawning 项目的核心编码模式：静态 Mapper、UnitOfWork、异常处理、常量定义、Service 重构。
-
-## 触发条件
-
-- **关键词**：编码规范, code pattern, mapper, 映射, AutoMapper, UnitOfWork, 异常处理, error handling, 常量, constants, 重构, refactor service
-- **文件模式**：`*Service.cs`, `*Mappers.cs`, `*Profile.cs`, `*Constants.cs`, `*Exception.cs`
-- **用户意图**：创建映射器、处理异常、定义常量、重构 Service
-
-## 编排
-
-- **前置**：无
-- **后续**：`code-review`（编码后审查）
-
----
 
 ## 1. 静态 Mapper 模式
 
@@ -254,8 +237,3 @@ await _cache.SetAsync($"user:{id}", user);
 await _cache.SetAsync(CacheKeyConstants.User.ById(id), user);
 ```
 
-## 验收场景
-
-- **输入**："帮我创建 Role 的 Mapper"
-- **预期**：agent 按标准模板生成 `RoleProfile.cs`（Profile + Mappers 静态类）
-- **上次验证**：2026-02-27 ✅

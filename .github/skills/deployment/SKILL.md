@@ -1,25 +1,8 @@
 ---
-description: "Docker and deployment configuration for Dawning: Dockerfile, docker-compose, Nginx. Trigger: docker, 部署, deploy, dockerfile, docker-compose, 容器, container, nginx"
+description: "Use when: Creating or modifying Dockerfiles (.NET 8 multi-stage, Vue 3 + Nginx), docker-compose configs, or Nginx configuration\nDon't use when: Building the project (use build-project), configuring K8s (not used in dawning)\nInputs: Deployment requirement or Docker config change\nOutputs: Dockerfile, docker-compose.yml, or nginx.conf\nSuccess criteria: Docker images build, containers start, services communicate correctly"
 ---
 
 # Deployment Skill
-
-## 目标
-
-为 Dawning 项目创建 Docker 配置和部署文件。
-
-## 触发条件
-
-- **关键词**：docker, 部署, deploy, dockerfile, docker-compose, 容器, container, nginx, k8s
-- **文件模式**：`Dockerfile`, `docker-compose*.yml`, `nginx.conf`, `deploy/**`
-- **用户意图**：容器化部署、创建 Docker 配置、配置 Nginx
-
-## 编排
-
-- **前置**：`build-project`（构建通过后部署）
-- **后续**：无
-
----
 
 ## .NET 8 Dockerfile
 
@@ -87,8 +70,3 @@ volumes:
   redis_data:
 ```
 
-## 验收场景
-
-- **输入**："帮我创建 Gateway 的 Dockerfile"
-- **预期**：agent 生成多阶段 Dockerfile（build → publish → runtime），非 root 用户
-- **上次验证**：2026-02-27 ✅

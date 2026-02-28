@@ -1,25 +1,8 @@
 ---
-description: "Create Vue 3 admin page with Arco Design: list, form, i18n, CRUD operations. Trigger: 创建页面, create page, Vue页面, 新建页面, 前端页面, vue page, 管理页面"
+description: "Use when: Creating Vue 3 admin pages with Arco Design: list view, CRUD form, EditModal, i18n locale files, route registration\nDon't use when: Creating backend APIs (use create-api), modifying shared components, adding new npm packages\nInputs: Page name and CRUD operations needed\nOutputs: Complete page: directory structure, index.vue, components, API file, i18n files, route config\nSuccess criteria: Page renders, uses Composition API + <script setup>, has i18n support, follows Arco Design conventions"
 ---
 
 # Create Vue Page Skill
-
-## 目标
-
-创建完整的 Vue 3 管理后台页面（列表 + CRUD + 国际化）。
-
-## 触发条件
-
-- **关键词**：创建页面, create page, Vue页面, 新建页面, 前端页面, vue page, 管理页面, 列表页
-- **文件模式**：`*.vue`, `src/views/**`, `src/api/*.ts`
-- **用户意图**：创建新的管理后台页面
-
-## 编排
-
-- **前置**：`create-api`（先有后端接口）
-- **后续**：无
-
----
 
 ## 目录结构
 
@@ -217,8 +200,3 @@ export default {
 - 操作后显示成功/失败消息
 - 删除前显示确认提示
 
-## 验收场景
-
-- **输入**："创建一个产品管理页面"
-- **预期**：agent 生成 API 接口、列表页、编辑弹窗、国际化文件
-- **上次验证**：2026-02-27 ✅

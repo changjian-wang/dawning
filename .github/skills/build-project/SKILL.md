@@ -1,25 +1,8 @@
 ---
-description: "Build Dawning Gateway backend (.NET 8) and Admin frontend (Vue 3). Trigger: 构建, build, compile, 编译, dotnet build, pnpm build, 编译错误, build error"
+description: "Use when: Building Gateway backend (.NET 8), Admin frontend (Vue 3), or SDK packages; fixing compilation errors\nDon't use when: Running tests (use create-tests), deploying (use deployment), formatting (use git-workflow)\nInputs: Build command or compilation error\nOutputs: Successful build or resolved compilation error\nSuccess criteria: `dotnet build` and/or `pnpm build` succeed with 0 errors"
 ---
 
 # Build Project Skill
-
-## 目标
-
-构建 Dawning 项目的后端（.NET 8 Gateway）和前端（Vue 3 Admin）。
-
-## 触发条件
-
-- **关键词**：构建, 编译, build, compile, dotnet build, pnpm build, 编译错误, build error, restore
-- **文件模式**：`*.csproj`, `*.sln`, `Directory.Build.props`, `package.json`, `tsconfig.json`
-- **用户意图**：构建项目、修复编译错误、恢复依赖
-
-## 编排
-
-- **前置**：代码变更后
-- **后续**：运行测试
-
----
 
 ## Backend (Gateway)
 
@@ -71,8 +54,3 @@ dotnet build --nologo -v q
 - **Frontend node_modules**: `pnpm install`
 - **TypeScript errors**: `pnpm type-check` for details
 
-## 验收场景
-
-- **输入**："构建报错 CS0246 找不到类型"
-- **预期**：agent 检查 using 语句、项目引用、NuGet 包版本
-- **上次验证**：2026-02-27

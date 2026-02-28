@@ -1,25 +1,8 @@
 ---
-description: "Git operations for Dawning project with conventional commit messages. Trigger: git, commit, 提交, push, branch, 分支, merge, tag, pre-commit"
+description: "Use when: Making git commits with conventional format (scopes: admin, gateway, identity, sdk), running pre-commit checks for backend and frontend\nDon't use when: Writing code (use code-patterns), building (use build-project)\nInputs: Changes to commit\nOutputs: Git commit with conventional message, pre-commit checks passed\nSuccess criteria: Commit follows `type(scope): subject` format, backend and frontend checks pass"
 ---
 
 # Git Workflow Skill
-
-## 目标
-
-应用 Git 工作流和 Conventional Commits 规范。
-
-## 触发条件
-
-- **关键词**：git, commit, 提交, push, branch, 分支, merge, tag, 标签, pre-commit
-- **文件模式**：`.git/**`, `.gitignore`
-- **用户意图**：提交代码、推送分支、创建标签、查看历史
-
-## 编排
-
-- **前置**：格式化完成后提交
-- **后续**：无
-
----
 
 ## Standard Flow
 
@@ -74,8 +57,3 @@ pnpm lint
 pnpm type-check
 ```
 
-## 验收场景
-
-- **输入**："提交这次修改"
-- **预期**：agent 运行 pre-commit 检查，生成符合规范的 commit message，执行 `git add && git commit`
-- **上次验证**：2026-02-27

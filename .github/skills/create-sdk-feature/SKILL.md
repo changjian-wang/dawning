@@ -1,25 +1,8 @@
 ---
-description: "Create SDK package features for Dawning: extension methods, services, middleware. Trigger: SDK, 扩展方法, extension, 中间件, middleware, NuGet包, package, Dawning.Core, Dawning.Extensions"
+description: "Use when: Adding features to SDK packages (Dawning.Core/Extensions/Identity/Caching/etc.): extension methods, service interfaces, middleware\nDon't use when: Modifying gateway code (use create-api or code-patterns), creating tests inline (use create-tests)\nInputs: SDK package name, feature description\nOutputs: Extension method, service interface+implementation, or middleware class with DI registration\nSuccess criteria: Feature follows SDK conventions, has XML docs, DI extension provided, >80% test coverage target"
 ---
 
 # Create SDK Feature Skill
-
-## 目标
-
-为 Dawning SDK 包添加新功能、扩展方法或中间件。
-
-## 触发条件
-
-- **关键词**：SDK, 扩展方法, extension, 中间件, middleware, NuGet包, package, 新功能
-- **文件模式**：`sdk/**/*.cs`, `Dawning.Core/**`, `Dawning.Extensions/**`
-- **用户意图**：创建 SDK 功能、添加扩展方法、创建中间件
-
-## 编排
-
-- **前置**：无
-- **后续**：`create-tests`（SDK 包必须 >80% 覆盖率）
-
----
 
 ## SDK 包结构
 
@@ -102,8 +85,3 @@ public static class {Name}Extensions
 - ✅ 单元测试覆盖率 > 80%
 - ✅ 测试命名：`{MethodName}_{State}_{Expected}`
 
-## 验收场景
-
-- **输入**："给 Dawning.Extensions 添加一个字符串截断方法"
-- **预期**：agent 生成扩展方法 + XML 文档 + 单元测试
-- **上次验证**：2026-02-27 ✅

@@ -1,25 +1,8 @@
 ---
-description: "Create RESTful API endpoint for Dawning: DTO, Mapper, Service, Controller, DI registration. Trigger: 创建API, create api, 新建接口, 新增端点, endpoint, controller, 后端接口"
+description: "Use when: Scaffolding a new RESTful API endpoint: CreateDto/UpdateDto/ResponseDto, Mapper profile, Service interface+implementation, Controller, DI registration\nDon't use when: Creating database tables (use create-database), creating tests (use create-tests), reviewing existing APIs (use code-review)\nInputs: Entity name and CRUD operations needed\nOutputs: Complete API scaffolding: DTOs, Mapper, Service, Controller, DI registration\nSuccess criteria: API endpoint compiles, follows UnitOfWork pattern, returns ApiResult<T>, has proper route attributes"
 ---
 
 # Create API Skill
-
-## 目标
-
-创建完整的 RESTful API 端点，包括 DTO、Mapper、Service、Controller。
-
-## 触发条件
-
-- **关键词**：创建API, create api, 新建接口, 新增端点, endpoint, controller, 后端接口, CRUD
-- **文件模式**：`*Controller.cs`, `*Service.cs`, `*Dto.cs`
-- **用户意图**：创建新的后端 API 端点、新增 CRUD 接口
-
-## 编排
-
-- **前置**：`create-database`（先有表结构）
-- **后续**：`create-tests`（创建后写测试）
-
----
 
 ## 创建流程
 
@@ -154,8 +137,3 @@ services.AddScoped<I{Resource}Service, {Resource}Service>();
 - 使用静态 Mapper（不注入 IMapper）
 - 通过 UnitOfWork 访问 Repository
 
-## 验收场景
-
-- **输入**："创建一个 Product 的 CRUD API"
-- **预期**：agent 生成 DTO、Mapper、Service、Controller 全套代码
-- **上次验证**：2026-02-27 ✅

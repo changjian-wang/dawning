@@ -1,25 +1,8 @@
 ---
-description: "Markdown formatting rules for Dawning project documentation. Trigger: markdown, 写文档, README, API docs, documentation, 文档格式"
+description: "Use when: Writing or formatting Markdown docs, XML doc comments for C#, or bilingual documentation (en + zh-CN)\nDon't use when: Writing C# code (use code-patterns), generating changelogs (use changelog)\nInputs: Documentation content to write or format\nOutputs: Well-formatted Markdown following 10 core rules, or XML documentation\nSuccess criteria: Documentation follows formatting rules, bilingual docs are consistent"
 ---
 
 # Markdown Formatting Skill
-
-## 目标
-
-定义项目中所有 Markdown 文档和 XML 注释的格式化规范。
-
-## 触发条件
-
-- **关键词**：markdown, 写文档, README, API docs, documentation, 文档格式, 注释规范
-- **文件模式**：`*.md`, `docs/**`
-- **用户意图**：编写文档、格式化 Markdown、编写 XML 注释
-
-## 编排
-
-- **前置**：无
-- **后续**：无
-
----
 
 ## Core Rules
 
@@ -55,8 +38,3 @@ Dawning 项目使用双语文档模式：
 
 修改一种语言版本后，另一种语言版本也需要同步更新。
 
-## 验收场景
-
-- **输入**："帮我写一下这个功能的文档"
-- **预期**：agent 按照格式规范输出 Markdown，代码块指定语言，提醒双语同步
-- **上次验证**：2026-02-27

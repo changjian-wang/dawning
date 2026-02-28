@@ -1,25 +1,8 @@
 ---
-description: "Create MySQL database table with GUID primary key, timestamp field, entity class, and repository. Trigger: 创建表, create table, 建表, database, 数据库, 实体, entity, 表结构"
+description: "Use when: Creating MySQL table with GUID+timestamp primary key, entity class with BaseEntity, and repository interface+implementation\nDon't use when: Creating API endpoints (use create-api), writing migrations, modifying existing tables without understanding constraints\nInputs: Table name, columns, and relationships\nOutputs: SQL CREATE TABLE, Entity class, Repository interface and implementation\nSuccess criteria: Table has GUID PK + timestamp + indexes, entity extends BaseEntity, repository follows convention"
 ---
 
 # Create Database Skill
-
-## 目标
-
-创建符合项目规范的数据库表结构和对应的 C# 实体类、Repository。
-
-## 触发条件
-
-- **关键词**：创建表, create table, 建表, database, 数据库, 实体, entity, 表结构, migration, 迁移
-- **文件模式**：`*.sql`, `*Entity.cs`, `*Repository.cs`
-- **用户意图**：设计数据库表、创建实体类、创建 Repository
-
-## 编排
-
-- **前置**：无
-- **后续**：`create-api`（表结构就绪后创建 API）
-
----
 
 ## 重要规范
 
@@ -96,8 +79,3 @@ public interface I{EntityName}Repository
 | JSON | `metadata JSON` | 扩展元数据 |
 | 排序 | `sort_order INT DEFAULT 0` | 列表排序 |
 
-## 验收场景
-
-- **输入**："创建一个 products 表"
-- **预期**：agent 生成带 GUID+timestamp 的 SQL、实体类、Repository 接口
-- **上次验证**：2026-02-27 ✅
