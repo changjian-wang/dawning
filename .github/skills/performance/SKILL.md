@@ -1,7 +1,11 @@
 ---
 description: |
   Use when: Analyzing N+1 queries, memory allocation issues, async anti-patterns, database optimization, or caching strategy
-  Don't use when: Fixing functional bugs (use code-patterns); auditing code quality (use code-review); diagnosing errors (use troubleshooting); creating tests (use create-tests)
+  Don't use when:
+    - Fixing functional bugs (use code-patterns)
+    - Auditing code quality (use code-review)
+    - Diagnosing errors (use troubleshooting)
+    - Creating tests (use create-tests)
   Inputs: Performance concern or slow operation to analyze
   Outputs: Root cause analysis with specific optimization recommendations
   Success criteria: Performance issue identified, optimization applied, measurable improvement

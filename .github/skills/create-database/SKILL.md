@@ -1,7 +1,12 @@
 ---
 description: |
   Use when: Creating MySQL table with GUID+timestamp primary key, entity class with BaseEntity, and repository interface+implementation
-  Don't use when: Creating API endpoints (use create-api); creating tests (use create-tests); building the project (use build-project); creating Vue pages (use create-vue-page); reviewing existing schema (use code-review)
+  Don't use when:
+    - Creating API endpoints (use create-api)
+    - Creating tests (use create-tests)
+    - Building the project (use build-project)
+    - Creating Vue pages (use create-vue-page)
+    - Reviewing existing schema (use code-review)
   Inputs: Table name, columns, and relationships
   Outputs: SQL CREATE TABLE, Entity class, Repository interface and implementation
   Success criteria: Table has GUID PK + timestamp + indexes, entity extends BaseEntity, repository follows convention

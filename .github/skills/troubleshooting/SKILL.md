@@ -1,7 +1,12 @@
 ---
 description: |
   Use when: Diagnosing NullReference errors, DI registration failures, database connection issues, auth failures, or API errors
-  Don't use when: Performing code audits (use code-review); writing new features (use create-api); creating tests (use create-tests); building the project (use build-project); analyzing performance without errors (use performance)
+  Don't use when:
+    - Performing code audits (use code-review)
+    - Writing new features (use create-api)
+    - Creating tests (use create-tests)
+    - Building the project (use build-project)
+    - Analyzing performance without errors (use performance)
   Inputs: Error message, stack trace, or problem description
   Outputs: Root cause diagnosis and resolution steps
   Success criteria: Problem identified and resolved with a clear explanation

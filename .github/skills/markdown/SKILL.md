@@ -1,7 +1,11 @@
 ---
 description: |
   Use when: Writing or formatting Markdown docs, XML doc comments for C#, or bilingual documentation (en + zh-CN)
-  Don't use when: Writing C# code (use code-patterns); generating changelogs (use changelog); creating Vue pages (use create-vue-page); reviewing code (use code-review)
+  Don't use when:
+    - Writing C# code (use code-patterns)
+    - Generating changelogs (use changelog)
+    - Creating Vue pages (use create-vue-page)
+    - Reviewing code (use code-review)
   Inputs: Documentation content to write or format
   Outputs: Well-formatted Markdown following 10 core rules, or XML documentation
   Success criteria: Documentation follows formatting rules, bilingual docs are consistent

@@ -1,7 +1,12 @@
 ---
 description: |
   Use when: Making git commits with conventional format (scopes: admin, gateway, identity, sdk), running pre-commit checks for backend and frontend
-  Don't use when: Writing code (use code-patterns or create-api); building (use build-project); creating tests (use create-tests); writing changelog (use changelog); deploying (use deployment)
+  Don't use when:
+    - Writing code (use code-patterns or create-api)
+    - Building (use build-project)
+    - Creating tests (use create-tests)
+    - Writing changelog (use changelog)
+    - Deploying (use deployment)
   Inputs: Changes to commit
   Outputs: Git commit with conventional message, pre-commit checks passed
   Success criteria: Commit follows `type(scope): subject` format, backend and frontend checks pass

@@ -1,7 +1,12 @@
 ---
 description: |
   Use when: Adding features to SDK packages (Dawning.Core/Extensions/Identity/Caching/etc.): extension methods, service interfaces, middleware
-  Don't use when: Modifying gateway code (use create-api or code-patterns); creating tests separately (use create-tests); creating Vue pages (use create-vue-page); reviewing SDK code (use code-review); building without code changes (use build-project)
+  Don't use when:
+    - Modifying gateway code (use create-api or code-patterns)
+    - Creating tests separately (use create-tests)
+    - Creating Vue pages (use create-vue-page)
+    - Reviewing SDK code (use code-review)
+    - Building without code changes (use build-project)
   Inputs: SDK package name, feature description
   Outputs: Extension method, service interface+implementation, or middleware class with DI registration
   Success criteria: Feature follows SDK conventions, has XML docs, DI extension provided, >80% test coverage target

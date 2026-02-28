@@ -1,7 +1,11 @@
 ---
 description: |
   Use when: Writing or updating CHANGELOG.md for Gateway, Admin, Identity, or SDK changes
-  Don't use when: Making code changes (use code-patterns or create-api); building (use build-project); deploying (use deployment); writing general docs (use markdown)
+  Don't use when:
+    - Making code changes (use code-patterns or create-api)
+    - Building (use build-project)
+    - Deploying (use deployment)
+    - Writing general docs (use markdown)
   Inputs: List of changes to document
   Outputs: Updated CHANGELOG.md entry following Keep a Changelog format with proper scopes
   Success criteria: CHANGELOG.md has properly formatted and scoped entries
