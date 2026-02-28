@@ -1,5 +1,10 @@
 ---
-description: "Use when: Creating MySQL table with GUID+timestamp primary key, entity class with BaseEntity, and repository interface+implementation\nDon't use when: Creating API endpoints (use create-api), writing migrations, modifying existing tables without understanding constraints\nInputs: Table name, columns, and relationships\nOutputs: SQL CREATE TABLE, Entity class, Repository interface and implementation\nSuccess criteria: Table has GUID PK + timestamp + indexes, entity extends BaseEntity, repository follows convention"
+description: |
+  Use when: Creating MySQL table with GUID+timestamp primary key, entity class with BaseEntity, and repository interface+implementation
+  Don't use when: Creating API endpoints (use create-api), writing migrations, modifying existing tables without understanding constraints
+  Inputs: Table name, columns, and relationships
+  Outputs: SQL CREATE TABLE, Entity class, Repository interface and implementation
+  Success criteria: Table has GUID PK + timestamp + indexes, entity extends BaseEntity, repository follows convention
 ---
 
 # Create Database Skill

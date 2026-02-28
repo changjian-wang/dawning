@@ -1,5 +1,10 @@
 ---
-description: "Use when: Creating xUnit unit tests with Moq, UnitOfWork mock pattern for Service tests, Controller tests with mocked services\nDon't use when: Writing production code (use code-patterns or create-api), running existing tests\nInputs: Class or method to test\nOutputs: Test class with arrange/act/assert pattern, proper mocking of UnitOfWork and repositories\nSuccess criteria: Tests follow naming convention, mock UnitOfWork correctly, cover happy path and edge cases"
+description: |
+  Use when: Creating xUnit unit tests with Moq, UnitOfWork mock pattern for Service tests, Controller tests with mocked services
+  Don't use when: Writing production code (use code-patterns or create-api), running existing tests
+  Inputs: Class or method to test
+  Outputs: Test class with arrange/act/assert pattern, proper mocking of UnitOfWork and repositories
+  Success criteria: Tests follow naming convention, mock UnitOfWork correctly, cover happy path and edge cases
 ---
 
 # Create Tests Skill

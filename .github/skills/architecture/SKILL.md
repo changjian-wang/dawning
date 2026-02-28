@@ -1,5 +1,10 @@
 ---
-description: "Use when: Understanding DDD layers, gateway project structure, SDK package layout, generating Mermaid architecture diagrams, or reviewing module boundaries\nDon't use when: Writing code (use code-patterns or create-api), building (use build-project)\nInputs: Architecture question or diagram request\nOutputs: Project structure reference, Mermaid diagram, or module boundary analysis\nSuccess criteria: User understands project architecture and can make informed structural decisions"
+description: |
+  Use when: Understanding DDD layers, gateway project structure, SDK package layout, generating Mermaid architecture diagrams, or reviewing module boundaries
+  Don't use when: Writing code (use code-patterns or create-api), building (use build-project)
+  Inputs: Architecture question or diagram request
+  Outputs: Project structure reference, Mermaid diagram, or module boundary analysis
+  Success criteria: User understands project architecture and can make informed structural decisions
 ---
 
 # Architecture Skill

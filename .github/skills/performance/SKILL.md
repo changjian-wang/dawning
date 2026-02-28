@@ -1,5 +1,10 @@
 ---
-description: "Use when: Analyzing N+1 queries, memory allocation issues, async anti-patterns, database optimization, or caching strategy\nDon't use when: Fixing bugs (use code-patterns), auditing code (use code-review)\nInputs: Performance concern or slow operation to analyze\nOutputs: Root cause analysis with specific optimization recommendations\nSuccess criteria: Performance issue identified, optimization applied, measurable improvement"
+description: |
+  Use when: Analyzing N+1 queries, memory allocation issues, async anti-patterns, database optimization, or caching strategy
+  Don't use when: Fixing bugs (use code-patterns), auditing code (use code-review)
+  Inputs: Performance concern or slow operation to analyze
+  Outputs: Root cause analysis with specific optimization recommendations
+  Success criteria: Performance issue identified, optimization applied, measurable improvement
 ---
 
 # Performance Skill

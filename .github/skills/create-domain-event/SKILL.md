@@ -1,5 +1,10 @@
 ---
-description: "Use when: Creating domain event records, event handler classes, audit log event handlers, and integrating events into services\nDon't use when: Creating API endpoints (use create-api), creating database tables (use create-database)\nInputs: Event name and trigger scenario\nOutputs: Event record, EventHandler class, service integration code\nSuccess criteria: Event follows record pattern, handler implements IDomainEventHandler<T>, service dispatches event correctly"
+description: |
+  Use when: Creating domain event records, event handler classes, audit log event handlers, and integrating events into services
+  Don't use when: Creating API endpoints (use create-api), creating database tables (use create-database)
+  Inputs: Event name and trigger scenario
+  Outputs: Event record, EventHandler class, service integration code
+  Success criteria: Event follows record pattern, handler implements IDomainEventHandler<T>, service dispatches event correctly
 ---
 
 # Create Domain Event Skill

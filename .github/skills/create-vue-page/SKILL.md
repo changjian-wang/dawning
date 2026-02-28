@@ -1,5 +1,10 @@
 ---
-description: "Use when: Creating Vue 3 admin pages with Arco Design: list view, CRUD form, EditModal, i18n locale files, route registration\nDon't use when: Creating backend APIs (use create-api), modifying shared components, adding new npm packages\nInputs: Page name and CRUD operations needed\nOutputs: Complete page: directory structure, index.vue, components, API file, i18n files, route config\nSuccess criteria: Page renders, uses Composition API + <script setup>, has i18n support, follows Arco Design conventions"
+description: |
+  Use when: Creating Vue 3 admin pages with Arco Design: list view, CRUD form, EditModal, i18n locale files, route registration
+  Don't use when: Creating backend APIs (use create-api), modifying shared components, adding new npm packages
+  Inputs: Page name and CRUD operations needed
+  Outputs: Complete page: directory structure, index.vue, components, API file, i18n files, route config
+  Success criteria: Page renders, uses Composition API + <script setup>, has i18n support, follows Arco Design conventions
 ---
 
 # Create Vue Page Skill

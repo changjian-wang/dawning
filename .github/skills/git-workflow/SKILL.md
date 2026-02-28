@@ -1,5 +1,10 @@
 ---
-description: "Use when: Making git commits with conventional format (scopes: admin, gateway, identity, sdk), running pre-commit checks for backend and frontend\nDon't use when: Writing code (use code-patterns), building (use build-project)\nInputs: Changes to commit\nOutputs: Git commit with conventional message, pre-commit checks passed\nSuccess criteria: Commit follows `type(scope): subject` format, backend and frontend checks pass"
+description: |
+  Use when: Making git commits with conventional format (scopes: admin, gateway, identity, sdk), running pre-commit checks for backend and frontend
+  Don't use when: Writing code (use code-patterns), building (use build-project)
+  Inputs: Changes to commit
+  Outputs: Git commit with conventional message, pre-commit checks passed
+  Success criteria: Commit follows `type(scope): subject` format, backend and frontend checks pass
 ---
 
 # Git Workflow Skill

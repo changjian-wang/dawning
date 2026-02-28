@@ -1,5 +1,10 @@
 ---
-description: "Use when: Scaffolding a new RESTful API endpoint: CreateDto/UpdateDto/ResponseDto, Mapper profile, Service interface+implementation, Controller, DI registration\nDon't use when: Creating database tables (use create-database), creating tests (use create-tests), reviewing existing APIs (use code-review)\nInputs: Entity name and CRUD operations needed\nOutputs: Complete API scaffolding: DTOs, Mapper, Service, Controller, DI registration\nSuccess criteria: API endpoint compiles, follows UnitOfWork pattern, returns ApiResult<T>, has proper route attributes"
+description: |
+  Use when: Scaffolding a new RESTful API endpoint: CreateDto/UpdateDto/ResponseDto, Mapper profile, Service interface+implementation, Controller, DI registration
+  Don't use when: Creating database tables (use create-database), creating tests (use create-tests), reviewing existing APIs (use code-review)
+  Inputs: Entity name and CRUD operations needed
+  Outputs: Complete API scaffolding: DTOs, Mapper, Service, Controller, DI registration
+  Success criteria: API endpoint compiles, follows UnitOfWork pattern, returns ApiResult<T>, has proper route attributes
 ---
 
 # Create API Skill

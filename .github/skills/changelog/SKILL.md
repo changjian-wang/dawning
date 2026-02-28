@@ -1,5 +1,10 @@
 ---
-description: "Use when: Writing or updating CHANGELOG.md for Gateway, Admin, Identity, or SDK changes\nDon't use when: Making code changes, building, or deploying\nInputs: List of changes to document\nOutputs: Updated CHANGELOG.md entry following Keep a Changelog format with proper scopes\nSuccess criteria: CHANGELOG.md has properly formatted and scoped entries"
+description: |
+  Use when: Writing or updating CHANGELOG.md for Gateway, Admin, Identity, or SDK changes
+  Don't use when: Making code changes, building, or deploying
+  Inputs: List of changes to document
+  Outputs: Updated CHANGELOG.md entry following Keep a Changelog format with proper scopes
+  Success criteria: CHANGELOG.md has properly formatted and scoped entries
 ---
 
 # Changelog Skill

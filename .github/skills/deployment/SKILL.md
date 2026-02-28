@@ -1,5 +1,10 @@
 ---
-description: "Use when: Creating or modifying Dockerfiles (.NET 8 multi-stage, Vue 3 + Nginx), docker-compose configs, or Nginx configuration\nDon't use when: Building the project (use build-project), configuring K8s (not used in dawning)\nInputs: Deployment requirement or Docker config change\nOutputs: Dockerfile, docker-compose.yml, or nginx.conf\nSuccess criteria: Docker images build, containers start, services communicate correctly"
+description: |
+  Use when: Creating or modifying Dockerfiles (.NET 8 multi-stage, Vue 3 + Nginx), docker-compose configs, or Nginx configuration
+  Don't use when: Building the project (use build-project), configuring K8s (not used in dawning)
+  Inputs: Deployment requirement or Docker config change
+  Outputs: Dockerfile, docker-compose.yml, or nginx.conf
+  Success criteria: Docker images build, containers start, services communicate correctly
 ---
 
 # Deployment Skill

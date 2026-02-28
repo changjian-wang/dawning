@@ -1,5 +1,10 @@
 ---
-description: "Use when: Reviewing code across 9 dimensions: code style, DI, mappers, API design, database, security, performance, error handling, tests\nDon't use when: Writing or fixing code (use code-patterns or create-api), building (use build-project)\nInputs: Code files or changes to review\nOutputs: Structured review with findings per dimension, severity ratings\nSuccess criteria: All 9 dimensions checked, findings documented with severity and fix suggestions"
+description: |
+  Use when: Reviewing code across 9 dimensions: code style, DI, mappers, API design, database, security, performance, error handling, tests
+  Don't use when: Writing or fixing code (use code-patterns or create-api), building (use build-project)
+  Inputs: Code files or changes to review
+  Outputs: Structured review with findings per dimension, severity ratings
+  Success criteria: All 9 dimensions checked, findings documented with severity and fix suggestions
 ---
 
 # Code Review Skill

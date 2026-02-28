@@ -1,5 +1,10 @@
 ---
-description: "Use when: Diagnosing NullReference errors, DI registration failures, database connection issues, auth failures, or API errors\nDon't use when: Performing code audits (use code-review), writing new features (use create-api)\nInputs: Error message, stack trace, or problem description\nOutputs: Root cause diagnosis and resolution steps\nSuccess criteria: Problem identified and resolved with a clear explanation"
+description: |
+  Use when: Diagnosing NullReference errors, DI registration failures, database connection issues, auth failures, or API errors
+  Don't use when: Performing code audits (use code-review), writing new features (use create-api)
+  Inputs: Error message, stack trace, or problem description
+  Outputs: Root cause diagnosis and resolution steps
+  Success criteria: Problem identified and resolved with a clear explanation
 ---
 
 # Troubleshooting Skill
