@@ -3,7 +3,6 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
 using Dapper;
 using Dawning.ORM.Dapper;
@@ -15,17 +14,6 @@ namespace Dawning.ORM.Dapper
     /// </summary>
     public static partial class SqlMapperExtensions
     {
-        /// <summary>
-        /// Defined a proxy object with a possibly dirty state.
-        /// </summary>
-        public interface IProxy //must be kept public
-        {
-            /// <summary>
-            /// Whether the object has been changed.
-            /// </summary>
-            bool IsDirty { get; set; }
-        }
-
         /// <summary>
         /// Defines a table name mapper for getting table names from types.
         /// </summary>
@@ -230,18 +218,16 @@ namespace Dawning.ORM.Dapper
         }
 
         /// <summary>
-        /// Returns a single entity by a single id from table "Ts".
-        /// Id must be marked with [Key] attribute.
-        /// Entities created from interfaces are tracked/intercepted for changes and used by the Update() extension
-        /// for optimal performance.
+        /// Returns a single entity by a single id from table "Ts", or <c>null</c> if not found.
+        /// Id must be marked with [Key] or [ExplicitKey] attribute.
         /// </summary>
-        /// <typeparam name="T">Interface or type to create and populate</typeparam>
+        /// <typeparam name="T">Type to create and populate</typeparam>
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="id">Id of the entity to get, must be marked with [Key] attribute</param>
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
-        /// <returns>Entity of T</returns>
-        public static T Get<T>(
+        /// <returns>Entity of T, or <c>null</c> when no row matches the supplied id.</returns>
+        public static T? Get<T>(
             this IDbConnection connection,
             dynamic id,
             IDbTransaction? transaction = null,
@@ -257,7 +243,7 @@ namespace Dawning.ORM.Dapper
                 var key = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
                 var name = GetTableName(type);
 
-                sql = $"select * from {name} where {key} = @id";
+                sql = $"SELECT * FROM {name} WHERE {key} = @id";
                 GetQueries[type.TypeHandle] = sql;
             }
 
@@ -271,135 +257,98 @@ namespace Dawning.ORM.Dapper
         }
 
         /// <summary>
-        /// Returns an entity from table "Ts".
+        /// Maps a single Dapper row into an entity of <typeparamref name="T"/>.
+        /// Returns <c>null</c> when <paramref name="data"/> is <c>null</c> (no row matched).
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection">Open SqlConnection</param>
-        /// <param name="transaction">The transaction to run under, null (the default) if none</param>
-        /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
-        /// <param name="sql"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private static T GetImpl<T>(dynamic data, Type type)
+        private static T? GetImpl<T>(dynamic? data, Type type)
             where T : class, new()
         {
-            T obj = new T();
+            if (data == null)
+                return null;
 
-            foreach (var property in TypePropertiesCache(type))
-            {
-                var name = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
-                var res = data as IDictionary<string, object>;
-                var val = res[name];
-                if (val == null)
-                    continue;
-                if (
-                    property.PropertyType.IsGenericType
-                    && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>)
-                )
-                {
-                    var genericType = Nullable.GetUnderlyingType(property.PropertyType);
-                    if (genericType != null)
-                        property.SetValue(obj, Convert.ChangeType(val, genericType), null);
-                }
-                else
-                {
-                    property.SetValue(obj, Convert.ChangeType(val, property.PropertyType), null);
-                }
-            }
-
-            return obj;
+            var row = (IDictionary<string, object>)data;
+            return MapRow<T>(row, type);
         }
 
+        /// <summary>
+        /// Maps a sequence of Dapper rows into a list of <typeparamref name="T"/>.
+        /// </summary>
         private static IEnumerable<T> GetListImpl<T>(IEnumerable<dynamic> data, Type type)
             where T : class, new()
         {
             var list = new List<T>();
-
-            foreach (IDictionary<string, object> res in data)
+            foreach (IDictionary<string, object> row in data)
             {
-                T obj = new T();
-                foreach (var property in TypePropertiesCache(type))
+                list.Add(MapRow<T>(row, type));
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Materializes one entity from a row dictionary. Handles nullable types, DBNull,
+        /// Guid, DateTime, and enum values explicitly to avoid Convert.ChangeType edge cases.
+        /// </summary>
+        private static T MapRow<T>(IDictionary<string, object> row, Type type)
+            where T : class, new()
+        {
+            T obj = new T();
+            foreach (var property in TypePropertiesCache(type))
+            {
+                var name = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+
+                if (!row.TryGetValue(name, out var val))
+                    continue;
+
+                var propType = property.PropertyType;
+                var isNullable =
+                    propType.IsGenericType
+                    && propType.GetGenericTypeDefinition() == typeof(Nullable<>);
+
+                if (val == null || val is DBNull)
                 {
-                    var name =
-                        property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                    if (isNullable)
+                        property.SetValue(obj, null, null);
+                    continue;
+                }
 
-                    // ✅ Use TryGetValue
-                    if (!res.TryGetValue(name, out var val))
+                try
+                {
+                    if (isNullable)
                     {
-                        continue;
+                        var underlyingType = Nullable.GetUnderlyingType(propType)!;
+                        property.SetValue(obj, ConvertScalar(val, underlyingType), null);
                     }
-
-                    // ✅ Handle DBNull and null
-                    if (val == null || val is DBNull)
+                    else
                     {
-                        if (
-                            property.PropertyType.IsGenericType
-                            && property.PropertyType.GetGenericTypeDefinition()
-                                == typeof(Nullable<>)
-                        )
-                        {
-                            property.SetValue(obj, null, null);
-                        }
-                        continue;
-                    }
-
-                    try
-                    {
-                        // ✅ Safe type conversion
-                        if (
-                            property.PropertyType.IsGenericType
-                            && property.PropertyType.GetGenericTypeDefinition()
-                                == typeof(Nullable<>)
-                        )
-                        {
-                            var underlyingType = Nullable.GetUnderlyingType(property.PropertyType);
-                            property.SetValue(obj, Convert.ChangeType(val, underlyingType!), null);
-                        }
-                        else if (property.PropertyType == typeof(Guid))
-                        {
-                            property.SetValue(
-                                obj,
-                                val is Guid guid ? guid : Guid.Parse(val.ToString()!),
-                                null
-                            );
-                        }
-                        else if (
-                            property.PropertyType == typeof(DateTime)
-                            || property.PropertyType == typeof(DateTime?)
-                        )
-                        {
-                            // Set DateTime directly to avoid Convert.ChangeType type conversion issues
-                            property.SetValue(
-                                obj,
-                                val is DateTime dt ? dt : DateTime.Parse(val.ToString()!),
-                                null
-                            );
-                        }
-                        else if (property.PropertyType.IsEnum)
-                        {
-                            property.SetValue(obj, Enum.ToObject(property.PropertyType, val), null);
-                        }
-                        else
-                        {
-                            property.SetValue(
-                                obj,
-                                Convert.ChangeType(val, property.PropertyType),
-                                null
-                            );
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidOperationException(
-                            $"Failed to set property '{property.Name}' of type '{property.PropertyType}' with value '{val}' of type '{val?.GetType()}'",
-                            ex
-                        );
+                        property.SetValue(obj, ConvertScalar(val, propType), null);
                     }
                 }
-                list.Add(obj);
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        $"Failed to set property '{property.Name}' of type '{propType}' with value '{val}' of type '{val.GetType()}'",
+                        ex
+                    );
+                }
             }
+            return obj;
+        }
 
-            return list;
+        private static object ConvertScalar(object val, Type targetType)
+        {
+            if (targetType == typeof(Guid))
+            {
+                return val is Guid guid ? guid : Guid.Parse(val.ToString()!);
+            }
+            if (targetType == typeof(DateTime))
+            {
+                return val is DateTime dt ? dt : DateTime.Parse(val.ToString()!);
+            }
+            if (targetType.IsEnum)
+            {
+                return Enum.ToObject(targetType, val);
+            }
+            return Convert.ChangeType(val, targetType);
         }
 
         /// <summary>
@@ -428,7 +377,7 @@ namespace Dawning.ORM.Dapper
                 GetSingleKey<T>(nameof(GetAll));
                 var name = GetTableName(type);
 
-                sql = "select * from " + name;
+                sql = "SELECT * FROM " + name;
                 GetQueries[cacheType.TypeHandle] = sql;
             }
 
@@ -454,18 +403,10 @@ namespace Dawning.ORM.Dapper
             }
             else
             {
-                //NOTE: This as dynamic trick falls back to handle both our own Table-attribute as well as the one in EntityFramework
-                var tableAttrName =
-                    type.GetCustomAttribute<TableAttribute>(false)?.Name
-                    ?? (
-                        type.GetCustomAttributes(false)
-                            .FirstOrDefault(attr => attr.GetType().Name == "TableAttribute")
-                        as dynamic
-                    )?.Name;
-
-                if (tableAttrName != null)
+                var tableAttr = type.GetCustomAttribute<TableAttribute>(false);
+                if (tableAttr != null)
                 {
-                    name = tableAttrName;
+                    name = tableAttr.Name;
                 }
                 else
                 {
@@ -551,7 +492,7 @@ namespace Dawning.ORM.Dapper
                     sbParameterList.Append(", ");
             }
 
-            int returnVal;
+            long returnVal;
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed)
                 connection.Open();
@@ -572,7 +513,7 @@ namespace Dawning.ORM.Dapper
             else
             {
                 //insert list of entities
-                var cmd = $"insert into {name} ({sbColumnList}) values ({sbParameterList})";
+                var cmd = $"INSERT INTO {name} ({sbColumnList}) VALUES ({sbParameterList})";
                 returnVal = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
             }
             if (wasClosed)
@@ -597,11 +538,6 @@ namespace Dawning.ORM.Dapper
         )
             where T : class
         {
-            if (entityToUpdate is IProxy proxy && !proxy.IsDirty)
-            {
-                return false;
-            }
-
             var type = typeof(T);
 
             if (type.IsArray)
@@ -633,7 +569,7 @@ namespace Dawning.ORM.Dapper
             var name = GetTableName(type);
 
             var sb = new StringBuilder();
-            sb.AppendFormat("update {0} set ", name);
+            sb.AppendFormat("UPDATE {0} SET ", name);
 
             var allProperties = TypePropertiesCache(type);
             keyProperties.AddRange(explicitKeyProperties);
@@ -652,13 +588,13 @@ namespace Dawning.ORM.Dapper
                 if (i < nonIdProps.Count - 1)
                     sb.Append(", ");
             }
-            sb.Append(" where ");
+            sb.Append(" WHERE ");
             for (var i = 0; i < keyProperties.Count; i++)
             {
                 var property = keyProperties[i];
                 adapter.AppendColumnNameEqualsValue(sb, property); //fix for issue #336
                 if (i < keyProperties.Count - 1)
-                    sb.Append(" and ");
+                    sb.Append(" AND ");
             }
             var updated = connection.Execute(
                 sb.ToString(),
@@ -721,7 +657,7 @@ namespace Dawning.ORM.Dapper
             keyProperties.AddRange(explicitKeyProperties);
 
             var sb = new StringBuilder();
-            sb.AppendFormat("delete from {0} where ", name);
+            sb.AppendFormat("DELETE FROM {0} WHERE ", name);
 
             var adapter = GetFormatter(connection);
 
@@ -730,7 +666,7 @@ namespace Dawning.ORM.Dapper
                 var property = keyProperties[i];
                 adapter.AppendColumnNameEqualsValue(sb, property); //fix for issue #336
                 if (i < keyProperties.Count - 1)
-                    sb.Append(" and ");
+                    sb.Append(" AND ");
             }
             var deleted = connection.Execute(
                 sb.ToString(),
@@ -758,7 +694,7 @@ namespace Dawning.ORM.Dapper
         {
             var type = typeof(T);
             var name = GetTableName(type);
-            var statement = $"delete from {name}";
+            var statement = $"DELETE FROM {name}";
             var deleted = connection.Execute(statement, null, transaction, commandTimeout);
             return deleted > 0;
         }
@@ -778,206 +714,6 @@ namespace Dawning.ORM.Dapper
                 ?? connection.GetType().Name.ToLower();
 
             return AdapterDictionary.TryGetValue(name, out var adapter) ? adapter : DefaultAdapter;
-        }
-
-        private static class ProxyGenerator
-        {
-            private static readonly Dictionary<Type, Type> TypeCache = new Dictionary<Type, Type>();
-
-            private static AssemblyBuilder GetAsmBuilder(string name)
-            {
-#if !NET461
-                return AssemblyBuilder.DefineDynamicAssembly(
-                    new AssemblyName { Name = name },
-                    AssemblyBuilderAccess.Run
-                );
-#else
-                return Thread
-                    .GetDomain()
-                    .DefineDynamicAssembly(
-                        new AssemblyName { Name = name },
-                        AssemblyBuilderAccess.Run
-                    );
-#endif
-            }
-
-            public static T GetInterfaceProxy<T>()
-            {
-                Type typeOfT = typeof(T);
-
-                if (TypeCache.TryGetValue(typeOfT, out Type k))
-                {
-                    return (T)Activator.CreateInstance(k);
-                }
-                var assemblyBuilder = GetAsmBuilder(typeOfT.Name);
-
-                var moduleBuilder = assemblyBuilder.DefineDynamicModule(
-                    "SqlMapperExtensions." + typeOfT.Name
-                ); //NOTE: to save, add "asdasd.dll" parameter
-
-                var interfaceType = typeof(IProxy);
-                var typeBuilder = moduleBuilder.DefineType(
-                    typeOfT.Name + "_" + Guid.NewGuid(),
-                    TypeAttributes.Public | TypeAttributes.Class
-                );
-                typeBuilder.AddInterfaceImplementation(typeOfT);
-                typeBuilder.AddInterfaceImplementation(interfaceType);
-
-                //create our _isDirty field, which implements IProxy
-                var setIsDirtyMethod = CreateIsDirtyProperty(typeBuilder);
-
-                // Generate a field for each property, which implements the T
-                foreach (var property in typeof(T).GetProperties())
-                {
-                    var isId = property.GetCustomAttributes(true).Any(a => a is KeyAttribute);
-                    CreateProperty<T>(
-                        typeBuilder,
-                        property.Name,
-                        property.PropertyType,
-                        setIsDirtyMethod,
-                        isId
-                    );
-                }
-
-#if NETSTANDARD2_0
-                var generatedType = typeBuilder.CreateTypeInfo().AsType();
-#else
-                var generatedType = typeBuilder.CreateType();
-#endif
-
-                TypeCache.Add(typeOfT, generatedType);
-                return (T)Activator.CreateInstance(generatedType);
-            }
-
-            private static MethodInfo CreateIsDirtyProperty(TypeBuilder typeBuilder)
-            {
-                var propType = typeof(bool);
-                var field = typeBuilder.DefineField(
-                    "_" + nameof(IProxy.IsDirty),
-                    propType,
-                    FieldAttributes.Private
-                );
-                var property = typeBuilder.DefineProperty(
-                    nameof(IProxy.IsDirty),
-                    System.Reflection.PropertyAttributes.None,
-                    propType,
-                    new[] { propType }
-                );
-
-                const MethodAttributes getSetAttr =
-                    MethodAttributes.Public
-                    | MethodAttributes.NewSlot
-                    | MethodAttributes.SpecialName
-                    | MethodAttributes.Final
-                    | MethodAttributes.Virtual
-                    | MethodAttributes.HideBySig;
-
-                // Define the "get" and "set" accessor methods
-                var currGetPropMthdBldr = typeBuilder.DefineMethod(
-                    "get_" + nameof(IProxy.IsDirty),
-                    getSetAttr,
-                    propType,
-                    Type.EmptyTypes
-                );
-                var currGetIl = currGetPropMthdBldr.GetILGenerator();
-                currGetIl.Emit(OpCodes.Ldarg_0);
-                currGetIl.Emit(OpCodes.Ldfld, field);
-                currGetIl.Emit(OpCodes.Ret);
-                var currSetPropMthdBldr = typeBuilder.DefineMethod(
-                    "set_" + nameof(IProxy.IsDirty),
-                    getSetAttr,
-                    null,
-                    new[] { propType }
-                );
-                var currSetIl = currSetPropMthdBldr.GetILGenerator();
-                currSetIl.Emit(OpCodes.Ldarg_0);
-                currSetIl.Emit(OpCodes.Ldarg_1);
-                currSetIl.Emit(OpCodes.Stfld, field);
-                currSetIl.Emit(OpCodes.Ret);
-
-                property.SetGetMethod(currGetPropMthdBldr);
-                property.SetSetMethod(currSetPropMthdBldr);
-                var getMethod = typeof(IProxy).GetMethod("get_" + nameof(IProxy.IsDirty));
-                var setMethod = typeof(IProxy).GetMethod("set_" + nameof(IProxy.IsDirty));
-                typeBuilder.DefineMethodOverride(currGetPropMthdBldr, getMethod);
-                typeBuilder.DefineMethodOverride(currSetPropMthdBldr, setMethod);
-
-                return currSetPropMthdBldr;
-            }
-
-            private static void CreateProperty<T>(
-                TypeBuilder typeBuilder,
-                string propertyName,
-                Type propType,
-                MethodInfo setIsDirtyMethod,
-                bool isIdentity
-            )
-            {
-                //Define the field and the property
-                var field = typeBuilder.DefineField(
-                    "_" + propertyName,
-                    propType,
-                    FieldAttributes.Private
-                );
-                var property = typeBuilder.DefineProperty(
-                    propertyName,
-                    System.Reflection.PropertyAttributes.None,
-                    propType,
-                    new[] { propType }
-                );
-
-                const MethodAttributes getSetAttr =
-                    MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig;
-
-                // Define the "get" and "set" accessor methods
-                var currGetPropMthdBldr = typeBuilder.DefineMethod(
-                    "get_" + propertyName,
-                    getSetAttr,
-                    propType,
-                    Type.EmptyTypes
-                );
-
-                var currGetIl = currGetPropMthdBldr.GetILGenerator();
-                currGetIl.Emit(OpCodes.Ldarg_0);
-                currGetIl.Emit(OpCodes.Ldfld, field);
-                currGetIl.Emit(OpCodes.Ret);
-
-                var currSetPropMthdBldr = typeBuilder.DefineMethod(
-                    "set_" + propertyName,
-                    getSetAttr,
-                    null,
-                    new[] { propType }
-                );
-
-                //store value in private field and set the isdirty flag
-                var currSetIl = currSetPropMthdBldr.GetILGenerator();
-                currSetIl.Emit(OpCodes.Ldarg_0);
-                currSetIl.Emit(OpCodes.Ldarg_1);
-                currSetIl.Emit(OpCodes.Stfld, field);
-                currSetIl.Emit(OpCodes.Ldarg_0);
-                currSetIl.Emit(OpCodes.Ldc_I4_1);
-                currSetIl.Emit(OpCodes.Call, setIsDirtyMethod);
-                currSetIl.Emit(OpCodes.Ret);
-
-                //TODO: Should copy all attributes defined by the interface?
-                if (isIdentity)
-                {
-                    var keyAttribute = typeof(KeyAttribute);
-                    var myConstructorInfo = keyAttribute.GetConstructor(Type.EmptyTypes);
-                    var attributeBuilder = new CustomAttributeBuilder(
-                        myConstructorInfo,
-                        Array.Empty<object>()
-                    );
-                    property.SetCustomAttribute(attributeBuilder);
-                }
-
-                property.SetGetMethod(currGetPropMthdBldr);
-                property.SetSetMethod(currSetPropMthdBldr);
-                var getMethod = typeof(T).GetMethod("get_" + propertyName);
-                var setMethod = typeof(T).GetMethod("set_" + propertyName);
-                typeBuilder.DefineMethodOverride(currGetPropMthdBldr, getMethod);
-                typeBuilder.DefineMethodOverride(currSetPropMthdBldr, setMethod);
-            }
         }
 
         #region Build Conditions
@@ -1004,8 +740,6 @@ namespace Dawning.ORM.Dapper
             private readonly List<string> _conditions = new List<string>();
             private readonly List<(string Column, bool Descending)> _orderByList =
                 new List<(string, bool)>();
-            private string _orderBy = "";
-            private bool _orderByDescending = true;
             private ISqlAdapter sqlAdapter;
             private readonly Dictionary<string, object?> _parameters =
                 new Dictionary<string, object?>();
@@ -1062,23 +796,27 @@ namespace Dawning.ORM.Dapper
                 return this;
             }
 
+            /// <summary>
+            /// Set the primary ascending sort. Replaces any previously configured ordering.
+            /// </summary>
             public QueryBuilder<TEntity> OrderBy<T>(Expression<Func<TEntity, T>> expression)
             {
-                _orderBy = GetMemberName(expression);
-                _orderByDescending = false;
+                var column = GetMemberName(expression);
                 _orderByList.Clear();
-                _orderByList.Add((_orderBy, false));
+                _orderByList.Add((column, false));
                 return this;
             }
 
+            /// <summary>
+            /// Set the primary descending sort. Replaces any previously configured ordering.
+            /// </summary>
             public QueryBuilder<TEntity> OrderByDescending<T>(
                 Expression<Func<TEntity, T>> expression
             )
             {
-                _orderBy = GetMemberName(expression);
-                _orderByDescending = true;
+                var column = GetMemberName(expression);
                 _orderByList.Clear();
-                _orderByList.Add((_orderBy, true));
+                _orderByList.Add((column, true));
                 return this;
             }
 
@@ -1104,70 +842,6 @@ namespace Dawning.ORM.Dapper
                 return this;
             }
 
-            /// <summary>
-            /// Dynamic sort by column name (string)
-            /// </summary>
-            /// <param name="columnName">Column name (property name or [Column] attribute name)</param>
-            /// <param name="ascending">Sort direction: true for ASC, false for DESC</param>
-            public QueryBuilder<TEntity> OrderBy(string columnName, bool ascending = true)
-            {
-                // Validate column name exists
-                var property = typeof(TEntity)
-                    .GetProperties()
-                    .FirstOrDefault(p =>
-                        p.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase)
-                        || (
-                            p.GetCustomAttribute<ColumnAttribute>()
-                                ?.Name?.Equals(columnName, StringComparison.OrdinalIgnoreCase)
-                            ?? false
-                        )
-                    );
-
-                if (property == null)
-                {
-                    throw new ArgumentException(
-                        $"Column '{columnName}' not found in entity {typeof(TEntity).Name}"
-                    );
-                }
-
-                var actualColumnName =
-                    property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
-                _orderBy = actualColumnName;
-                _orderByDescending = !ascending;
-                _orderByList.Clear();
-                _orderByList.Add((actualColumnName, !ascending));
-                return this;
-            }
-
-            /// <summary>
-            /// Add secondary sort by column name (string)
-            /// </summary>
-            public QueryBuilder<TEntity> ThenBy(string columnName, bool ascending = true)
-            {
-                var property = typeof(TEntity)
-                    .GetProperties()
-                    .FirstOrDefault(p =>
-                        p.Name.Equals(columnName, StringComparison.OrdinalIgnoreCase)
-                        || (
-                            p.GetCustomAttribute<ColumnAttribute>()
-                                ?.Name?.Equals(columnName, StringComparison.OrdinalIgnoreCase)
-                            ?? false
-                        )
-                    );
-
-                if (property == null)
-                {
-                    throw new ArgumentException(
-                        $"Column '{columnName}' not found in entity {typeof(TEntity).Name}"
-                    );
-                }
-
-                var actualColumnName =
-                    property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
-                _orderByList.Add((actualColumnName, !ascending));
-                return this;
-            }
-
             public PagedResult<TEntity> AsPagedList(int page, int itemsPerPage)
             {
                 if (page < 1)
@@ -1185,7 +859,7 @@ namespace Dawning.ORM.Dapper
                 var parameters = ConvertToDynamicParameters();
 
                 // Ensure a sort column is specified
-                if (string.IsNullOrEmpty(_orderBy))
+                if (_orderByList.Count == 0)
                 {
                     throw new InvalidOperationException(
                         "A sorting column must be specified for pagination. "
@@ -1193,13 +867,15 @@ namespace Dawning.ORM.Dapper
                     );
                 }
 
+                var orderByClause = BuildOrderByClauseInner();
+
                 // Get paginated data
                 var list = sqlAdapter.RetrieveCurrentPaginatedData(
                     _connection,
                     _transaction,
                     _commandTimeout,
                     name,
-                    _orderBy,
+                    orderByClause,
                     page,
                     itemsPerPage,
                     whereClause,
@@ -1851,7 +1527,8 @@ namespace Dawning.ORM.Dapper
                 if (defaultSortProperty != null)
                 {
                     var columnAttr = defaultSortProperty.GetCustomAttribute<ColumnAttribute>();
-                    _orderBy = columnAttr?.Name ?? defaultSortProperty.Name;
+                    var column = columnAttr?.Name ?? defaultSortProperty.Name;
+                    _orderByList.Add((column, true));
                 }
             }
 
@@ -1887,36 +1564,32 @@ namespace Dawning.ORM.Dapper
             }
 
             /// <summary>
-            /// Build ORDER BY clause (supports multiple columns)
+            /// Build ORDER BY clause body (without the leading " ORDER BY ").
+            /// Returns an empty string when no ordering has been configured.
+            /// </summary>
+            private string BuildOrderByClauseInner()
+            {
+                if (_orderByList.Count == 0)
+                    return string.Empty;
+
+                var parts = new List<string>(_orderByList.Count);
+                foreach (var (column, descending) in _orderByList)
+                {
+                    parts.Add(
+                        $"{sqlAdapter.ConvertColumnName(column)} {(descending ? "DESC" : "ASC")}"
+                    );
+                }
+                return string.Join(", ", parts);
+            }
+
+            /// <summary>
+            /// Build full ORDER BY clause with leading space and keyword (e.g. " ORDER BY [a] ASC").
+            /// Returns an empty string when no ordering has been configured.
             /// </summary>
             private string BuildOrderByClause()
             {
-                if (_orderByList.Count == 0 && string.IsNullOrEmpty(_orderBy))
-                {
-                    return string.Empty;
-                }
-
-                var orderByParts = new List<string>();
-
-                if (_orderByList.Count > 0)
-                {
-                    foreach (var (column, descending) in _orderByList)
-                    {
-                        orderByParts.Add(
-                            $"{sqlAdapter.ConvertColumnName(column)} {(descending ? "DESC" : "ASC")}"
-                        );
-                    }
-                }
-                else if (!string.IsNullOrEmpty(_orderBy))
-                {
-                    orderByParts.Add(
-                        $"{sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}"
-                    );
-                }
-
-                return orderByParts.Count > 0
-                    ? $" ORDER BY {string.Join(", ", orderByParts)}"
-                    : string.Empty;
+                var inner = BuildOrderByClauseInner();
+                return inner.Length == 0 ? string.Empty : $" ORDER BY {inner}";
             }
 
             /// <summary>
@@ -2044,19 +1717,6 @@ namespace Dawning.ORM.Dapper
             public int DefaultPageSize { get; set; } = 10;
 
             /// <summary>
-            /// Enable parallel COUNT query execution (default: false)
-            /// Note: Only works with databases supporting MARS (e.g., SQL Server)
-            /// MySQL does not support MARS and will execute sequentially
-            /// </summary>
-            public bool EnableParallelCount { get; set; } = false;
-
-            /// <summary>
-            /// Enable delayed join optimization for deep pagination (default: false)
-            /// Uses covering index scan with later table join for better performance
-            /// </summary>
-            public bool EnableDelayedJoin { get; set; } = false;
-
-            /// <summary>
             /// Preferred pagination strategy (default: Offset)
             /// </summary>
             public PaginationStrategy Strategy { get; set; } = PaginationStrategy.Offset;
@@ -2083,12 +1743,6 @@ namespace Dawning.ORM.Dapper
             /// Better performance for large datasets but no page jumping
             /// </summary>
             Cursor = 1,
-
-            /// <summary>
-            /// Automatic strategy selection based on context
-            /// Uses Offset for small page numbers, Cursor for deep pagination
-            /// </summary>
-            Auto = 2,
         }
 
         #endregion
@@ -2200,7 +1854,7 @@ public partial interface ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    int Insert(
+    long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2241,7 +1895,7 @@ public partial interface ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2266,7 +1920,7 @@ public partial class SqlServerAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(
+    public long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2278,7 +1932,7 @@ public partial class SqlServerAdapter : ISqlAdapter
     )
     {
         var cmd =
-            $"insert into {tableName} ({columnList}) values ({parameterList});select SCOPE_IDENTITY() id";
+            $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList});SELECT SCOPE_IDENTITY() id";
         var multi = connection.QueryMultiple(cmd, entityToInsert, transaction, commandTimeout);
 
         if (keyProperties.Any())
@@ -2287,7 +1941,7 @@ public partial class SqlServerAdapter : ISqlAdapter
             if (first == null || first.id == null)
                 return 0;
 
-            var id = (int)first.id;
+            var id = Convert.ToInt64(first.id);
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (propertyInfos.Length == 0)
                 return id;
@@ -2315,7 +1969,7 @@ public partial class SqlServerAdapter : ISqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -2325,7 +1979,7 @@ public partial class SqlServerAdapter : ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2336,7 +1990,7 @@ public partial class SqlServerAdapter : ISqlAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      OFFSET {(page - 1) * itemsPerPage} ROWS 
                      FETCH NEXT {itemsPerPage} ROWS ONLY";
 
@@ -2396,7 +2050,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(
+    public long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2407,14 +2061,14 @@ public partial class SqlCeServerAdapter : ISqlAdapter
         object entityToInsert
     )
     {
-        var cmd = $"insert into {tableName} ({columnList}) values ({parameterList})";
+        var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
         var result = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
 
         if (keyProperties.Any() && result > 0)
         {
             var r = connection
                 .Query(
-                    "select @@IDENTITY id",
+                    "SELECT @@IDENTITY id",
                     transaction: transaction,
                     commandTimeout: commandTimeout
                 )
@@ -2422,7 +2076,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
 
             if (r[0].id == null)
                 return 0;
-            var id = (int)r[0].id;
+            var id = Convert.ToInt64(r[0].id);
 
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (propertyInfos.Length == 0)
@@ -2449,7 +2103,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -2459,7 +2113,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2469,7 +2123,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
         // ✅ Simplified: Single query with ROW_NUMBER pagination
         var sql =
             $@"SELECT * FROM (
-                        SELECT *, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS RowNum
+                        SELECT *, ROW_NUMBER() OVER (ORDER BY {orderByClause}) AS RowNum
                         FROM {tableName}
                         WHERE {whereClause ?? "1=1"}
                      ) AS t
@@ -2531,7 +2185,7 @@ public partial class MySqlAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(
+    public long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2548,7 +2202,7 @@ public partial class MySqlAdapter : ISqlAdapter
         if (keyProperties.Any() && result > 0)
         {
             var r = connection.Query(
-                "Select LAST_INSERT_ID() id",
+                "SELECT LAST_INSERT_ID() id",
                 transaction: transaction,
                 commandTimeout: commandTimeout
             );
@@ -2558,12 +2212,12 @@ public partial class MySqlAdapter : ISqlAdapter
                 return 0;
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (propertyInfos.Length == 0)
-                return Convert.ToInt32(id);
+                return Convert.ToInt64(id);
 
             var idp = propertyInfos[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
 
-            return Convert.ToInt32(id);
+            return Convert.ToInt64(id);
         }
 
         return result;
@@ -2577,7 +2231,7 @@ public partial class MySqlAdapter : ISqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -2587,7 +2241,7 @@ public partial class MySqlAdapter : ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2598,7 +2252,7 @@ public partial class MySqlAdapter : ISqlAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY `{sortingColumnName}` DESC 
+                     ORDER BY {orderByClause} 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
 
         return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
@@ -2657,7 +2311,7 @@ public partial class PostgresAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(
+    public long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2669,7 +2323,7 @@ public partial class PostgresAdapter : ISqlAdapter
     )
     {
         var sb = new StringBuilder();
-        sb.AppendFormat("insert into {0} ({1}) values ({2})", tableName, columnList, parameterList);
+        sb.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", tableName, columnList, parameterList);
 
         // If no primary key then safe to assume a join table with not too much data to return
         var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
@@ -2686,7 +2340,7 @@ public partial class PostgresAdapter : ISqlAdapter
                 if (!first)
                     sb.Append(", ");
                 first = false;
-                sb.Append(property.Name);
+                sb.Append(property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name);
             }
         }
 
@@ -2697,13 +2351,18 @@ public partial class PostgresAdapter : ISqlAdapter
         if (keyProperties.Any())
         {
             // Return the key by assigning the corresponding property in the object - by product is that it supports compound primary keys
-            var id = 0;
+            var row = new Dictionary<string, object>(
+                (IDictionary<string, object>)results[0],
+                StringComparer.OrdinalIgnoreCase
+            );
+            long id = 0;
             foreach (var p in propertyInfos)
             {
-                var value = ((IDictionary<string, object>)results[0])[p.Name.ToLower()];
+                var lookupKey = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name;
+                var value = row[lookupKey];
                 p.SetValue(entityToInsert, value, null);
                 if (id == 0)
-                    id = Convert.ToInt32(value);
+                    id = Convert.ToInt64(value);
             }
             return id;
         }
@@ -2719,7 +2378,7 @@ public partial class PostgresAdapter : ISqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -2729,7 +2388,7 @@ public partial class PostgresAdapter : ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2740,7 +2399,7 @@ public partial class PostgresAdapter : ISqlAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
 
         return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
@@ -2799,7 +2458,7 @@ public partial class SQLiteAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(
+    public long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2816,7 +2475,7 @@ public partial class SQLiteAdapter : ISqlAdapter
 
         if (keyProperties.Any())
         {
-            var id = (int)multi.Read().First().id;
+            var id = Convert.ToInt64(multi.Read().First().id);
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (propertyInfos.Length == 0)
                 return id;
@@ -2844,7 +2503,7 @@ public partial class SQLiteAdapter : ISqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -2854,7 +2513,7 @@ public partial class SQLiteAdapter : ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2865,7 +2524,7 @@ public partial class SQLiteAdapter : ISqlAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
 
         return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);
@@ -2924,7 +2583,7 @@ public partial class FbAdapter : ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public int Insert(
+    public long Insert(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -2952,12 +2611,12 @@ public partial class FbAdapter : ISqlAdapter
             if (id == null)
                 return 0;
             if (propertyInfos.Length == 0)
-                return Convert.ToInt32(id);
+                return Convert.ToInt64(id);
 
             var idp = propertyInfos[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
 
-            return Convert.ToInt32(id);
+            return Convert.ToInt64(id);
         }
 
         return result;
@@ -2971,7 +2630,7 @@ public partial class FbAdapter : ISqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -2981,7 +2640,7 @@ public partial class FbAdapter : ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string whereClause,
@@ -2992,7 +2651,7 @@ public partial class FbAdapter : ISqlAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      ROWS {(page - 1) * itemsPerPage + 1} TO {page * itemsPerPage}";
 
         return connection.Query(sql, parameters, transaction, commandTimeout: commandTimeout);

@@ -11,17 +11,16 @@ namespace Dawning.ORM.Dapper
     public static partial class SqlMapperExtensions
     {
         /// <summary>
-        /// Returns a single entity by a single id from table "Ts" asynchronously using Task. T must be of interface type.
-        /// Id must be marked with [Key] attribute.
-        /// Created entity is tracked/intercepted for changes and used by the Update() extension.
+        /// Returns a single entity by a single id from table "Ts" asynchronously, or <c>null</c> if not found.
+        /// Id must be marked with [Key] or [ExplicitKey] attribute.
         /// </summary>
-        /// <typeparam name="T">Interface type to create and populate</typeparam>
+        /// <typeparam name="T">Type to create and populate</typeparam>
         /// <param name="connection">Open SqlConnection</param>
         /// <param name="id">Id of the entity to get, must be marked with [Key] attribute</param>
         /// <param name="transaction">The transaction to run under, null (the default) if none</param>
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
-        /// <returns>Entity of T</returns>
-        public static async Task<T> GetAsync<T>(
+        /// <returns>Entity of T, or <c>null</c> when no row matches the supplied id.</returns>
+        public static async Task<T?> GetAsync<T>(
             this IDbConnection connection,
             dynamic id,
             IDbTransaction? transaction = null,
@@ -87,44 +86,7 @@ namespace Dawning.ORM.Dapper
             var result = await connection
                 .QueryAsync(sql, transaction: transaction, commandTimeout: commandTimeout)
                 .ConfigureAwait(false);
-            // return GetAllAsyncImpl<T>(result, type);
             return GetListImpl<T>(result, type);
-        }
-
-        private static IEnumerable<T> GetAllAsyncImpl<T>(dynamic result, Type type)
-            where T : class, new()
-        {
-            var list = new List<T>();
-            foreach (IDictionary<string, object> res in result)
-            {
-                var obj = ProxyGenerator.GetInterfaceProxy<T>();
-                foreach (var property in TypePropertiesCache(type))
-                {
-                    var val = res[property.Name];
-                    if (val == null)
-                        continue;
-                    if (
-                        property.PropertyType.IsGenericType
-                        && property.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>)
-                    )
-                    {
-                        var genericType = Nullable.GetUnderlyingType(property.PropertyType);
-                        if (genericType != null)
-                            property.SetValue(obj, Convert.ChangeType(val, genericType), null);
-                    }
-                    else
-                    {
-                        property.SetValue(
-                            obj,
-                            Convert.ChangeType(val, property.PropertyType),
-                            null
-                        );
-                    }
-                }
-                ((IProxy)obj).IsDirty = false; //reset change tracking and return
-                list.Add(obj);
-            }
-            return list;
         }
 
         /// <summary>
@@ -137,7 +99,7 @@ namespace Dawning.ORM.Dapper
         /// <param name="commandTimeout">Number of seconds before command execution timeout</param>
         /// <param name="sqlAdapter">The specific ISqlAdapter to use, auto-detected based on connection if null</param>
         /// <returns>Identity of inserted entity</returns>
-        public static Task<int> InsertAsync<T>(
+        public static async Task<long> InsertAsync<T>(
             this IDbConnection connection,
             T entityToInsert,
             IDbTransaction? transaction = null,
@@ -199,23 +161,39 @@ namespace Dawning.ORM.Dapper
                     sbParameterList.Append(", ");
             }
 
-            if (!isList) //single entity
-            {
-                return sqlAdapter.InsertAsync(
-                    connection,
-                    transaction,
-                    commandTimeout,
-                    name,
-                    sbColumnList.ToString(),
-                    sbParameterList.ToString(),
-                    keyProperties,
-                    entityToInsert
-                );
-            }
+            var wasClosed = connection.State == ConnectionState.Closed;
+            if (wasClosed)
+                connection.Open();
 
-            //insert list of entities
-            var cmd = $"INSERT INTO {name} ({sbColumnList}) values ({sbParameterList})";
-            return connection.ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout);
+            try
+            {
+                if (!isList) //single entity
+                {
+                    return await sqlAdapter
+                        .InsertAsync(
+                            connection,
+                            transaction,
+                            commandTimeout,
+                            name,
+                            sbColumnList.ToString(),
+                            sbParameterList.ToString(),
+                            keyProperties,
+                            entityToInsert
+                        )
+                        .ConfigureAwait(false);
+                }
+
+                //insert list of entities
+                var cmd = $"INSERT INTO {name} ({sbColumnList}) VALUES ({sbParameterList})";
+                return await connection
+                    .ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout)
+                    .ConfigureAwait(false);
+            }
+            finally
+            {
+                if (wasClosed)
+                    connection.Close();
+            }
         }
 
         /// <summary>
@@ -235,11 +213,6 @@ namespace Dawning.ORM.Dapper
         )
             where T : class
         {
-            if ((entityToUpdate is IProxy proxy) && !proxy.IsDirty)
-            {
-                return false;
-            }
-
             var type = typeof(T);
 
             if (type.IsArray)
@@ -271,7 +244,7 @@ namespace Dawning.ORM.Dapper
             var name = GetTableName(type);
 
             var sb = new StringBuilder();
-            sb.AppendFormat("update {0} set ", name);
+            sb.AppendFormat("UPDATE {0} SET ", name);
 
             var allProperties = TypePropertiesCache(type);
             keyProperties.AddRange(explicitKeyProperties);
@@ -290,13 +263,13 @@ namespace Dawning.ORM.Dapper
                 if (i < nonIdProps.Count - 1)
                     sb.Append(", ");
             }
-            sb.Append(" where ");
+            sb.Append(" WHERE ");
             for (var i = 0; i < keyProperties.Count; i++)
             {
                 var property = keyProperties[i];
                 adapter.AppendColumnNameEqualsValue(sb, property);
                 if (i < keyProperties.Count - 1)
-                    sb.Append(" and ");
+                    sb.Append(" AND ");
             }
             var updated = await connection
                 .ExecuteAsync(
@@ -481,12 +454,14 @@ namespace Dawning.ORM.Dapper
 
                 var parameters = ConvertToDynamicParameters();
 
-                if (string.IsNullOrEmpty(_orderBy))
+                if (_orderByList.Count == 0)
                 {
                     throw new InvalidOperationException(
                         "A sorting column must be specified for pagination."
                     );
                 }
+
+                var orderByClause = BuildOrderByClauseInner();
 
                 // ✅ Execute COUNT first, then data query (MySQL doesn't support MARS - Multiple Active Result Sets)
                 var countSql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
@@ -503,7 +478,7 @@ namespace Dawning.ORM.Dapper
                     _transaction,
                     _commandTimeout,
                     name,
-                    _orderBy,
+                    orderByClause,
                     page,
                     itemsPerPage,
                     whereClause,
@@ -521,22 +496,20 @@ namespace Dawning.ORM.Dapper
 
             /// <summary>
             /// Cursor-based pagination for large datasets. Better performance than OFFSET pagination.
-            /// No page jumping support - only next/previous navigation.
+            /// Requires exactly one OrderBy/OrderByDescending call. The cursor column and direction
+            /// are taken from that OrderBy expression.
             /// </summary>
             /// <param name="itemsPerPage">Number of items per page</param>
             /// <param name="lastCursorValue">Last cursor value from previous page (null for first page)</param>
-            /// <param name="ascending">Sort direction (true for ASC, false for DESC, default is DESC)</param>
             /// <returns>CursorPagedResult with data and cursor info</returns>
             public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(
                 int itemsPerPage,
-                object? lastCursorValue = null,
-                bool ascending = false
+                object? lastCursorValue = null
             )
             {
                 return await AsPagedListByCursorAsync(
                     itemsPerPage,
                     lastCursorValue,
-                    ascending,
                     PagedOptions.Default
                 );
             }
@@ -547,7 +520,6 @@ namespace Dawning.ORM.Dapper
             public async Task<CursorPagedResult<TEntity>> AsPagedListByCursorAsync(
                 int itemsPerPage,
                 object? lastCursorValue,
-                bool ascending,
                 PagedOptions options
             )
             {
@@ -565,12 +537,16 @@ namespace Dawning.ORM.Dapper
                 var type = typeof(TEntity);
                 var name = GetTableName(type);
 
-                if (string.IsNullOrEmpty(_orderBy))
+                if (_orderByList.Count != 1)
                 {
                     throw new InvalidOperationException(
-                        "A cursor column must be specified for cursor-based pagination. Use OrderBy() or OrderByDescending()."
+                        "Cursor-based pagination requires exactly one OrderBy/OrderByDescending column. "
+                            + $"Got {_orderByList.Count} ordering column(s)."
                     );
                 }
+
+                var (cursorColumn, cursorDescending) = _orderByList[0];
+                var ascending = !cursorDescending;
 
                 // Build WHERE clause: join conditions with AND when multiple conditions exist
                 string whereClause;
@@ -616,7 +592,7 @@ namespace Dawning.ORM.Dapper
                     _transaction,
                     _commandTimeout,
                     name,
-                    _orderBy,
+                    cursorColumn,
                     itemsPerPage + 1,
                     lastCursorValue,
                     whereClause,
@@ -637,7 +613,7 @@ namespace Dawning.ORM.Dapper
                 if (entities.Any())
                 {
                     var lastEntity = entities.Last();
-                    var cursorProperty = type.GetProperty(_orderBy);
+                    var cursorProperty = type.GetProperty(cursorColumn);
                     if (cursorProperty != null)
                     {
                         nextCursor = cursorProperty.GetValue(lastEntity);
@@ -662,12 +638,7 @@ namespace Dawning.ORM.Dapper
                 var parameters = ConvertToDynamicParameters();
 
                 var sql = $"SELECT * FROM {name} WHERE {whereClause}";
-
-                if (!string.IsNullOrEmpty(_orderBy))
-                {
-                    sql +=
-                        $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
-                }
+                sql += BuildOrderByClause();
 
                 var list = await _connection.QueryAsync(
                     sql,
@@ -711,20 +682,7 @@ namespace Dawning.ORM.Dapper
                 }
 
                 var sql = $"SELECT {selectClause} FROM {name} WHERE {whereClause}";
-
-                // Add ORDER BY if specified
-                if (_orderByList.Count > 0)
-                {
-                    var orderByParts = _orderByList.Select(o =>
-                        $"{sqlAdapter.ConvertColumnName(o.Column)} {(o.Descending ? "DESC" : "ASC")}"
-                    );
-                    sql += $" ORDER BY {string.Join(", ", orderByParts)}";
-                }
-                else if (!string.IsNullOrEmpty(_orderBy))
-                {
-                    sql +=
-                        $" ORDER BY {sqlAdapter.ConvertColumnName(_orderBy)} {(_orderByDescending ? "DESC" : "ASC")}";
-                }
+                sql += BuildOrderByClause();
 
                 // Limit to 1 result for efficiency
                 sql += " LIMIT 1";
@@ -757,7 +715,7 @@ public partial interface ISqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    Task<int> InsertAsync(
+    Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -777,7 +735,7 @@ public partial interface ISqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -826,7 +784,7 @@ public partial class SqlServerAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(
+    public async Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -838,7 +796,7 @@ public partial class SqlServerAdapter
     )
     {
         var cmd =
-            $"INSERT INTO {tableName} ({columnList}) values ({parameterList}); SELECT SCOPE_IDENTITY() id";
+            $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT SCOPE_IDENTITY() id";
         var multi = await connection
             .QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout)
             .ConfigureAwait(false);
@@ -849,7 +807,7 @@ public partial class SqlServerAdapter
             if (first == null || first.id == null)
                 return 0;
 
-            var id = (int)first.id;
+            var id = Convert.ToInt64(first.id);
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (pi.Length == 0)
                 return id;
@@ -873,7 +831,7 @@ public partial class SqlServerAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -883,7 +841,7 @@ public partial class SqlServerAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -894,7 +852,7 @@ public partial class SqlServerAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      OFFSET {(page - 1) * itemsPerPage} ROWS 
                      FETCH NEXT {itemsPerPage} ROWS ONLY";
 
@@ -953,7 +911,7 @@ public partial class SqlCeServerAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(
+    public async Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -983,7 +941,7 @@ public partial class SqlCeServerAdapter
 
             if (r[0] == null || r[0].id == null)
                 return 0;
-            var id = (int)r[0].id;
+            var id = Convert.ToInt64(r[0].id);
 
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (pi.Length == 0)
@@ -1006,7 +964,7 @@ public partial class SqlCeServerAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -1016,7 +974,7 @@ public partial class SqlCeServerAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -1026,7 +984,7 @@ public partial class SqlCeServerAdapter
         // ✅ Simplified: Single query with ROW_NUMBER pagination
         var sql =
             $@"SELECT * FROM (
-                        SELECT *, ROW_NUMBER() OVER (ORDER BY {sortingColumnName} DESC) AS RowNum
+                        SELECT *, ROW_NUMBER() OVER (ORDER BY {orderByClause}) AS RowNum
                         FROM {tableName}
                         WHERE {whereClause ?? "1=1"}
                      ) AS t
@@ -1090,7 +1048,7 @@ public partial class MySqlAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(
+    public async Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -1121,12 +1079,12 @@ public partial class MySqlAdapter
                 return 0;
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (pi.Length == 0)
-                return Convert.ToInt32(id);
+                return Convert.ToInt64(id);
 
             var idp = pi[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
 
-            return Convert.ToInt32(id);
+            return Convert.ToInt64(id);
         }
 
         return result;
@@ -1140,7 +1098,7 @@ public partial class MySqlAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -1150,7 +1108,7 @@ public partial class MySqlAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -1161,7 +1119,7 @@ public partial class MySqlAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
 
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
@@ -1219,7 +1177,7 @@ public partial class PostgresAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(
+    public async Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -1259,13 +1217,18 @@ public partial class PostgresAdapter
         if (keyProperties.Any())
         {
             // Return the key by assigning the corresponding property in the object - by product is that it supports compound primary keys
-            var id = 0;
+            var row = new Dictionary<string, object>(
+                (IDictionary<string, object>)results.First(),
+                StringComparer.OrdinalIgnoreCase
+            );
+            long id = 0;
             foreach (var p in propertyInfos)
             {
-                var value = ((IDictionary<string, object>)results.First())[p.Name.ToLower()];
+                var lookupKey = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name;
+                var value = row[lookupKey];
                 p.SetValue(entityToInsert, value, null);
                 if (id == 0)
-                    id = Convert.ToInt32(value);
+                    id = Convert.ToInt64(value);
             }
             return id;
         }
@@ -1281,7 +1244,7 @@ public partial class PostgresAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -1291,7 +1254,7 @@ public partial class PostgresAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -1302,7 +1265,7 @@ public partial class PostgresAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
 
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
@@ -1360,7 +1323,7 @@ public partial class SQLiteAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(
+    public async Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -1379,7 +1342,7 @@ public partial class SQLiteAdapter
 
         if (keyProperties.Any())
         {
-            var id = (int)(await multi.ReadFirstAsync().ConfigureAwait(false)).id;
+            var id = Convert.ToInt64((await multi.ReadFirstAsync().ConfigureAwait(false)).id);
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (pi.Length == 0)
                 return id;
@@ -1403,7 +1366,7 @@ public partial class SQLiteAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -1413,7 +1376,7 @@ public partial class SQLiteAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -1424,7 +1387,7 @@ public partial class SQLiteAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      LIMIT {itemsPerPage} OFFSET {(page - 1) * itemsPerPage}";
 
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
@@ -1482,7 +1445,7 @@ public partial class FbAdapter
     /// <param name="keyProperties">The key columns in this table.</param>
     /// <param name="entityToInsert">The entity to insert.</param>
     /// <returns>The Id of the row created.</returns>
-    public async Task<int> InsertAsync(
+    public async Task<long> InsertAsync(
         IDbConnection connection,
         IDbTransaction transaction,
         int? commandTimeout,
@@ -1514,12 +1477,12 @@ public partial class FbAdapter
             if (id == null)
                 return 0;
             if (propertyInfos.Length == 0)
-                return Convert.ToInt32(id);
+                return Convert.ToInt64(id);
 
             var idp = propertyInfos[0];
             idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
 
-            return Convert.ToInt32(id);
+            return Convert.ToInt64(id);
         }
 
         return result;
@@ -1533,7 +1496,7 @@ public partial class FbAdapter
     /// <param name="transaction"></param>
     /// <param name="commandTimeout"></param>
     /// <param name="tableName">The table to insert into.</param>
-    /// <param name="sortingColumnName">Sorting column name, such as timestamp or auto-increment column</param>
+    /// <param name="orderByClause">ORDER BY clause body (without the leading "ORDER BY"), e.g. "[name] ASC, [id] DESC".</param>
     /// <param name="page">Current page index</param>
     /// <param name="itemsPerPage">Items for per page</param>
     /// <param name="result"></param>
@@ -1543,7 +1506,7 @@ public partial class FbAdapter
         IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
-        string sortingColumnName,
+        string orderByClause,
         int page,
         int itemsPerPage,
         string? whereClause,
@@ -1554,7 +1517,7 @@ public partial class FbAdapter
         var sql =
             $@"SELECT * FROM {tableName} 
                      WHERE {whereClause ?? "1=1"} 
-                     ORDER BY {sortingColumnName} DESC 
+                     ORDER BY {orderByClause} 
                      ROWS {(page - 1) * itemsPerPage + 1} TO {page * itemsPerPage}";
 
         return await connection.QueryAsync(sql, parameters, transaction, commandTimeout);
