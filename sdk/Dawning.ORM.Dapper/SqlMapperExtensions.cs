@@ -303,10 +303,25 @@ namespace Dawning.ORM.Dapper
         /// Iterates the full set of writable CLR properties, including those marked
         /// <c>[Write(false)]</c> and <c>[Computed]</c>. Those attributes only suppress
         /// outbound INSERT/UPDATE writes; the values must still flow back from SELECT.
+        /// Column-name lookup is case-insensitive so adapters that fold identifier
+        /// case (Firebird → UPPERCASE, PostgreSQL → lowercase for unquoted) still
+        /// resolve to the correct property.
         /// </remarks>
         private static T MapRow<T>(IDictionary<string, object> row, Type type)
             where T : class, new()
         {
+            // Snapshot the row into an ordinal-case-insensitive dictionary once per row.
+            // The IDictionary handed back by Dapper is case-sensitive in some code paths,
+            // so we cannot rely on its TryGetValue semantics for cross-adapter mapping.
+            var lookup = new Dictionary<string, object?>(
+                row.Count,
+                StringComparer.OrdinalIgnoreCase
+            );
+            foreach (var kvp in row)
+            {
+                lookup[kvp.Key] = kvp.Value;
+            }
+
             T obj = new T();
             foreach (
                 var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -317,7 +332,7 @@ namespace Dawning.ORM.Dapper
 
                 var name = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
 
-                if (!row.TryGetValue(name, out var val))
+                if (!lookup.TryGetValue(name, out var val))
                     continue;
 
                 var propType = property.PropertyType;

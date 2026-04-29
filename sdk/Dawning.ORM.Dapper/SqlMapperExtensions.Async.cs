@@ -685,21 +685,31 @@ namespace Dawning.ORM.Dapper
                 string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
                 var parameters = ConvertToDynamicParameters();
 
-                // Build SELECT clause
-                string selectClause = "*";
-                if (_selectColumns.Count > 0)
-                {
-                    selectClause = string.Join(
-                        ", ",
-                        _selectColumns.Select(c => sqlAdapter.ConvertColumnName(c))
-                    );
-                }
+                // Build SELECT clause (mirrors the sync FirstOrDefault path so
+                // _distinct and _selectColumns are honored consistently).
+                var selectClause = BuildSelectClause();
+                var distinctKeyword = _distinct ? "DISTINCT " : "";
 
-                var sql = $"SELECT {selectClause} FROM {name} WHERE {whereClause}";
+                var sql = $"SELECT {distinctKeyword}{selectClause} FROM {name} WHERE {whereClause}";
                 sql += BuildOrderByClause();
 
-                // Limit to 1 result for efficiency
-                sql += " LIMIT 1";
+                // Per-adapter "limit one row" syntax (matches sync FirstOrDefault).
+                if (
+                    sqlAdapter is MySqlAdapter
+                    || sqlAdapter is PostgresAdapter
+                    || sqlAdapter is SQLiteAdapter
+                )
+                {
+                    sql += " LIMIT 1";
+                }
+                else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
+                {
+                    sql = sql.Replace("SELECT *", "SELECT TOP 1 *");
+                }
+                else if (sqlAdapter is FbAdapter)
+                {
+                    sql = sql.Replace("SELECT *", "SELECT FIRST 1 *");
+                }
 
                 var list = await _connection.QueryAsync(
                     sql,

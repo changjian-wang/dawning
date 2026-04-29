@@ -18,8 +18,8 @@ namespace Dawning.ORM.Dapper.Tests;
 ///
 /// PostgreSQL folds unquoted identifiers to lowercase; the ORM emits column
 /// names quoted, so the schema below uses double-quoted identifiers wherever
-/// the property name preserves case (Id, Name, Notes, Timestamp). The
-/// <c>score_value</c> column comes from a <c>[Column]</c> attribute and is
+/// the property name preserves case (Id, Name, Notes). The <c>score_value</c>
+/// and <c>ts_ms</c> columns come from <c>[Column]</c> attributes and are
 /// already lowercase.
 /// </summary>
 public class PostgresIntegrationTests : OrmIntegrationTestBase
@@ -41,11 +41,11 @@ public class PostgresIntegrationTests : OrmIntegrationTestBase
         Connection.Execute("DROP TABLE IF EXISTS \"noOrder\";");
         Connection.Execute(
             @"CREATE TABLE widgets (
-                ""Id""        BIGSERIAL PRIMARY KEY,
-                ""Name""      TEXT NOT NULL,
-                score_value   INT NOT NULL DEFAULT 0,
-                ""Notes""     TEXT NULL,
-                ""Timestamp"" BIGINT NOT NULL
+                ""Id""      BIGSERIAL PRIMARY KEY,
+                ""Name""    TEXT NOT NULL,
+                score_value INT NOT NULL DEFAULT 0,
+                ""Notes""   TEXT NULL,
+                ts_ms       BIGINT NOT NULL
             );"
         );
     }

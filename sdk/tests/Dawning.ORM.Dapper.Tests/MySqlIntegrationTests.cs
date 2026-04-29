@@ -39,7 +39,7 @@ public class MySqlIntegrationTests : OrmIntegrationTestBase
                 `Name`        VARCHAR(255) NOT NULL,
                 `score_value` INT NOT NULL DEFAULT 0,
                 `Notes`       VARCHAR(255) NULL,
-                `Timestamp`   BIGINT NOT NULL,
+                `ts_ms`       BIGINT NOT NULL,
                 PRIMARY KEY (`Id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
         );

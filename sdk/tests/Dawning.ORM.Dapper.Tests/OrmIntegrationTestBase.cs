@@ -33,6 +33,10 @@ public abstract class OrmIntegrationTestBase : IDisposable
 
         public string? Notes { get; set; }
 
+        // Mapped to a non-reserved column name so every supported adapter
+        // (Firebird in particular treats TIMESTAMP as a reserved keyword)
+        // can use bare identifiers in CREATE TABLE statements.
+        [Column("ts_ms")]
         [DefaultSortName]
         public long Timestamp { get; set; }
     }

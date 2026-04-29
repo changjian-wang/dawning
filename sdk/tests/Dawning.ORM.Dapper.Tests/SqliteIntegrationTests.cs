@@ -24,7 +24,7 @@ public class SqliteIntegrationTests : OrmIntegrationTestBase
                 Name TEXT NOT NULL,
                 score_value INTEGER NOT NULL DEFAULT 0,
                 Notes TEXT NULL,
-                Timestamp INTEGER NOT NULL
+                ts_ms INTEGER NOT NULL
             );"
         );
     }
