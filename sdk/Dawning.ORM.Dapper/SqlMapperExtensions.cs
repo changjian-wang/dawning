@@ -2165,7 +2165,14 @@ public partial class SqlServerAdapter : ISqlAdapter
     {
         var cmd =
             $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList});SELECT SCOPE_IDENTITY() id";
-        var multi = connection.QueryMultiple(cmd, entityToInsert, transaction, commandTimeout);
+        // GridReader owns a live DataReader; must dispose to release the
+        // underlying provider resources back to the connection pool.
+        using var multi = connection.QueryMultiple(
+            cmd,
+            entityToInsert,
+            transaction,
+            commandTimeout
+        );
 
         if (keyProperties.Any())
         {
@@ -2717,7 +2724,14 @@ public partial class SQLiteAdapter : ISqlAdapter
     {
         var cmd =
             $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT last_insert_rowid() id";
-        var multi = connection.QueryMultiple(cmd, entityToInsert, transaction, commandTimeout);
+        // GridReader owns a live DataReader; must dispose to release the
+        // underlying provider resources back to the connection pool.
+        using var multi = connection.QueryMultiple(
+            cmd,
+            entityToInsert,
+            transaction,
+            commandTimeout
+        );
 
         if (keyProperties.Any())
         {

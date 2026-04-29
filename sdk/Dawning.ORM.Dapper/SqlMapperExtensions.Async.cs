@@ -170,7 +170,18 @@ namespace Dawning.ORM.Dapper
 
             var wasClosed = connection.State == ConnectionState.Closed;
             if (wasClosed)
-                connection.Open();
+            {
+                // Avoid blocking the calling thread on connection establishment
+                // when the underlying driver supports async open.
+                if (connection is DbConnection dbConn)
+                {
+                    await dbConn.OpenAsync().ConfigureAwait(false);
+                }
+                else
+                {
+                    connection.Open();
+                }
+            }
 
             try
             {
@@ -807,7 +818,11 @@ public partial class SqlServerAdapter
     {
         var cmd =
             $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT SCOPE_IDENTITY() id";
-        var multi = await connection
+        // GridReader owns a live DataReader; must dispose to release the
+        // underlying provider resources back to the connection pool.
+        // Dapper's GridReader is IDisposable (not IAsyncDisposable), so
+        // sync `using` is the correct shape here.
+        using var multi = await connection
             .QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout)
             .ConfigureAwait(false);
 
@@ -1361,7 +1376,11 @@ public partial class SQLiteAdapter
     {
         var cmd =
             $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList}); SELECT last_insert_rowid() id";
-        var multi = await connection
+        // GridReader owns a live DataReader; must dispose to release the
+        // underlying provider resources back to the connection pool.
+        // Dapper's GridReader is IDisposable (not IAsyncDisposable), so
+        // sync `using` is the correct shape here.
+        using var multi = await connection
             .QueryMultipleAsync(cmd, entityToInsert, transaction, commandTimeout)
             .ConfigureAwait(false);
 

@@ -118,6 +118,25 @@ post-Phase-5 deep audit, fixed in this release:
   adapters' "no key yielded" semantics). This is defensive — under normal
   schemas `RETURNING` always yields one row per inserted row, but a
   user-defined `INSTEAD OF` trigger can suppress it.
+- **`SqlServerAdapter.Insert[Async]` and `SQLiteAdapter.Insert[Async]` no
+  longer leak the underlying `DataReader` returned by Dapper's
+  `QueryMultiple[Async]`.** Both adapters use `QueryMultiple` to combine
+  `INSERT … ; SELECT SCOPE_IDENTITY()` (SQL Server) or
+  `INSERT … ; SELECT last_insert_rowid()` (SQLite) into a single round-trip,
+  but the resulting `SqlMapper.GridReader` (which owns a live `IDataReader`)
+  was assigned to a plain local and never disposed. Under sustained insert
+  load this leaked one reader per insert until the pool's command/cursor
+  budget was exhausted. All four call sites now wrap the reader in
+  `using var multi = …` (`GridReader` is `IDisposable`, not
+  `IAsyncDisposable`, so sync `using` is the correct shape on both
+  the sync and the async paths).
+- **Async `Insert<T>` opens the connection asynchronously when possible.**
+  The async entry path called `connection.Open()` (sync) when the caller
+  passed a closed `IDbConnection`, blocking the calling thread on TCP /
+  TLS handshake. It now prefers `DbConnection.OpenAsync()` when the
+  connection derives from `System.Data.Common.DbConnection` (true for
+  every driver shipped in this matrix) and only falls back to sync
+  `Open()` for pure `IDbConnection` shims that don't expose `OpenAsync`.
 
 Plus the nine bugs documented earlier in this Unreleased entry from the
 initial multi-adapter rollout (SQLite parity, PG quoting, etc.).
