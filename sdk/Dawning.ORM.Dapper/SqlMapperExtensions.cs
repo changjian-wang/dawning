@@ -535,27 +535,39 @@ namespace Dawning.ORM.Dapper
             if (wasClosed)
                 connection.Open();
 
-            if (!isList) //single entity
+            try
             {
-                returnVal = adapter.Insert(
-                    connection,
-                    transaction,
-                    commandTimeout,
-                    name,
-                    sbColumnList.ToString(),
-                    sbParameterList.ToString(),
-                    keyProperties,
-                    entityToInsert
-                );
+                if (!isList) //single entity
+                {
+                    returnVal = adapter.Insert(
+                        connection,
+                        transaction,
+                        commandTimeout,
+                        name,
+                        sbColumnList.ToString(),
+                        sbParameterList.ToString(),
+                        keyProperties,
+                        entityToInsert
+                    );
+                }
+                else
+                {
+                    //insert list of entities
+                    var cmd = $"INSERT INTO {name} ({sbColumnList}) VALUES ({sbParameterList})";
+                    returnVal = connection.Execute(
+                        cmd,
+                        entityToInsert,
+                        transaction,
+                        commandTimeout
+                    );
+                }
             }
-            else
+            finally
             {
-                //insert list of entities
-                var cmd = $"INSERT INTO {name} ({sbColumnList}) VALUES ({sbParameterList})";
-                returnVal = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
+                if (wasClosed)
+                    connection.Close();
             }
-            if (wasClosed)
-                connection.Close();
+
             return returnVal;
         }
 
@@ -778,7 +790,7 @@ namespace Dawning.ORM.Dapper
             private readonly List<string> _conditions = new List<string>();
             private readonly List<(string Column, bool Descending)> _orderByList =
                 new List<(string, bool)>();
-            private ISqlAdapter sqlAdapter;
+            private readonly ISqlAdapter _sqlAdapter;
             private readonly Dictionary<string, object?> _parameters =
                 new Dictionary<string, object?>();
             private int? _takeCount;
@@ -792,7 +804,7 @@ namespace Dawning.ORM.Dapper
                 int? commandTimeout
             )
             {
-                sqlAdapter ??= GetFormatter(connection);
+                _sqlAdapter = GetFormatter(connection);
                 _connection = connection;
                 _transaction = transaction;
                 _commandTimeout = commandTimeout;
@@ -908,7 +920,7 @@ namespace Dawning.ORM.Dapper
                 var orderByClause = BuildOrderByClauseInner();
 
                 // Get paginated data
-                var list = sqlAdapter.RetrieveCurrentPaginatedData(
+                var list = _sqlAdapter.RetrieveCurrentPaginatedData(
                     _connection,
                     _transaction,
                     _commandTimeout,
@@ -994,20 +1006,20 @@ namespace Dawning.ORM.Dapper
                 sql += BuildOrderByClause();
 
                 if (
-                    sqlAdapter is MySqlAdapter
-                    || sqlAdapter is PostgresAdapter
-                    || sqlAdapter is SQLiteAdapter
+                    _sqlAdapter is MySqlAdapter
+                    || _sqlAdapter is PostgresAdapter
+                    || _sqlAdapter is SQLiteAdapter
                 )
                 {
                     sql += " LIMIT 1";
                 }
-                else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
+                else if (_sqlAdapter is SqlServerAdapter || _sqlAdapter is SqlCeServerAdapter)
                 {
-                    sql = sql.Replace("SELECT *", "SELECT TOP 1 *");
+                    sql = InsertSelectModifier(sql, "TOP 1");
                 }
-                else if (sqlAdapter is FbAdapter)
+                else if (_sqlAdapter is FbAdapter)
                 {
-                    sql = sql.Replace("SELECT *", "SELECT FIRST 1 *");
+                    sql = InsertSelectModifier(sql, "FIRST 1");
                 }
 
                 var result = _connection
@@ -1198,13 +1210,15 @@ namespace Dawning.ORM.Dapper
                         // ✅ Handle null comparison
                         if (value == null)
                         {
-                            conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} IS NULL");
+                            conditions.Add($"{_sqlAdapter.ConvertColumnName(memberName)} IS NULL");
                             break;
                         }
 
                         paramName = GetUniqueParameterName(memberName);
                         _parameters[paramName] = value;
-                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} = {paramName}");
+                        conditions.Add(
+                            $"{_sqlAdapter.ConvertColumnName(memberName)} = {paramName}"
+                        );
                         break;
 
                     case ExpressionType.NotEqual:
@@ -1216,7 +1230,7 @@ namespace Dawning.ORM.Dapper
                         if (value == null)
                         {
                             conditions.Add(
-                                $"{sqlAdapter.ConvertColumnName(memberName)} IS NOT NULL"
+                                $"{_sqlAdapter.ConvertColumnName(memberName)} IS NOT NULL"
                             );
                             break;
                         }
@@ -1224,7 +1238,7 @@ namespace Dawning.ORM.Dapper
                         paramName = GetUniqueParameterName(memberName);
                         _parameters[paramName] = value;
                         conditions.Add(
-                            $"{sqlAdapter.ConvertColumnName(memberName)} <> {paramName}"
+                            $"{_sqlAdapter.ConvertColumnName(memberName)} <> {paramName}"
                         );
                         break;
 
@@ -1234,7 +1248,9 @@ namespace Dawning.ORM.Dapper
                         value = GetValueFromExpression(binaryGreaterThan.Right);
                         paramName = GetUniqueParameterName(memberName);
                         _parameters[paramName] = value;
-                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} > {paramName}");
+                        conditions.Add(
+                            $"{_sqlAdapter.ConvertColumnName(memberName)} > {paramName}"
+                        );
                         break;
 
                     case ExpressionType.GreaterThanOrEqual:
@@ -1244,7 +1260,7 @@ namespace Dawning.ORM.Dapper
                         paramName = GetUniqueParameterName(memberName);
                         _parameters[paramName] = value;
                         conditions.Add(
-                            $"{sqlAdapter.ConvertColumnName(memberName)} >= {paramName}"
+                            $"{_sqlAdapter.ConvertColumnName(memberName)} >= {paramName}"
                         );
                         break;
 
@@ -1254,7 +1270,9 @@ namespace Dawning.ORM.Dapper
                         value = GetValueFromExpression(binaryLessThan.Right);
                         paramName = GetUniqueParameterName(memberName);
                         _parameters[paramName] = value;
-                        conditions.Add($"{sqlAdapter.ConvertColumnName(memberName)} < {paramName}");
+                        conditions.Add(
+                            $"{_sqlAdapter.ConvertColumnName(memberName)} < {paramName}"
+                        );
                         break;
 
                     case ExpressionType.LessThanOrEqual:
@@ -1264,7 +1282,7 @@ namespace Dawning.ORM.Dapper
                         paramName = GetUniqueParameterName(memberName);
                         _parameters[paramName] = value;
                         conditions.Add(
-                            $"{sqlAdapter.ConvertColumnName(memberName)} <= {paramName}"
+                            $"{_sqlAdapter.ConvertColumnName(memberName)} <= {paramName}"
                         );
                         break;
 
@@ -1279,13 +1297,13 @@ namespace Dawning.ORM.Dapper
                                 break;
 
                             paramName = GetUniqueParameterName(memberName);
-                            var escapedValue = EscapeLikeValue(value.ToString()!, sqlAdapter);
+                            var escapedValue = EscapeLikeValue(value.ToString()!, _sqlAdapter);
                             _parameters[paramName] = $"{escapedValue}%";
 
                             var likeCondition = BuildLikeCondition(
                                 memberName,
                                 paramName,
-                                sqlAdapter
+                                _sqlAdapter
                             );
                             conditions.Add(likeCondition);
                         }
@@ -1298,13 +1316,13 @@ namespace Dawning.ORM.Dapper
                                 break;
 
                             paramName = GetUniqueParameterName(memberName);
-                            var escapedValue = EscapeLikeValue(value.ToString()!, sqlAdapter);
+                            var escapedValue = EscapeLikeValue(value.ToString()!, _sqlAdapter);
                             _parameters[paramName] = $"%{escapedValue}";
 
                             var likeCondition = BuildLikeCondition(
                                 memberName,
                                 paramName,
-                                sqlAdapter
+                                _sqlAdapter
                             );
                             conditions.Add(likeCondition);
                         }
@@ -1317,7 +1335,7 @@ namespace Dawning.ORM.Dapper
                             if (value == null)
                             {
                                 conditions.Add(
-                                    $"{sqlAdapter.ConvertColumnName(memberName)} IS NULL"
+                                    $"{_sqlAdapter.ConvertColumnName(memberName)} IS NULL"
                                 );
                                 break;
                             }
@@ -1325,7 +1343,7 @@ namespace Dawning.ORM.Dapper
                             paramName = GetUniqueParameterName(memberName);
                             _parameters[paramName] = value;
                             conditions.Add(
-                                $"{sqlAdapter.ConvertColumnName(memberName)} = {paramName}"
+                                $"{_sqlAdapter.ConvertColumnName(memberName)} = {paramName}"
                             );
                         }
                         else if (methodCall.Method.Name == "Contains")
@@ -1340,13 +1358,13 @@ namespace Dawning.ORM.Dapper
                                     break;
 
                                 paramName = GetUniqueParameterName(memberName);
-                                var escapedValue = EscapeLikeValue(value.ToString()!, sqlAdapter);
+                                var escapedValue = EscapeLikeValue(value.ToString()!, _sqlAdapter);
                                 _parameters[paramName] = $"%{escapedValue}%";
 
                                 var likeCondition = BuildLikeCondition(
                                     memberName,
                                     paramName,
-                                    sqlAdapter
+                                    _sqlAdapter
                                 );
                                 conditions.Add(likeCondition);
                             }
@@ -1393,7 +1411,7 @@ namespace Dawning.ORM.Dapper
                                 }
 
                                 conditions.Add(
-                                    $"{sqlAdapter.ConvertColumnName(memberName)} IN ({string.Join(", ", inParams)})"
+                                    $"{_sqlAdapter.ConvertColumnName(memberName)} IN ({string.Join(", ", inParams)})"
                                 );
                             }
                         }
@@ -1441,7 +1459,7 @@ namespace Dawning.ORM.Dapper
                                 }
 
                                 conditions.Add(
-                                    $"{sqlAdapter.ConvertColumnName(memberName)} NOT IN ({string.Join(", ", notInParams)})"
+                                    $"{_sqlAdapter.ConvertColumnName(memberName)} NOT IN ({string.Join(", ", notInParams)})"
                                 );
                             }
                         }
@@ -1641,7 +1659,7 @@ namespace Dawning.ORM.Dapper
                 var columnParts = new List<string>();
                 foreach (var column in _selectColumns)
                 {
-                    columnParts.Add(sqlAdapter.ConvertColumnName(column));
+                    columnParts.Add(_sqlAdapter.ConvertColumnName(column));
                 }
 
                 return string.Join(", ", columnParts);
@@ -1660,7 +1678,7 @@ namespace Dawning.ORM.Dapper
                 foreach (var (column, descending) in _orderByList)
                 {
                     parts.Add(
-                        $"{sqlAdapter.ConvertColumnName(column)} {(descending ? "DESC" : "ASC")}"
+                        $"{_sqlAdapter.ConvertColumnName(column)} {(descending ? "DESC" : "ASC")}"
                     );
                 }
                 return string.Join(", ", parts);
@@ -1686,7 +1704,7 @@ namespace Dawning.ORM.Dapper
                     return sql;
                 }
 
-                if (sqlAdapter is MySqlAdapter)
+                if (_sqlAdapter is MySqlAdapter)
                 {
                     // MySQL requires LIMIT before OFFSET. Use the documented sentinel
                     // when skipping without an explicit limit.
@@ -1697,7 +1715,7 @@ namespace Dawning.ORM.Dapper
                     if (_skipCount.HasValue)
                         sql += $" OFFSET {_skipCount.Value}";
                 }
-                else if (sqlAdapter is SQLiteAdapter)
+                else if (_sqlAdapter is SQLiteAdapter)
                 {
                     // SQLite requires LIMIT before OFFSET. -1 means "no upper bound".
                     if (_takeCount.HasValue)
@@ -1707,7 +1725,7 @@ namespace Dawning.ORM.Dapper
                     if (_skipCount.HasValue)
                         sql += $" OFFSET {_skipCount.Value}";
                 }
-                else if (sqlAdapter is PostgresAdapter)
+                else if (_sqlAdapter is PostgresAdapter)
                 {
                     // PostgreSQL accepts standalone OFFSET.
                     if (_takeCount.HasValue)
@@ -1716,7 +1734,7 @@ namespace Dawning.ORM.Dapper
                         sql += $" OFFSET {_skipCount.Value}";
                 }
                 // SQL Server 2012+ (requires ORDER BY)
-                else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
+                else if (_sqlAdapter is SqlServerAdapter || _sqlAdapter is SqlCeServerAdapter)
                 {
                     if (!sql.Contains("ORDER BY"))
                     {
@@ -1731,26 +1749,62 @@ namespace Dawning.ORM.Dapper
                     }
                 }
                 // Firebird
-                else if (sqlAdapter is FbAdapter)
+                else if (_sqlAdapter is FbAdapter)
                 {
                     if (_skipCount.HasValue && _takeCount.HasValue)
                     {
-                        sql = sql.Replace(
-                            "SELECT *",
-                            $"SELECT FIRST {_takeCount.Value} SKIP {_skipCount.Value} *"
+                        sql = InsertSelectModifier(
+                            sql,
+                            $"FIRST {_takeCount.Value} SKIP {_skipCount.Value}"
                         );
                     }
                     else if (_takeCount.HasValue)
                     {
-                        sql = sql.Replace("SELECT *", $"SELECT FIRST {_takeCount.Value} *");
+                        sql = InsertSelectModifier(sql, $"FIRST {_takeCount.Value}");
                     }
                     else if (_skipCount.HasValue)
                     {
-                        sql = sql.Replace("SELECT *", $"SELECT SKIP {_skipCount.Value} *");
+                        sql = InsertSelectModifier(sql, $"SKIP {_skipCount.Value}");
                     }
                 }
 
                 return sql;
+            }
+
+            /// <summary>
+            /// Inserts <paramref name="modifier"/> immediately after the leading
+            /// <c>SELECT</c> (and optional <c>DISTINCT</c>) keyword(s) of
+            /// <paramref name="sql"/>.
+            /// Used for adapter-specific row-limit dialects (e.g. SQL Server's
+            /// <c>TOP n</c>, Firebird's <c>FIRST n SKIP m</c>) so that
+            /// projections via <c>Select(...)</c> are honored — a naive
+            /// <c>Replace("SELECT *", ...)</c> would silently fail to match
+            /// once the <c>*</c> is replaced with a column list.
+            /// </summary>
+            private static string InsertSelectModifier(string sql, string modifier)
+            {
+                int selectIdx = sql.IndexOf("SELECT ", StringComparison.OrdinalIgnoreCase);
+                if (selectIdx < 0)
+                    return sql;
+
+                int insertAt = selectIdx + "SELECT ".Length;
+                const string distinctKeyword = "DISTINCT ";
+                if (
+                    insertAt + distinctKeyword.Length <= sql.Length
+                    && string.Compare(
+                        sql,
+                        insertAt,
+                        distinctKeyword,
+                        0,
+                        distinctKeyword.Length,
+                        StringComparison.OrdinalIgnoreCase
+                    ) == 0
+                )
+                {
+                    insertAt += distinctKeyword.Length;
+                }
+
+                return sql.Insert(insertAt, modifier + " ");
             }
         }
 
@@ -2455,6 +2509,12 @@ public partial class PostgresAdapter : ISqlAdapter
 
         if (keyProperties.Any())
         {
+            // Defensive: PostgreSQL's RETURNING normally yields one row per
+            // inserted row, but a misconfigured INSTEAD OF trigger could
+            // suppress it. Don't NRE on results[0] in that case.
+            if (results.Count == 0)
+                return 0;
+
             // Return the key by assigning the corresponding property in the object - by product is that it supports compound primary keys
             var row = new Dictionary<string, object>(
                 (IDictionary<string, object>)results[0],
@@ -2699,32 +2759,73 @@ public partial class FbAdapter : ISqlAdapter
         object entityToInsert
     )
     {
-        var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
-        var result = connection.Execute(cmd, entityToInsert, transaction, commandTimeout);
+        var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
 
-        if (keyProperties.Any())
+        var sb = new StringBuilder();
+        sb.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", tableName, columnList, parameterList);
+
+        if (propertyInfos.Length == 0)
         {
-            var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
-            var keyName = propertyInfos[0].Name;
-            var r = connection.Query(
-                $"SELECT FIRST 1 {keyName} ID FROM {tableName} ORDER BY {keyName} DESC",
-                transaction: transaction,
-                commandTimeout: commandTimeout
-            );
-
-            var id = r.First().ID;
-            if (id == null)
-                return 0;
-            if (propertyInfos.Length == 0)
-                return Convert.ToInt64(id);
-
-            var idp = propertyInfos[0];
-            idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
-
-            return Convert.ToInt64(id);
+            // No key columns — execute as plain INSERT and return rows-affected.
+            return connection.Execute(sb.ToString(), entityToInsert, transaction, commandTimeout);
         }
 
-        return result;
+        // Use Firebird's INSERT ... RETURNING (supported since 2.0). This is
+        // race-safe (the previous implementation issued a separate
+        // "SELECT FIRST 1 ... ORDER BY key DESC" which under concurrency
+        // returned another transaction's row) and honors [Column] renames
+        // (the previous implementation used the bare CLR property name).
+        sb.Append(" RETURNING ");
+        var first = true;
+        foreach (var p in propertyInfos)
+        {
+            if (!first)
+                sb.Append(", ");
+            first = false;
+            var columnName = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name;
+            sb.Append(columnName);
+        }
+
+        var results = connection
+            .Query(sb.ToString(), entityToInsert, transaction, commandTimeout: commandTimeout)
+            .ToList();
+        if (results.Count == 0)
+            return 0;
+
+        var row = new Dictionary<string, object>(
+            (IDictionary<string, object>)results[0],
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        long id = 0;
+        foreach (var p in propertyInfos)
+        {
+            var lookupKey = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name;
+            if (!row.TryGetValue(lookupKey, out var value) || value == null)
+                continue;
+
+            p.SetValue(entityToInsert, Convert.ChangeType(value, p.PropertyType), null);
+
+            if (id == 0)
+            {
+                try
+                {
+                    id = Convert.ToInt64(value);
+                }
+                catch (InvalidCastException)
+                {
+                    // Non-numeric keys (e.g. Guid) leave id at 0; the property
+                    // value is still assigned above so the caller can read it
+                    // back from the entity directly.
+                }
+                catch (FormatException)
+                {
+                    // Same as above for unparseable string keys.
+                }
+            }
+        }
+
+        return id;
     }
 
     /// <summary>

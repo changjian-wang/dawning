@@ -17,6 +17,10 @@ been fixed along the way.
   `NoneAsync()` now mirror the existing sync `Count() / Any() / None()`
   semantics over `await`. They honor the current `WHERE` chain and ignore
   `_distinct` / `_selectColumns`, exactly as the sync versions do.
+- **Projection + cursor regression suite** — three new integration cases per
+  adapter exercise `Skip/Take + Select` (sync and async), and cursor
+  pagination over a `[Column]`-renamed property. These lock in the
+  projection / cursor fixes below.
 - **Multi-adapter integration test matrix** — full ORM API coverage on:
   - SQLite (`Microsoft.Data.Sqlite 8.0.10`, in-memory)
   - MySQL (`MySqlConnector 2.4.0`, `mysql:8` container)
@@ -26,7 +30,7 @@ been fixed along the way.
   - Firebird (`FirebirdSql.Data.FirebirdClient 10.3.1`,
     `jacobalberty/firebird:v4` container; connection strings must include
     `Pooling=false` to avoid xUnit re-instantiation lock contention).
-  Total ORM test count: **237 passing**.
+  Total ORM test count: **252 passing** (237 prior + 15 new regression cases).
 
 ### Changed
 
@@ -34,46 +38,67 @@ been fixed along the way.
   `IDbTransaction?` instead of `IDbTransaction`. This is a non-breaking
   widening for callers, but custom adapter implementations should update
   their signatures to match.
+- **`FbAdapter.Insert` / `InsertAsync`** now use Firebird's
+  `INSERT … RETURNING` clause to round-trip auto-generated keys. The
+  previous implementation issued a separate
+  `SELECT FIRST 1 {key} FROM {table} ORDER BY {key} DESC` — race-prone under
+  concurrency (a different transaction's row could be returned) and broken
+  for entities whose key carries a `[Column("…")]` rename. The new path is
+  race-safe and honors `[Column]` for the key column.
 - **Internal helpers** `GetMemberName(Expression?)` and
   `GetValueFromExpression(Expression?)` now accept and validate nullable
   expressions (`ArgumentNullException` for the former, returns `null` for the
   latter) so callers no longer need to pre-guard `Expression?` references.
+- **`QueryBuilder._sqlAdapter`** is now `private readonly` and follows the
+  project's `_camelCase` field convention. Constructor uses a direct
+  assignment (the old `??=` was redundant on a freshly-constructed
+  reference type field).
 - Codebase compiles cleanly with full nullable analysis enabled —
   the previous `<NoWarn>$(NoWarn);CS8600;CS8602;CS8603;CS8604;CS8625</NoWarn>`
   suppression block has been removed from `Dawning.ORM.Dapper.csproj`.
 
 ### Fixed
 
-Nine latent correctness bugs surfaced by the new integration matrix and
-fixed in this release:
-
-#### SQLite
-- `AsListAsync` no longer diverges from the sync `AsList` path when the row
-  set is empty (parity restored).
-- `MapRow` now passes `Write(false)` to Dapper's `MapRow`, preventing spurious
-  property writes on read-only mappings.
-- `ApplySkipTake` now emits `OFFSET` after `LIMIT` (SQLite requires both
-  clauses; the previous shape silently dropped pagination on Skip-only
-  queries).
-
-#### PostgreSQL
-- Quoted identifier handling in `INSERT` / `UPDATE` now matches PG's
-  case-folding rules (no more lookup misses on mixed-case column names).
-- `RETURNING` clauses now flow through the auto-key-fetch path on
-  `InsertAsync`, restoring identity round-tripping for `bigint` primary keys.
-- `ApplySkipTake` for PG now emits `LIMIT … OFFSET …` instead of the
-  SqlServer-style `OFFSET … FETCH NEXT …` that PG rejects.
-- Boolean parameter binding in `WHERE` no longer coerces to `int` on the
-  Npgsql path.
+Latent correctness bugs surfaced by the new integration matrix and the
+post-Phase-5 deep audit, fixed in this release:
 
 #### Cross-adapter
-- `FirstOrDefaultAsync` no longer hard-codes `LIMIT 1`; it now defers to the
-  adapter's `ApplySkipTake(0, 1)`, which produces the correct dialect on
-  every backend (SQL Server / Firebird in particular previously failed at
-  parse time).
-- `MapRow` is now case-insensitive for column-to-property matching, fixing
-  PG's lower-cased return columns and SQL Server's mixed-case unquoted
-  identifiers.
+
+- **`QueryBuilder.FirstOrDefault[Async]` no longer ignores per-adapter
+  row-limit injection when a `Select(...)` projection is used.** The previous
+  implementation called `sql.Replace("SELECT *", "SELECT TOP 1 *")` (SQL
+  Server / SqlCe) and `sql.Replace("SELECT *", "SELECT FIRST 1 *")`
+  (Firebird), but once the leading `*` was replaced by a projected column
+  list the `Replace` was a no-op — so the entire matching row set was
+  streamed back to the client and `.FirstOrDefault()` was applied
+  client-side. The new helper `InsertSelectModifier` injects the modifier
+  immediately after the leading `SELECT [DISTINCT]` regardless of the
+  projection.
+- **`QueryBuilder.Skip(...).Take(...)` on Firebird now applies the row
+  limit when combined with `Select(...)` projection.** Same root cause as
+  above: the Firebird branch of `ApplySkipTake` rewrote the leading `*` to
+  `FIRST n SKIP m *`. Fixed to use `InsertSelectModifier`. Other adapters
+  (which append `LIMIT/OFFSET` to the SQL tail) were unaffected.
+- **`QueryBuilder.AsPagedListByCursorAsync` now extracts `NextCursor`
+  correctly when the order-by property carries `[Column("…")]`.** The
+  cursor-property lookup used `type.GetProperty(cursorColumn)` where
+  `cursorColumn` is the resolved SQL column name. For renamed properties
+  (e.g. `[Column("score_value")] public int Score`) the lookup returned
+  `null`, leaving `NextCursor` at `null` and silently restarting the next
+  page from the beginning. Now matches by either CLR property name or
+  `[Column]` attribute value.
+- **Sync `Insert<T>` no longer leaks the connection on exception.** The
+  `if (wasClosed) connection.Close()` reset is now in a `finally` block,
+  matching the existing `InsertAsync` shape.
+- **`PostgresAdapter.Insert / InsertAsync` no longer NREs when
+  `RETURNING` produces zero rows.** Previously `results[0]` was indexed
+  unconditionally; now the empty case returns `0` (matches the other
+  adapters' "no key yielded" semantics). This is defensive — under normal
+  schemas `RETURNING` always yields one row per inserted row, but a
+  user-defined `INSTEAD OF` trigger can suppress it.
+
+Plus the nine bugs documented earlier in this Unreleased entry from the
+initial multi-adapter rollout (SQLite parity, PG quoting, etc.).
 
 ### Notes for Maintainers
 
@@ -83,6 +108,13 @@ fixed in this release:
 - The async aggregate parity tests (`QueryBuilder_CountAsync_AnyAsync_NoneAsync`)
   now run inside every adapter's integration test suite via
   `OrmIntegrationTestBase`.
+- Table-name identifier quoting remains intentionally adapter-agnostic
+  (raw `[Table("…")]` value passes through unquoted to the SQL). Adding
+  per-adapter quoting would change behavior for case-folding databases
+  (PostgreSQL, Firebird) where unquoted identifiers fold to lower / upper
+  case respectively. Users who want case-preserved table names should
+  embed the quotes themselves via `[Table("\"MyTable\"")]` or register a
+  custom `TableNameMapper`.
 
 ---
 

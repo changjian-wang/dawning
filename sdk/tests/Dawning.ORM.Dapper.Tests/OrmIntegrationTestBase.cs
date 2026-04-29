@@ -737,6 +737,98 @@ public abstract class OrmIntegrationTestBase : IDisposable
             .ContainInOrder(("alpha", 5), ("alpha", 1), ("beta", 5));
     }
 
+    [Fact]
+    public void QueryBuilder_SkipTake_WithProjection_AppliesLimit()
+    {
+        // Regression: Firebird's ApplySkipTake used Replace("SELECT *", ...)
+        // which silently fails to match once a Select(...) projection
+        // replaces the '*' with a column list, so the entire table was
+        // returned. The fix injects FIRST/SKIP after the SELECT keyword
+        // regardless of the projection. Other adapters (which append
+        // " LIMIT/OFFSET" to the SQL tail) were unaffected; running this
+        // suite-wide ensures the new injection logic does not regress them.
+        Seed("a", 1, null, 1);
+        Seed("b", 2, null, 2);
+        Seed("c", 3, null, 3);
+        Seed("d", 4, null, 4);
+        Seed("e", 5, null, 5);
+
+        var rows = Connection
+            .Builder<Widget>()
+            .Select(x => x.Score)
+            .OrderBy(x => x.Score)
+            .Skip(1)
+            .Take(2)
+            .AsList()
+            .ToList();
+
+        rows.Should().HaveCount(2);
+        rows.Select(w => w.Score).Should().ContainInOrder(2, 3);
+    }
+
+    [Fact]
+    public async Task QueryBuilder_SkipTakeAsync_WithProjection_AppliesLimit()
+    {
+        // Async mirror of QueryBuilder_SkipTake_WithProjection_AppliesLimit.
+        // ApplySkipTake is shared between sync and async paths, so a single
+        // implementation regression would surface on both — but we exercise
+        // both code paths to be thorough.
+        Seed("a", 1, null, 1);
+        Seed("b", 2, null, 2);
+        Seed("c", 3, null, 3);
+        Seed("d", 4, null, 4);
+        Seed("e", 5, null, 5);
+
+        var rows = (
+            await Connection
+                .Builder<Widget>()
+                .Select(x => x.Score)
+                .OrderBy(x => x.Score)
+                .Skip(1)
+                .Take(2)
+                .AsListAsync()
+        ).ToList();
+
+        rows.Should().HaveCount(2);
+        rows.Select(w => w.Score).Should().ContainInOrder(2, 3);
+    }
+
+    [Fact]
+    public async Task QueryBuilder_AsPagedListByCursorAsync_ShouldHandleColumnRename()
+    {
+        // Regression: AsPagedListByCursorAsync looked up the cursor property
+        // via type.GetProperty(cursorColumn), where cursorColumn is the SQL
+        // column name (post-[Column] rename resolution from GetMemberName).
+        // For Widget.Score (which has [Column("score_value")]), GetProperty
+        // returned null, NextCursor stayed null, and the next-page call
+        // silently restarted from the beginning. The fix matches by either
+        // CLR property name or [Column] attribute value.
+        Seed("a", 1, null, 1);
+        Seed("b", 2, null, 2);
+        Seed("c", 3, null, 3);
+        Seed("d", 4, null, 4);
+
+        var firstPage = await Connection
+            .Builder<Widget>()
+            .OrderBy(w => w.Score)
+            .AsPagedListByCursorAsync(2);
+
+        firstPage.Values.Select(w => w.Score).Should().ContainInOrder(1, 2);
+        firstPage.HasNextPage.Should().BeTrue();
+        firstPage.NextCursor.Should().NotBeNull();
+        // The cursor must hold the renamed property's value, not null —
+        // proving GetValue(lastEntity) on the matched PropertyInfo worked.
+        firstPage.NextCursor.Should().Be(2);
+
+        var secondPage = await Connection
+            .Builder<Widget>()
+            .OrderBy(w => w.Score)
+            .AsPagedListByCursorAsync(2, firstPage.NextCursor);
+
+        secondPage.Values.Select(w => w.Score).Should().ContainInOrder(3, 4);
+        secondPage.HasNextPage.Should().BeFalse();
+    }
+
     // -----------------------------------------------------------------------
     // Insert<list> + async CRUD parity
     // -----------------------------------------------------------------------

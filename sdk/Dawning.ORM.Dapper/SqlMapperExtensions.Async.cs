@@ -423,41 +423,10 @@ namespace Dawning.ORM.Dapper
                 var type = typeof(TEntity);
                 var name = GetTableName(type);
 
-                // Build WHERE clause: join conditions with AND when multiple conditions exist
-                string whereClause;
-                if (_conditions.Count > 0)
-                {
-                    // Insert AND between conditions (not before/after AND/OR/parentheses keywords)
-                    var conditionsList = new List<string>();
-                    for (int i = 0; i < _conditions.Count; i++)
-                    {
-                        var condition = _conditions[i];
-                        conditionsList.Add(condition);
-
-                        // Add AND between conditions if next item is not AND/OR/(/)
-                        if (i < _conditions.Count - 1)
-                        {
-                            var nextCondition = _conditions[i + 1];
-                            if (
-                                nextCondition != "AND"
-                                && nextCondition != "OR"
-                                && nextCondition != "("
-                                && nextCondition != ")"
-                                && condition != "AND"
-                                && condition != "OR"
-                                && condition != "("
-                            )
-                            {
-                                conditionsList.Add("AND");
-                            }
-                        }
-                    }
-                    whereClause = string.Join(" ", conditionsList);
-                }
-                else
-                {
-                    whereClause = "1=1";
-                }
+                // Build WHERE clause (mirrors the sync AsPagedList — Where()
+                // already inserts AND/OR connectors between conditions, so a
+                // simple space-join produces a valid clause).
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
 
                 var parameters = ConvertToDynamicParameters();
 
@@ -480,7 +449,7 @@ namespace Dawning.ORM.Dapper
                 );
                 long totalCount = count != null ? Convert.ToInt64(count) : 0;
 
-                var list = await sqlAdapter.RetrieveCurrentPaginatedDataAsync(
+                var list = await _sqlAdapter.RetrieveCurrentPaginatedDataAsync(
                     _connection,
                     _transaction,
                     _commandTimeout,
@@ -555,50 +524,19 @@ namespace Dawning.ORM.Dapper
                 var (cursorColumn, cursorDescending) = _orderByList[0];
                 var ascending = !cursorDescending;
 
-                // Build WHERE clause: join conditions with AND when multiple conditions exist
-                string whereClause;
-                if (_conditions.Count > 0)
-                {
-                    // Insert AND between conditions (not before/after AND/OR/parentheses keywords)
-                    var conditionsList = new List<string>();
-                    for (int i = 0; i < _conditions.Count; i++)
-                    {
-                        var condition = _conditions[i];
-                        conditionsList.Add(condition);
-
-                        // Add AND between conditions if next item is not AND/OR/(/)
-                        if (i < _conditions.Count - 1)
-                        {
-                            var nextCondition = _conditions[i + 1];
-                            if (
-                                nextCondition != "AND"
-                                && nextCondition != "OR"
-                                && nextCondition != "("
-                                && nextCondition != ")"
-                                && condition != "AND"
-                                && condition != "OR"
-                                && condition != "("
-                            )
-                            {
-                                conditionsList.Add("AND");
-                            }
-                        }
-                    }
-                    whereClause = string.Join(" ", conditionsList);
-                }
-                else
-                {
-                    whereClause = "1=1";
-                }
+                // Build WHERE clause (mirrors the sync paged list — Where()
+                // already inserts AND/OR connectors between conditions, so a
+                // simple space-join produces a valid clause).
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
 
                 var parameters = ConvertToDynamicParameters();
 
                 // Quote the cursor column for SQL emission. Property lookup
                 // below still uses the raw CLR name.
-                var cursorColumnSql = sqlAdapter.ConvertColumnName(cursorColumn);
+                var cursorColumnSql = _sqlAdapter.ConvertColumnName(cursorColumn);
 
                 // Fetch itemsPerPage + 1 to detect if there's a next page
-                var list = await sqlAdapter.RetrieveCursorPaginatedDataAsync(
+                var list = await _sqlAdapter.RetrieveCursorPaginatedDataAsync(
                     _connection,
                     _transaction,
                     _commandTimeout,
@@ -624,7 +562,20 @@ namespace Dawning.ORM.Dapper
                 if (entities.Any())
                 {
                     var lastEntity = entities.Last();
-                    var cursorProperty = type.GetProperty(cursorColumn);
+                    // _orderByList stores the SQL column name (post-[Column] rename
+                    // resolution from GetMemberName). When the underlying CLR
+                    // property is renamed via [Column("foo")], a direct
+                    // type.GetProperty(cursorColumn) returns null. Match by
+                    // either CLR name or [Column] attribute name to handle both.
+                    var cursorProperty = type.GetProperties()
+                        .FirstOrDefault(p =>
+                            string.Equals(p.Name, cursorColumn, StringComparison.Ordinal)
+                            || string.Equals(
+                                p.GetCustomAttribute<ColumnAttribute>()?.Name,
+                                cursorColumn,
+                                StringComparison.Ordinal
+                            )
+                        );
                     if (cursorProperty != null)
                     {
                         nextCursor = cursorProperty.GetValue(lastEntity);
@@ -695,20 +646,20 @@ namespace Dawning.ORM.Dapper
 
                 // Per-adapter "limit one row" syntax (matches sync FirstOrDefault).
                 if (
-                    sqlAdapter is MySqlAdapter
-                    || sqlAdapter is PostgresAdapter
-                    || sqlAdapter is SQLiteAdapter
+                    _sqlAdapter is MySqlAdapter
+                    || _sqlAdapter is PostgresAdapter
+                    || _sqlAdapter is SQLiteAdapter
                 )
                 {
                     sql += " LIMIT 1";
                 }
-                else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
+                else if (_sqlAdapter is SqlServerAdapter || _sqlAdapter is SqlCeServerAdapter)
                 {
-                    sql = sql.Replace("SELECT *", "SELECT TOP 1 *");
+                    sql = InsertSelectModifier(sql, "TOP 1");
                 }
-                else if (sqlAdapter is FbAdapter)
+                else if (_sqlAdapter is FbAdapter)
                 {
-                    sql = sql.Replace("SELECT *", "SELECT FIRST 1 *");
+                    sql = InsertSelectModifier(sql, "FIRST 1");
                 }
 
                 var list = await _connection.QueryAsync(
@@ -1283,9 +1234,16 @@ public partial class PostgresAdapter
 
         if (keyProperties.Any())
         {
+            // Defensive: matches the sync PostgresAdapter.Insert behavior so a
+            // RETURNING clause that yields zero rows (e.g. suppressed by a
+            // user-defined trigger) returns 0 instead of NRE'ing.
+            var firstResult = results.FirstOrDefault();
+            if (firstResult == null)
+                return 0;
+
             // Return the key by assigning the corresponding property in the object - by product is that it supports compound primary keys
             var row = new Dictionary<string, object>(
-                (IDictionary<string, object>)results.First(),
+                (IDictionary<string, object>)firstResult,
                 StringComparer.OrdinalIgnoreCase
             );
             long id = 0;
@@ -1523,36 +1481,73 @@ public partial class FbAdapter
         object entityToInsert
     )
     {
-        var cmd = $"INSERT INTO {tableName} ({columnList}) VALUES ({parameterList})";
-        var result = await connection
-            .ExecuteAsync(cmd, entityToInsert, transaction, commandTimeout)
-            .ConfigureAwait(false);
+        var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
 
-        if (keyProperties.Any())
+        var sb = new StringBuilder();
+        sb.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", tableName, columnList, parameterList);
+
+        if (propertyInfos.Length == 0)
         {
-            var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
-            var keyName = propertyInfos[0].Name;
-            var r = await connection
-                .QueryAsync(
-                    $"SELECT FIRST 1 {keyName} ID FROM {tableName} ORDER BY {keyName} DESC",
-                    transaction: transaction,
-                    commandTimeout: commandTimeout
-                )
+            return await connection
+                .ExecuteAsync(sb.ToString(), entityToInsert, transaction, commandTimeout)
                 .ConfigureAwait(false);
-
-            var id = r.First().ID;
-            if (id == null)
-                return 0;
-            if (propertyInfos.Length == 0)
-                return Convert.ToInt64(id);
-
-            var idp = propertyInfos[0];
-            idp.SetValue(entityToInsert, Convert.ChangeType(id, idp.PropertyType), null);
-
-            return Convert.ToInt64(id);
         }
 
-        return result;
+        // Use Firebird's INSERT ... RETURNING (supported since 2.0). Race-safe
+        // and respects [Column] renames; see sync FbAdapter.Insert for the
+        // detailed rationale.
+        sb.Append(" RETURNING ");
+        var first = true;
+        foreach (var p in propertyInfos)
+        {
+            if (!first)
+                sb.Append(", ");
+            first = false;
+            var columnName = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name;
+            sb.Append(columnName);
+        }
+
+        var results = (
+            await connection
+                .QueryAsync(sb.ToString(), entityToInsert, transaction, commandTimeout)
+                .ConfigureAwait(false)
+        ).ToList();
+        if (results.Count == 0)
+            return 0;
+
+        var row = new Dictionary<string, object>(
+            (IDictionary<string, object>)results[0],
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        long id = 0;
+        foreach (var p in propertyInfos)
+        {
+            var lookupKey = p.GetCustomAttribute<ColumnAttribute>()?.Name ?? p.Name;
+            if (!row.TryGetValue(lookupKey, out var value) || value == null)
+                continue;
+
+            p.SetValue(entityToInsert, Convert.ChangeType(value, p.PropertyType), null);
+
+            if (id == 0)
+            {
+                try
+                {
+                    id = Convert.ToInt64(value);
+                }
+                catch (InvalidCastException)
+                {
+                    // Non-numeric keys (e.g. Guid) leave id at 0; entity is
+                    // still updated above.
+                }
+                catch (FormatException)
+                {
+                    // Unparseable string keys behave the same way.
+                }
+            }
+        }
+
+        return id;
     }
 
     /// <summary>
