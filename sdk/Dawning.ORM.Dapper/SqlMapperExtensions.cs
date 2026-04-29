@@ -62,8 +62,14 @@ namespace Dawning.ORM.Dapper
             IEnumerable<PropertyInfo>
         > IgnoreUpdateProperties =
             new ConcurrentDictionary<RuntimeTypeHandle, IEnumerable<PropertyInfo>>();
-        private static readonly ConcurrentDictionary<RuntimeTypeHandle, string> GetQueries =
-            new ConcurrentDictionary<RuntimeTypeHandle, string>();
+
+        // Cache key is (entity type handle, adapter type) so that adapter-
+        // specific SQL (e.g. PostgreSQL emits double-quoted column names while
+        // SQL Server emits bracketed ones) is not shared across adapters.
+        private static readonly ConcurrentDictionary<
+            (RuntimeTypeHandle Entity, Type Adapter),
+            string
+        > GetQueries = new();
         private static readonly ConcurrentDictionary<RuntimeTypeHandle, string> TypeTableName =
             new ConcurrentDictionary<RuntimeTypeHandle, string>();
 
@@ -236,15 +242,20 @@ namespace Dawning.ORM.Dapper
             where T : class, new()
         {
             var type = typeof(T);
+            var adapter = GetFormatter(connection);
+            var cacheKey = (type.TypeHandle, adapter.GetType());
 
-            if (!GetQueries.TryGetValue(type.TypeHandle, out string? sql))
+            if (!GetQueries.TryGetValue(cacheKey, out string? sql))
             {
                 var property = GetSingleKey<T>(nameof(Get));
                 var key = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
                 var name = GetTableName(type);
 
-                sql = $"SELECT * FROM {name} WHERE {key} = @id";
-                GetQueries[type.TypeHandle] = sql;
+                // Quote the key column via the adapter so case-preserving
+                // schemas work on PostgreSQL ("Id" rather than Id, which PG
+                // would fold to lowercase).
+                sql = $"SELECT * FROM {name} WHERE {adapter.ConvertColumnName(key)} = @id";
+                GetQueries[cacheKey] = sql;
             }
 
             var dynParams = new DynamicParameters();
@@ -381,14 +392,16 @@ namespace Dawning.ORM.Dapper
         {
             var type = typeof(T);
             var cacheType = typeof(List<T>);
+            var adapter = GetFormatter(connection);
+            var cacheKey = (cacheType.TypeHandle, adapter.GetType());
 
-            if (!GetQueries.TryGetValue(cacheType.TypeHandle, out string? sql))
+            if (!GetQueries.TryGetValue(cacheKey, out string? sql))
             {
                 GetSingleKey<T>(nameof(GetAll));
                 var name = GetTableName(type);
 
                 sql = "SELECT * FROM " + name;
-                GetQueries[cacheType.TypeHandle] = sql;
+                GetQueries[cacheKey] = sql;
             }
 
             var result = connection.Query(sql);
@@ -1334,21 +1347,38 @@ namespace Dawning.ORM.Dapper
                                     break;
                                 }
 
-                                // ✅ Check if collection is empty
-                                if (value is System.Collections.IEnumerable enumerable)
+                                // Manually expand the collection into individual
+                                // parameters. Relying on Dapper's IEnumerable
+                                // auto-expansion ("IN @list") is not portable
+                                // across providers — e.g. Npgsql 8.x converts
+                                // named parameters to positional ones in a way
+                                // that races Dapper's expansion.
+                                if (value is not System.Collections.IEnumerable enumerable)
                                 {
-                                    var enumerator = enumerable.GetEnumerator();
-                                    if (!enumerator.MoveNext())
-                                    {
-                                        conditions.Add("1 = 0");
-                                        break;
-                                    }
+                                    conditions.Add("1 = 0");
+                                    break;
                                 }
 
-                                paramName = GetUniqueParameterName(memberName);
-                                _parameters[paramName] = value;
+                                var inParams = new List<string>();
+                                int idx = 0;
+                                foreach (var item in enumerable)
+                                {
+                                    var itemParam = GetUniqueParameterName(
+                                        $"{memberName}_in_{idx}"
+                                    );
+                                    _parameters[itemParam] = item;
+                                    inParams.Add(itemParam);
+                                    idx++;
+                                }
+
+                                if (inParams.Count == 0)
+                                {
+                                    conditions.Add("1 = 0");
+                                    break;
+                                }
+
                                 conditions.Add(
-                                    $"{sqlAdapter.ConvertColumnName(memberName)} IN {paramName}"
+                                    $"{sqlAdapter.ConvertColumnName(memberName)} IN ({string.Join(", ", inParams)})"
                                 );
                             }
                         }
@@ -1371,10 +1401,32 @@ namespace Dawning.ORM.Dapper
                                     break;
                                 }
 
-                                paramName = GetUniqueParameterName(memberName);
-                                _parameters[paramName] = value;
+                                if (value is not System.Collections.IEnumerable notEnumerable)
+                                {
+                                    conditions.Add("1 = 1");
+                                    break;
+                                }
+
+                                var notInParams = new List<string>();
+                                int notIdx = 0;
+                                foreach (var item in notEnumerable)
+                                {
+                                    var itemParam = GetUniqueParameterName(
+                                        $"{memberName}_notin_{notIdx}"
+                                    );
+                                    _parameters[itemParam] = item;
+                                    notInParams.Add(itemParam);
+                                    notIdx++;
+                                }
+
+                                if (notInParams.Count == 0)
+                                {
+                                    conditions.Add("1 = 1");
+                                    break;
+                                }
+
                                 conditions.Add(
-                                    $"{sqlAdapter.ConvertColumnName(memberName)} NOT IN {paramName}"
+                                    $"{sqlAdapter.ConvertColumnName(memberName)} NOT IN ({string.Join(", ", notInParams)})"
                                 );
                             }
                         }
@@ -2356,6 +2408,10 @@ public partial class PostgresAdapter : ISqlAdapter
         }
         else
         {
+            // Quote each returned column the same way the rest of the adapter
+            // does. Without this PostgreSQL folds unquoted identifiers to lower
+            // case and rejects schemas that preserve case (e.g. a column
+            // declared as "Id" can no longer be resolved by RETURNING Id).
             sb.Append(" RETURNING ");
             var first = true;
             foreach (var property in propertyInfos)
@@ -2363,7 +2419,9 @@ public partial class PostgresAdapter : ISqlAdapter
                 if (!first)
                     sb.Append(", ");
                 first = false;
-                sb.Append(property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name);
+                var columnName =
+                    property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                AppendColumnName(sb, columnName);
             }
         }
 

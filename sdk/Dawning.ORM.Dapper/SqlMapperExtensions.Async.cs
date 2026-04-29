@@ -29,14 +29,19 @@ namespace Dawning.ORM.Dapper
             where T : class, new()
         {
             var type = typeof(T);
-            if (!GetQueries.TryGetValue(type.TypeHandle, out string? sql))
+            var adapter = GetFormatter(connection);
+            var cacheKey = (type.TypeHandle, adapter.GetType());
+
+            if (!GetQueries.TryGetValue(cacheKey, out string? sql))
             {
                 var property = GetSingleKey<T>(nameof(GetAsync));
                 var key = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
                 var name = GetTableName(type);
 
-                sql = $"SELECT * FROM {name} WHERE {key} = @id";
-                GetQueries[type.TypeHandle] = sql;
+                // Quote the key column via the adapter so case-preserving
+                // schemas work on PostgreSQL.
+                sql = $"SELECT * FROM {name} WHERE {adapter.ConvertColumnName(key)} = @id";
+                GetQueries[cacheKey] = sql;
             }
 
             var dynParams = new DynamicParameters();
@@ -73,14 +78,16 @@ namespace Dawning.ORM.Dapper
         {
             var type = typeof(T);
             var cacheType = typeof(List<T>);
+            var adapter = GetFormatter(connection);
+            var cacheKey = (cacheType.TypeHandle, adapter.GetType());
 
-            if (!GetQueries.TryGetValue(cacheType.TypeHandle, out string? sql))
+            if (!GetQueries.TryGetValue(cacheKey, out string? sql))
             {
                 GetSingleKey<T>(nameof(GetAll));
                 var name = GetTableName(type);
 
                 sql = "SELECT * FROM " + name;
-                GetQueries[cacheType.TypeHandle] = sql;
+                GetQueries[cacheKey] = sql;
             }
 
             var result = await connection
@@ -586,13 +593,17 @@ namespace Dawning.ORM.Dapper
 
                 var parameters = ConvertToDynamicParameters();
 
+                // Quote the cursor column for SQL emission. Property lookup
+                // below still uses the raw CLR name.
+                var cursorColumnSql = sqlAdapter.ConvertColumnName(cursorColumn);
+
                 // Fetch itemsPerPage + 1 to detect if there's a next page
                 var list = await sqlAdapter.RetrieveCursorPaginatedDataAsync(
                     _connection,
                     _transaction,
                     _commandTimeout,
                     name,
-                    cursorColumn,
+                    cursorColumnSql,
                     itemsPerPage + 1,
                     lastCursorValue,
                     whereClause,
@@ -1202,6 +1213,10 @@ public partial class PostgresAdapter
         }
         else
         {
+            // Quote each returned column the same way the rest of the adapter
+            // does. Without this PostgreSQL folds unquoted identifiers to lower
+            // case and rejects schemas that preserve case (e.g. a column
+            // declared as "Id" can no longer be resolved by RETURNING Id).
             sb.Append(" RETURNING ");
             bool first = true;
             foreach (var property in propertyInfos)
@@ -1209,7 +1224,9 @@ public partial class PostgresAdapter
                 if (!first)
                     sb.Append(", ");
                 first = false;
-                sb.Append(property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name);
+                var columnName =
+                    property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
+                AppendColumnName(sb, columnName);
             }
         }
 
