@@ -600,6 +600,25 @@ public abstract class OrmIntegrationTestBase : IDisposable
     }
 
     [Fact]
+    public async Task QueryBuilder_CountAsync_AnyAsync_NoneAsync()
+    {
+        Seed("a", 1, null, 1);
+        Seed("b", 2, null, 2);
+
+        (await Connection.Builder<Widget>().CountAsync()).Should().Be(2);
+        (await Connection.Builder<Widget>().AnyAsync()).Should().BeTrue();
+        (await Connection.Builder<Widget>().NoneAsync()).Should().BeFalse();
+
+        (await Connection.Builder<Widget>().Where(w => w.Score > 100).AnyAsync())
+            .Should()
+            .BeFalse();
+        (await Connection.Builder<Widget>().Where(w => w.Score > 100).NoneAsync())
+            .Should()
+            .BeTrue();
+        (await Connection.Builder<Widget>().Where(w => w.Score >= 2).CountAsync()).Should().Be(1);
+    }
+
+    [Fact]
     public void QueryBuilder_TakeSkip_LimitsRowsCorrectly()
     {
         for (int i = 1; i <= 5; i++)

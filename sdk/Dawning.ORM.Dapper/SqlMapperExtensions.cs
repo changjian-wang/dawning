@@ -482,7 +482,7 @@ namespace Dawning.ORM.Dapper
             if (type.IsArray)
             {
                 isList = true;
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
             else if (type.IsGenericType)
             {
@@ -580,7 +580,7 @@ namespace Dawning.ORM.Dapper
 
             if (type.IsArray)
             {
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
             else if (type.IsGenericType)
             {
@@ -667,7 +667,7 @@ namespace Dawning.ORM.Dapper
 
             if (type.IsArray)
             {
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
             else if (type.IsGenericType)
             {
@@ -1527,8 +1527,13 @@ namespace Dawning.ORM.Dapper
                 return paramName;
             }
 
-            private static string GetMemberName(Expression expression)
+            private static string GetMemberName(Expression? expression)
             {
+                if (expression is null)
+                    throw new ArgumentNullException(
+                        nameof(expression),
+                        "Expression must be non-null when extracting a member name."
+                    );
                 string? name;
                 switch (expression)
                 {
@@ -1562,8 +1567,10 @@ namespace Dawning.ORM.Dapper
             /// <summary>
             /// Get actual value from expression (used for parameterized queries)
             /// </summary>
-            private static object? GetValueFromExpression(Expression expression)
+            private static object? GetValueFromExpression(Expression? expression)
             {
+                if (expression is null)
+                    return null;
                 switch (expression)
                 {
                     case ConstantExpression constant:
@@ -1946,7 +1953,7 @@ public partial interface ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -2012,7 +2019,7 @@ public partial class SqlServerAdapter : ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     public long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -2028,10 +2035,12 @@ public partial class SqlServerAdapter : ISqlAdapter
         if (keyProperties.Any())
         {
             var first = multi.Read().FirstOrDefault();
-            if (first == null || first.id == null)
+            // Compiler can't narrow dynamic across the short-circuiting `||`, so
+            // null-forgive the second access — the first clause already guards.
+            if (first == null || first!.id == null)
                 return 0;
 
-            var id = Convert.ToInt64(first.id);
+            var id = Convert.ToInt64(first!.id);
             var propertyInfos = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (propertyInfos.Length == 0)
                 return id;
@@ -2142,7 +2151,7 @@ public partial class SqlCeServerAdapter : ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     public long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -2277,7 +2286,7 @@ public partial class MySqlAdapter : ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     public long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -2403,7 +2412,7 @@ public partial class PostgresAdapter : ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     public long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -2556,7 +2565,7 @@ public partial class SQLiteAdapter : ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     public long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -2681,7 +2690,7 @@ public partial class FbAdapter : ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     public long Insert(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,

@@ -111,7 +111,7 @@ namespace Dawning.ORM.Dapper
             T entityToInsert,
             IDbTransaction? transaction = null,
             int? commandTimeout = null,
-            ISqlAdapter sqlAdapter = null
+            ISqlAdapter? sqlAdapter = null
         )
             where T : class
         {
@@ -122,7 +122,7 @@ namespace Dawning.ORM.Dapper
             if (type.IsArray)
             {
                 isList = true;
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
             else if (type.IsGenericType)
             {
@@ -224,7 +224,7 @@ namespace Dawning.ORM.Dapper
 
             if (type.IsArray)
             {
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
             else if (type.IsGenericType)
             {
@@ -313,7 +313,7 @@ namespace Dawning.ORM.Dapper
 
             if (type.IsArray)
             {
-                type = type.GetElementType();
+                type = type.GetElementType()!;
             }
             else if (type.IsGenericType)
             {
@@ -721,6 +721,41 @@ namespace Dawning.ORM.Dapper
 
                 return entities.FirstOrDefault();
             }
+
+            /// <summary>
+            /// Get total count of rows matching the current WHERE clause.
+            /// Mirrors the synchronous <see cref="Count"/> exactly: <c>_distinct</c>
+            /// and <c>_selectColumns</c> are intentionally ignored — this counts
+            /// rows, not projected values.
+            /// </summary>
+            public async Task<long> CountAsync()
+            {
+                var name = GetTableName(typeof(TEntity));
+                string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
+                var parameters = ConvertToDynamicParameters();
+
+                var sql = $"SELECT COUNT(*) FROM {name} WHERE {whereClause}";
+                var count = await _connection
+                    .ExecuteScalarAsync(sql, parameters, _transaction, _commandTimeout)
+                    .ConfigureAwait(false);
+                return count != null ? Convert.ToInt64(count) : 0;
+            }
+
+            /// <summary>
+            /// Check if any records exist matching the current WHERE clause.
+            /// </summary>
+            public async Task<bool> AnyAsync()
+            {
+                return await CountAsync().ConfigureAwait(false) > 0;
+            }
+
+            /// <summary>
+            /// Check if no records exist matching the current WHERE clause.
+            /// </summary>
+            public async Task<bool> NoneAsync()
+            {
+                return await CountAsync().ConfigureAwait(false) == 0;
+            }
         }
     }
 }
@@ -741,7 +776,7 @@ public partial interface ISqlAdapter
     /// <returns>The Id of the row created.</returns>
     Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -810,7 +845,7 @@ public partial class SqlServerAdapter
     /// <returns>The Id of the row created.</returns>
     public async Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -828,10 +863,12 @@ public partial class SqlServerAdapter
         if (keyProperties.Any())
         {
             var first = await multi.ReadFirstOrDefaultAsync().ConfigureAwait(false);
-            if (first == null || first.id == null)
+            // Compiler can't narrow dynamic across the short-circuiting `||`, so
+            // null-forgive the second access — the first clause already guards.
+            if (first == null || first!.id == null)
                 return 0;
 
-            var id = Convert.ToInt64(first.id);
+            var id = Convert.ToInt64(first!.id);
             var pi = keyProperties as PropertyInfo[] ?? keyProperties.ToArray();
             if (pi.Length == 0)
                 return id;
@@ -937,7 +974,7 @@ public partial class SqlCeServerAdapter
     /// <returns>The Id of the row created.</returns>
     public async Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -1074,7 +1111,7 @@ public partial class MySqlAdapter
     /// <returns>The Id of the row created.</returns>
     public async Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -1203,7 +1240,7 @@ public partial class PostgresAdapter
     /// <returns>The Id of the row created.</returns>
     public async Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -1355,7 +1392,7 @@ public partial class SQLiteAdapter
     /// <returns>The Id of the row created.</returns>
     public async Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
@@ -1477,7 +1514,7 @@ public partial class FbAdapter
     /// <returns>The Id of the row created.</returns>
     public async Task<long> InsertAsync(
         IDbConnection connection,
-        IDbTransaction transaction,
+        IDbTransaction? transaction,
         int? commandTimeout,
         string tableName,
         string columnList,
