@@ -28,7 +28,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Scope> GetAsync(Guid id)
         {
-            ScopeEntity entity = await _context.Connection.GetAsync<ScopeEntity>(
+            ScopeEntity? entity = await _context.Connection.GetAsync<ScopeEntity>(
                 id,
                 _context.Transaction
             );

@@ -40,11 +40,11 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <returns>Returns the ClaimType entity matching the given ID, or a new ClaimType instance if not found.</returns>
         public async Task<ClaimType> GetAsync(Guid id)
         {
-            ClaimTypeEntity entity = await _context.Connection.GetAsync<ClaimTypeEntity>(
+            ClaimTypeEntity? entity = await _context.Connection.GetAsync<ClaimTypeEntity>(
                 id,
                 _context.Transaction
             );
-            return entity.ToModel() ?? new ClaimType();
+            return entity?.ToModel() ?? new ClaimType();
         }
 
         /// <summary>

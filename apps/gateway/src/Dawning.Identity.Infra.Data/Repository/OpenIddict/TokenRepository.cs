@@ -33,7 +33,7 @@ namespace Dawning.Identity.Infra.Data.Repository.OpenIddict
         /// </summary>
         public async Task<Token> GetAsync(Guid id)
         {
-            TokenEntity entity = await _context.Connection.GetAsync<TokenEntity>(
+            TokenEntity? entity = await _context.Connection.GetAsync<TokenEntity>(
                 id,
                 _context.Transaction
             );

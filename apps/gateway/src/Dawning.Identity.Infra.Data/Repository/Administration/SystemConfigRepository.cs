@@ -37,8 +37,10 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         /// <returns>A SystemConfigAggregate object representing the retrieved system config, or null if not found.</returns>
         public async Task<SystemConfigAggregate> GetAsync(Guid id)
         {
-            SystemConfigEntity entity = await _context.Connection.GetAsync<SystemConfigEntity>(id);
-            return entity.ToModel() ?? new SystemConfigAggregate();
+            SystemConfigEntity? entity = await _context.Connection.GetAsync<SystemConfigEntity>(
+                id
+            );
+            return entity?.ToModel() ?? new SystemConfigAggregate();
         }
 
         /// <summary>
