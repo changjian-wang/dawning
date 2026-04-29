@@ -87,7 +87,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             }
 
             SystemConfigEntity entity = model.ToEntity();
-            return await _context.Connection.InsertAsync(entity);
+            return (int)await _context.Connection.InsertAsync(entity);
         }
 
         /// <summary>

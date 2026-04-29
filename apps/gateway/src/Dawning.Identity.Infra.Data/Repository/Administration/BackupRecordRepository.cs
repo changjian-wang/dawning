@@ -55,7 +55,7 @@ public class BackupRecordRepository : IBackupRecordRepository
     public async Task<bool> CreateAsync(BackupRecord record)
     {
         var entity = record.ToEntity();
-        var result = await _context.Connection.InsertAsync(entity, _context.Transaction);
+        var result = (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
         return result > 0;
     }
 

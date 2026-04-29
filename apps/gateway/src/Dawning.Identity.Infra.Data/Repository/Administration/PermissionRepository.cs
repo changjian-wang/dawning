@@ -148,7 +148,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
         public async Task<bool> InsertAsync(Permission permission)
         {
             var entity = permission.ToEntity();
-            var result = await _context.Connection.InsertAsync(entity, _context.Transaction);
+            var result = (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
             return result > 0;
         }
 

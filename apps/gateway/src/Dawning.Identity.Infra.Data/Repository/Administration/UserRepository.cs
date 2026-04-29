@@ -171,7 +171,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             }
 
             var entity = model.ToEntity();
-            return await _context.Connection.InsertAsync(entity, _context.Transaction);
+            return (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
         }
 
         /// <summary>

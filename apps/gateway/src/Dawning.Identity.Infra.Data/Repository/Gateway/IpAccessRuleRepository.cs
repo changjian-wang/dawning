@@ -123,7 +123,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Gateway
             var entity = model.ToEntity();
             entity.CreatedAt = DateTime.UtcNow;
 
-            var result = await _context.Connection.InsertAsync(entity, _context.Transaction);
+            var result = (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
             return result;
         }
 

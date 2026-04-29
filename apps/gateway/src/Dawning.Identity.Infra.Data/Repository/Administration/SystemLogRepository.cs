@@ -94,7 +94,7 @@ namespace Dawning.Identity.Infra.Data.Repository.Administration
             entity.CreatedAt = DateTime.UtcNow;
             entity.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            var result = await _context.Connection.InsertAsync(entity, _context.Transaction);
+            var result = (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
             return result;
         }
 

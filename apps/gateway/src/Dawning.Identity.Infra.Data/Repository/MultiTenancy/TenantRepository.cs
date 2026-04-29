@@ -117,7 +117,7 @@ namespace Dawning.Identity.Infra.Data.Repository.MultiTenancy
         public async Task<int> InsertAsync(Tenant tenant)
         {
             var entity = tenant.ToEntity();
-            return await _context.Connection.InsertAsync(entity, _context.Transaction);
+            return (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
         }
 
         /// <inheritdoc/>

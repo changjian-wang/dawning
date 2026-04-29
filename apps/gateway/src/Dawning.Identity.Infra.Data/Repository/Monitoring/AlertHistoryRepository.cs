@@ -79,7 +79,7 @@ public class AlertHistoryRepository : IAlertHistoryRepository
         var entity = history.ToEntity();
         entity.TriggeredAt = DateTime.UtcNow;
 
-        var result = await _context.Connection.InsertAsync(entity, _context.Transaction);
+        var result = (int)await _context.Connection.InsertAsync(entity, _context.Transaction);
         return result;
     }
 
