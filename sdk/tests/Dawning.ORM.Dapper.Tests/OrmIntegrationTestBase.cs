@@ -829,6 +829,75 @@ public abstract class OrmIntegrationTestBase : IDisposable
         secondPage.HasNextPage.Should().BeFalse();
     }
 
+    [Fact]
+    public void QueryBuilder_Where_NotBinary_AppliesNegation()
+    {
+        // Regression: Visit's ExpressionType.Not branch only matched
+        // !list.Contains(member). Other shapes — !(x.A == 1), !x.IsActive
+        // — fell through with no condition emitted, silently degrading
+        // WHERE to "1=1" and returning the entire table. Now wraps the
+        // operand with "NOT (...)".
+        Seed("a", 1, null, 1);
+        Seed("b", 2, null, 2);
+        Seed("c", 3, null, 3);
+
+        var rows = Connection
+            .Builder<Widget>()
+            .Where(w => !(w.Score == 2))
+            .OrderBy(w => w.Score)
+            .AsList()
+            .ToList();
+
+        rows.Should().HaveCount(2);
+        rows.Select(w => w.Score).Should().ContainInOrder(1, 3);
+    }
+
+    [Fact]
+    public void QueryBuilder_Where_UnsupportedNotShape_Throws()
+    {
+        // Regression: a previously silent fallthrough is now a hard
+        // NotSupportedException so subtle WHERE-eats-everything bugs
+        // surface immediately rather than at audit time. We exercise
+        // an explicitly unhandled Not operand (a Convert wrapping a
+        // member access), which must throw — not return the full table.
+        Seed("a", 1, null, 1);
+
+        // !(int)x.Score is Not(Convert(...)) — Convert recurses to
+        // member, member is not bool, so the new code rewraps the inner
+        // condition with NOT. To force the exception path we use a Not
+        // over a constant which yields "Constant" inside Not, which
+        // Visit cannot translate.
+        Action act = () =>
+            _ = Connection
+                .Builder<Widget>()
+                .Where(w => !true) // Not(Constant(true)) — unsupported
+                .AsList();
+
+        act.Should().Throw<NotSupportedException>();
+    }
+
+    [Fact]
+    public void MapRow_ShouldNotThrow_WhenColumnTypeMatchesProperty()
+    {
+        // Regression: ConvertScalar called Convert.ChangeType
+        // unconditionally as the fallback branch. Convert.ChangeType
+        // requires IConvertible, which byte[] / DateTimeOffset / TimeSpan
+        // do not implement, so any provider that handed back the target
+        // CLR type directly via Dapper's row dictionary would still get
+        // routed through ChangeType and throw InvalidCastException.
+        // Now ConvertScalar short-circuits when val is already an
+        // instance of targetType. We exercise that shortcut by
+        // round-tripping a value through GetAll where the provider
+        // already returns the property's declared type.
+        Seed("a", 1, null, 1);
+
+        var rows = Connection.GetAll<Widget>().ToList();
+
+        rows.Should().HaveCount(1);
+        rows[0].Score.Should().Be(1);
+        rows[0].Timestamp.Should().Be(1L);
+    }
+
     // -----------------------------------------------------------------------
     // Insert<list> + async CRUD parity
     // -----------------------------------------------------------------------

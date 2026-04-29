@@ -64,6 +64,28 @@ post-Phase-5 deep audit, fixed in this release:
 
 #### Cross-adapter
 
+- **`QueryBuilder.Where(... !x.Member ...)` and `Where(... !(expr) ...)`
+  no longer silently return the entire table.** `Visit`'s
+  `ExpressionType.Not` branch only matched `!list.Contains(member)`. Any
+  other shape (a bool member negation, a binary negation, a Convert
+  wrap) fell through with no SQL emitted, leaving the `WHERE` clause
+  empty (`1=1`). `!member` (bool / bool?) now emits `{col} = 0`,
+  arbitrary `!(expr)` emits `NOT (...)`, and unhandled shapes throw
+  `NotSupportedException` instead of silently widening the result set.
+- **`MapRow.ConvertScalar` now short-circuits when the provider already
+  returned the target CLR type.** The previous fallback was
+  `Convert.ChangeType`, which requires `IConvertible` — `byte[]`,
+  `DateTimeOffset`, `TimeSpan`, and any custom non-IConvertible type
+  threw at materialization time. Also added explicit branches for
+  `DateTimeOffset` and `TimeSpan` (parse-from-string fallback) and
+  string-based enum parsing.
+- **`SqlMapperExtensions.TableNameMapper` swap now invalidates the
+  table-name cache.** `GetTableName` cached the resolved name keyed
+  only by `RuntimeTypeHandle`, so reassigning the global mapper at
+  runtime (multi-tenant prefixing, test isolation) silently kept
+  returning stale names. Cache entries now record which mapper
+  produced them and are invalidated when the mapper reference
+  changes.
 - **`QueryBuilder.FirstOrDefault[Async]` no longer ignores per-adapter
   row-limit injection when a `Select(...)` projection is used.** The previous
   implementation called `sql.Replace("SELECT *", "SELECT TOP 1 *")` (SQL

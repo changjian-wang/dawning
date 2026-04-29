@@ -70,8 +70,10 @@ namespace Dawning.ORM.Dapper
             (RuntimeTypeHandle Entity, Type Adapter),
             string
         > GetQueries = new();
-        private static readonly ConcurrentDictionary<RuntimeTypeHandle, string> TypeTableName =
-            new ConcurrentDictionary<RuntimeTypeHandle, string>();
+        private static readonly ConcurrentDictionary<
+            RuntimeTypeHandle,
+            TableNameCacheEntry
+        > TypeTableName = new ConcurrentDictionary<RuntimeTypeHandle, TableNameCacheEntry>();
 
         private static readonly ISqlAdapter DefaultAdapter = new SqlServerAdapter();
         private static readonly Dictionary<string, ISqlAdapter> AdapterDictionary = new Dictionary<
@@ -372,6 +374,15 @@ namespace Dawning.ORM.Dapper
 
         private static object ConvertScalar(object val, Type targetType)
         {
+            // Fast path: provider already returned the target CLR type (very
+            // common for byte[], DateTimeOffset on PG, TimeSpan on MySQL, etc.).
+            // Doing this before the type-specific branches also lets a custom
+            // type handler short-circuit Convert.ChangeType, which would
+            // otherwise throw on non-IConvertible types.
+            if (targetType.IsInstanceOfType(val))
+            {
+                return val;
+            }
             if (targetType == typeof(Guid))
             {
                 return val is Guid guid ? guid : Guid.Parse(val.ToString()!);
@@ -380,8 +391,22 @@ namespace Dawning.ORM.Dapper
             {
                 return val is DateTime dt ? dt : DateTime.Parse(val.ToString()!);
             }
+            if (targetType == typeof(DateTimeOffset))
+            {
+                return val is DateTime dtSrc
+                    ? new DateTimeOffset(DateTime.SpecifyKind(dtSrc, DateTimeKind.Utc))
+                    : DateTimeOffset.Parse(val.ToString()!);
+            }
+            if (targetType == typeof(TimeSpan))
+            {
+                return val is TimeSpan ts ? ts : TimeSpan.Parse(val.ToString()!);
+            }
             if (targetType.IsEnum)
             {
+                if (val is string s)
+                {
+                    return Enum.Parse(targetType, s, ignoreCase: true);
+                }
                 return Enum.ToObject(targetType, val);
             }
             return Convert.ChangeType(val, targetType);
@@ -432,12 +457,23 @@ namespace Dawning.ORM.Dapper
 
         private static string GetTableName(Type type)
         {
-            if (TypeTableName.TryGetValue(type.TypeHandle, out string? name) && name != null)
-                return name;
-
-            if (TableNameMapper != null)
+            // Snapshot the current mapper once. The cache hit path must compare
+            // against the same delegate that produced the cached value, so a
+            // runtime swap of TableNameMapper invalidates the entry.
+            var currentMapper = TableNameMapper;
+            if (
+                TypeTableName.TryGetValue(type.TypeHandle, out var cached)
+                && cached != null
+                && cached.Mapper == currentMapper
+            )
             {
-                name = TableNameMapper(type);
+                return cached.Name;
+            }
+
+            string name;
+            if (currentMapper != null)
+            {
+                name = currentMapper(type);
             }
             else
             {
@@ -454,9 +490,11 @@ namespace Dawning.ORM.Dapper
                 }
             }
 
-            TypeTableName[type.TypeHandle] = name;
+            TypeTableName[type.TypeHandle] = new TableNameCacheEntry(name, currentMapper);
             return name;
         }
+
+        private sealed record TableNameCacheEntry(string Name, TableNameMapperDelegate? Mapper);
 
         /// <summary>
         /// Inserts an entity into table "Ts" and returns identity id or number of inserted rows if inserting a list.
@@ -1461,9 +1499,52 @@ namespace Dawning.ORM.Dapper
                                 conditions.Add(
                                     $"{_sqlAdapter.ConvertColumnName(memberName)} NOT IN ({string.Join(", ", notInParams)})"
                                 );
+                                break;
                             }
+
+                            throw new NotSupportedException(
+                                $"Unsupported method call inside Not: {notContains.Method.Name}"
+                            );
                         }
-                        break;
+
+                        // !x.IsActive  (boolean member)  → emit "{col} = 0"
+                        if (
+                            expression is UnaryExpression unaryMember
+                            && unaryMember.Operand is MemberExpression notMember
+                            && (notMember.Type == typeof(bool) || notMember.Type == typeof(bool?))
+                        )
+                        {
+                            memberName = GetMemberName(notMember);
+                            paramName = GetUniqueParameterName(memberName);
+                            _parameters[paramName] = false;
+                            conditions.Add(
+                                $"{_sqlAdapter.ConvertColumnName(memberName)} = {paramName}"
+                            );
+                            break;
+                        }
+
+                        // !(arbitrary expression)  → emit "NOT (...)"
+                        if (expression is UnaryExpression unaryWrap)
+                        {
+                            var inner = new List<string>();
+                            Visit(unaryWrap.Operand, inner);
+                            if (inner.Count == 0)
+                            {
+                                throw new NotSupportedException(
+                                    $"Unsupported operand inside Not: {unaryWrap.Operand.NodeType}"
+                                );
+                            }
+                            conditions.Add("NOT");
+                            conditions.Add("(");
+                            foreach (var part in inner)
+                                conditions.Add(part);
+                            conditions.Add(")");
+                            break;
+                        }
+
+                        throw new NotSupportedException(
+                            "Unsupported Not expression shape; expected UnaryExpression."
+                        );
 
                     case ExpressionType.Convert:
                     case ExpressionType.TypeAs:
