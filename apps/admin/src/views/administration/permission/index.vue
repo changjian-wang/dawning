@@ -690,9 +690,9 @@
       overflow: hidden;
 
       :deep(.arco-table-th) {
-        background-color: #f7f8fa;
+        background-color: var(--color-fill-2);
         font-weight: 600;
-        color: #1d2129;
+        color: var(--color-text-1);
 
         &:last-child {
           .arco-table-th-item-title {
@@ -705,7 +705,7 @@
         transition: all 0.3s ease;
 
         &:hover {
-          background-color: #f7f8fa;
+          background-color: var(--color-fill-2);
           transform: scale(1.002);
         }
       }

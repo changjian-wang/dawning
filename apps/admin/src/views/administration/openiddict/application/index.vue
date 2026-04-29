@@ -718,7 +718,7 @@
     }
 
     :deep(.arco-table-th) {
-      background-color: #f7f8fa;
+      background-color: var(--color-fill-2);
       font-weight: 600;
     }
   }
