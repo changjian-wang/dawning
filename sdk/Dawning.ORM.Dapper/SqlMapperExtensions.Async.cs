@@ -636,9 +636,12 @@ namespace Dawning.ORM.Dapper
 
                 string whereClause = _conditions.Count > 0 ? string.Join(" ", _conditions) : "1=1";
                 var parameters = ConvertToDynamicParameters();
+                var selectClause = BuildSelectClause();
 
-                var sql = $"SELECT * FROM {name} WHERE {whereClause}";
+                var distinctKeyword = _distinct ? "DISTINCT " : "";
+                var sql = $"SELECT {distinctKeyword}{selectClause} FROM {name} WHERE {whereClause}";
                 sql += BuildOrderByClause();
+                sql = ApplySkipTake(sql);
 
                 var list = await _connection.QueryAsync(
                     sql,

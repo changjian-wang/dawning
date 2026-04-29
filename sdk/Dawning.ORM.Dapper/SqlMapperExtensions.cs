@@ -288,12 +288,22 @@ namespace Dawning.ORM.Dapper
         /// Materializes one entity from a row dictionary. Handles nullable types, DBNull,
         /// Guid, DateTime, and enum values explicitly to avoid Convert.ChangeType edge cases.
         /// </summary>
+        /// <remarks>
+        /// Iterates the full set of writable CLR properties, including those marked
+        /// <c>[Write(false)]</c> and <c>[Computed]</c>. Those attributes only suppress
+        /// outbound INSERT/UPDATE writes; the values must still flow back from SELECT.
+        /// </remarks>
         private static T MapRow<T>(IDictionary<string, object> row, Type type)
             where T : class, new()
         {
             T obj = new T();
-            foreach (var property in TypePropertiesCache(type))
+            foreach (
+                var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            )
             {
+                if (!property.CanWrite || property.GetIndexParameters().Length > 0)
+                    continue;
+
                 var name = property.GetCustomAttribute<ColumnAttribute>()?.Name ?? property.Name;
 
                 if (!row.TryGetValue(name, out var val))
@@ -1602,21 +1612,34 @@ namespace Dawning.ORM.Dapper
                     return sql;
                 }
 
-                // MySQL, PostgreSQL, SQLite
-                if (
-                    sqlAdapter is MySqlAdapter
-                    || sqlAdapter is PostgresAdapter
-                    || sqlAdapter is SQLiteAdapter
-                )
+                if (sqlAdapter is MySqlAdapter)
                 {
+                    // MySQL requires LIMIT before OFFSET. Use the documented sentinel
+                    // when skipping without an explicit limit.
                     if (_takeCount.HasValue)
-                    {
                         sql += $" LIMIT {_takeCount.Value}";
-                    }
+                    else if (_skipCount.HasValue)
+                        sql += " LIMIT 18446744073709551615";
                     if (_skipCount.HasValue)
-                    {
                         sql += $" OFFSET {_skipCount.Value}";
-                    }
+                }
+                else if (sqlAdapter is SQLiteAdapter)
+                {
+                    // SQLite requires LIMIT before OFFSET. -1 means "no upper bound".
+                    if (_takeCount.HasValue)
+                        sql += $" LIMIT {_takeCount.Value}";
+                    else if (_skipCount.HasValue)
+                        sql += " LIMIT -1";
+                    if (_skipCount.HasValue)
+                        sql += $" OFFSET {_skipCount.Value}";
+                }
+                else if (sqlAdapter is PostgresAdapter)
+                {
+                    // PostgreSQL accepts standalone OFFSET.
+                    if (_takeCount.HasValue)
+                        sql += $" LIMIT {_takeCount.Value}";
+                    if (_skipCount.HasValue)
+                        sql += $" OFFSET {_skipCount.Value}";
                 }
                 // SQL Server 2012+ (requires ORDER BY)
                 else if (sqlAdapter is SqlServerAdapter || sqlAdapter is SqlCeServerAdapter)
