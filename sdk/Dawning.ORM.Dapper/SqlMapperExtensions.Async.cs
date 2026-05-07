@@ -55,7 +55,13 @@ namespace Dawning.ORM.Dapper
                     commandTimeout: commandTimeout
                 )
             ).FirstOrDefault();
-            return GetImpl<T>(obj, type);
+            // Cast to object so the call to GetImpl<T> binds statically.
+            // Without this cast 'obj' is 'dynamic' and the compiler emits a
+            // CallSite; at runtime the dynamic binder tries to convert the
+            // dispatch result back to 'T?' and fails with RuntimeBinderException
+            // "Cannot implicitly convert type 'object' to 'T'" for any reference
+            // T because no implicit object→T conversion exists.
+            return GetImpl<T>((object?)obj, type);
         }
 
         /// <summary>
