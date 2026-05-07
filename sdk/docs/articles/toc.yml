@@ -2,3 +2,5 @@
   href: getting-started.md
 - name: 示例代码
   href: samples.md
+- name: NuGet 版本下架与隐藏策略
+  href: nuget-version-listing.md

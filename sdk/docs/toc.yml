@@ -4,5 +4,7 @@
   href: articles/getting-started.md
 - name: 示例代码
   href: articles/samples.md
+- name: NuGet 版本下架与隐藏策略
+  href: articles/nuget-version-listing.md
 - name: API 参考
   href: api/
