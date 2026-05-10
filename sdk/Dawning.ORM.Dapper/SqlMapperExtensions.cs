@@ -382,12 +382,30 @@ namespace Dawning.ORM.Dapper
         {
             // Fast path: provider already returned the target CLR type (very
             // common for byte[], DateTimeOffset on PG, TimeSpan on MySQL, etc.).
-            // Doing this before the type-specific branches also lets a custom
-            // type handler short-circuit Convert.ChangeType, which would
-            // otherwise throw on non-IConvertible types.
             if (targetType.IsInstanceOfType(val))
             {
                 return val;
+            }
+            // Dispatch to a Dapper-registered ITypeHandler before falling
+            // through to the hard-coded scalar coercions. The write path
+            // (InsertAsync / UpdateAsync) already routes JsonDocument /
+            // pgvector / NodaTime / etc. through SqlMapper.LookupDbType, so
+            // the read path must do the same to keep round-trips symmetric.
+            // Without this dispatch, a registered TypeHandler<T> would never
+            // be invoked on SELECT and Convert.ChangeType would throw on
+            // every non-IConvertible target (e.g. JsonDocument, Vector).
+            //
+            // Dapper 2.1.66 marks LookupDbType obsolete with the message
+            // "for internal use only", but it remains the sole public entry
+            // point into the type-handler registry. Until Dapper exposes a
+            // supported alternative we accept the suppression here; the read
+            // path simply cannot honor user-registered handlers otherwise.
+#pragma warning disable CS0618 // Type or member is obsolete
+            SqlMapper.LookupDbType(targetType, "_", false, out var typeHandler);
+#pragma warning restore CS0618
+            if (typeHandler is not null)
+            {
+                return typeHandler.Parse(targetType, val)!;
             }
             if (targetType == typeof(Guid))
             {

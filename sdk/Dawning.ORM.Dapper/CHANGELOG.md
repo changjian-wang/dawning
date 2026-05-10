@@ -79,6 +79,22 @@ post-Phase-5 deep audit, fixed in this release:
   threw at materialization time. Also added explicit branches for
   `DateTimeOffset` and `TimeSpan` (parse-from-string fallback) and
   string-based enum parsing.
+- **Read path now dispatches to `SqlMapper.TypeHandler<T>` registrations,
+  matching the write path.** `Insert*` / `Update*` routes parameter
+  binding through `Dapper.Execute`, which consults
+  `SqlMapper.LookupDbType` and invokes user-registered handlers — so
+  `JsonDocument`, `Pgvector.Vector`, NodaTime values, and other
+  non-`IConvertible` CLR types persist correctly. `Get` / `GetAll` /
+  `QueryBuilder.AsList` / `AsPagedList` went through Dawning's own
+  `MapRow` → `ConvertScalar` and only knew about `Guid` / `DateTime` /
+  `DateTimeOffset` / `TimeSpan` / enum, so any registered handler for a
+  non-`IConvertible` target was silently ignored on SELECT and threw
+  `"Invalid cast from System.String to ..."`. `ConvertScalar` now calls
+  `SqlMapper.LookupDbType(targetType, "_", false, out var handler)`
+  immediately after the `IsInstanceOfType` fast path, before the
+  hard-coded scalar coercions, so read and write share a single
+  TypeHandler registry. New `TypeHandlerReadPathTests` regression suite
+  (SQLite + `JsonDocument`) pins the contract for all four read APIs.
 - **`SqlMapperExtensions.TableNameMapper` swap now invalidates the
   table-name cache.** `GetTableName` cached the resolved name keyed
   only by `RuntimeTypeHandle`, so reassigning the global mapper at
