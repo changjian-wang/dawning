@@ -264,8 +264,9 @@ public class UserService(IMapper mapper)  // Don't do this!
 | git-workflow | 提交规范、pre-commit 检查 | git, commit, push, branch, tag |
 | markdown | Markdown/XML 文档规范 | markdown, 写文档, README, API docs |
 | changelog | CHANGELOG 格式、release notes | changelog, 变更日志, release notes |
-| code-review | 代码审查（9 维度：代码风格、DI、Mapper、API、DB、安全、性能、异常、测试） | 审查, review, check code, code review |
+| code-review | 代码审查（两轴：Standards 是否守规范 × Spec 是否忠实实现原始 issue/PRD） | 审查, review, check code, code review |
 | code-patterns | 编码模式：静态 AutoMapper、UnitOfWork 服务、异常处理、常量定义 | mapper, AutoMapper, 异常处理, 常量, constants, refactor |
+| vertical-slice | 垂直切片纪律：端到端薄切片、HITL/AFK 标注、`create-database → create-api → create-tests → create-vue-page` 串行 | 切片, slice, 端到端, 切多大, HITL, AFK, 跨层 |
 | create-api | API 端点脚手架：DTO → Mapper → Service → Controller | 创建 API, create api, 新增接口, endpoint |
 | create-vue-page | Vue 3 页面脚手架：Arco Design、i18n、路由 | 创建页面, create page, vue page, 前端页面 |
 | create-database | MySQL 表结构 + Entity + Repository 脚手架 | 创建表, create table, 数据库, database, entity |
@@ -273,7 +274,7 @@ public class UserService(IMapper mapper)  // Don't do this!
 | create-domain-event | 领域事件 + 处理器脚手架 | 领域事件, domain event, 事件处理 |
 | create-sdk-feature | SDK 包功能脚手架：扩展方法、服务、中间件 | SDK, create feature, 新增功能, NuGet |
 | deployment | Docker 配置：.NET 8 多阶段构建、Vue 3 Nginx、docker-compose | Docker, 部署, deploy, Dockerfile, compose |
-| troubleshooting | 调试排错：常见错误诊断、日志分析 | 调试, debug, 排错, troubleshoot, error |
+| troubleshooting | 调试六段法：repro → 假设 → 探针 → 修复 → 回归测试 → 清理；反馈回路 < 30s | 调试, debug, 排错, troubleshoot, error, regression |
 | performance | 性能分析：N+1 查询、内存分配、异步模式、缓存 | 性能, performance, 优化, optimize, N+1 |
 | architecture | 项目架构：DDD 分层、Mermaid 图表、模块边界 | 架构, architecture, 分层, diagram |
 
