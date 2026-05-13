@@ -267,6 +267,8 @@ public class UserService(IMapper mapper)  // Don't do this!
 | code-review | 代码审查（两轴：Standards 是否守规范 × Spec 是否忠实实现原始 issue/PRD） | 审查, review, check code, code review |
 | code-patterns | 编码模式：静态 AutoMapper、UnitOfWork 服务、异常处理、常量定义 | mapper, AutoMapper, 异常处理, 常量, constants, refactor |
 | vertical-slice | 垂直切片纪律：端到端薄切片、HITL/AFK 标注、`create-database → create-api → create-tests → create-vue-page` 串行 | 切片, slice, 端到端, 切多大, HITL, AFK, 跨层 |
+| grill-before-scaffold | 模糊需求先反问 7 个维度（实体/唯一性/鉴权/分页/错误/UI/切片边界），定下来再写代码 | 模糊需求, 不清楚, 反问, grill, 需求澄清, 先做个简单的 |
+| prototype | 一次性 prototype 纪律：2-3 候选实测、一个 prototype 一个问题、跑完必删或吸收，结论入 ADR/NOTES | prototype, 原型, spike, 实测对比, 选型实验 |
 | create-api | API 端点脚手架：DTO → Mapper → Service → Controller | 创建 API, create api, 新增接口, endpoint |
 | create-vue-page | Vue 3 页面脚手架：Arco Design、i18n、路由 | 创建页面, create page, vue page, 前端页面 |
 | create-database | MySQL 表结构 + Entity + Repository 脚手架 | 创建表, create table, 数据库, database, entity |
