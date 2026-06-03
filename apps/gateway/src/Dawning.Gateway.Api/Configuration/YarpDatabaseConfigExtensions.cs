@@ -1,4 +1,3 @@
-using Dawning.Identity.Application.Interfaces;
 using Yarp.ReverseProxy.Configuration;
 
 namespace Dawning.Gateway.Api.Configuration;
@@ -64,7 +63,7 @@ public static class YarpDatabaseConfigExtensions
                     {
                         logger.LogError(ex, "Failed to reload gateway configuration");
                         return Results.Problem(
-                            detail: ex.Message,
+                            detail: "An internal error occurred while reloading the configuration.",
                             statusCode: 500,
                             title: "Failed to reload configuration"
                         );
