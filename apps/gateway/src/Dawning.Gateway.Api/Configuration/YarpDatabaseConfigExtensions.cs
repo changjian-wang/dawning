@@ -7,6 +7,8 @@ namespace Dawning.Gateway.Api.Configuration;
 /// </summary>
 public static class YarpDatabaseConfigExtensions
 {
+    private static readonly SemaphoreSlim ReloadGate = new(1, 1);
+
     /// <summary>
     /// Add database configuration provider
     /// </summary>
@@ -51,6 +53,16 @@ public static class YarpDatabaseConfigExtensions
                     ILogger<DatabaseProxyConfigProvider> logger
                 ) =>
                 {
+                    if (!await ReloadGate.WaitAsync(0))
+                    {
+                        logger.LogWarning("Gateway configuration reload already in progress");
+                        return Results.Problem(
+                            detail: "A configuration reload is already in progress. Please retry later.",
+                            statusCode: 409,
+                            title: "Reload already in progress"
+                        );
+                    }
+
                     try
                     {
                         await configProvider.ReloadConfigAsync();
@@ -67,6 +79,10 @@ public static class YarpDatabaseConfigExtensions
                             statusCode: 500,
                             title: "Failed to reload configuration"
                         );
+                    }
+                    finally
+                    {
+                        ReloadGate.Release();
                     }
                 }
             )
