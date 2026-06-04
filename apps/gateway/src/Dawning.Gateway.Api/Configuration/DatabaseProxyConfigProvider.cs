@@ -14,6 +14,7 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
     private volatile DatabaseProxyConfig _config;
     private CancellationTokenSource _changeTokenSource;
     private readonly object _lock = new();
+    private bool _disposed;
 
     public DatabaseProxyConfigProvider(
         IGatewayConfigService configService,
@@ -75,6 +76,11 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
     {
         lock (_lock)
         {
+            if (_disposed)
+            {
+                return;
+            }
+
             var oldTokenSource = _changeTokenSource;
             _changeTokenSource = new CancellationTokenSource();
 
@@ -85,15 +91,40 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
             );
 
             // Trigger configuration change
-            oldTokenSource.Cancel();
-            oldTokenSource.Dispose();
+            try
+            {
+                oldTokenSource.Cancel();
+            }
+            finally
+            {
+                oldTokenSource.Dispose();
+            }
         }
     }
 
     public void Dispose()
     {
-        _changeTokenSource?.Cancel();
-        _changeTokenSource?.Dispose();
+        lock (_lock)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            var tokenSource = _changeTokenSource;
+            _changeTokenSource = null;
+            try
+            {
+                tokenSource?.Cancel();
+            }
+            finally
+            {
+                tokenSource?.Dispose();
+            }
+        }
+
+        GC.SuppressFinalize(this);
     }
 }
 
