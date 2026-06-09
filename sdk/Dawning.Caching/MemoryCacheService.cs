@@ -57,7 +57,7 @@ public class MemoryCacheService : ICacheService
     /// <inheritdoc />
     public async Task<T?> GetOrSetAsync<T>(
         string key,
-        Func<Task<T>> factory,
+        Func<Task<T?>> factory,
         TimeSpan? expiration = null,
         CancellationToken cancellationToken = default
     )
@@ -69,7 +69,10 @@ public class MemoryCacheService : ICacheService
         }
 
         var value = await factory();
-        await SetAsync(key, value, expiration, cancellationToken);
+        if (value is not null)
+        {
+            await SetAsync(key, value, expiration, cancellationToken);
+        }
         return value;
     }
 

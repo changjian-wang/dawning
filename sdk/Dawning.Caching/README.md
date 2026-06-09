@@ -46,10 +46,12 @@ builder.Services.AddDawningRedisCache("localhost:6379", options =>
 public class UserService
 {
     private readonly ICacheService _cache;
+    private readonly IUserRepository _userRepository;
 
-    public UserService(ICacheService cache)
+    public UserService(ICacheService cache, IUserRepository userRepository)
     {
         _cache = cache;
+        _userRepository = userRepository;
     }
 
     public async Task<User?> GetUserAsync(int id)
@@ -99,3 +101,4 @@ public class UserService
 | `RemoveByPatternAsync(pattern)` | 按模式移除缓存（仅内存缓存） |
 | `ExistsAsync(key)` | 检查缓存是否存在 |
 | `RefreshAsync(key, expiration)` | 刷新缓存过期时间 |
+

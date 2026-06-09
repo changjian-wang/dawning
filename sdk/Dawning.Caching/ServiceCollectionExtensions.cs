@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Dawning.Caching;
 
@@ -34,18 +35,25 @@ public static class CachingServiceCollectionExtensions
         switch (options.Provider)
         {
             case CacheProvider.Redis:
+                if (options.Redis is null)
+                {
+                    throw new ArgumentNullException(
+                        nameof(options.Redis),
+                        "Redis options must be configured when using CacheProvider.Redis."
+                    );
+                }
                 services.AddStackExchangeRedisCache(redisOptions =>
                 {
                     redisOptions.Configuration = options.Redis.ConnectionString;
                     redisOptions.InstanceName = options.Redis.InstanceName;
                 });
-                services.AddSingleton<ICacheService, RedisCacheService>();
+                services.TryAddSingleton<ICacheService, RedisCacheService>();
                 break;
 
             case CacheProvider.Memory:
             default:
                 services.AddMemoryCache();
-                services.AddSingleton<ICacheService, MemoryCacheService>();
+                services.TryAddSingleton<ICacheService, MemoryCacheService>();
                 break;
         }
 
@@ -65,8 +73,8 @@ public static class CachingServiceCollectionExtensions
     {
         return services.AddDawningCaching(options =>
         {
-            options.Provider = CacheProvider.Memory;
             configure?.Invoke(options);
+            options.Provider = CacheProvider.Memory;
         });
     }
 
@@ -83,11 +91,13 @@ public static class CachingServiceCollectionExtensions
         Action<CacheOptions>? configure = null
     )
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(connectionString);
+
         return services.AddDawningCaching(options =>
         {
+            configure?.Invoke(options);
             options.Provider = CacheProvider.Redis;
             options.Redis.ConnectionString = connectionString;
-            configure?.Invoke(options);
         });
     }
 }

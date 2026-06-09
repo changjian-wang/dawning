@@ -18,7 +18,14 @@ public class CacheOptions
     /// <summary>
     /// Default expiration time in minutes
     /// </summary>
-    public int DefaultExpirationMinutes { get; set; } = 30;
+    private int _defaultExpirationMinutes = 30;
+    public int DefaultExpirationMinutes
+    {
+        get => _defaultExpirationMinutes;
+        set => _defaultExpirationMinutes = value > 0
+            ? value
+            : throw new ArgumentOutOfRangeException(nameof(value), value, "DefaultExpirationMinutes must be greater than 0.");
+    }
 
     /// <summary>
     /// Key prefix
@@ -47,9 +54,16 @@ public class RedisOptions
     public string InstanceName { get; set; } = "Dawning:";
 
     /// <summary>
-    /// Database index
+    /// Database index (valid range: 0–15 with default Redis configuration)
     /// </summary>
-    public int Database { get; set; } = 0;
+    private int _database = 0;
+    public int Database
+    {
+        get => _database;
+        set => _database = value is >= 0 and <= 15
+            ? value
+            : throw new ArgumentOutOfRangeException(nameof(value), value, "Database index must be between 0 and 15.");
+    }
 }
 
 /// <summary>

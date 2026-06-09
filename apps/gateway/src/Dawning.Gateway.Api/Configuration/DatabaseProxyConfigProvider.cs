@@ -11,10 +11,12 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
 {
     private readonly IGatewayConfigService _configService;
     private readonly ILogger<DatabaseProxyConfigProvider> _logger;
-    private volatile DatabaseProxyConfig _config;
+    private DatabaseProxyConfig _config;
     private CancellationTokenSource _changeTokenSource;
     private readonly object _lock = new();
     private bool _disposed;
+    private readonly TaskCompletionSource _initTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private volatile bool _initialized;
 
     public DatabaseProxyConfigProvider(
         IGatewayConfigService configService,
@@ -31,7 +33,19 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
         );
     }
 
-    public IProxyConfig GetConfig() => _config;
+    public IProxyConfig GetConfig()
+    {
+        if (!_initialized)
+        {
+            // 阻塞等待首次 LoadConfigAsync 完成，确保不会返回空配置
+            _initTcs.Task.GetAwaiter().GetResult();
+        }
+
+        lock (_lock)
+        {
+            return _config;
+        }
+    }
 
     /// <summary>
     /// Load configuration from database
@@ -52,10 +66,13 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable
             );
 
             UpdateConfig(routes, clusters);
+            _initTcs.TrySetResult();
+            _initialized = true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load YARP configuration from database");
+            _initTcs.TrySetException(ex);
             throw;
         }
     }

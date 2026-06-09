@@ -64,7 +64,7 @@ public class RedisCacheService : ICacheService
     /// <inheritdoc />
     public async Task<T?> GetOrSetAsync<T>(
         string key,
-        Func<Task<T>> factory,
+        Func<Task<T?>> factory,
         TimeSpan? expiration = null,
         CancellationToken cancellationToken = default
     )
@@ -76,6 +76,11 @@ public class RedisCacheService : ICacheService
         }
 
         var value = await factory();
+        if (value is null)
+        {
+            return default;
+        }
+
         await SetAsync(key, value, expiration, cancellationToken);
         return value;
     }
@@ -114,7 +119,17 @@ public class RedisCacheService : ICacheService
     )
     {
         var fullKey = GetFullKey(key);
-        await _cache.RefreshAsync(fullKey, cancellationToken);
+        var data = await _cache.GetStringAsync(fullKey, cancellationToken);
+        if (string.IsNullOrEmpty(data))
+        {
+            return;
+        }
+
+        var options = new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = expiration,
+        };
+        await _cache.SetStringAsync(fullKey, data, options, cancellationToken);
     }
 
     private string GetFullKey(string key)
