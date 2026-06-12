@@ -4,6 +4,7 @@ using OpenIddict.Abstractions;
 using OpenIddict.Validation.AspNetCore;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using ApplicationEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Application;
+using ScopeEntity = Dawning.Identity.Domain.Aggregates.OpenIddict.Scope;
 
 namespace Dawning.Identity.Api.Configurations
 {
@@ -17,7 +18,8 @@ namespace Dawning.Identity.Api.Configurations
         /// </summary>
         public static IServiceCollection AddOpenIddictConfiguration(
             this IServiceCollection services,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IWebHostEnvironment environment
         )
         {
             // Disable default claim type mapping to preserve original claim names
@@ -32,19 +34,14 @@ namespace Dawning.Identity.Api.Configurations
                     OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
             });
 
-            // Configure Authorization to use OpenIddict claim types
             services.AddAuthorization();
-            services.Configure<Microsoft.AspNetCore.Authentication.AuthenticationOptions>(options =>
-            {
-                // Ensure ClaimsPrincipal uses OpenIddict claim types
-            });
 
             // Register custom Stores (based on Dapper Repository)
             services.AddScoped<
                 IOpenIddictApplicationStore<ApplicationEntity>,
                 OpenIddictApplicationStore
             >();
-            services.AddScoped<IOpenIddictScopeStore<Scope>, OpenIddictScopeStore>();
+            services.AddScoped<IOpenIddictScopeStore<ScopeEntity>, OpenIddictScopeStore>();
             services.AddScoped<
                 IOpenIddictAuthorizationStore<Authorization>,
                 OpenIddictAuthorizationStore
@@ -59,7 +56,7 @@ namespace Dawning.Identity.Api.Configurations
                     // Use custom Stores (based on Dapper + MySQL)
                     options
                         .SetDefaultApplicationEntity<ApplicationEntity>()
-                        .SetDefaultScopeEntity<Scope>()
+                        .SetDefaultScopeEntity<ScopeEntity>()
                         .SetDefaultAuthorizationEntity<Authorization>()
                         .SetDefaultTokenEntity<Token>();
 
@@ -86,7 +83,19 @@ namespace Dawning.Identity.Api.Configurations
                         .SetRevocationEndpointUris("/connect/revoke");
 
                     // Register signing and encryption credentials
-                    if (configuration.GetValue<bool>("OpenIddict:UseDevelopmentCertificate"))
+                    var useDevelopmentCertificate = configuration.GetValue<bool>(
+                        "OpenIddict:UseDevelopmentCertificate"
+                    );
+
+                    // Fail fast: development certificates must never be used outside the development environment
+                    if (useDevelopmentCertificate && !environment.IsDevelopment())
+                    {
+                        throw new InvalidOperationException(
+                            $"OpenIddict:UseDevelopmentCertificate=true is not allowed in environment '{environment.EnvironmentName}'. Development certificates and disabling transport security are only permitted when the host is running in the Development environment."
+                        );
+                    }
+
+                    if (useDevelopmentCertificate && environment.IsDevelopment())
                     {
                         // Use temporary certificates in development environment
                         options
@@ -119,15 +128,13 @@ namespace Dawning.Identity.Api.Configurations
                         var encryptionCert = CertificateLoader.LoadCertificate(
                             certConfig.Encryption
                         );
-                        if (encryptionCert != null)
+                        if (encryptionCert == null)
                         {
-                            options.AddEncryptionCertificate(encryptionCert);
+                            throw new InvalidOperationException(
+                                "Encryption certificate could not be loaded; a dedicated encryption certificate is required in production (reusing the signing certificate is not allowed)"
+                            );
                         }
-                        else
-                        {
-                            // If no encryption certificate is configured, use signing certificate
-                            options.AddEncryptionCertificate(signingCert);
-                        }
+                        options.AddEncryptionCertificate(encryptionCert);
                     }
 
                     // Register scopes
@@ -162,13 +169,18 @@ namespace Dawning.Identity.Api.Configurations
                     );
 
                     // Configure ASP.NET Core integration
-                    options
+                    var aspNetCoreBuilder = options
                         .UseAspNetCore()
                         .EnableTokenEndpointPassthrough()
                         .EnableAuthorizationEndpointPassthrough()
                         .EnableUserinfoEndpointPassthrough()
-                        .EnableLogoutEndpointPassthrough()
-                        .DisableTransportSecurityRequirement(); // Only disabled in development, HTTPS should be enabled in production
+                        .EnableLogoutEndpointPassthrough();
+
+                    // Only disable transport security in development; HTTPS must stay enforced in production
+                    if (useDevelopmentCertificate && environment.IsDevelopment())
+                    {
+                        aspNetCoreBuilder.DisableTransportSecurityRequirement();
+                    }
                 })
                 // Register OpenIddict Validation components
                 .AddValidation(options =>
