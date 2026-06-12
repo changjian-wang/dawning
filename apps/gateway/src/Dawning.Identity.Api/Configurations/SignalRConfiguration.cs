@@ -15,14 +15,15 @@ namespace Dawning.Identity.Api.Configurations
         /// </summary>
         public static IServiceCollection AddSignalRConfiguration(
             this IServiceCollection services,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IHostEnvironment environment
         )
         {
             // Add SignalR services
             var signalRBuilder = services.AddSignalR(options =>
             {
                 // Enable detailed error messages (development only)
-                options.EnableDetailedErrors = true;
+                options.EnableDetailedErrors = environment.IsDevelopment();
 
                 // Client timeout (default 30 seconds)
                 options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
@@ -107,10 +108,11 @@ namespace Dawning.Identity.Api.Configurations
                     // Long polling configuration
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(90);
 
-                    // Authorization requirement
-                    options.AllowStatefulReconnects = true;
-                }
-            );
+                            // Stateful reconnect configuration
+                            options.AllowStatefulReconnects = true;
+                        }
+                    )
+                    .RequireAuthorization();
 
             return endpoints;
         }
