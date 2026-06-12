@@ -36,7 +36,7 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 Message = alert.Message,
                 CreatedAt = alert.CreatedAt,
                 Severity = alert.Severity,
-                RuleId = alert.RuleId.HasValue ? Guid.Parse(alert.RuleId.Value.ToString()) : null,
+                RuleId = alert.RuleId,
                 RuleName = alert.RuleName,
                 Source = alert.MetricType,
                 Value = alert.Value,
@@ -44,17 +44,12 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
                 Data = alert.Data,
             };
 
-            // Send to users subscribed to alerts channel
-            await _hubContext
-                .Clients.Group("channel_alerts")
-                .SendAsync("AlertReceived", notification);
-
-            // Also send to administrators
-            await _hubContext.Clients.Group("role_admin").SendAsync("AlertReceived", notification);
-
-            await _hubContext
-                .Clients.Group("role_super_admin")
-                .SendAsync("AlertReceived", notification);
+            // Send in parallel: alerts channel subscribers + administrators
+            await Task.WhenAll(
+                _hubContext.Clients.Group("channel_alerts").SendAsync("AlertReceived", notification),
+                _hubContext.Clients.Group("role_admin").SendAsync("AlertReceived", notification),
+                _hubContext.Clients.Group("role_super_admin").SendAsync("AlertReceived", notification)
+            );
 
             _logger.LogInformation("Alert pushed: {Title} ({Severity})", alert.Title, alert.Severity);
         }
@@ -160,7 +155,7 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
             _logger.LogDebug(
                 "Log pushed: [{Level}] {Message}",
                 logEntry.Level,
-                logEntry.Message.Length > 50 ? logEntry.Message[..50] + "..." : logEntry.Message
+                logEntry.Message?.Length > 50 ? logEntry.Message[..50] + "..." : logEntry.Message
             );
         }
         catch (Exception ex)
@@ -172,9 +167,9 @@ public class SignalRNotificationAdapter : IRealTimeNotificationService
     /// <summary>
     /// Get channel name corresponding to log level
     /// </summary>
-    private static string? GetLevelChannel(string level)
+    private static string? GetLevelChannel(string? level)
     {
-        return level.ToLower() switch
+        return level?.ToLowerInvariant() switch
         {
             "error" or "critical" or "fatal" => "logs_error",
             "warning" or "warn" => "logs_warning",
