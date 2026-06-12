@@ -64,8 +64,12 @@ namespace Dawning.Identity.Api.Configurations
                     }
                 );
 
-                // Display all APIs in both documents
-                options.DocInclusionPredicate((docName, api) => true);
+                // Include APIs in the document matching their GroupName.
+                // APIs without an explicit group are shown in both documents.
+                options.DocInclusionPredicate(
+                    (docName, api) =>
+                        string.IsNullOrEmpty(api.GroupName) || api.GroupName == docName
+                );
 
                 // Add XML comments
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -171,41 +175,41 @@ To obtain a Token, use the `/api/auth/connect/token` endpoint",
         private static string GetChineseDescription()
         {
             return @"
-## Dawning Gateway Identity API (Chinese Version)
+## Dawning Gateway 身份认证 API（中文版）
 
-Dawning Gateway is a fully-featured API gateway and identity authentication system with the following core features:
+Dawning Gateway 是一个功能完备的 API 网关与身份认证系统，具备以下核心功能：
 
-### 🔐 Authentication
-- OAuth 2.0 / OpenID Connect standard protocols
-- JWT Token authentication and refresh
-- Login failure lockout protection
-- Password strength policy validation
+### 🔐 身份认证
+- 支持 OAuth 2.0 / OpenID Connect 标准协议
+- JWT Token 认证与刷新
+- 登录失败锁定保护
+- 密码强度策略校验
 
-### 👥 User Management
-- User CRUD operations
-- Role and permission management
-- Password change and reset
+### 👥 用户管理
+- 用户增删改查
+- 角色与权限管理
+- 密码修改与重置
 
-### 🌐 Gateway Configuration
-- Dynamic routing configuration
-- Cluster management
-- Health checks
+### 🌐 网关配置
+- 动态路由配置
+- 集群管理
+- 健康检查
 
-### 📊 System Administration
-- System configuration management
-- Audit logs
-- Health status monitoring
+### 📊 系统管理
+- 系统配置管理
+- 审计日志
+- 健康状态监控
 
-### ⚡ Error Codes
-| Code | Description |
-|------|-------------|
-| 400 | Bad Request - Invalid parameters |
-| 401 | Unauthorized - Login required |
-| 403 | Forbidden - Insufficient permissions |
-| 404 | Not Found - Resource does not exist |
-| 409 | Conflict - Resource already exists |
-| 429 | Too Many Requests - Rate limit exceeded |
-| 500 | Internal Server Error |
+### ⚡ 错误码
+| 错误码 | 说明 |
+|--------|------|
+| 400 | 请求错误 —— 参数无效 |
+| 401 | 未授权 —— 需要登录 |
+| 403 | 禁止访问 —— 权限不足 |
+| 404 | 未找到 —— 资源不存在 |
+| 409 | 冲突 —— 资源已存在 |
+| 429 | 请求过多 —— 超出速率限制 |
+| 500 | 服务器内部错误 |
 ";
         }
 
