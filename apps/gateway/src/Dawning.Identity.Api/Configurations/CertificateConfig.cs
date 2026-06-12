@@ -84,12 +84,12 @@ namespace Dawning.Identity.Api.Configurations
                 return null;
             }
 
-            return config.Type.ToLowerInvariant() switch
+            return config.Type?.ToLowerInvariant() switch
             {
                 "file" => LoadFromFile(config),
                 "store" => LoadFromStore(config),
-                "azurekeyvault" => throw new NotImplementedException(
-                    "Azure Key Vault integration not implemented yet"
+                "azurekeyvault" => throw new InvalidOperationException(
+                    "Certificate type 'AzureKeyVault' is not supported yet. Please use Type=File or Type=Store instead."
                 ),
                 _ => throw new InvalidOperationException(
                     $"Unknown certificate type: {config.Type}"
@@ -100,7 +100,7 @@ namespace Dawning.Identity.Api.Configurations
         /// <summary>
         /// Load certificate from file
         /// </summary>
-        private static X509Certificate2? LoadFromFile(CertificateSource config)
+        private static X509Certificate2 LoadFromFile(CertificateSource config)
         {
             if (string.IsNullOrEmpty(config.Path))
             {
@@ -112,18 +112,26 @@ namespace Dawning.Identity.Api.Configurations
                 throw new FileNotFoundException($"Certificate file not found: {config.Path}");
             }
 
-            return string.IsNullOrEmpty(config.Password)
-                ? new X509Certificate2(config.Path)
-                : new X509Certificate2(config.Path, config.Password);
+            return X509CertificateLoader.LoadPkcs12FromFile(
+                config.Path,
+                config.Password,
+                X509KeyStorageFlags.DefaultKeySet
+            );
         }
 
         /// <summary>
         /// Load certificate from certificate store
         /// </summary>
-        private static X509Certificate2? LoadFromStore(CertificateSource config)
+        private static X509Certificate2 LoadFromStore(CertificateSource config)
         {
-            var storeLocation = Enum.Parse<StoreLocation>(config.StoreLocation ?? "CurrentUser");
-            var storeName = Enum.Parse<StoreName>(config.StoreName ?? "My");
+            if (!Enum.TryParse<StoreLocation>(config.StoreLocation ?? "CurrentUser", ignoreCase: true, out var storeLocation))
+            {
+                throw new InvalidOperationException(
+                    $"Invalid StoreLocation value: '{config.StoreLocation}'. Valid values are: {string.Join(", ", Enum.GetNames<StoreLocation>())}"
+                );
+            }
+
+            var storeName = string.IsNullOrEmpty(config.StoreName) ? "My" : config.StoreName;
 
             using var store = new X509Store(storeName, storeLocation);
             store.Open(OpenFlags.ReadOnly);
@@ -158,7 +166,55 @@ namespace Dawning.Identity.Api.Configurations
                 throw new InvalidOperationException("Certificate not found in store");
             }
 
-            return certificates[0];
+            var now = DateTime.UtcNow;
+            var all = certificates.OfType<X509Certificate2>().ToList();
+
+            X509Certificate2? selected = null;
+            try
+            {
+                selected = all
+                    .Where(c => c.HasPrivateKey && c.NotAfter > now)
+                    .OrderByDescending(c => c.NotAfter)
+                    .FirstOrDefault();
+
+                // Compute diagnostic stats while certificates are still alive (before Dispose).
+                var total = all.Count;
+                var expiredCount = all.Count(c => c.NotAfter <= now);
+                var noPrivateKeyCount = all.Count(c => !c.HasPrivateKey);
+
+                if (selected == null)
+                {
+                    string reason;
+                    if (total > 0 && expiredCount == total)
+                    {
+                        reason = $"all {total} matching certificate(s) have expired";
+                    }
+                    else if (total > 0 && noPrivateKeyCount == total)
+                    {
+                        reason = $"none of the {total} matching certificate(s) have an accessible private key (check permissions or install the certificate with its private key)";
+                    }
+                    else
+                    {
+                        reason = $"no certificate among the {total} matching one(s) is both non-expired and has an accessible private key ({expiredCount} expired, {noPrivateKeyCount} without private key)";
+                    }
+
+                    throw new InvalidOperationException(
+                        $"No valid certificate found in store: {reason}."
+                    );
+                }
+
+                return selected;
+            }
+            finally
+            {
+                foreach (var c in all)
+                {
+                    if (!ReferenceEquals(c, selected))
+                    {
+                        c.Dispose();
+                    }
+                }
+            }
         }
     }
 }
