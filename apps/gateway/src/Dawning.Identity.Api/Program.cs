@@ -41,7 +41,7 @@ namespace Dawning.Identity.Api
 
             // ===== OpenIddict Configuration =====
             // Uses custom Stores based on Dapper + MySQL
-            builder.Services.AddOpenIddictConfiguration(builder.Configuration);
+            builder.Services.AddOpenIddictConfiguration(builder.Configuration, builder.Environment);
 
             // ===== Security Services =====
             builder.Services.AddScoped<
@@ -193,7 +193,7 @@ namespace Dawning.Identity.Api
             builder.Services.AddHealthChecks();
 
             // ===== SignalR (Real-time Communication) =====
-            builder.Services.AddSignalRConfiguration(builder.Configuration);
+            builder.Services.AddSignalRConfiguration(builder.Configuration, builder.Environment);
 
             // ===== OpenTelemetry =====
             builder.Services.AddOpenTelemetryConfiguration(builder.Configuration);
