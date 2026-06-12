@@ -5,8 +5,19 @@ using Yarp.ReverseProxy.Configuration;
 namespace Dawning.Gateway.Api.Configuration;
 
 /// <summary>
-/// YARP configuration provider - loads route and cluster configuration from database
+/// YARP configuration provider - loads route and cluster configuration from database.
 /// </summary>
+/// <remarks>
+/// 生命周期契约（务必遵守）：本类型持有 <see cref="CancellationTokenSource"/> 及其上由 YARP
+/// 注册的 <see cref="IChangeToken"/> 变更回调。这些资源的回收依赖宿主在关闭时显式调用
+/// <see cref="Dispose"/> 或 <see cref="DisposeAsync"/>。
+/// 因此必须将其注册为由 DI 容器管理生命周期的单例（services.AddSingleton），
+/// 使容器在应用关闭时通过其 Dispose/DisposeAsync 链路释放本实例；
+/// 切勿以「容器外手动 new 且从不释放」的方式长期持有。
+/// 若 Provider 在最后一次 SwapConfig 之后既未 Dispose 也未 DisposeAsync 便随进程结束，
+/// 最后写回的 CancellationTokenSource 上 YARP 注册的变更回调对象将随其存活而无法回收，
+/// 造成轻微内存滞留（CTS 自身在未访问 WaitHandle 时不持有内核句柄）。
+/// </remarks>
 public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable, IAsyncDisposable
 {
     private readonly IGatewayConfigService _configService;
@@ -59,17 +70,16 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable, IA
             // ObjectDisposedException，异常可能逃逸到 YARP 配置加载管线（行为随 YARP 版本而异），
             // 在正常关闭期间产生意外错误日志甚至使反向代理瞬时不可用。
             // 故改为返回一个空 routes/clusters、且 ChangeToken 已立即触发的良性快照，
-            // 让 YARP 拿到「无路由、需立即重载」的状态而非异常。此处用一次性已取消的
-            // CancellationTokenSource 构造 ChangeToken（构造后立即取消并释放），
-            // 不写回 _changeTokenSource 字段，避免引入额外的 CTS 泄漏。
+            // 让 YARP 拿到「无路由、需立即重载」的状态而非异常。此处使用一个不持有任何
+            // 需 Dispose 资源的已触发 IChangeToken（HasChanged=true 且 RegisterChangeCallback
+            // 立即同步回调），既不泄漏 CTS，也避免「对已 Dispose 的 CancellationTokenSource.Token
+            // 调用 Register」抛出的 ObjectDisposedException 逃逸到 YARP 配置加载管线。
             if (_disposed)
             {
-                using var disposedTokenSource = new CancellationTokenSource();
-                disposedTokenSource.Cancel();
                 return new DatabaseProxyConfig(
                     Array.Empty<RouteConfig>(),
                     Array.Empty<ClusterConfig>(),
-                    new CancellationChangeToken(disposedTokenSource.Token)
+                    TriggeredChangeToken.Instance
                 );
             }
 
@@ -107,13 +117,30 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable, IA
             }
             catch (ObjectDisposedException)
             {
-                // 检查通过后到此处之间发生 Dispose 的极端竞态：信号量已释放，放弃本次加载。
+                // 检查通过后到此处之间发生 Dispose 的极端竞态：信号量已释放。
+                // - 启动路径（throwOnFailure=true）必须 fail-fast，向上抛出以中断宿主启动，
+                //   避免「等待信号量时遭遇 Dispose」被误判为成功加载空配置（破坏 fail-fast 契约），
+                //   与 OperationCanceledException 分支在 throwOnFailure 时重新抛出的处理保持一致。
+                // - 后台重载路径（throwOnFailure=false）按本类降级策略静默放弃本次加载、保留旧快照。
+                if (throwOnFailure)
+                {
+                    throw;
+                }
+
                 return;
             }
             catch (OperationCanceledException)
             {
-                // 调用方在等待信号量期间取消：与本类「加载失败降级、保留旧快照」的策略一致，
-                // 静默放弃本次加载而非向上冒泡。此时尚未获取信号量（acquired 仍为 false），无需 Release。
+                // 调用方在等待信号量期间取消：
+                // - 启动路径（throwOnFailure=true）必须 fail-fast，向上抛出以中断宿主启动，
+                //   避免「等待信号量被取消」与「成功加载空配置」对调用方不可区分（破坏 fail-fast 契约）。
+                // - 后台重载路径（throwOnFailure=false）按本类降级策略静默放弃、保留旧快照。
+                // 此时尚未获取信号量（acquired 仍为 false），无需 Release。
+                if (throwOnFailure)
+                {
+                    throw;
+                }
+
                 return;
             }
 
@@ -338,7 +365,9 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable, IA
 
         if (tokenSource is null)
         {
-            // UpdateConfig 已抢先换走并负责释放该实例，这里只需保证 Dispose 幂等。
+            // UpdateConfig 已抢先换走并负责释放该 CTS，这里无需再 Cancel/Dispose 它；
+            // 但仍须按本类统一契约回收 _loadGate（fire-and-forget），与 tokenSource 非 null 路径一致。
+            _ = DisposeLoadGateAsync();
             GC.SuppressFinalize(this);
             return;
         }
@@ -424,29 +453,29 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable, IA
             _lifetimeCts.Dispose();
         }
 
-        if (tokenSource is null)
+        // tokenSource 为 null 表示 UpdateConfig 已抢先换走并负责释放该 CTS，此处无需再 Cancel/Dispose；
+        // 但无论是否为 null，方法末尾都必须确定性回收 _loadGate，故不在此提前 return。
+        if (tokenSource is not null)
         {
-            // UpdateConfig 已抢先换走并负责释放该实例，这里只需保证幂等。
-            return;
-        }
-
-        // 在锁外触发取消：Cancel() 默认会同步执行 IChangeToken 回调，
-        // 回调链路可能访问其他资源，持锁触发会增加重入/死锁面并延长锁持有时间。
-        try
-        {
-            tokenSource.Cancel();
-        }
-        catch (ObjectDisposedException)
-        {
-            // 极端竞态下该 CTS 可能已被并发释放，忽略即可保证幂等。
-        }
-        finally
-        {
-            tokenSource.Dispose();
+            // 在锁外触发取消：Cancel() 默认会同步执行 IChangeToken 回调，
+            // 回调链路可能访问其他资源，持锁触发会增加重入/死锁面并延长锁持有时间。
+            try
+            {
+                tokenSource.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // 极端竞态下该 CTS 可能已被并发释放，忽略即可保证幂等。
+            }
+            finally
+            {
+                tokenSource.Dispose();
+            }
         }
 
         // 与同步 Dispose 不同，这里 await DisposeLoadGateAsync()：确定性等待在途加载释放 _loadGate
         // 后回收信号量（或在 30s 超时后按既有策略放弃 Dispose、交由 GC 回收）。
+        // 该调用对所有路径（含 tokenSource is null 的竞态路径）均执行，履行 DisposeAsync 的回收契约。
         await DisposeLoadGateAsync().ConfigureAwait(false);
     }
 
@@ -512,6 +541,37 @@ public class DatabaseProxyConfigProvider : IProxyConfigProvider, IDisposable, IA
         }
     }
 }
+
+/// <summary>
+/// 一个不可变、已触发的 <see cref="IChangeToken"/>：HasChanged 恒为 true，
+/// RegisterChangeCallback 立即同步执行回调并返回一个无操作的 IDisposable。
+/// 用于在 Provider 已 Dispose 时返回「无路由、需立即重载」的良性快照，
+/// 不持有任何需要 Dispose 的资源，避免依赖已 Dispose 的 CancellationTokenSource。
+/// </summary>
+internal sealed class TriggeredChangeToken : IChangeToken
+{
+    public static readonly TriggeredChangeToken Instance = new();
+
+    private TriggeredChangeToken() { }
+
+    public bool HasChanged => true;
+
+    public bool ActiveChangeCallbacks => false;
+
+    public IDisposable RegisterChangeCallback(Action<object?> callback, object? state)
+    {
+        callback(state);
+        return EmptyDisposable.Instance;
+    }
+
+    private sealed class EmptyDisposable : IDisposable
+    {
+        public static readonly EmptyDisposable Instance = new();
+
+        public void Dispose() { }
+    }
+}
+
 
 /// <summary>
 /// Hosted service that loads the initial YARP configuration during host startup,
